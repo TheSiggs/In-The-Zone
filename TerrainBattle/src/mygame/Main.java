@@ -10,6 +10,8 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -27,7 +29,7 @@ import com.jme3.texture.Texture;
 public class Main extends SimpleApplication {
 
 	float scale = 0.8f;
-	int width = 7;
+	int width = 10;
 	int height = 10;
 	Node boardNode = new Node("board");
 	ColorRGBA colors[] = {
@@ -81,6 +83,15 @@ public class Main extends SimpleApplication {
 		rootNode.attachChild(boardNode);
 		placePlayer(player1, 3, 9);
 		placePlayer(player2, 3, 0);
+		Quaternion quaternion = new Quaternion();
+		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
+		rootNode.rotate(quaternion);
+		//rootNode.rotate(FastMath.QUARTER_PI, 0f, 0f);
+		System.out.println("quat = " + quaternion);
+		Vector3f axis = new Vector3f(1f, -1f, 0).normalizeLocal();
+		
+		quaternion.fromAngleAxis(-FastMath.QUARTER_PI, axis);
+		rootNode.rotate(quaternion);
 	}
 
 	@Override

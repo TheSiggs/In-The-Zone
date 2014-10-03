@@ -31,6 +31,9 @@ public class Main extends SimpleApplication {
 	float scale = 0.8f;
 	int width = 10;
 	int height = 10;
+	long flags = 0;
+	static final long LEFT_ROTATE = 0b1;
+	static final long RIGHT_ROTATE = 0b10;
 	Node boardNode = new Node("board");
 	ColorRGBA colors[] = {
 		new ColorRGBA(0.3f, 0.3f, 0.3f, 0f),
@@ -54,7 +57,7 @@ public class Main extends SimpleApplication {
 			for (int j = 0; j < height; ++j) {
 				x = i * scale;
 				y = -j * scale;
-				String name = i +","+ j;
+				String name = i + "," + j;
 				addBox(name, new Vector3f(x, y, z), colors[j % 2 == 0 ? i % 2 : (i + 1) % 2]);
 			}
 		}
@@ -87,16 +90,44 @@ public class Main extends SimpleApplication {
 		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
 		rootNode.rotate(quaternion);
 		//rootNode.rotate(FastMath.QUARTER_PI, 0f, 0f);
-		System.out.println("quat = " + quaternion);
 		Vector3f axis = new Vector3f(1f, -1f, 0).normalizeLocal();
-		
+
 		quaternion.fromAngleAxis(-FastMath.QUARTER_PI, axis);
 		rootNode.rotate(quaternion);
 	}
+	Quaternion quat = new Quaternion();
+	Vector3f axis = Vector3f.UNIT_Z;
+	float currentX = -1;
+	float currentY = -1;
 
 	@Override
 	public void simpleUpdate(float tpf) {
-		//TODO: add update code
+		if ((flags & LEFT_ROTATE) != 0) {
+			quat.fromAngleAxis(tpf * 3f, axis);
+			rootNode.rotate(quat);
+		}
+		if ((flags & RIGHT_ROTATE) != 0) {
+			quat.fromAngleAxis(-tpf * 3f, axis);
+			rootNode.rotate(quat);
+		}
+		/*
+		if (currentX == -1) {
+			currentX = lastX;
+		}
+
+		if (currentX != -1) {
+			if (lastX < targetX) {
+				currentX += tpf * 0.1f;
+			} else if (lastX > targetX) {
+			}
+			float x = currentX * scale;
+			float y = -targetY * scale;
+			float z = 0.2f * scale;
+			Vector3f translation = new Vector3f(x, y, z);
+			player1.setLocalTranslation(translation);
+			boardNode.attachChild(player1);
+		}
+		*/
 	}
 
 	@Override
@@ -122,14 +153,19 @@ public class Main extends SimpleApplication {
 		mat2.setTexture("ColorMap", cube2Tex);
 		player2.setMaterial(mat2);
 	}
+	int lastX = -1;
+	int lastY = -1;
 
 	private void placePlayer(Geometry geom, int xDir, int yDir) {
+		//walkTowards(geom, xDir, yDir);
 		float x = xDir * scale;
 		float y = -yDir * scale;
 		float z = 0.2f * scale;
 		Vector3f translation = new Vector3f(x, y, z);
 		geom.setLocalTranslation(translation);
 		boardNode.attachChild(geom);
+		lastX = xDir;
+		lastY = yDir;
 	}
 
 	private void initInput() {
@@ -137,11 +173,13 @@ public class Main extends SimpleApplication {
 		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_RIGHT));
 		inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_DOWN));
 		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_LEFT));
+		inputManager.addMapping("A", new KeyTrigger(KeyInput.KEY_A));
+		inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("LeftMouse", new MouseButtonTrigger(
 				MouseInput.BUTTON_LEFT));
 		// Add the names to the action listener.
 		inputManager.addListener(actionListener, "Up", "Right", "Down", "Left",
-				"LeftMouse");
+				"LeftMouse", "A", "D");
 		//inputManager.addListener(analogListener, "Left", "Right", "Rotate");
 
 	}
@@ -149,6 +187,12 @@ public class Main extends SimpleApplication {
 		public void onAction(String name, boolean isPressed, float tpf) {
 			Vector3f pos = player1.getLocalTranslation();
 			if (isPressed) {
+				if (name.equals("A")) {
+					flags |= LEFT_ROTATE;
+				}
+				if (name.equals("D")) {
+					flags |= RIGHT_ROTATE;
+				}
 				if (name.equals("Up")) {
 					pos.addLocal(Vector3f.UNIT_Y.mult(scale));
 					player1.setLocalTranslation(pos);
@@ -168,7 +212,7 @@ public class Main extends SimpleApplication {
 				if (name.equals("LeftMouse")) {
 					System.out.println("Left Mouse");
 					Vector2f mousePos = inputManager.getCursorPosition();
-					System.out.println("Mouse Pos: "+ mousePos);
+					System.out.println("Mouse Pos: " + mousePos);
 
 					CollisionResults results = new CollisionResults();
 					Vector2f click2d = inputManager.getCursorPosition();
@@ -178,6 +222,7 @@ public class Main extends SimpleApplication {
 							new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
 					Ray ray = new Ray(click3d, dir);
 					boardNode.collideWith(ray, results);
+					int iCoord = -1, jCoord = -1;
 					for (int i = 0; i < results.size(); i++) {
 						// For each hit, we know distance, impact point, name of geometry.
 						float dist = results.getCollision(i).getDistance();
@@ -186,14 +231,39 @@ public class Main extends SimpleApplication {
 						System.out.println("* Collision #" + i);
 						System.out.println("  You shot " + hit + " at " + pt + ", " + dist + " wu away.");
 						String coords[] = hit.split(",");
-						int iCoord, jCoord;
 						iCoord = Integer.parseInt(coords[0]);
 						jCoord = Integer.parseInt(coords[1]);
-						placePlayer(player1, iCoord, jCoord);
-						
 					}
+					placePlayer(player1, iCoord, jCoord);
+				}
+			} else {
+				if (name.equals("A")) {
+					flags &= ~LEFT_ROTATE;
+				}
+				if (name.equals("D")) {
+					flags &= ~RIGHT_ROTATE;
 				}
 			}
 		}
 	};
+	int targetX = -1;
+	int targetY = -1;
+
+	private void walkTowards(Geometry geom, int xDir, int yDir) {
+		if ((geom == player1 && lastX == -1) || geom == player2) {
+			float x = xDir * scale;
+			float y = -yDir * scale;
+			float z = 0.2f * scale;
+			Vector3f translation = new Vector3f(x, y, z);
+			geom.setLocalTranslation(translation);
+			boardNode.attachChild(geom);
+			currentX = x;
+			currentY = y;
+		} else {
+			currentX = lastX;
+			currentY = lastY;
+			targetX = xDir;
+			targetY = yDir;
+		}
+	}
 }

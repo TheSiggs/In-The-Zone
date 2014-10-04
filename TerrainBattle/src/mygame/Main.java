@@ -29,11 +29,12 @@ import com.jme3.texture.Texture;
 public class Main extends SimpleApplication {
 
 	float scale = 0.8f;
-	int width = 10;
-	int height = 10;
+	int width = 20;
+	int height = 20;
 	long flags = 0;
 	static final long LEFT_ROTATE = 0b1;
 	static final long RIGHT_ROTATE = 0b10;
+	static final long PLAYER_MOVING = 0b100;
 	Node boardNode = new Node("board");
 	ColorRGBA colors[] = {
 		new ColorRGBA(0.3f, 0.3f, 0.3f, 0f),
@@ -99,35 +100,42 @@ public class Main extends SimpleApplication {
 	Vector3f axis = Vector3f.UNIT_Z;
 	float currentX = -1;
 	float currentY = -1;
+	float rotationSpeed = 1.5f;
+	float travelSpeed = 3f;
+	float percentAlong = 0f;
 
 	@Override
 	public void simpleUpdate(float tpf) {
 		if ((flags & LEFT_ROTATE) != 0) {
-			quat.fromAngleAxis(tpf * 3f, axis);
+			quat.fromAngleAxis(tpf * rotationSpeed, axis);
 			rootNode.rotate(quat);
 		}
 		if ((flags & RIGHT_ROTATE) != 0) {
-			quat.fromAngleAxis(-tpf * 3f, axis);
+			quat.fromAngleAxis(-tpf * rotationSpeed, axis);
 			rootNode.rotate(quat);
 		}
+		if ((flags & PLAYER_MOVING) != 0) {
+			percentAlong += tpf * travelSpeed;
+			setPlayerLocation(player1, startX, startY, targetX, targetY, percentAlong);
+		}
 		/*
-		if (currentX == -1) {
-			currentX = lastX;
-		}
+		 if (currentX == -1) {
+		 currentX = lastX;
+		 }
 
-		if (currentX != -1) {
-			if (lastX < targetX) {
-				currentX += tpf * 0.1f;
-			} else if (lastX > targetX) {
-			}
-			float x = currentX * scale;
-			float y = -targetY * scale;
-			float z = 0.2f * scale;
-			Vector3f translation = new Vector3f(x, y, z);
-			player1.setLocalTranslation(translation);
-			boardNode.attachChild(player1);
-		}
-		*/
+		 if (currentX != -1) {
+		 if (lastX < targetX) {
+		 currentX += tpf * 0.1f;
+		 } else if (lastX > targetX) {
+		 }
+		 float x = currentX * scale;
+		 float y = -targetY * scale;
+		 float z = 0.2f * scale;
+		 Vector3f translation = new Vector3f(x, y, z);
+		 player1.setLocalTranslation(translation);
+		 boardNode.attachChild(player1);
+		 }
+		 */
 	}
 
 	@Override
@@ -156,16 +164,55 @@ public class Main extends SimpleApplication {
 	int lastX = -1;
 	int lastY = -1;
 
-	private void placePlayer(Geometry geom, int xDir, int yDir) {
-		//walkTowards(geom, xDir, yDir);
+	private void setPlayerLocation(Geometry geom, int startX, int startY, int endX, int endY, float along) {
+		if (along > 1f) {
+			percentAlong = 0f;
+			along = 1f;
+			flags &= ~PLAYER_MOVING;
+		}
+		float addX = (endX - startX) * along;
+		float addY = (endY - startY) * along;
+		float x = ((float) startX + addX) * scale;
+		float y = -((float) startY + addY) * scale;
+		float z = 0.2f * scale;
+		Vector3f translation = new Vector3f(x, y, z);
+		geom.setLocalTranslation(translation);
+		boardNode.attachChild(geom);
+	}
+
+	private void setPlayerLocation(Geometry geom, int xDir, int yDir) {
 		float x = xDir * scale;
 		float y = -yDir * scale;
 		float z = 0.2f * scale;
 		Vector3f translation = new Vector3f(x, y, z);
 		geom.setLocalTranslation(translation);
 		boardNode.attachChild(geom);
-		lastX = xDir;
-		lastY = yDir;
+	}
+
+	private void placePlayer(Geometry geom, int xDir, int yDir) {
+		if (lastX == -1) {
+			setPlayerLocation(geom, xDir, yDir);
+			if (geom == player2) {
+				lastX = xDir;
+				lastY = yDir;
+			}
+		} else {
+			walkTo(geom, lastX, lastY, xDir, yDir);
+			lastX = xDir;
+			lastY = yDir;
+		}
+	}
+	int startX = -1;
+	int startY = -1;
+	int targetX = -1;
+	int targetY = -1;
+
+	private void walkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
+		startX = fromX;
+		startY = fromY;
+		targetX = toX;
+		targetY = toY;
+		flags |= PLAYER_MOVING;
 	}
 
 	private void initInput() {
@@ -193,21 +240,19 @@ public class Main extends SimpleApplication {
 				if (name.equals("D")) {
 					flags |= RIGHT_ROTATE;
 				}
+				int x = (int) (pos.x / scale);
+				int y = (int) (-pos.y / scale);
 				if (name.equals("Up")) {
-					pos.addLocal(Vector3f.UNIT_Y.mult(scale));
-					player1.setLocalTranslation(pos);
+					walkTo(player1, x, y, x, y - 1);
 				}
 				if (name.equals("Right")) {
-					pos.addLocal(Vector3f.UNIT_X.mult(scale));
-					player1.setLocalTranslation(pos);
+					walkTo(player1, x, y, x + 1, y);
 				}
 				if (name.equals("Down")) {
-					pos.addLocal(Vector3f.UNIT_Y.mult(-scale));
-					player1.setLocalTranslation(pos);
+					walkTo(player1, x, y, x, y + 1);
 				}
 				if (name.equals("Left")) {
-					pos.addLocal(Vector3f.UNIT_X.mult(-scale));
-					player1.setLocalTranslation(pos);
+					walkTo(player1, x, y, x - 1, y);
 				}
 				if (name.equals("LeftMouse")) {
 					System.out.println("Left Mouse");
@@ -246,8 +291,6 @@ public class Main extends SimpleApplication {
 			}
 		}
 	};
-	int targetX = -1;
-	int targetY = -1;
 
 	private void walkTowards(Geometry geom, int xDir, int yDir) {
 		if ((geom == player1 && lastX == -1) || geom == player2) {

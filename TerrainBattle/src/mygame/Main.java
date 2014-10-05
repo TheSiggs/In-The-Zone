@@ -276,8 +276,10 @@ public class Main extends SimpleApplication {
 						System.out.println("* Collision #" + i);
 						System.out.println("  You shot " + hit + " at " + pt + ", " + dist + " wu away.");
 						String coords[] = hit.split(",");
-						iCoord = Integer.parseInt(coords[0]);
-						jCoord = Integer.parseInt(coords[1]);
+						if (coords.length > 1) {
+							iCoord = Integer.parseInt(coords[0]);
+							jCoord = Integer.parseInt(coords[1]);
+						}
 					}
 					placePlayer(player1, iCoord, jCoord);
 				}

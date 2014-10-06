@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = '1.7'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -33,3 +34,38 @@ dependencies {
 	//compile files('assets.jar', 'eventbus.jar', 'j-ogg-oggd.jar', 'j-ogg-vorbisd.jar', 'jbullet.jar', 'jinput.jar', 'jME3-core.jar', 'jME3-desktop.jar', 'jME3-effects.jar', 'jME3-jbullet.jar', 'jME3-jogg.jar', 'jME3-lwjgl-natives.jar', 'jME3-lwjgl.jar', 'jME3-networking.jar', 'jME3-niftygui.jar', 'jME3-plugins.jar', 'jME3-terrain.jar', 'lwjgl.jar', 'nifty-default-controls.jar', 'nifty-style-black.jar', 'nifty.jar', 'stack-alloc.jar', 'vecmath.jar', 'xmlpull-xpp3.jar')
 	compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
+mainClassName = "nz.dcoder.inthezone.Main"
+startScripts {
+	classpath  = files('libs/*.jar')
+}
+jar {
+    enabled = true
+    baseName = "terrain-battle"
+	version = '0.0.1'
+	manifest.mainAttributes("Main-Class" : "nz.dcoder.inthezone.Main")
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
+
+distZip {
+	into(project.name) {
+        from '.'
+        include 'assets/**', '*.dylib'
+    }
+}
+//apply plugin: 'distribution'
+
+/*
+distributions {
+    main {
+        baseName = 'terrain-battle-dist'
+        contents {
+            from { 'libs' }
+        }
+    }
+}
+*/

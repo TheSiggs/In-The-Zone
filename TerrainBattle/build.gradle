@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
+def mainClass = 'nz.dcoder.inthezone.Main'
 sourceCompatibility = '1.7'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -12,7 +13,7 @@ sourceCompatibility = '1.7'
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'nz.dcoder.inthezone.Main'
+    ext.mainClass = mainClass
 }
 
 repositories {
@@ -26,25 +27,29 @@ repositories {
 }
 
 dependencies {
-    // TODO: Add dependencies here ...
     // You can read more about how to add dependency here:
     //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
     testCompile group: 'junit', name: 'junit', version: '4.10'
-	//compile 'org.cogchar:ext.bundle.opengl.jmonkey:1.1.0'
-	//compile files('assets.jar', 'eventbus.jar', 'j-ogg-oggd.jar', 'j-ogg-vorbisd.jar', 'jbullet.jar', 'jinput.jar', 'jME3-core.jar', 'jME3-desktop.jar', 'jME3-effects.jar', 'jME3-jbullet.jar', 'jME3-jogg.jar', 'jME3-lwjgl-natives.jar', 'jME3-lwjgl.jar', 'jME3-networking.jar', 'jME3-niftygui.jar', 'jME3-plugins.jar', 'jME3-terrain.jar', 'lwjgl.jar', 'nifty-default-controls.jar', 'nifty-style-black.jar', 'nifty.jar', 'stack-alloc.jar', 'vecmath.jar', 'xmlpull-xpp3.jar')
 	compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
-mainClassName = "nz.dcoder.inthezone.Main"
+//applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
+mainClassName = mainClass
 startScripts {
-	classpath  = files('libs/*.jar')
+	classpath  = files('lib/terrain-battle-0.0.1.jar')
 }
 jar {
     enabled = true
     baseName = "terrain-battle"
 	version = '0.0.1'
-	manifest.mainAttributes("Main-Class" : "nz.dcoder.inthezone.Main")
+	manifest {
+		def manifestCp = configurations.runtime.files.collect  {
+        	File file = it
+        	"${file.name}"
+        }.join(' ')
+		attributes 'Class-Path': manifestCp
+		attributes 'Main-Class': mainClass
+	}
 }
 
 task wrapper(type: Wrapper) {
@@ -57,15 +62,3 @@ distZip {
         include 'assets/**', '*.dylib'
     }
 }
-//apply plugin: 'distribution'
-
-/*
-distributions {
-    main {
-        baseName = 'terrain-battle-dist'
-        contents {
-            from { 'libs' }
-        }
-    }
-}
-*/

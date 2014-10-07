@@ -59,6 +59,6 @@ task wrapper(type: Wrapper) {
 distZip {
 	into(project.name) {
         from '.'
-        include 'assets/**', '*.dylib'
+        include 'assets/**', '*.dylib', '*.so'
     }
 }

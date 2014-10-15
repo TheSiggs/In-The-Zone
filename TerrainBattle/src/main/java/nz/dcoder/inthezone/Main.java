@@ -281,7 +281,8 @@ public class Main extends SimpleApplication {
 							jCoord = Integer.parseInt(coords[1]);
 						}
 					}
-					placePlayer(player1, iCoord, jCoord);
+					//placePlayer(player1, iCoord, jCoord);
+					highlightRoute(iCoord, jCoord);
 				}
 			} else {
 				if (name.equals("A")) {
@@ -292,23 +293,11 @@ public class Main extends SimpleApplication {
 				}
 			}
 		}
-	};
 
-	private void walkTowards(Geometry geom, int xDir, int yDir) {
-		if ((geom == player1 && lastX == -1) || geom == player2) {
-			float x = xDir * scale;
-			float y = -yDir * scale;
-			float z = 0.2f * scale;
-			Vector3f translation = new Vector3f(x, y, z);
-			geom.setLocalTranslation(translation);
-			boardNode.attachChild(geom);
-			currentX = x;
-			currentY = y;
-		} else {
-			currentX = lastX;
-			currentY = lastY;
-			targetX = xDir;
-			targetY = yDir;
+		private void highlightRoute(int iCoord, int jCoord) {
+			int lx = lastX;
+			int ly = lastY;
+			
 		}
-	}
+	};
 }

@@ -25,7 +25,7 @@ public class BoardPathFinder {
 			}
 		}
 		BoardNode.board = board;
-		AStarTree astar = new AStarTree();
+		AStarTree astar = new AStarTree(1000);
 		Path path = astar.findPath(start, end);
 		int len = path.getLength();
 		for (int i = 0; i < len; ++i) {

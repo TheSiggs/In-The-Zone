@@ -7,6 +7,7 @@ package nz.dcoder.inthezone;
 import aima.core.agent.Action;
 import aima.core.search.framework.GraphSearch;
 import aima.core.search.framework.Problem;
+import aima.core.search.framework.SearchAgent;
 import aima.core.search.framework.TreeSearch;
 import aima.core.search.informed.AStarSearch;
 import com.jme3.scene.Spatial;
@@ -45,18 +46,20 @@ public class HighlightedRoute {
 		//boardState.addObstacle(x, y, 1);
 		Problem aStarPath = new Problem(boardState, new BoardActions(), 
 				new BoardResultFunction(), new BoardGoalTestFunction());
-		AStarSearch search = new AStarSearch(new GraphSearch(), 
+		GraphSearch graphSearch = new GraphSearch();
+		//graphSearch.setCheckGoalBeforeAddingToFrontier(true);
+		TreeSearch treeSearch = new TreeSearch();
+		
+		AStarSearch search = new AStarSearch(treeSearch, 
 				new BoardHeuristicFunction());
-		List<Action> todoActions = null;
+		SearchAgent agent = null;
 		try {
-			todoActions = search.search(aStarPath);
+			agent = new SearchAgent(aStarPath, search);
 		} catch (Exception ex) {
 			Logger.getLogger(HighlightedRoute.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		if (todoActions != null) {
-			System.out.println("actions: "+ todoActions);
-		} else {
-			System.out.println("No solution found.");
+		if (agent != null) {
+			System.out.println("actions: "+ agent.getActions());
 		}
 	}
 }

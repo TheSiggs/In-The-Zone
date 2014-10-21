@@ -14,6 +14,7 @@ import javax.vecmath.Point2i;
  */
 public class BoardState {
 	//static enum Dir { NORTH, EAST, SOUTH, WEST};
+	static int VISITED = -1;
 
 	int board[][];
 	Point2i position;
@@ -40,10 +41,12 @@ public class BoardState {
 	 * @return 
 	 */
 	public double distanceToEndHeuristic() {
-		return Math.abs(end.x - position.x) + Math.abs(end.y - position.y);
+		return Math.sqrt((end.x*end.x) + (end.y*end.y));
+		//return Math.abs(end.x - position.x) + Math.abs(end.y - position.y);
 	}
 
 	public Point2i move(MoveAction.Dir direction) {
+		this.board[position.x][position.y] = VISITED;
 		switch (direction) {
 			default:
 			case NORTH:
@@ -59,6 +62,12 @@ public class BoardState {
 				position.x--;
 				break;
 		}
+		this.board[position.x][position.y] = VISITED;
 		return position;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return this.position.equals(((BoardState) other).position);
 	}
 }

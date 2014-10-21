@@ -9,7 +9,7 @@ import aima.core.search.framework.ResultFunction;
 
 /**
  *
- * @author informatics-palmerson
+ * @author Tim-Hinnerk Heuer
  */
 public class BoardResultFunction implements ResultFunction {
 
@@ -17,22 +17,7 @@ public class BoardResultFunction implements ResultFunction {
 	public Object result(Object s, Action a) {
 		BoardState state = (BoardState) s;
 		MoveAction action = (MoveAction) a;
-		switch (action.direction) {
-			default:
-			case NORTH:
-				state.position.y++;
-				break;
-			case EAST:
-				state.position.x++;
-				break;
-			case SOUTH:
-				state.position.y--;
-				break;
-			case WEST:
-				state.position.x--;
-				break;
-		}
-		//state.move(action.direction);
+		state.move(action.direction);
 		return state;
 	}
 	

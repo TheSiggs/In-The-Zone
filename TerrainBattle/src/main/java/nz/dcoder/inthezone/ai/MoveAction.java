@@ -42,7 +42,7 @@ public class MoveAction implements Action, Comparable<MoveAction> {
 	
 	@Override
 	public int compareTo(MoveAction o) {
-		return 0;
+		return this.direction == o.direction ? 0 : 1;
 	}
 
 }

@@ -12,7 +12,7 @@ import javax.vecmath.Point2i;
  *
  * @author heuert
  */
-public class BoardNode extends Node{
+public class BoardNode extends Node {
 
 	public static int board[][];
 	private Point2i position;
@@ -50,7 +50,8 @@ public class BoardNode extends Node{
 		BoardNode b = (BoardNode) node;
 		double diffX = this.getPosition().x - b.getPosition().x;
 		double diffY = this.getPosition().y - b.getPosition().y;
-		return (float) Math.sqrt(diffX*diffX + diffY*diffY);
+		float heuristic = (float) Math.sqrt(diffX*diffX + diffY*diffY);
+		return heuristic + cost;
 	}
 
 	@Override
@@ -66,4 +67,11 @@ public class BoardNode extends Node{
 		return position;
 	}
 	
+	public boolean equals(BoardNode o) {
+		return this.position.equals(o.position);
+	}
+
+	public String toString() {
+		return this.position +"|"+ this.cost;
+	}
 }

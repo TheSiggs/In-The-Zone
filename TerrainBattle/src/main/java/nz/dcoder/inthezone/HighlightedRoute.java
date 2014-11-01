@@ -4,10 +4,10 @@
  */
 package nz.dcoder.inthezone;
 
-import aima.core.agent.Action;
 import aima.core.search.framework.GraphSearch;
 import aima.core.search.framework.Problem;
 import aima.core.search.framework.SearchAgent;
+import aima.core.search.framework.TreeSearch;
 import aima.core.search.informed.AStarSearch;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;

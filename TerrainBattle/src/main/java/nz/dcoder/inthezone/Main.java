@@ -41,9 +41,13 @@ public class Main extends SimpleApplication {
 		new ColorRGBA(0.9f, 0.9f, 0.9f, 0f)
 	};
 	Geometry player1, player2;
+	BoardState boardState;
 
 	public Main() {
 		super((AppState) null);
+		boardState = new BoardState().load("board.map");
+		width = boardState.getWidth();
+		height = boardState.getHeight();
 	}
 
 	public static void main(String[] args) {
@@ -59,20 +63,28 @@ public class Main extends SimpleApplication {
 				x = i * scale;
 				y = -j * scale;
 				String name = i + "," + j;
-				addBox(name, new Vector3f(x, y, z), colors[j % 2 == 0 ? i % 2 : (i + 1) % 2]);
+				addBox(name, new Vector3f(x, y, z), 
+						colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
+						boardState.get(i, j));
 			}
 		}
 	}
 
-	private void addBox(String name, Vector3f translation, ColorRGBA color) {
-		Box b = new Box(scale / 2, scale / 2, 0.1f * scale);
+	private void addBox(String name, Vector3f translation, ColorRGBA color, int boardValue) {
+		float offsetZ = boardValue * 0.5f;
+		Box b = new Box(scale / 2, scale / 2, 0.1f * scale + offsetZ);
 		Geometry geom = new Geometry(name, b);
 		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		mat.setColor("Color", color);
+		ColorRGBA real = color.clone();
+		if (boardValue != 0) {
+			real.r = 1f;
+		}
+		mat.setColor("Color", real);
 		Texture cube1Tex = assetManager.loadTexture(
 				"Textures/random_grey_variations.png");
 		mat.setTexture("ColorMap", cube1Tex);
 		geom.setMaterial(mat);
+		//geom.setLocalTranslation(translation.add(Vector3f.UNIT_Z.multLocal(1f * boardValue)));
 		geom.setLocalTranslation(translation);
 		boardNode.attachChild(geom);
 	}

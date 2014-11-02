@@ -90,7 +90,7 @@ public class BoardState implements Serializable {
 		return myBoardState;
 	}
 
-	public void load(String mapFile) {
+	public BoardState load(String mapFile) {
 		List<String> lines = null;
 		Path path = FileSystems.getDefault().getPath("", mapFile);
 		try {
@@ -98,9 +98,23 @@ public class BoardState implements Serializable {
 		} catch (IOException ex) {
 			Logger.getLogger(BoardState.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		int y = 0;
 		for (String line : lines) {
+			if (y == 0) {
+				board = new int[line.length()/2][lines.size()];
+			}
 			System.out.println(line);
+			int len = line.length();
+			for (int x = 0; x < len - 1; x+=2) {
+				char byte1 = line.charAt(x);
+				char byte2 = line.charAt(x + 1);
+				String hex = ""+ byte1 + byte2;
+				int value = Integer.parseInt(hex, 16);
+				board[x/2][y] = value;
+			}
+			++y;
 		}
+		return this;
 	}
 
 	public String toString() {
@@ -117,6 +131,14 @@ public class BoardState implements Serializable {
 			}
 		}
 		return ret;
+	}
+
+	int getWidth() {
+		return board.length;
+	}
+
+	int getHeight() {
+		return board.length > 0 ? board[0].length : 0;
 	}
 	
 }

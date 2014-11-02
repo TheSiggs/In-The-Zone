@@ -14,30 +14,6 @@ import java.util.TreeSet;
  */
 public class BoardSearch {
 	public static void main(String args[]) {
-		int board[][] = new int[][]{
-			{0,0, 0,0},
-			{0,0,-1,0},
-			{0,0,-1,0},
-			{0,0, 0,0}
-		};
-		/*
-		for (int i = 0; i < board.length; ++i) {
-			for (int j = 0; j < board[i].length; ++j) {
-				board[i][j] = 0;
-			}
-		}
-		*/
-		/*
-		int leni = board[0].length;
-		int lenj = board.length;
-		BoardNode.board = new int[leni][lenj];
-		for (int i = 0; i < leni; ++i) {
-			for (int j = 0; j < lenj; ++j) {
-				BoardNode.board[j][i] = board[i][j];
-			}
-		}
-		*/
-		//BoardNode.board = board;
 		SortedSet<Tile> tiles = new TreeSet<>();
 		tiles.add(new Tile(0,0));
 		tiles.add(new Tile(1,0));

@@ -1,7 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'application'
+//apply from: "src/main/resources/project.properties"
 
 def mainClass = 'nz.dcoder.inthezone.Main'
+def jmonkeyengine_version = '3.0'
 sourceCompatibility = '1.7'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -13,25 +15,56 @@ sourceCompatibility = '1.7'
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
 if (!hasProperty('mainClass')) {
-    ext.mainClass = mainClass
+	ext.mainClass = mainClass
 }
 
 repositories {
-    mavenCentral()
-    // You may define additional repositories, or even remove "mavenCentral()".
-    // Read more about repositories here:
-    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+	mavenCentral()
+	// You may define additional repositories, or even remove "mavenCentral()".
+	// Read more about repositories here:
+	//   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+	/*
 	flatDir {
-		dirs 'libs'
+	dirs 'libs'
+	}
+	 */
+	maven {
+		url 'http://updates.jmonkeyengine.org/maven'
+	}
+}
+
+sourceSets {
+	main {
+		//java {
+		//srcDir 'src/main/java'
+		//output.classesDir   = 'build/classes/main'      
+		//}
+		resources {
+			srcDir 'src/main/resources'
+			//include '*.csv'
+			include '*.properties'
+			output.resourcesDir = 'build/resources/main'
+		}
 	}
 }
 
 dependencies {
-    // You can read more about how to add dependency here:
-    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
-    testCompile group: 'junit', name: 'junit', version: '4.10'
+	// You can read more about how to add dependency here:
+	//   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
+	testCompile group: 'junit', name: 'junit', version: '4.10'
 	compile fileTree(dir: 'libs', include: ['*.jar'])
 	compile 'com.googlecode.aima-java:aima-core:0.11.0'
+	compile 'com.jme3:jme3-core:3.0.+'
+	compile 'com.jme3:jme3-effects:3.0.+'
+	compile 'com.jme3:jme3-networking:3.0.+'
+	compile 'com.jme3:jme3-plugins:3.0.+'
+	compile 'com.jme3:jme3-jogg:3.0.+'
+	compile 'com.jme3:jme3-terrain:3.0.+'
+	compile 'com.jme3:jme3-blender:3.0.+'
+	compile 'com.jme3:jme3-jbullet:3.0.+'
+	compile 'com.jme3:jme3-niftygui:3.0.+'
+	compile 'com.jme3:jme3-desktop:3.0.+'
+	compile 'com.jme3:jme3-lwjgl:3.0.+'
 }
 
 //applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
@@ -40,26 +73,26 @@ startScripts {
 	classpath  = files('lib/terrain-battle-0.0.1.jar')
 }
 jar {
-    enabled = true
-    baseName = "terrain-battle"
+	enabled = true
+	baseName = "terrain-battle"
 	version = '0.0.1'
 	manifest {
 		def manifestCp = configurations.runtime.files.collect  {
-        	File file = it
+			File file = it
         	"${file.name}"
-        }.join(' ')
+		}.join(' ')
 		attributes 'Class-Path': manifestCp
 		attributes 'Main-Class': mainClass
 	}
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+	gradleVersion = '2.1'
 }
 
 distZip {
 	into(project.name) {
-        from '.'
-        include 'assets/**', '*.dylib', '*.so'
-    }
+		from '.'
+		include 'assets/**', '*.dylib', '*.so'
+	}
 }

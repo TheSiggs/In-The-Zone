@@ -5,9 +5,9 @@
 package nz.dcoder.inthezone;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.plugins.FileLocator;
+import com.jme3.asset.plugins.ZipLocator;
 import com.jme3.material.Material;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -28,6 +28,8 @@ public class Scene extends SimpleApplication {
 
 	@Override
 	public void simpleInitApp() {
+		assetManager.registerLocator("assets", FileLocator.class);
+		assetManager.registerLocator("assets/town.zip", ZipLocator.class);
 		flyCam.setMoveSpeed(70f);
 		getCamera().setLocation(new Vector3f(-111.59849f,
 				67.81453f, -65.62508f));

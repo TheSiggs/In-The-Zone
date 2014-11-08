@@ -2,6 +2,7 @@ package nz.dcoder.inthezone;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
+import com.jme3.asset.plugins.FileLocator;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -20,6 +21,13 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import nz.dcoder.ai.astar.AStarSearch;
+import nz.dcoder.ai.astar.BoardNode;
+import nz.dcoder.ai.astar.Tile;
+
 
 /**
  * test
@@ -42,12 +50,22 @@ public class Main extends SimpleApplication {
 	};
 	Geometry player1, player2;
 	BoardState boardState;
+	SortedSet<Tile> boardTiles;
 
 	public Main() {
 		super((AppState) null);
 		boardState = new BoardState().load("board.map");
 		width = boardState.getWidth();
 		height = boardState.getHeight();
+		boardTiles = new TreeSet<>();
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				if (boardState.get(x, y) == 0) {
+					boardTiles.add(new Tile(x, y));
+				}
+			}
+		}
+		BoardNode.tiles = boardTiles;
 	}
 
 	public static void main(String[] args) {
@@ -91,6 +109,7 @@ public class Main extends SimpleApplication {
 
 	@Override
 	public void simpleInitApp() {
+		assetManager.registerLocator("assets", FileLocator.class);
 		makeGrid();
 		initPlayers();
 		initInput();
@@ -209,7 +228,7 @@ public class Main extends SimpleApplication {
 				lastY = yDir;
 			}
 		} else {
-			walkTo(geom, lastX, lastY, xDir, yDir);
+			findPathAndWalkTo(geom, lastX, lastY, xDir, yDir);
 			lastX = xDir;
 			lastY = yDir;
 		}
@@ -219,6 +238,14 @@ public class Main extends SimpleApplication {
 	int targetX = -1;
 	int targetY = -1;
 
+	private void findPathAndWalkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
+		BoardNode start = new BoardNode(fromX, fromY, null);
+		BoardNode goal = new BoardNode(toX, toY, null);
+		AStarSearch search = new AStarSearch(start, goal);
+		List<nz.dcoder.ai.astar.Node> path = search.search();
+		System.out.println(path);
+		walkTo(geom, fromX, fromY, toX, toY);
+	}
 	private void walkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
 		startX = fromX;
 		startY = fromY;
@@ -255,16 +282,16 @@ public class Main extends SimpleApplication {
 				int x = (int) (pos.x / scale);
 				int y = (int) (-pos.y / scale);
 				if (name.equals("Up")) {
-					walkTo(player1, x, y, x, y - 1);
+					findPathAndWalkTo(player1, x, y, x, y - 1);
 				}
 				if (name.equals("Right")) {
-					walkTo(player1, x, y, x + 1, y);
+					findPathAndWalkTo(player1, x, y, x + 1, y);
 				}
 				if (name.equals("Down")) {
-					walkTo(player1, x, y, x, y + 1);
+					findPathAndWalkTo(player1, x, y, x, y + 1);
 				}
 				if (name.equals("Left")) {
-					walkTo(player1, x, y, x - 1, y);
+					findPathAndWalkTo(player1, x, y, x - 1, y);
 				}
 				if (name.equals("LeftMouse")) {
 					System.out.println("Left Mouse");
@@ -293,7 +320,8 @@ public class Main extends SimpleApplication {
 							jCoord = Integer.parseInt(coords[1]);
 						}
 					}
-					//placePlayer(player1, iCoord, jCoord);
+					placePlayer(player1, iCoord, jCoord);
+					findPathAndWalkTo(player1, x, y, iCoord, jCoord);
 					highlightRoute(iCoord, jCoord);
 				}
 			} else {

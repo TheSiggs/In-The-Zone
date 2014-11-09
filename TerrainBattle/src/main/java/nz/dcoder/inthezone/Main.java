@@ -239,11 +239,13 @@ public class Main extends SimpleApplication {
 	int targetY = -1;
 
 	private void findPathAndWalkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
+		/*
 		BoardNode start = new BoardNode(fromX, fromY, null);
 		BoardNode goal = new BoardNode(toX, toY, null);
 		AStarSearch search = new AStarSearch(start, goal);
 		List<nz.dcoder.ai.astar.Node> path = search.search();
 		System.out.println(path);
+		*/
 		walkTo(geom, fromX, fromY, toX, toY);
 	}
 	private void walkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {

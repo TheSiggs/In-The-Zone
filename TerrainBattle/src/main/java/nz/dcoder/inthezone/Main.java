@@ -26,6 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
+import nz.dcoder.ai.astar.BoardState;
 import nz.dcoder.ai.astar.Tile;
 
 

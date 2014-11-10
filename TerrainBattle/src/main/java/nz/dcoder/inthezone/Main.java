@@ -52,6 +52,8 @@ public class Main extends SimpleApplication {
 	Geometry player1, player2;
 	BoardState boardState;
 	SortedSet<Tile> boardTiles;
+	private List<nz.dcoder.ai.astar.Node> path;
+	private int pathNode;
 
 	public Main() {
 		super((AppState) null);
@@ -138,6 +140,9 @@ public class Main extends SimpleApplication {
 
 	@Override
 	public void simpleUpdate(float tpf) {
+		if (percentAlong > 1f) {
+			pathNode++;
+		}
 		if ((flags & LEFT_ROTATE) != 0) {
 			quat.fromAngleAxis(tpf * rotationSpeed, axis);
 			rootNode.rotate(quat);
@@ -243,9 +248,11 @@ public class Main extends SimpleApplication {
 		BoardNode start = new BoardNode(fromX, fromY, null);
 		BoardNode goal = new BoardNode(toX, toY, null);
 		AStarSearch search = new AStarSearch(start, goal);
-		List<nz.dcoder.ai.astar.Node> path = search.search();
+		path = search.search();
 		System.out.println(path);
-		walkTo(geom, fromX, fromY, toX, toY);
+		pathNode = 0;
+		//walkTo(geom, fromX, fromY, toX, toY);
+		
 	}
 	private void walkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
 		startX = fromX;

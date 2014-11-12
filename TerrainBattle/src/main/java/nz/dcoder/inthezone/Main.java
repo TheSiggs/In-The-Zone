@@ -29,7 +29,6 @@ import nz.dcoder.ai.astar.BoardNode;
 import nz.dcoder.ai.astar.BoardState;
 import nz.dcoder.ai.astar.Tile;
 
-
 /**
  * test
  *
@@ -84,7 +83,7 @@ public class Main extends SimpleApplication {
 				x = i * scale;
 				y = -j * scale;
 				String name = i + "," + j;
-				addBox(name, new Vector3f(x, y, z), 
+				addBox(name, new Vector3f(x, y, z),
 						colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
 						boardState.get(i, j));
 			}
@@ -140,9 +139,6 @@ public class Main extends SimpleApplication {
 
 	@Override
 	public void simpleUpdate(float tpf) {
-		if (percentAlong > 1f) {
-			pathNode++;
-		}
 		if ((flags & LEFT_ROTATE) != 0) {
 			quat.fromAngleAxis(tpf * rotationSpeed, axis);
 			rootNode.rotate(quat);
@@ -152,8 +148,13 @@ public class Main extends SimpleApplication {
 			rootNode.rotate(quat);
 		}
 		if ((flags & PLAYER_MOVING) != 0) {
+			setPlayerLocation(player1, beginX, beginY, targetX, targetY, percentAlong);
 			percentAlong += tpf * travelSpeed;
-			setPlayerLocation(player1, startX, startY, targetX, targetY, percentAlong);
+			if (percentAlong > 1f) {
+				percentAlong = 0f;
+			}
+		} else {
+			percentAlong = 0f;
 		}
 		/*
 		 if (currentX == -1) {
@@ -202,10 +203,25 @@ public class Main extends SimpleApplication {
 	int lastY = -1;
 
 	private void setPlayerLocation(Geometry geom, int startX, int startY, int endX, int endY, float along) {
-		if (along > 1f) {
-			percentAlong = 0f;
-			along = 1f;
-			flags &= ~PLAYER_MOVING;
+		if (along == 0f) {
+			//along = 1f;
+			int size = path.size();
+			BoardNode bn;
+			if (pathNode < size) {
+				bn = (BoardNode) path.get(pathNode);
+				startX = beginX = bn.getX();
+				startY = beginY = bn.getY();
+				pathNode++;
+			}
+			if (pathNode < size) {
+				bn = (BoardNode) path.get(pathNode);
+				endX = targetX = bn.getX();
+				endY = targetY = bn.getY();
+			} else {
+				flags &= ~PLAYER_MOVING;
+				percentAlong = 0f;
+			}
+			//percentAlong = 0f;
 		}
 		float addX = (endX - startX) * along;
 		float addY = (endY - startY) * along;
@@ -239,24 +255,38 @@ public class Main extends SimpleApplication {
 			lastY = yDir;
 		}
 	}
-	int startX = -1;
-	int startY = -1;
+	int beginX = -1;
+	int beginY = -1;
 	int targetX = -1;
 	int targetY = -1;
 
 	private void findPathAndWalkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
+		int maxX = boardState.getWidth() - 1;
+		int maxY = boardState.getHeight() - 1;
+		if (fromX < 0 || fromX > maxX ||
+				toX < 0 || toX > maxX ||
+				fromY < 0 || fromY > maxY ||
+				toY < 0 || toY > maxY ||
+				boardState.get(fromX, fromY) != 0 || 
+				boardState.get(toX, toY) != 0 ||
+				(percentAlong > 0f && percentAlong < 1f)) {
+			return;
+		}
 		BoardNode start = new BoardNode(fromX, fromY, null);
 		BoardNode goal = new BoardNode(toX, toY, null);
 		AStarSearch search = new AStarSearch(start, goal);
 		path = search.search();
 		System.out.println(path);
 		pathNode = 0;
+		flags |= PLAYER_MOVING;
+		percentAlong = 0f;
 		//walkTo(geom, fromX, fromY, toX, toY);
-		
+
 	}
+
 	private void walkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
-		startX = fromX;
-		startY = fromY;
+		beginX = fromX;
+		beginY = fromY;
 		targetX = toX;
 		targetY = toY;
 		flags |= PLAYER_MOVING;
@@ -326,9 +356,12 @@ public class Main extends SimpleApplication {
 						if (coords.length > 1) {
 							iCoord = Integer.parseInt(coords[0]);
 							jCoord = Integer.parseInt(coords[1]);
+							if (boardState.get(iCoord, jCoord) == 0) {
+								break;
+							}
 						}
 					}
-					placePlayer(player1, iCoord, jCoord);
+					//placePlayer(player1, iCoord, jCoord);
 					findPathAndWalkTo(player1, x, y, iCoord, jCoord);
 					highlightRoute(iCoord, jCoord);
 				}
@@ -345,7 +378,7 @@ public class Main extends SimpleApplication {
 		private void highlightRoute(int iCoord, int jCoord) {
 			int lx = lastX;
 			int ly = lastY;
-			
+
 		}
 	};
 }

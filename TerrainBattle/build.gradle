@@ -3,6 +3,7 @@ apply plugin: 'application'
 //apply from: "src/main/resources/project.properties"
 
 def mainClass = 'nz.dcoder.inthezone.Main'
+def sceneClass = 'nz.dcoder.inthezone.Scene'
 def jmonkeyengine_version = '3.0'
 sourceCompatibility = '1.7'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -86,6 +87,11 @@ jar {
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.1'
+}
+
+task scene(type: JavaExec, dependsOn: classes) {
+	main sceneClass
+	classpath sourceSets.main.runtimeClasspath 
 }
 
 distZip {

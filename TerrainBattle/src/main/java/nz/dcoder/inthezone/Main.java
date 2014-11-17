@@ -134,7 +134,7 @@ public class Main extends SimpleApplication {
 	float currentX = -1;
 	float currentY = -1;
 	float rotationSpeed = 1.5f;
-	float travelSpeed = 3f;
+	float travelSpeed = 6f;
 	float percentAlong = 0f;
 
 	@Override

@@ -7,7 +7,11 @@ package nz.dcoder.inthezone;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.asset.plugins.ZipLocator;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
+import com.jme3.light.Light;
 import com.jme3.material.Material;
+import com.jme3.material.MaterialList;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -21,11 +25,10 @@ import com.jme3.scene.shape.Quad;
 public class Scene extends SimpleApplication {
 
 	/*
-	public Scene() {
-		super((AppState) null);
-	}
-	*/
-
+	 public Scene() {
+	 super((AppState) null);
+	 }
+	 */
 	@Override
 	public void simpleInitApp() {
 		assetManager.registerLocator("assets", FileLocator.class);
@@ -37,7 +40,20 @@ public class Scene extends SimpleApplication {
 		getCamera().lookAtDirection(new Vector3f(0.7044869f,
 				-0.6950954f, 0.1433202f), Vector3f.UNIT_Y);
 		Spatial scene = assetManager.loadModel("Scenes/sample.j3o");
+		Spatial canary = assetManager.loadModel("Models/black-canary/black canary hero185.j3o");
+		//Spatial canary = assetManager.loadModel("Models/black-canary/black canary hero185.obj");
+		//MaterialList materialList = new MaterialList(assetManager, "");
+		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+
+		mat.setTexture("ColorMap",
+				assetManager.loadTexture("Models/black-canary/CHRNPCICOHER113_DIFFUSE.png"));
+		//canary.setMaterial(mat);
 		rootNode.attachChild(scene);
+		rootNode.attachChild(canary);
+		//Light light = new AmbientLight();
+		DirectionalLight light = new DirectionalLight();
+		light.setDirection(new Vector3f(-1f, -1f, 0f));
+		rootNode.addLight(light);
 		initGrid();
 	}
 
@@ -75,14 +91,14 @@ public class Scene extends SimpleApplication {
 
 	private void drawGridCell(int i, int j) {
 		/*
-		Mesh m = new Mesh();
-		m.setMode(Mesh.Mode.Lines);
+		 Mesh m = new Mesh();
+		 m.setMode(Mesh.Mode.Lines);
 
-// Line from 0,0,0 to 0,1,0
-		m.setBuffer(VertexBuffer.Type.Position, 3, new float[]{0, 0, 0, 0, 1, 0});
-		m.setBuffer(VertexBuffer.Type.Index, 2, new short[]{0, 1});
-		*/
-		Quad mesh = new Quad(1f,1f);
+		 // Line from 0,0,0 to 0,1,0
+		 m.setBuffer(VertexBuffer.Type.Position, 3, new float[]{0, 0, 0, 0, 1, 0});
+		 m.setBuffer(VertexBuffer.Type.Index, 2, new short[]{0, 1});
+		 */
+		Quad mesh = new Quad(1f, 1f);
 		Geometry geom = new Geometry("A shape", mesh); // wrap shape into geometry
 		Material mat = new Material(assetManager,
 				"Common/MatDefs/Misc/ShowNormals.j3md");   // create material
@@ -91,6 +107,6 @@ public class Scene extends SimpleApplication {
 // if you want, transform (move, rotate, scale) the geometry.
 		geom.setLocalTranslation(i * 2.0f, 0f, -j * 2.0f);
 		reference.attachChild(geom);
-		
+
 	}
 }

@@ -3,12 +3,14 @@ package nz.dcoder.inthezone;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.asset.plugins.FileLocator;
+import com.jme3.asset.plugins.ZipLocator;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -19,6 +21,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import java.util.List;
@@ -48,7 +51,8 @@ public class Main extends SimpleApplication {
 		new ColorRGBA(0.3f, 0.3f, 0.3f, 0f),
 		new ColorRGBA(0.9f, 0.9f, 0.9f, 0f)
 	};
-	Geometry player1, player2;
+	Geometry player2;
+	Spatial player1;
 	BoardState boardState;
 	SortedSet<Tile> boardTiles;
 	private List<nz.dcoder.ai.astar.Node> path;
@@ -112,6 +116,11 @@ public class Main extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		assetManager.registerLocator("assets", FileLocator.class);
+		//assetManager.registerLocator("assets/town.zip", ZipLocator.class);
+		Spatial scene = assetManager.loadModel("Scenes/sample.j3o");
+		scene.rotate(FastMath.HALF_PI, 0f, 0f);
+		rootNode.attachChild(scene);
+		initLight();
 		makeGrid();
 		initPlayers();
 		initInput();
@@ -124,17 +133,18 @@ public class Main extends SimpleApplication {
 		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
 		rootNode.rotate(quaternion);
 		//rootNode.rotate(FastMath.QUARTER_PI, 0f, 0f);
-		Vector3f axis = new Vector3f(1f, -1f, 0).normalizeLocal();
+		Vector3f myAxis = new Vector3f(1f, -1f, 0).normalizeLocal();
 
-		quaternion.fromAngleAxis(-FastMath.QUARTER_PI, axis);
+		quaternion.fromAngleAxis(-FastMath.QUARTER_PI, myAxis);
 		rootNode.rotate(quaternion);
+		cam.setFrustumFar(80f);
 	}
 	Quaternion quat = new Quaternion();
 	Vector3f axis = Vector3f.UNIT_Z;
 	float currentX = -1;
 	float currentY = -1;
 	float rotationSpeed = 1.5f;
-	float travelSpeed = 6f;
+	float travelSpeed = 4f;
 	float percentAlong = 0f;
 
 	@Override
@@ -156,24 +166,7 @@ public class Main extends SimpleApplication {
 		} else {
 			percentAlong = 0f;
 		}
-		/*
-		 if (currentX == -1) {
-		 currentX = lastX;
-		 }
-
-		 if (currentX != -1) {
-		 if (lastX < targetX) {
-		 currentX += tpf * 0.1f;
-		 } else if (lastX > targetX) {
-		 }
-		 float x = currentX * scale;
-		 float y = -targetY * scale;
-		 float z = 0.2f * scale;
-		 Vector3f translation = new Vector3f(x, y, z);
-		 player1.setLocalTranslation(translation);
-		 boardNode.attachChild(player1);
-		 }
-		 */
+		fixFacing();
 	}
 
 	@Override
@@ -182,14 +175,21 @@ public class Main extends SimpleApplication {
 	}
 
 	void initPlayers() {
-		Box b = new Box(scale / 2, scale / 2, 0.1f * scale);
-		player1 = new Geometry("Box", b);
+		//Box b = new Box(scale / 2, scale / 2, 0.1f * scale);
+		//player1 = new Geometry("Box", b);
+		player1 = assetManager.loadModel("Models/black-canary/black canary hero185.j3o");
+		//Quaternion playerRotation = new Quaternion();
+		//playerRotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
+		//player1.setLocalRotation(playerRotation);
+		player1.scale(0.25f);
+		
 
-		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture cube1Tex = assetManager.loadTexture(
-				"Textures/player1.jpg");
-		mat.setTexture("ColorMap", cube1Tex);
-		player1.setMaterial(mat);
+		//Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+
+		//Texture cube1Tex = assetManager.loadTexture(
+		//		"Textures/player1.jpg");
+		//mat.setTexture("ColorMap", cube1Tex);
+		//player1.setMaterial(mat);
 		Box b2 = new Box(scale / 2, scale / 2, 0.1f * scale);
 		player2 = new Geometry("Box", b2);
 
@@ -202,7 +202,7 @@ public class Main extends SimpleApplication {
 	int lastX = -1;
 	int lastY = -1;
 
-	private void setPlayerLocation(Geometry geom, int startX, int startY, int endX, int endY, float along) {
+	private void setPlayerLocation(Spatial geom, int startX, int startY, int endX, int endY, float along) {
 		if (along == 0f) {
 			//along = 1f;
 			int size = path.size();
@@ -233,7 +233,7 @@ public class Main extends SimpleApplication {
 		boardNode.attachChild(geom);
 	}
 
-	private void setPlayerLocation(Geometry geom, int xDir, int yDir) {
+	private void setPlayerLocation(Spatial geom, int xDir, int yDir) {
 		float x = xDir * scale;
 		float y = -yDir * scale;
 		float z = 0.2f * scale;
@@ -242,7 +242,7 @@ public class Main extends SimpleApplication {
 		boardNode.attachChild(geom);
 	}
 
-	private void placePlayer(Geometry geom, int xDir, int yDir) {
+	private void placePlayer(Spatial geom, int xDir, int yDir) {
 		if (lastX == -1) {
 			setPlayerLocation(geom, xDir, yDir);
 			if (geom == player2) {
@@ -260,16 +260,16 @@ public class Main extends SimpleApplication {
 	int targetX = -1;
 	int targetY = -1;
 
-	private void findPathAndWalkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
+	private void findPathAndWalkTo(Spatial geom, int fromX, int fromY, int toX, int toY) {
 		int maxX = boardState.getWidth() - 1;
 		int maxY = boardState.getHeight() - 1;
-		if (fromX < 0 || fromX > maxX ||
-				toX < 0 || toX > maxX ||
-				fromY < 0 || fromY > maxY ||
-				toY < 0 || toY > maxY ||
-				boardState.get(fromX, fromY) != 0 || 
-				boardState.get(toX, toY) != 0 ||
-				(percentAlong > 0f && percentAlong < 1f)) {
+		if (fromX < 0 || fromX > maxX
+				|| toX < 0 || toX > maxX
+				|| fromY < 0 || fromY > maxY
+				|| toY < 0 || toY > maxY
+				|| boardState.get(fromX, fromY) != 0
+				|| boardState.get(toX, toY) != 0
+				|| (percentAlong > 0f && percentAlong < 1f)) {
 			return;
 		}
 		BoardNode start = new BoardNode(fromX, fromY, null);
@@ -284,7 +284,7 @@ public class Main extends SimpleApplication {
 
 	}
 
-	private void walkTo(Geometry geom, int fromX, int fromY, int toX, int toY) {
+	private void walkTo(Spatial geom, int fromX, int fromY, int toX, int toY) {
 		beginX = fromX;
 		beginY = fromY;
 		targetX = toX;
@@ -381,4 +381,41 @@ public class Main extends SimpleApplication {
 
 		}
 	};
+
+	private void initLight() {
+		DirectionalLight westLight = new DirectionalLight();
+		westLight.setDirection(new Vector3f(-1f, -1f, 0));
+		rootNode.addLight(westLight);
+		DirectionalLight eastLight = new DirectionalLight();
+		eastLight.setDirection(new Vector3f(1f, -1f, 0));
+		rootNode.addLight(eastLight);
+		DirectionalLight northLight = new DirectionalLight();
+		northLight.setDirection(new Vector3f(0f, -1f, 1f));
+		rootNode.addLight(northLight);
+		DirectionalLight southLight = new DirectionalLight();
+		southLight.setDirection(new Vector3f(0f, -1f, -1f));
+		rootNode.addLight(southLight);
+	}
+
+	private void fixFacing() {
+		Quaternion facing = new Quaternion();
+		Vector3f myAxis = Vector3f.UNIT_Y;
+		float mult = 0f;
+		if (beginX > targetX) {
+			mult = 1f;
+		}
+		if (beginX < targetX) {
+			mult = -1f;
+		}
+		if (beginY < targetY) {
+			mult = 2f;
+		}
+		facing.fromAngleAxis(mult * FastMath.HALF_PI, myAxis);
+		Quaternion upright = new Quaternion();
+		Quaternion front = new Quaternion(0f, FastMath.PI, 0f, 0f);
+		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
+		upright.multLocal(front);
+		upright.multLocal(facing);
+		player1.setLocalRotation(upright);
+	}
 }

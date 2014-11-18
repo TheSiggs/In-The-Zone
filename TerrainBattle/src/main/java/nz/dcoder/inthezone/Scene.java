@@ -40,15 +40,8 @@ public class Scene extends SimpleApplication {
 		getCamera().lookAtDirection(new Vector3f(0.7044869f,
 				-0.6950954f, 0.1433202f), Vector3f.UNIT_Y);
 		Spatial scene = assetManager.loadModel("Scenes/sample.j3o");
-		Spatial canary = assetManager.loadModel("Models/black-canary/black canary hero185.j3o");
-		//Spatial canary = assetManager.loadModel("Models/black-canary/black canary hero185.obj");
-		//MaterialList materialList = new MaterialList(assetManager, "");
-		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-
-		mat.setTexture("ColorMap",
-				assetManager.loadTexture("Models/black-canary/CHRNPCICOHER113_DIFFUSE.png"));
-		//canary.setMaterial(mat);
 		rootNode.attachChild(scene);
+		Spatial canary = assetManager.loadModel("Models/black-canary/black canary hero185.j3o");
 		rootNode.attachChild(canary);
 		//Light light = new AmbientLight();
 		DirectionalLight light = new DirectionalLight();

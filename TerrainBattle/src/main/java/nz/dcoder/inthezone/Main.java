@@ -412,7 +412,8 @@ public class Main extends SimpleApplication {
 		}
 		facing.fromAngleAxis(mult * FastMath.HALF_PI, myAxis);
 		Quaternion upright = new Quaternion();
-		Quaternion front = new Quaternion(0f, FastMath.PI, 0f, 0f);
+		Quaternion front = new Quaternion();
+		front.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
 		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
 		upright.multLocal(front);
 		upright.multLocal(facing);

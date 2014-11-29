@@ -3,7 +3,6 @@ package nz.dcoder.inthezone;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.asset.plugins.FileLocator;
-import com.jme3.asset.plugins.ZipLocator;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -395,6 +394,7 @@ public class Main extends SimpleApplication {
 		DirectionalLight southLight = new DirectionalLight();
 		southLight.setDirection(new Vector3f(0f, -1f, -1f));
 		rootNode.addLight(southLight);
+		cam
 	}
 
 	private void fixFacing() {

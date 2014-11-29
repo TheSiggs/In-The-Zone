@@ -1,0 +1,8 @@
+import * from "resources/ogre/scripts/materials/base.material" 
+
+material /global/creatures/goblin/belt : /base/normalmap/specular
+{
+    set_texture_alias DiffuseMap 3d_objects/creatures/goblin/textures/belt/D.png
+    set_texture_alias NormalHeightMap 3d_objects/creatures/goblin/textures/belt/N.png
+    set_texture_alias SpecularMap 3d_objects/creatures/goblin/textures/belt/S.png
+}

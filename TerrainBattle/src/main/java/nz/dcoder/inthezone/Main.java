@@ -19,12 +19,12 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
-import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -52,13 +52,13 @@ public class Main extends SimpleApplication {
 		new ColorRGBA(0.3f, 0.3f, 0.3f, 0f),
 		new ColorRGBA(0.9f, 0.9f, 0.9f, 0f)
 	};
-	Geometry player2;
 	Spatial player1;
 	BoardState boardState;
 	SortedSet<Tile> boardTiles;
 	private List<nz.dcoder.ai.astar.Node> path;
 	private int pathNode;
 	private Node sceneNode;
+	private List<Character> players = new ArrayList<>();
 
 	public Main() {
 		super((AppState) null);
@@ -122,6 +122,9 @@ public class Main extends SimpleApplication {
 		Spatial scene = assetManager.loadModel("Scenes/sample.j3o");
 		scene.rotate(FastMath.HALF_PI, 0f, 0f);
 		sceneNode = new Node();
+		Vector3f trans = Vector3f.UNIT_Y.clone();
+		trans.multLocal(1.5f);
+		sceneNode.setLocalTranslation(trans);
 		rootNode.attachChild(sceneNode);
 		sceneNode.attachChild(scene);
 		initLight();
@@ -132,7 +135,6 @@ public class Main extends SimpleApplication {
 				scale * height / 2 - scale / 2, 0);
 		sceneNode.attachChild(boardNode);
 		placePlayer(player1, 3, 9);
-		placePlayer(player2, 3, 0);
 		Quaternion quaternion = new Quaternion();
 		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
 		sceneNode.rotate(quaternion);
@@ -178,6 +180,21 @@ public class Main extends SimpleApplication {
 		//TODO: add render code
 	}
 
+	private Character makeCharacter(int x, int y) {
+		Spatial mySpatial = assetManager.loadModel("3d_objects/creatures/goblin/goblin.mesh.xml");
+		// 3d_objects/creatures/goblin/textures/green/ogre.material
+		Material mat = new Material( 
+            assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setTexture("ColorMap", 
+            assetManager.loadTexture("3d_objects/creatures/goblin/textures/green/D.png"));
+        mySpatial.setMaterial(mat);
+		mySpatial.scale(0.5f);
+		Character character = new Character(mySpatial);
+		character.setX(x);
+		character.setY(y);
+		placePlayer(character.getSpatial(), x, y);
+		return character;
+	}
 	void initPlayers() {
 		//Box b = new Box(scale / 2, scale / 2, 0.1f * scale);
 		//player1 = new Geometry("Box", b);
@@ -186,7 +203,9 @@ public class Main extends SimpleApplication {
 		//playerRotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
 		//player1.setLocalRotation(playerRotation);
 		player1.scale(0.25f);
-		
+		for (int x = 0; x < 5; ++x) {
+			players.add(makeCharacter(x*2, 9));
+		}
 
 		//Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 
@@ -194,14 +213,6 @@ public class Main extends SimpleApplication {
 		//		"Textures/player1.jpg");
 		//mat.setTexture("ColorMap", cube1Tex);
 		//player1.setMaterial(mat);
-		Box b2 = new Box(scale / 2, scale / 2, 0.1f * scale);
-		player2 = new Geometry("Box", b2);
-
-		Material mat2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture cube2Tex = assetManager.loadTexture(
-				"Textures/player2.png");
-		mat2.setTexture("ColorMap", cube2Tex);
-		player2.setMaterial(mat2);
 	}
 	int lastX = -1;
 	int lastY = -1;
@@ -246,13 +257,15 @@ public class Main extends SimpleApplication {
 		boardNode.attachChild(geom);
 	}
 
+	/**
+	 * Place player on field with coordinates
+	 * @param geom The player geometry
+	 * @param xDir x coordinate
+	 * @param yDir y coordinate
+	 */
 	private void placePlayer(Spatial geom, int xDir, int yDir) {
 		if (lastX == -1) {
 			setPlayerLocation(geom, xDir, yDir);
-			if (geom == player2) {
-				lastX = xDir;
-				lastY = yDir;
-			}
 		} else {
 			findPathAndWalkTo(geom, lastX, lastY, xDir, yDir);
 			lastX = xDir;
@@ -387,15 +400,15 @@ public class Main extends SimpleApplication {
 	};
 
 	private void initLight() {
+		/*
 		PointLight pl = new PointLight();
 		pl.setPosition(getCamera().getLocation());
-		pl.setRadius(10f);
+		pl.setRadius(200f);
 		rootNode.addLight(pl);
-		/*
+		*/ 
 		DirectionalLight southLight = new DirectionalLight();
-		southLight.setDirection(new Vector3f(0f, -1f, -1f));
+		southLight.setDirection(new Vector3f(0f, -1f, -1f).normalizeLocal());
 		rootNode.addLight(southLight);
-		*/
 	}
 
 	private void fixFacing() {
@@ -419,5 +432,8 @@ public class Main extends SimpleApplication {
 		upright.multLocal(front);
 		upright.multLocal(facing);
 		player1.setLocalRotation(upright);
+		for (Character c : players) {
+			c.getSpatial().setLocalRotation(upright);
+		}
 	}
 }

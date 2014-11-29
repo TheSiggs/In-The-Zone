@@ -10,6 +10,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
+import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -18,6 +19,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
+import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -56,6 +58,7 @@ public class Main extends SimpleApplication {
 	SortedSet<Tile> boardTiles;
 	private List<nz.dcoder.ai.astar.Node> path;
 	private int pathNode;
+	private Node sceneNode;
 
 	public Main() {
 		super((AppState) null);
@@ -118,24 +121,26 @@ public class Main extends SimpleApplication {
 		//assetManager.registerLocator("assets/town.zip", ZipLocator.class);
 		Spatial scene = assetManager.loadModel("Scenes/sample.j3o");
 		scene.rotate(FastMath.HALF_PI, 0f, 0f);
-		rootNode.attachChild(scene);
+		sceneNode = new Node();
+		rootNode.attachChild(sceneNode);
+		sceneNode.attachChild(scene);
 		initLight();
 		makeGrid();
 		initPlayers();
 		initInput();
 		boardNode.setLocalTranslation(-scale * width / 2 + scale / 2,
 				scale * height / 2 - scale / 2, 0);
-		rootNode.attachChild(boardNode);
+		sceneNode.attachChild(boardNode);
 		placePlayer(player1, 3, 9);
 		placePlayer(player2, 3, 0);
 		Quaternion quaternion = new Quaternion();
 		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
-		rootNode.rotate(quaternion);
+		sceneNode.rotate(quaternion);
 		//rootNode.rotate(FastMath.QUARTER_PI, 0f, 0f);
 		Vector3f myAxis = new Vector3f(1f, -1f, 0).normalizeLocal();
 
 		quaternion.fromAngleAxis(-FastMath.QUARTER_PI, myAxis);
-		rootNode.rotate(quaternion);
+		sceneNode.rotate(quaternion);
 		cam.setFrustumFar(80f);
 	}
 	Quaternion quat = new Quaternion();
@@ -150,11 +155,11 @@ public class Main extends SimpleApplication {
 	public void simpleUpdate(float tpf) {
 		if ((flags & LEFT_ROTATE) != 0) {
 			quat.fromAngleAxis(tpf * rotationSpeed, axis);
-			rootNode.rotate(quat);
+			sceneNode.rotate(quat);
 		}
 		if ((flags & RIGHT_ROTATE) != 0) {
 			quat.fromAngleAxis(-tpf * rotationSpeed, axis);
-			rootNode.rotate(quat);
+			sceneNode.rotate(quat);
 		}
 		if ((flags & PLAYER_MOVING) != 0) {
 			setPlayerLocation(player1, beginX, beginY, targetX, targetY, percentAlong);
@@ -382,19 +387,15 @@ public class Main extends SimpleApplication {
 	};
 
 	private void initLight() {
-		DirectionalLight westLight = new DirectionalLight();
-		westLight.setDirection(new Vector3f(-1f, -1f, 0));
-		rootNode.addLight(westLight);
-		DirectionalLight eastLight = new DirectionalLight();
-		eastLight.setDirection(new Vector3f(1f, -1f, 0));
-		rootNode.addLight(eastLight);
-		DirectionalLight northLight = new DirectionalLight();
-		northLight.setDirection(new Vector3f(0f, -1f, 1f));
-		rootNode.addLight(northLight);
+		PointLight pl = new PointLight();
+		pl.setPosition(getCamera().getLocation());
+		pl.setRadius(10f);
+		rootNode.addLight(pl);
+		/*
 		DirectionalLight southLight = new DirectionalLight();
 		southLight.setDirection(new Vector3f(0f, -1f, -1f));
 		rootNode.addLight(southLight);
-		cam
+		*/
 	}
 
 	private void fixFacing() {

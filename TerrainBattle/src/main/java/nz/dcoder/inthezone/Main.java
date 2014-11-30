@@ -23,7 +23,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -59,7 +58,9 @@ public class Main extends SimpleApplication {
 	private List<nz.dcoder.ai.astar.Node> path;
 	private int pathNode;
 	private Node sceneNode;
-	private List<Character> players = new ArrayList<>();
+	//private List<Character> players = new ArrayList<>();
+	private List<Character> team1 = new ArrayList<>();
+	private List<Character> team2 = new ArrayList<>();
 
 	public Main() {
 		super((AppState) null);
@@ -135,7 +136,7 @@ public class Main extends SimpleApplication {
 		boardNode.setLocalTranslation(-scale * width / 2 + scale / 2,
 				scale * height / 2 - scale / 2, 0);
 		sceneNode.attachChild(boardNode);
-		placePlayer(player1, 3, 9);
+		//placePlayer(player1, 3, 9);
 		Quaternion quaternion = new Quaternion();
 		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
 		sceneNode.rotate(quaternion);
@@ -181,13 +182,13 @@ public class Main extends SimpleApplication {
 		//TODO: add render code
 	}
 
-	private Character makeCharacter(int x, int y) {
+	private Character makeCharacter(int x, int y, String texture) {
 		Spatial mySpatial = assetManager.loadModel("3d_objects/creatures/goblin/goblin.mesh.xml");
 		// 3d_objects/creatures/goblin/textures/green/ogre.material
 		Material mat = new Material(
 				assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		mat.setTexture("ColorMap",
-				assetManager.loadTexture("3d_objects/creatures/goblin/textures/green/D.png"));
+				assetManager.loadTexture("3d_objects/creatures/goblin/textures/"+ texture));
 		mySpatial.setMaterial(mat);
 		mySpatial.scale(0.5f);
 		Character character = new Character(mySpatial);
@@ -200,13 +201,17 @@ public class Main extends SimpleApplication {
 	void initPlayers() {
 		//Box b = new Box(scale / 2, scale / 2, 0.1f * scale);
 		//player1 = new Geometry("Box", b);
-		player1 = assetManager.loadModel("Models/black-canary/black canary hero185.j3o");
+		//player1 = assetManager.loadModel("Models/black-canary/black canary hero185.j3o");
 		//Quaternion playerRotation = new Quaternion();
 		//playerRotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
 		//player1.setLocalRotation(playerRotation);
-		player1.scale(0.25f);
+		//player1.scale(0.25f);
 		for (int x = 0; x < 5; ++x) {
-			players.add(makeCharacter(x * 2, 9));
+			team1.add(makeCharacter(x * 2, 9, "belt/D.png"));
+		}
+		player1 = team1.get(0).getSpatial();
+		for (int x = 0; x < 5; ++x) {
+			team2.add(makeCharacter(x * 2, 0, "green/D.png"));
 		}
 
 		//Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -236,6 +241,7 @@ public class Main extends SimpleApplication {
 				endY = targetY = bn.getY();
 			} else {
 				flags &= ~PLAYER_MOVING;
+				findCurrentPlayer().setAnimation("idleA");
 				percentAlong = 0f;
 			}
 			//percentAlong = 0f;
@@ -301,6 +307,7 @@ public class Main extends SimpleApplication {
 		flags |= PLAYER_MOVING;
 		percentAlong = 0f;
 		updateCurrentCharacterLocation(toX, toY);
+		setWalkingAnimation();
 	}
 
 	private void walkTo(Spatial geom, int fromX, int fromY, int toX, int toY) {
@@ -328,6 +335,7 @@ public class Main extends SimpleApplication {
 
 	}
 	ActionListener actionListener = new ActionListener() {
+		@Override
 		public void onAction(String name, boolean isPressed, float tpf) {
 			Vector3f pos = player1.getLocalTranslation();
 			if (isPressed) {
@@ -353,6 +361,9 @@ public class Main extends SimpleApplication {
 				}
 				CollisionResults results;
 				if (name.equals("C")) {
+					if ((flags & PLAYER_MOVING) != 0) {
+						return;
+					}
 					results = new CollisionResults();
 					boardNode.collideWith(getCollisionRay(), results);
 					Point2i point = getCollidingBoardTile(results);
@@ -382,7 +393,13 @@ public class Main extends SimpleApplication {
 		}
 
 		private void selectPlayerAt(Point2i point) {
-			for (Character c : players) {
+			for (Character c : team1) {
+				if (c.getX() == point.x && c.getY() == point.y) {
+					player1 = c.getSpatial();
+					break;
+				}
+			}
+			for (Character c : team2) {
 				if (c.getX() == point.x && c.getY() == point.y) {
 					player1 = c.getSpatial();
 					break;
@@ -422,11 +439,18 @@ public class Main extends SimpleApplication {
 		front.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
 		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
 		upright.multLocal(front);
-		upright.multLocal(facing);
-		player1.setLocalRotation(upright);
-		for (Character c : players) {
+		for (Character c : team1) {
 			c.getSpatial().setLocalRotation(upright);
 		}
+		Quaternion opposite = upright.clone();
+		Quaternion turnedAround = new Quaternion();
+		turnedAround.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
+		opposite.multLocal(turnedAround);
+		for (Character c : team2) {
+			c.getSpatial().setLocalRotation(opposite);
+		}
+		upright.multLocal(facing);
+		player1.setLocalRotation(upright);
 	}
 
 	private Ray getCollisionRay() {
@@ -465,12 +489,27 @@ public class Main extends SimpleApplication {
 	}
 
 	private void updateCurrentCharacterLocation(int toX, int toY) {
-		for (Character c : players) {
-			if (player1 == c.getSpatial()) {
-				c.setX(toX);
-				c.setY(toY);
-				break;
+		Character current = findCurrentPlayer();
+		current.setX(toX);
+		current.setY(toY);
+	}
+
+	private Character findCurrentPlayer() {
+		for (Character c : team1) {
+			if (c.getSpatial() == player1) {
+				return c;
 			}
 		}
+		for (Character c : team2) {
+			if (c.getSpatial() == player1) {
+				return c;
+			}
+		}
+		return null;
+	}
+
+	private void setWalkingAnimation() {
+		Character currentPlayer = findCurrentPlayer();
+		currentPlayer.setAnimation("run");
 	}
 }

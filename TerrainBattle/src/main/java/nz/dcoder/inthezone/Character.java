@@ -27,7 +27,7 @@ public class Character implements AnimEventListener {
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
 		channel = control.createChannel();
-		channel.setAnim("idleA");
+		setAnimation("idleA");
 	}
 
 	/**
@@ -86,5 +86,9 @@ public class Character implements AnimEventListener {
 	@Override
 	public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
 
+	}
+
+	public void setAnimation(String name) {
+		channel.setAnim(name);
 	}
 }

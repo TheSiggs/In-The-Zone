@@ -27,7 +27,7 @@ public class Character implements AnimEventListener {
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
 		channel = control.createChannel();
-		channel.setAnim("run");
+		channel.setAnim("idleA");
 	}
 
 	/**

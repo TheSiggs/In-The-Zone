@@ -10,7 +10,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
-import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -24,10 +23,12 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.vecmath.Point2i;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
 import nz.dcoder.ai.astar.BoardState;
@@ -183,11 +184,11 @@ public class Main extends SimpleApplication {
 	private Character makeCharacter(int x, int y) {
 		Spatial mySpatial = assetManager.loadModel("3d_objects/creatures/goblin/goblin.mesh.xml");
 		// 3d_objects/creatures/goblin/textures/green/ogre.material
-		Material mat = new Material( 
-            assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setTexture("ColorMap", 
-            assetManager.loadTexture("3d_objects/creatures/goblin/textures/green/D.png"));
-        mySpatial.setMaterial(mat);
+		Material mat = new Material(
+				assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		mat.setTexture("ColorMap",
+				assetManager.loadTexture("3d_objects/creatures/goblin/textures/green/D.png"));
+		mySpatial.setMaterial(mat);
 		mySpatial.scale(0.5f);
 		Character character = new Character(mySpatial);
 		character.setX(x);
@@ -195,6 +196,7 @@ public class Main extends SimpleApplication {
 		placePlayer(character.getSpatial(), x, y);
 		return character;
 	}
+
 	void initPlayers() {
 		//Box b = new Box(scale / 2, scale / 2, 0.1f * scale);
 		//player1 = new Geometry("Box", b);
@@ -204,7 +206,7 @@ public class Main extends SimpleApplication {
 		//player1.setLocalRotation(playerRotation);
 		player1.scale(0.25f);
 		for (int x = 0; x < 5; ++x) {
-			players.add(makeCharacter(x*2, 9));
+			players.add(makeCharacter(x * 2, 9));
 		}
 
 		//Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -259,6 +261,7 @@ public class Main extends SimpleApplication {
 
 	/**
 	 * Place player on field with coordinates
+	 *
 	 * @param geom The player geometry
 	 * @param xDir x coordinate
 	 * @param yDir y coordinate
@@ -297,8 +300,7 @@ public class Main extends SimpleApplication {
 		pathNode = 0;
 		flags |= PLAYER_MOVING;
 		percentAlong = 0f;
-		//walkTo(geom, fromX, fromY, toX, toY);
-
+		updateCurrentCharacterLocation(toX, toY);
 	}
 
 	private void walkTo(Spatial geom, int fromX, int fromY, int toX, int toY) {
@@ -316,11 +318,12 @@ public class Main extends SimpleApplication {
 		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_LEFT));
 		inputManager.addMapping("A", new KeyTrigger(KeyInput.KEY_A));
 		inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D));
+		inputManager.addMapping("C", new KeyTrigger(KeyInput.KEY_C));
 		inputManager.addMapping("LeftMouse", new MouseButtonTrigger(
 				MouseInput.BUTTON_LEFT));
 		// Add the names to the action listener.
 		inputManager.addListener(actionListener, "Up", "Right", "Down", "Left",
-				"LeftMouse", "A", "D");
+				"LeftMouse", "A", "C", "D");
 		//inputManager.addListener(analogListener, "Left", "Right", "Rotate");
 
 	}
@@ -348,39 +351,19 @@ public class Main extends SimpleApplication {
 				if (name.equals("Left")) {
 					findPathAndWalkTo(player1, x, y, x - 1, y);
 				}
+				CollisionResults results;
+				if (name.equals("C")) {
+					results = new CollisionResults();
+					boardNode.collideWith(getCollisionRay(), results);
+					Point2i point = getCollidingBoardTile(results);
+					selectPlayerAt(point);
+				}
 				if (name.equals("LeftMouse")) {
-					System.out.println("Left Mouse");
-					Vector2f mousePos = inputManager.getCursorPosition();
-					System.out.println("Mouse Pos: " + mousePos);
-
-					CollisionResults results = new CollisionResults();
-					Vector2f click2d = inputManager.getCursorPosition();
-					Vector3f click3d = cam.getWorldCoordinates(
-							new Vector2f(click2d.x, click2d.y), 0f).clone();
-					Vector3f dir = cam.getWorldCoordinates(
-							new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-					Ray ray = new Ray(click3d, dir);
-					boardNode.collideWith(ray, results);
-					int iCoord = -1, jCoord = -1;
-					for (int i = 0; i < results.size(); i++) {
-						// For each hit, we know distance, impact point, name of geometry.
-						float dist = results.getCollision(i).getDistance();
-						Vector3f pt = results.getCollision(i).getContactPoint();
-						String hit = results.getCollision(i).getGeometry().getName();
-						System.out.println("* Collision #" + i);
-						System.out.println("  You shot " + hit + " at " + pt + ", " + dist + " wu away.");
-						String coords[] = hit.split(",");
-						if (coords.length > 1) {
-							iCoord = Integer.parseInt(coords[0]);
-							jCoord = Integer.parseInt(coords[1]);
-							if (boardState.get(iCoord, jCoord) == 0) {
-								break;
-							}
-						}
-					}
-					//placePlayer(player1, iCoord, jCoord);
-					findPathAndWalkTo(player1, x, y, iCoord, jCoord);
-					highlightRoute(iCoord, jCoord);
+					results = new CollisionResults();
+					boardNode.collideWith(getCollisionRay(), results);
+					Point2i point = getCollidingBoardTile(results);
+					findPathAndWalkTo(player1, x, y, point.x, point.y);
+					highlightRoute(point.x, point.y);
 				}
 			} else {
 				if (name.equals("A")) {
@@ -397,15 +380,24 @@ public class Main extends SimpleApplication {
 			int ly = lastY;
 
 		}
+
+		private void selectPlayerAt(Point2i point) {
+			for (Character c : players) {
+				if (c.getX() == point.x && c.getY() == point.y) {
+					player1 = c.getSpatial();
+					break;
+				}
+			}
+		}
 	};
 
 	private void initLight() {
 		/*
-		PointLight pl = new PointLight();
-		pl.setPosition(getCamera().getLocation());
-		pl.setRadius(200f);
-		rootNode.addLight(pl);
-		*/ 
+		 PointLight pl = new PointLight();
+		 pl.setPosition(getCamera().getLocation());
+		 pl.setRadius(200f);
+		 rootNode.addLight(pl);
+		 */
 		DirectionalLight southLight = new DirectionalLight();
 		southLight.setDirection(new Vector3f(0f, -1f, -1f).normalizeLocal());
 		rootNode.addLight(southLight);
@@ -434,6 +426,51 @@ public class Main extends SimpleApplication {
 		player1.setLocalRotation(upright);
 		for (Character c : players) {
 			c.getSpatial().setLocalRotation(upright);
+		}
+	}
+
+	private Ray getCollisionRay() {
+		System.out.println("Left Mouse");
+		Vector2f mousePos = inputManager.getCursorPosition();
+		System.out.println("Mouse Pos: " + mousePos);
+
+		Vector2f click2d = inputManager.getCursorPosition();
+		Vector3f click3d = cam.getWorldCoordinates(
+				new Vector2f(click2d.x, click2d.y), 0f).clone();
+		Vector3f dir = cam.getWorldCoordinates(
+				new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+		Ray ray = new Ray(click3d, dir);
+		return ray;
+	}
+
+	private Point2i getCollidingBoardTile(CollisionResults results) {
+		int iCoord = -1, jCoord = -1;
+		for (int i = 0; i < results.size(); i++) {
+			// For each hit, we know distance, impact point, name of geometry.
+			float dist = results.getCollision(i).getDistance();
+			Vector3f pt = results.getCollision(i).getContactPoint();
+			String hit = results.getCollision(i).getGeometry().getName();
+			System.out.println("* Collision #" + i);
+			System.out.println("  You shot " + hit + " at " + pt + ", " + dist + " wu away.");
+			String coords[] = hit.split(",");
+			if (coords.length > 1) {
+				iCoord = Integer.parseInt(coords[0]);
+				jCoord = Integer.parseInt(coords[1]);
+				if (boardState.get(iCoord, jCoord) == 0) {
+					break;
+				}
+			}
+		}
+		return new Point2i(iCoord, jCoord);
+	}
+
+	private void updateCurrentCharacterLocation(int toX, int toY) {
+		for (Character c : players) {
+			if (player1 == c.getSpatial()) {
+				c.setX(toX);
+				c.setY(toY);
+				break;
+			}
 		}
 	}
 }

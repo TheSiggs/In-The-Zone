@@ -1,3 +1,5 @@
+package nz.dcoder.inthezone.objects;
+
 /**
  * @author jedcalkin
  */
@@ -6,7 +8,8 @@ public class attack_example{
         Attack attackObj = new Attack();
     
         // make zan
-        Character zan = new Character();
+        CharacterState zan = new CharacterState();
+		/*
         zan.weapon = new Weapon(1); // damage 1
         zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range
         zan.armour = new Armour(0.1,0.0); // Physical 10%, magic 0%
@@ -19,5 +22,6 @@ public class attack_example{
 
         // attack
         attackObj.attack(zan, enemy, zan.skills[0]); // attacker, defender, attacker.skill
+		*/
     }
 }

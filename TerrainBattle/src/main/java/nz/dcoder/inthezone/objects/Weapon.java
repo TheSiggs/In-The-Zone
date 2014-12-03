@@ -1,3 +1,5 @@
+package nz.dcoder.inthezone.objects;
+
 /**
  * @author jedcalkin
  */

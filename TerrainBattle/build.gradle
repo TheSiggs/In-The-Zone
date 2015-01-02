@@ -5,7 +5,7 @@ apply plugin: 'application'
 def mainClass = 'nz.dcoder.inthezone.Main'
 def sceneClass = 'nz.dcoder.inthezone.Scene'
 def jmonkeyengine_version = '3.0'
-sourceCompatibility = '1.7'
+sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 // NetBeans will automatically add "run" and "debug" tasks relying on the
@@ -29,6 +29,9 @@ repositories {
 	}
 	maven {
 		url 'http://updates.jmonkeyengine.org/maven'
+	}
+	maven {
+		url 'http://dl.bintray.com/empirephoenix/VGS-OSS-Releases/'
 	}
 }
 
@@ -64,6 +67,7 @@ dependencies {
 	compile 'com.jme3:jme3-niftygui:3.0.+'
 	compile 'com.jme3:jme3-desktop:3.0.+'
 	compile 'com.jme3:jme3-lwjgl:3.0.+'
+	compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
 }
 
 //applicationDefaultJvmArgs = ["-Dgreeting.language=en"]

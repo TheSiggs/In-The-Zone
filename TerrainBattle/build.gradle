@@ -30,9 +30,8 @@ repositories {
 	maven {
 		url 'http://updates.jmonkeyengine.org/maven'
 	}
-	maven {
-		url 'http://dl.bintray.com/empirephoenix/VGS-OSS-Releases/'
-	}
+	//maven { url "http://dl.bintray.com/jmonkeyengine/contrib" }
+	maven { url "http://dl.bintray.com/davidb/jme3stuff" }
 }
 
 sourceSets {
@@ -42,9 +41,10 @@ sourceSets {
 		//output.classesDir   = 'build/classes/main'      
 		//}
 		resources {
-			srcDir 'src/main/resources'
+			//srcDir 'src/main/resources'
+			srcDirs = ["$projectDir/src/main/resources", "$projectDir/src/assets", "$projectDir/assets"]
 			//include '*.csv'
-			include '*.properties'
+			include '*.properties', '*.fxml'
 			output.resourcesDir = 'build/resources/main'
 		}
 	}
@@ -67,7 +67,8 @@ dependencies {
 	compile 'com.jme3:jme3-niftygui:3.0.+'
 	compile 'com.jme3:jme3-desktop:3.0.+'
 	compile 'com.jme3:jme3-lwjgl:3.0.+'
-	compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
+	//compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
+	compile "com.jme3x:jfx:1.+"
 }
 
 //applicationDefaultJvmArgs = ["-Dgreeting.language=en"]

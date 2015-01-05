@@ -23,10 +23,28 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import com.jme3x.jfx.JmeFxContainer;
+import com.jme3x.jfx.JmeFxScreenContainer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.paint.Color;
 import javax.vecmath.Point2i;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
@@ -92,8 +110,8 @@ public class Main extends SimpleApplication {
 				y = -j * scale;
 				String name = i + "," + j;
 				addBox(name, new Vector3f(x, y, z),
-						colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
-						boardState.get(i, j));
+					colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
+					boardState.get(i, j));
 			}
 		}
 	}
@@ -109,7 +127,7 @@ public class Main extends SimpleApplication {
 		}
 		mat.setColor("Color", real);
 		Texture cube1Tex = assetManager.loadTexture(
-				"Textures/random_grey_variations.png");
+			"Textures/random_grey_variations.png");
 		mat.setTexture("ColorMap", cube1Tex);
 		geom.setMaterial(mat);
 		//geom.setLocalTranslation(translation.add(Vector3f.UNIT_Z.multLocal(1f * boardValue)));
@@ -133,8 +151,9 @@ public class Main extends SimpleApplication {
 		makeGrid();
 		initPlayers();
 		initInput();
+		initGui();
 		boardNode.setLocalTranslation(-scale * width / 2 + scale / 2,
-				scale * height / 2 - scale / 2, 0);
+			scale * height / 2 - scale / 2, 0);
 		sceneNode.attachChild(boardNode);
 		//placePlayer(player1, 3, 9);
 		Quaternion quaternion = new Quaternion();
@@ -186,9 +205,9 @@ public class Main extends SimpleApplication {
 		Spatial mySpatial = assetManager.loadModel("3d_objects/creatures/goblin/goblin.mesh.xml");
 		// 3d_objects/creatures/goblin/textures/green/ogre.material
 		Material mat = new Material(
-				assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		mat.setTexture("ColorMap",
-				assetManager.loadTexture("3d_objects/creatures/goblin/textures/"+ texture));
+			assetManager.loadTexture("3d_objects/creatures/goblin/textures/" + texture));
 		mySpatial.setMaterial(mat);
 		mySpatial.scale(0.5f);
 		Character character = new Character(mySpatial);
@@ -215,7 +234,6 @@ public class Main extends SimpleApplication {
 		}
 
 		//Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-
 		//Texture cube1Tex = assetManager.loadTexture(
 		//		"Textures/player1.jpg");
 		//mat.setTexture("ColorMap", cube1Tex);
@@ -290,12 +308,12 @@ public class Main extends SimpleApplication {
 		int maxX = boardState.getWidth() - 1;
 		int maxY = boardState.getHeight() - 1;
 		if (fromX < 0 || fromX > maxX
-				|| toX < 0 || toX > maxX
-				|| fromY < 0 || fromY > maxY
-				|| toY < 0 || toY > maxY
-				|| boardState.get(fromX, fromY) != 0
-				|| boardState.get(toX, toY) != 0
-				|| (percentAlong > 0f && percentAlong < 1f)) {
+			|| toX < 0 || toX > maxX
+			|| fromY < 0 || fromY > maxY
+			|| toY < 0 || toY > maxY
+			|| boardState.get(fromX, fromY) != 0
+			|| boardState.get(toX, toY) != 0
+			|| (percentAlong > 0f && percentAlong < 1f)) {
 			return;
 		}
 		BoardNode start = new BoardNode(fromX, fromY, null);
@@ -327,10 +345,10 @@ public class Main extends SimpleApplication {
 		inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("C", new KeyTrigger(KeyInput.KEY_C));
 		inputManager.addMapping("LeftMouse", new MouseButtonTrigger(
-				MouseInput.BUTTON_LEFT));
+			MouseInput.BUTTON_LEFT));
 		// Add the names to the action listener.
 		inputManager.addListener(actionListener, "Up", "Right", "Down", "Left",
-				"LeftMouse", "A", "C", "D");
+			"LeftMouse", "A", "C", "D");
 		//inputManager.addListener(analogListener, "Left", "Right", "Rotate");
 
 	}
@@ -460,9 +478,9 @@ public class Main extends SimpleApplication {
 
 		Vector2f click2d = inputManager.getCursorPosition();
 		Vector3f click3d = cam.getWorldCoordinates(
-				new Vector2f(click2d.x, click2d.y), 0f).clone();
+			new Vector2f(click2d.x, click2d.y), 0f).clone();
 		Vector3f dir = cam.getWorldCoordinates(
-				new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+			new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
 		Ray ray = new Ray(click3d, dir);
 		return ray;
 	}
@@ -511,5 +529,95 @@ public class Main extends SimpleApplication {
 	private void setWalkingAnimation() {
 		Character currentPlayer = findCurrentPlayer();
 		currentPlayer.setAnimation("run");
+	}
+
+	private void initGui() {
+		/*
+		final GuiManager testguiManager = new GuiManager(this.guiNode, this.assetManager, this, true, new ProtonCursorProvider(this, this.assetManager, this.inputManager));
+		this.inputManager.addRawInputListener(testguiManager.getInputRedirector());
+		String path = "nz/dcoder/inthezone/FXMLDocument.fxml";
+		final FXMLHud testhud = new FXMLHud(path);
+		testhud.precache();
+		testguiManager.attachHudAsync(testhud);
+		final FXMLWindow testwindow = new FXMLWindow(path);
+		testwindow.setExternalisable(true);
+		testwindow.setExternalized(true);
+		testwindow.precache();
+		testwindow.setTitleAsync("TestTitle");
+		testguiManager.attachHudAsync(testwindow);
+		 */
+		JmeFxScreenContainer jmefx = JmeFxContainer.install(this, getGuiNode(), true, null);
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				jmefx.setScene(createScene(), root);
+			}
+		});
+
+		this.guiNode.attachChild(jmefx.getJmeNode());
+	}
+
+    private static Group root;
+	public static Scene createScene() {
+
+		root = new Group();
+
+		Scene scene = new Scene(root, 600, 600, true);
+		
+		scene.setFill(new Color(0, 0, 0, 0));
+
+		final TreeItem<String> treeRoot = new TreeItem<String>("Root node");
+		treeRoot.getChildren().addAll(Arrays.asList(new TreeItem<String>("Child Node 1"), new TreeItem<String>("Child Node 2"), new TreeItem<String>("Child Node 3")));
+		treeRoot.getChildren().get(2).getChildren().addAll(Arrays.asList(new TreeItem<String>("Child Node 4"), new TreeItem<String>("Child Node 5")));
+
+		final TreeView treeView = new TreeView();
+		treeView.setShowRoot(true);
+
+		treeView.setRoot(treeRoot);
+
+		treeRoot.setExpanded(true);
+		treeView.setLayoutY(100);
+
+		Button test1 = new Button("Test1");
+		test1.setLayoutX(500);
+		test1.setLayoutY(500);
+		test1.setOnAction(event -> {
+
+		});
+
+		CheckBox test2 = new CheckBox("Test2");
+		test2.setLayoutX(700);
+		test2.setLayoutY(700);
+
+		MenuBar bar = new MenuBar();
+
+		Menu testMenu = new Menu("Test");
+		bar.getMenus().add(testMenu);
+		MenuItem i1 = new MenuItem("Entry1");
+		MenuItem i2 = new MenuItem("Entry2");
+		Menu sub = new Menu("Submenu");
+		sub.getItems().addAll(new MenuItem("Sub entry 1"), new MenuItem("Sub Entry 2"));
+		testMenu.getItems().addAll(i1, sub, i2);
+
+		TextArea ta = new TextArea();
+		ta.setOpacity(0.4);
+		ta.setLayoutX(400);
+		ta.setLayoutY(300);
+
+		ChoiceBox cb = new ChoiceBox();
+
+		cb.setItems(FXCollections.observableArrayList("Alfa", "Beta"));
+		cb.setLayoutX(300);
+		cb.setLayoutY(200);
+
+		ComboBox<String> comboBox = new ComboBox<String>();
+		comboBox.getItems().addAll("11111", "22222", "3333", "44444", "55555", "6666");
+		comboBox.setLayoutX(350);
+		comboBox.setLayoutY(250);
+
+		root.getChildren().addAll(treeView, test1, bar, test2, ta, cb, comboBox);
+
+		return scene;
 	}
 }

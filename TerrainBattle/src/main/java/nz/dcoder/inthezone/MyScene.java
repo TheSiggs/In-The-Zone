@@ -22,10 +22,10 @@ import com.jme3.scene.shape.Quad;
  *
  * @author denz
  */
-public class Scene extends SimpleApplication {
+public class MyScene extends SimpleApplication {
 
 	/*
-	 public Scene() {
+	 public MyScene() {
 	 super((AppState) null);
 	 }
 	 */
@@ -51,7 +51,7 @@ public class Scene extends SimpleApplication {
 	}
 
 	public static void main(String[] args) {
-		Scene app = new Scene();
+		MyScene app = new MyScene();
 		app.start();
 	}
 	float val = 0;

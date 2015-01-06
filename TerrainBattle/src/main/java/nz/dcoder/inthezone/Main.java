@@ -25,14 +25,20 @@ import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import com.jme3x.jfx.JmeFxContainer;
 import com.jme3x.jfx.JmeFxScreenContainer;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -45,6 +51,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.paint.Color;
+import javafx.stage.StageStyle;
 import javax.vecmath.Point2i;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
@@ -532,26 +539,23 @@ public class Main extends SimpleApplication {
 	}
 
 	private void initGui() {
-		/*
-		final GuiManager testguiManager = new GuiManager(this.guiNode, this.assetManager, this, true, new ProtonCursorProvider(this, this.assetManager, this.inputManager));
-		this.inputManager.addRawInputListener(testguiManager.getInputRedirector());
-		String path = "nz/dcoder/inthezone/FXMLDocument.fxml";
-		final FXMLHud testhud = new FXMLHud(path);
-		testhud.precache();
-		testguiManager.attachHudAsync(testhud);
-		final FXMLWindow testwindow = new FXMLWindow(path);
-		testwindow.setExternalisable(true);
-		testwindow.setExternalized(true);
-		testwindow.precache();
-		testwindow.setTitleAsync("TestTitle");
-		testguiManager.attachHudAsync(testwindow);
-		 */
 		JmeFxScreenContainer jmefx = JmeFxContainer.install(this, getGuiNode(), true, null);
+		final Main that = this;
 		Platform.runLater(new Runnable() {
 
 			@Override
 			public void run() {
-				jmefx.setScene(createScene(), root);
+				try {
+					//URL path = new URL("nz/dcoder/inthezone/FXMLDocument.fxml");
+					URL path = that.getClass().getResource("hud.fxml");
+					Parent root = FXMLLoader.load(path);
+					Scene scene = new Scene(root, 300, 275);
+					//jmefx.setScene(createScene(), root);
+					scene.setFill(Color.TRANSPARENT);
+					jmefx.setScene(scene, root);
+				} catch (IOException ex) {
+					Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+				}
 			}
 		});
 

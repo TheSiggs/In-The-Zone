@@ -42,9 +42,10 @@ sourceSets {
 		//}
 		resources {
 			//srcDir 'src/main/resources'
-			srcDirs = ["$projectDir/src/main/resources", "$projectDir/src/assets", "$projectDir/assets"]
+			//srcDirs = ["$projectDir/src/main/resources", "$projectDir/src/assets", "$projectDir/assets"]
+			srcDirs = ["src/main/resources", "src/assets", "assets"]
 			//include '*.csv'
-			include '*.properties', '*.fxml'
+			include '*.properties', '**/*.fxml'
 			output.resourcesDir = 'build/resources/main'
 		}
 	}
@@ -88,6 +89,7 @@ jar {
 		attributes 'Class-Path': manifestCp
 		attributes 'Main-Class': mainClass
 	}
+	from fileTree('src/main/resources').include('**/*.fxml')
 }
 
 task wrapper(type: Wrapper) {

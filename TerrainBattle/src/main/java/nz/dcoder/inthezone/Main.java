@@ -51,7 +51,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.paint.Color;
-import javafx.stage.StageStyle;
 import javax.vecmath.Point2i;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;

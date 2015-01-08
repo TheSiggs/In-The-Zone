@@ -43,10 +43,14 @@ sourceSets {
 		resources {
 			//srcDir 'src/main/resources'
 			//srcDirs = ["$projectDir/src/main/resources", "$projectDir/src/assets", "$projectDir/assets"]
-			srcDirs = ["src/main/resources", "src/assets", "assets"]
+			srcDirs = ["src/main/java", "src/main/resources", "src/assets", "assets"]
 			//include '*.csv'
 			include '*.properties', '**/*.fxml'
 			output.resourcesDir = 'build/resources/main'
+		}
+		java {
+			//srcDirs = ["src/main/java"]
+			include '**/*.fxml', '**/*.java'
 		}
 	}
 }
@@ -90,6 +94,8 @@ jar {
 		attributes 'Main-Class': mainClass
 	}
 	from fileTree('src/main/resources').include('**/*.fxml')
+	from fileTree('src/main/java').include('**/*.fxml')
+	//from fileTree('src/main/java').include('**/*.class')
 }
 
 task wrapper(type: Wrapper) {

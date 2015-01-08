@@ -27,6 +27,7 @@ import com.jme3x.jfx.JmeFxContainer;
 import com.jme3x.jfx.JmeFxScreenContainer;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,7 @@ import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
 import nz.dcoder.ai.astar.BoardState;
 import nz.dcoder.ai.astar.Tile;
+import nz.dcoder.inthezone.jfx.MainHUDController;
 
 /**
  * test
@@ -537,6 +539,11 @@ public class Main extends SimpleApplication {
 		currentPlayer.setAnimation("run");
 	}
 
+	public void someMethod() {
+		System.out.println("hello from javafx");
+		findPathAndWalkTo(player1, 0, 0, 5, 5);
+	}
+	
 	private void initGui() {
 		JmeFxScreenContainer jmefx = JmeFxContainer.install(this, getGuiNode(), true, null);
 		final Main that = this;
@@ -545,11 +552,11 @@ public class Main extends SimpleApplication {
 			@Override
 			public void run() {
 				try {
-					//URL path = new URL("nz/dcoder/inthezone/FXMLDocument.fxml");
-					URL path = that.getClass().getResource("hud.fxml");
+					URL path = path = (new MainHUDController()).getClass().getResource("mainHUD.fxml");
 					Parent root = FXMLLoader.load(path);
 					Scene scene = new Scene(root, 300, 275);
 					//jmefx.setScene(createScene(), root);
+					MainHUDController.app = that;
 					scene.setFill(Color.TRANSPARENT);
 					jmefx.setScene(scene, root);
 				} catch (IOException ex) {

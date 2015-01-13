@@ -60,14 +60,20 @@ public class MainHUDController implements Initializable {
     @FXML
     private void healthUp(ActionEvent event) {
         health.setProgress(health.getProgress() + 0.1);
-
-        System.out.println("Health Up");
+        
+        if (health.getProgress() == 1) {
+            System.out.println("This character is at full health!");
+        }
+        System.out.println("Health Up!");
     }
 
     @FXML
     private void healthDown(ActionEvent event) {
         health.setProgress(health.getProgress() - 0.1);
-
-        System.out.println("Health Down");
+        
+        if (health.getProgress() == 0) {
+            System.out.println("This Character is Dead!");
+        }
+        System.out.println("Health Down!");
     }
 }

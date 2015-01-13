@@ -5,7 +5,6 @@
  */
 package nz.dcoder.inthezone.jfx;
 
-import com.jme3.app.SimpleApplication;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
@@ -59,9 +58,9 @@ public class MainHUDController implements Initializable {
 
     @FXML
     private void healthUp(ActionEvent event) {
-        health.setProgress(health.getProgress() + 0.1);
+        getHealth().setProgress(getHealth().getProgress() + 0.1);
         
-        if (health.getProgress() == 1) {
+        if (getHealth().getProgress() == 1) {
             System.out.println("This character is at full health!");
         }
         System.out.println("Health Up!");
@@ -69,11 +68,32 @@ public class MainHUDController implements Initializable {
 
     @FXML
     private void healthDown(ActionEvent event) {
-        health.setProgress(health.getProgress() - 0.1);
+        getHealth().setProgress(getHealth().getProgress() - 0.1);
         
-        if (health.getProgress() == 0) {
+        if (getHealth().getProgress() == 0) {
             System.out.println("This Character is Dead!");
         }
         System.out.println("Health Down!");
     }
+
+	public synchronized void decreaseHealthBy(double value, double total) {
+		this.getHealth().setProgress((total-value) / total);
+	}
+	public synchronized void setHealth(double value) {
+		this.health.setProgress(value);
+	}
+
+	/**
+	 * @return the health
+	 */
+	public ProgressBar getHealth() {
+		return health;
+	}
+
+	/**
+	 * @param health the health to set
+	 */
+	public void setHealth(ProgressBar health) {
+		this.health = health;
+	}
 }

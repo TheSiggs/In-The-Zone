@@ -25,39 +25,19 @@ import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import com.jme3x.jfx.JmeFxContainer;
 import com.jme3x.jfx.JmeFxScreenContainer;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.paint.Color;
 import javax.vecmath.Point2i;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
 import nz.dcoder.ai.astar.BoardState;
 import nz.dcoder.ai.astar.Tile;
-import nz.dcoder.inthezone.jfx.MainHUDController;
+import nz.dcoder.inthezone.concurrent.RunnableWithController;
+import nz.dcoder.inthezone.objects.CharacterState;
 
 /**
  * test
@@ -66,6 +46,7 @@ import nz.dcoder.inthezone.jfx.MainHUDController;
  */
 public class Main extends SimpleApplication {
 
+	public static Main instance;
 	float scale = 0.8f;
 	int width = 20;
 	int height = 20;
@@ -78,7 +59,7 @@ public class Main extends SimpleApplication {
 		new ColorRGBA(0.3f, 0.3f, 0.3f, 0f),
 		new ColorRGBA(0.9f, 0.9f, 0.9f, 0f)
 	};
-	Spatial player1;
+	Spatial currentCharacterSpatial;
 	BoardState boardState;
 	SortedSet<Tile> boardTiles;
 	private List<nz.dcoder.ai.astar.Node> path;
@@ -87,6 +68,7 @@ public class Main extends SimpleApplication {
 	//private List<Character> players = new ArrayList<>();
 	private List<Character> team1 = new ArrayList<>();
 	private List<Character> team2 = new ArrayList<>();
+	private RunnableWithController guiThread;
 
 	public Main() {
 		super((AppState) null);
@@ -102,6 +84,7 @@ public class Main extends SimpleApplication {
 			}
 		}
 		BoardNode.tiles = boardTiles;
+		Main.instance = this;
 	}
 
 	public static void main(String[] args) {
@@ -118,8 +101,8 @@ public class Main extends SimpleApplication {
 				y = -j * scale;
 				String name = i + "," + j;
 				addBox(name, new Vector3f(x, y, z),
-					colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
-					boardState.get(i, j));
+						colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
+						boardState.get(i, j));
 			}
 		}
 	}
@@ -135,7 +118,7 @@ public class Main extends SimpleApplication {
 		}
 		mat.setColor("Color", real);
 		Texture cube1Tex = assetManager.loadTexture(
-			"Textures/random_grey_variations.png");
+				"Textures/random_grey_variations.png");
 		mat.setTexture("ColorMap", cube1Tex);
 		geom.setMaterial(mat);
 		//geom.setLocalTranslation(translation.add(Vector3f.UNIT_Z.multLocal(1f * boardValue)));
@@ -161,9 +144,9 @@ public class Main extends SimpleApplication {
 		initInput();
 		initGui();
 		boardNode.setLocalTranslation(-scale * width / 2 + scale / 2,
-			scale * height / 2 - scale / 2, 0);
+				scale * height / 2 - scale / 2, 0);
 		sceneNode.attachChild(boardNode);
-		//placePlayer(player1, 3, 9);
+		//placePlayer(currentCharacterSpatial, 3, 9);
 		Quaternion quaternion = new Quaternion();
 		quaternion.fromAngles(0f, 0f, FastMath.QUARTER_PI);
 		sceneNode.rotate(quaternion);
@@ -193,7 +176,7 @@ public class Main extends SimpleApplication {
 			sceneNode.rotate(quat);
 		}
 		if ((flags & PLAYER_MOVING) != 0) {
-			setPlayerLocation(player1, beginX, beginY, targetX, targetY, percentAlong);
+			setPlayerLocation(currentCharacterSpatial, beginX, beginY, targetX, targetY, percentAlong);
 			percentAlong += tpf * travelSpeed;
 			if (percentAlong > 1f) {
 				percentAlong = 0f;
@@ -213,9 +196,9 @@ public class Main extends SimpleApplication {
 		Spatial mySpatial = assetManager.loadModel("3d_objects/creatures/goblin/goblin.mesh.xml");
 		// 3d_objects/creatures/goblin/textures/green/ogre.material
 		Material mat = new Material(
-			assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+				assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		mat.setTexture("ColorMap",
-			assetManager.loadTexture("3d_objects/creatures/goblin/textures/" + texture));
+				assetManager.loadTexture("3d_objects/creatures/goblin/textures/" + texture));
 		mySpatial.setMaterial(mat);
 		mySpatial.scale(0.5f);
 		Character character = new Character(mySpatial);
@@ -236,7 +219,7 @@ public class Main extends SimpleApplication {
 		for (int x = 0; x < 5; ++x) {
 			team1.add(makeCharacter(x * 2, 9, "belt/D.png"));
 		}
-		player1 = team1.get(0).getSpatial();
+		currentCharacterSpatial = team1.get(0).getSpatial();
 		for (int x = 0; x < 5; ++x) {
 			team2.add(makeCharacter(x * 2, 0, "green/D.png"));
 		}
@@ -316,12 +299,12 @@ public class Main extends SimpleApplication {
 		int maxX = boardState.getWidth() - 1;
 		int maxY = boardState.getHeight() - 1;
 		if (fromX < 0 || fromX > maxX
-			|| toX < 0 || toX > maxX
-			|| fromY < 0 || fromY > maxY
-			|| toY < 0 || toY > maxY
-			|| boardState.get(fromX, fromY) != 0
-			|| boardState.get(toX, toY) != 0
-			|| (percentAlong > 0f && percentAlong < 1f)) {
+				|| toX < 0 || toX > maxX
+				|| fromY < 0 || fromY > maxY
+				|| toY < 0 || toY > maxY
+				|| boardState.get(fromX, fromY) != 0
+				|| boardState.get(toX, toY) != 0
+				|| (percentAlong > 0f && percentAlong < 1f)) {
 			return;
 		}
 		BoardNode start = new BoardNode(fromX, fromY, null);
@@ -353,17 +336,19 @@ public class Main extends SimpleApplication {
 		inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("C", new KeyTrigger(KeyInput.KEY_C));
 		inputManager.addMapping("LeftMouse", new MouseButtonTrigger(
-			MouseInput.BUTTON_LEFT));
+				MouseInput.BUTTON_LEFT));
+		inputManager.addMapping("RightMouse", new MouseButtonTrigger(
+				MouseInput.BUTTON_RIGHT));
 		// Add the names to the action listener.
 		inputManager.addListener(actionListener, "Up", "Right", "Down", "Left",
-			"LeftMouse", "A", "C", "D");
+				"LeftMouse", "RightMouse", "A", "C", "D");
 		//inputManager.addListener(analogListener, "Left", "Right", "Rotate");
 
 	}
 	ActionListener actionListener = new ActionListener() {
 		@Override
 		public void onAction(String name, boolean isPressed, float tpf) {
-			Vector3f pos = player1.getLocalTranslation();
+			Vector3f pos = currentCharacterSpatial.getLocalTranslation();
 			if (isPressed) {
 				if (name.equals("A")) {
 					flags |= LEFT_ROTATE;
@@ -374,16 +359,16 @@ public class Main extends SimpleApplication {
 				int x = (int) (pos.x / scale);
 				int y = (int) (-pos.y / scale);
 				if (name.equals("Up")) {
-					findPathAndWalkTo(player1, x, y, x, y - 1);
+					findPathAndWalkTo(currentCharacterSpatial, x, y, x, y - 1);
 				}
 				if (name.equals("Right")) {
-					findPathAndWalkTo(player1, x, y, x + 1, y);
+					findPathAndWalkTo(currentCharacterSpatial, x, y, x + 1, y);
 				}
 				if (name.equals("Down")) {
-					findPathAndWalkTo(player1, x, y, x, y + 1);
+					findPathAndWalkTo(currentCharacterSpatial, x, y, x, y + 1);
 				}
 				if (name.equals("Left")) {
-					findPathAndWalkTo(player1, x, y, x - 1, y);
+					findPathAndWalkTo(currentCharacterSpatial, x, y, x - 1, y);
 				}
 				CollisionResults results;
 				if (name.equals("C")) {
@@ -399,8 +384,19 @@ public class Main extends SimpleApplication {
 					results = new CollisionResults();
 					boardNode.collideWith(getCollisionRay(), results);
 					Point2i point = getCollidingBoardTile(results);
-					findPathAndWalkTo(player1, x, y, point.x, point.y);
-					highlightRoute(point.x, point.y);
+					//findPathAndWalkTo(currentCharacterSpatial, x, y, point.x, point.y);
+					//highlightRoute(point.x, point.y);
+					if (isCharacterAt(point.x, point.y)) {
+						selectCharacterAt(point.x, point.y);
+					} else {
+						findPathAndWalkTo(currentCharacterSpatial, x, y, point.x, point.y);
+					}
+				}
+				if (name.equals("RightMouse")) {
+					results = new CollisionResults();
+					boardNode.collideWith(getCollisionRay(), results);
+					Point2i point = getCollidingBoardTile(results);
+					attackCharacter(point);
 				}
 			} else {
 				if (name.equals("A")) {
@@ -421,16 +417,64 @@ public class Main extends SimpleApplication {
 		private void selectPlayerAt(Point2i point) {
 			for (Character c : team1) {
 				if (c.getX() == point.x && c.getY() == point.y) {
-					player1 = c.getSpatial();
+					currentCharacterSpatial = c.getSpatial();
 					break;
 				}
 			}
 			for (Character c : team2) {
 				if (c.getX() == point.x && c.getY() == point.y) {
-					player1 = c.getSpatial();
+					currentCharacterSpatial = c.getSpatial();
 					break;
 				}
 			}
+		}
+
+		private boolean isCharacterAt(int x, int y) {
+			for (Character c : team1) {
+				if (c.getX() == x && c.getY() == y) {
+					return true;
+				}
+			}
+			for (Character c : team2) {
+				if (c.getX() == x && c.getY() == y) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private void selectCharacterAt(int x, int y) {
+			Character c = getCharacterAt(x, y);
+			if (c != null) {
+				currentCharacterSpatial = c.getSpatial();
+			}
+		}
+
+		private Character getCharacterAt(int x, int y) {
+			for (Character c : team1) {
+				if (c.getX() == x && c.getY() == y) {
+					return c;
+				}
+			}
+			for (Character c : team2) {
+				if (c.getX() == x && c.getY() == y) {
+					return c;
+				}
+			}
+			return null;
+		}
+
+		private void attackCharacter(Point2i point) {
+			Character attacker = findCurrentPlayer();
+			Character defender = getCharacterAt(point.x, point.y);
+			BoardNode start = new BoardNode(attacker.getX(), attacker.getY(), null);
+			BoardNode goal = new BoardNode(defender.getX(), defender.getY(), null);
+			AStarSearch search = new AStarSearch(start, goal);
+			List<nz.dcoder.ai.astar.Node> myPath = search.search();
+			int length = myPath.size();
+			CharacterState aState = attacker.getState();
+			CharacterState dState = defender.getState();
+			dState.decreaseHp(aState.getDamage());
 		}
 	};
 
@@ -476,7 +520,7 @@ public class Main extends SimpleApplication {
 			c.getSpatial().setLocalRotation(opposite);
 		}
 		upright.multLocal(facing);
-		player1.setLocalRotation(upright);
+		currentCharacterSpatial.setLocalRotation(upright);
 	}
 
 	private Ray getCollisionRay() {
@@ -486,9 +530,9 @@ public class Main extends SimpleApplication {
 
 		Vector2f click2d = inputManager.getCursorPosition();
 		Vector3f click3d = cam.getWorldCoordinates(
-			new Vector2f(click2d.x, click2d.y), 0f).clone();
+				new Vector2f(click2d.x, click2d.y), 0f).clone();
 		Vector3f dir = cam.getWorldCoordinates(
-			new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+				new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
 		Ray ray = new Ray(click3d, dir);
 		return ray;
 	}
@@ -522,12 +566,12 @@ public class Main extends SimpleApplication {
 
 	private Character findCurrentPlayer() {
 		for (Character c : team1) {
-			if (c.getSpatial() == player1) {
+			if (c.getSpatial() == currentCharacterSpatial) {
 				return c;
 			}
 		}
 		for (Character c : team2) {
-			if (c.getSpatial() == player1) {
+			if (c.getSpatial() == currentCharacterSpatial) {
 				return c;
 			}
 		}
@@ -541,93 +585,51 @@ public class Main extends SimpleApplication {
 
 	public void someMethod() {
 		System.out.println("hello from javafx");
-		findPathAndWalkTo(player1, 0, 0, 5, 5);
+		findPathAndWalkTo(currentCharacterSpatial, 0, 0, 5, 5);
 	}
-	
-	private void initGui() {
-		JmeFxScreenContainer jmefx = JmeFxContainer.install(this, getGuiNode(), true, null);
-		final Main that = this;
-		Platform.runLater(new Runnable() {
 
+	private Scene scene;
+
+	private void initGui() {
+		JmeFxScreenContainer jmeFx = JmeFxContainer.install(this, getGuiNode(), true, null);
+		//final Main that = this;
+		/*
+		guiThread = new Runnable() {
+			private MainHUDController controller;
 			@Override
 			public void run() {
 				try {
-					URL path = path = (new MainHUDController()).getClass().getResource("mainHUD.fxml");
-					Parent root = FXMLLoader.load(path);
-					Scene scene = new Scene(root, 300, 275);
-					//jmefx.setScene(createScene(), root);
+					URL path1 = path1 = (new MainHUDController()).getClass().getResource("mainHUD.fxml");
+					FXMLLoader loader = new FXMLLoader();
+					Parent root1 = loader.load(path1);
+					scene = new Scene(root1, 300, 275);
 					MainHUDController.app = that;
 					scene.setFill(Color.TRANSPARENT);
-					jmefx.setScene(scene, root);
+					getJmefx().setScene(scene, root1);
+					controller = loader.getController();
 				} catch (IOException ex) {
 					Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 				}
 			}
-		});
-
-		this.guiNode.attachChild(jmefx.getJmeNode());
+		};
+				*/
+		setGuiThread(new RunnableWithController(jmeFx, this));
+		Platform.runLater(getGuiThread());
+		this.guiNode.attachChild(getGuiThread().getJmeFx().getJmeNode());
 	}
 
-    private static Group root;
-	public static Scene createScene() {
-
-		root = new Group();
-
-		Scene scene = new Scene(root, 600, 600, true);
-		
-		scene.setFill(new Color(0, 0, 0, 0));
-
-		final TreeItem<String> treeRoot = new TreeItem<String>("Root node");
-		treeRoot.getChildren().addAll(Arrays.asList(new TreeItem<String>("Child Node 1"), new TreeItem<String>("Child Node 2"), new TreeItem<String>("Child Node 3")));
-		treeRoot.getChildren().get(2).getChildren().addAll(Arrays.asList(new TreeItem<String>("Child Node 4"), new TreeItem<String>("Child Node 5")));
-
-		final TreeView treeView = new TreeView();
-		treeView.setShowRoot(true);
-
-		treeView.setRoot(treeRoot);
-
-		treeRoot.setExpanded(true);
-		treeView.setLayoutY(100);
-
-		Button test1 = new Button("Test1");
-		test1.setLayoutX(500);
-		test1.setLayoutY(500);
-		test1.setOnAction(event -> {
-
-		});
-
-		CheckBox test2 = new CheckBox("Test2");
-		test2.setLayoutX(700);
-		test2.setLayoutY(700);
-
-		MenuBar bar = new MenuBar();
-
-		Menu testMenu = new Menu("Test");
-		bar.getMenus().add(testMenu);
-		MenuItem i1 = new MenuItem("Entry1");
-		MenuItem i2 = new MenuItem("Entry2");
-		Menu sub = new Menu("Submenu");
-		sub.getItems().addAll(new MenuItem("Sub entry 1"), new MenuItem("Sub Entry 2"));
-		testMenu.getItems().addAll(i1, sub, i2);
-
-		TextArea ta = new TextArea();
-		ta.setOpacity(0.4);
-		ta.setLayoutX(400);
-		ta.setLayoutY(300);
-
-		ChoiceBox cb = new ChoiceBox();
-
-		cb.setItems(FXCollections.observableArrayList("Alfa", "Beta"));
-		cb.setLayoutX(300);
-		cb.setLayoutY(200);
-
-		ComboBox<String> comboBox = new ComboBox<String>();
-		comboBox.getItems().addAll("11111", "22222", "3333", "44444", "55555", "6666");
-		comboBox.setLayoutX(350);
-		comboBox.setLayoutY(250);
-
-		root.getChildren().addAll(treeView, test1, bar, test2, ta, cb, comboBox);
-
-		return scene;
+	/**
+	 * @return the guiThread
+	 */
+	public RunnableWithController getGuiThread() {
+		return guiThread;
 	}
+
+	/**
+	 * @param guiThread the guiThread to set
+	 */
+	public void setGuiThread(RunnableWithController guiThread) {
+		this.guiThread = guiThread;
+	}
+
 }

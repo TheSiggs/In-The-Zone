@@ -8,6 +8,7 @@ import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
 import com.jme3.scene.Spatial;
+import nz.dcoder.inthezone.objects.CharacterState;
 
 /**
  *
@@ -20,6 +21,7 @@ public class Character implements AnimEventListener {
 	private int y = 0;
 	private AnimChannel channel;
 	private AnimControl control;
+	private CharacterState state;
 
 	public Character(Spatial spatial) {
 		this.spatial = spatial;
@@ -28,6 +30,8 @@ public class Character implements AnimEventListener {
 		control.addListener(this);
 		channel = control.createChannel();
 		setAnimation("idleA");
+		this.state = new CharacterState();
+		state.setCharacter(this);
 	}
 
 	/**
@@ -90,5 +94,23 @@ public class Character implements AnimEventListener {
 
 	public void setAnimation(String name) {
 		channel.setAnim(name);
+	}
+
+	/**
+	 * @return the state
+	 */
+	public CharacterState getState() {
+		return state;
+	}
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(CharacterState state) {
+		this.state = state;
+	}
+
+	public void die() {
+		this.getSpatial().getParent().detachChild(this.getSpatial());
 	}
 }

@@ -1,29 +1,39 @@
 package nz.dcoder.inthezone.objects;
 
+import java.util.ArrayList;
+import java.util.List;
+import nz.dcoder.inthezone.Character;
+import nz.dcoder.inthezone.Main;
+import nz.dcoder.inthezone.concurrent.RunnableWithController;
+import nz.dcoder.inthezone.jfx.MainHUDController;
+
 /**
  * @author jedcalkin
  */
 public class CharacterState {
-    private int AP;
-    private int HP;
-    private int Lvl;
-    private int Str;
-    private int Vit;
-    private int Int;
-    private Skill[] skills;
+    private int ap;
+    private double hp;
+	private double totalHp;
+    private int level;
+    private int strength;
+    private int vitality;
+    private int intelligence;
+    private List<Skill> skills;
     private Weapon weapon;
     private Armour armour;
+	private Character character;
     
     public CharacterState(){
         this.weapon = null;
         this.armour = null;
-        this.skills = new Skill[20];
-        this.Lvl = 1;
-        this.Str = 1;
-        this.Vit = 1;
-        this.Int = 1;
-        this.AP = 10;
-        this.HP = 7;
+        this.skills = new ArrayList();
+        this.level = 1;
+        this.strength = 1;
+        this.vitality = 1;
+        this.intelligence = 1;
+        this.ap = 10;
+        this.hp = 10;
+        this.totalHp = hp;
         
         
         /* // basic caracter
@@ -31,18 +41,18 @@ public class CharacterState {
           zan.weapon = new Weapon(1); // damage 1
           zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range
           zan.armour = new Armour(0.1,0); // Physical 10%, magic 0%
-          zan.max_hp(); // set HP
+          zan.maxHp(); // set hp
         */
     
     }
     
-    public void max_hp(){
+    public void maxHp(){
       int f = 1;
       int g = 1;
-      	setHP(getVit() * HPMod(getLvl()) * f + g);
+      	setHp(getVitality() * hpMod(getLevel()) * f + g);
     }
     
-    public int HPMod(int Lvl){
+    public int hpMod(int Lvl){
       // TODO Get from table
       return Lvl;
     }
@@ -51,7 +61,7 @@ public class CharacterState {
       return armour.getPhysical();
     }
     
-    public double Magical_Defense(){
+    public double magicalDefence(){
       double def = 0;
       // sum of all items
       def+= armour.getAntiMagic();
@@ -59,100 +69,135 @@ public class CharacterState {
     }
 
 	/**
-	 * @return the AP
+	 * @return the ap
 	 */
-	public int getAP() {
-		return AP;
+	public int getAp() {
+		return ap;
 	}
 
 	/**
-	 * @param AP the AP to set
+	 * @param ap the ap to set
 	 */
-	public void setAP(int AP) {
-		this.AP = AP;
+	public void setAp(int ap) {
+		this.ap = ap;
 	}
 
 	/**
-	 * @return the HP
+	 * @return the hp
 	 */
-	public int getHP() {
-		return HP;
+	public double getHp() {
+		return hp;
 	}
 
 	/**
-	 * @param HP the HP to set
+	 * @param hp the hp to set
 	 */
-	public void setHP(int HP) {
-		this.HP = HP;
+	public void setHp(int hp) {
+		this.hp = hp;
 	}
 
 	/**
-	 * @return the Lvl
+	 * @return the level
 	 */
-	public int getLvl() {
-		return Lvl;
+	public int getLevel() {
+		return level;
 	}
 
 	/**
-	 * @param Lvl the Lvl to set
+	 * @param level the level to set
 	 */
-	public void setLvl(int Lvl) {
-		this.Lvl = Lvl;
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	/**
-	 * @return the Str
+	 * @return the strength
 	 */
-	public int getStr() {
-		return Str;
+	public int getStrength() {
+		return strength;
 	}
 
 	/**
-	 * @param Str the Str to set
+	 * @param Strength the strength to set
 	 */
-	public void setStr(int Str) {
-		this.Str = Str;
+	public void setStrength(int Strength) {
+		this.strength = Strength;
 	}
 
 	/**
-	 * @return the Vit
+	 * @return the vitality
 	 */
-	public int getVit() {
-		return Vit;
+	public int getVitality() {
+		return vitality;
 	}
 
 	/**
-	 * @param Vit the Vit to set
+	 * @param vitality the vitality to set
 	 */
-	public void setVit(int Vit) {
-		this.Vit = Vit;
+	public void setVitality(int vitality) {
+		this.vitality = vitality;
 	}
 
 	/**
-	 * @return the Int
+	 * @return the intelligence
 	 */
-	public int getInt() {
-		return Int;
+	public int getIntelligence() {
+		return intelligence;
 	}
 
 	/**
-	 * @param Int the Int to set
+	 * @param intelligence the intelligence to set
 	 */
-	public void setInt(int Int) {
-		this.Int = Int;
+	public void setIntelligence(int intelligence) {
+		this.intelligence = intelligence;
 	}
 
 	/**
 	 * @return the skills
 	 */
-	public Skill[] getSkills() {
+	public List<Skill> getSkills() {
 		return skills;
 	}
 
 	/**
 	 * @param skills the skills to set
 	 */
-	public void setSkills(Skill[] skills) {
+	public void setSkills(List<Skill> skills) {
 		this.skills = skills;
+	}
+	public double getDamage() {
+		return 1.0;
+	}
+
+	public void decreaseHp(double damage) {
+		this.hp -= damage;
+		System.out.println("Health of character at "+ character.getX() +","+ character.getY() +" is "+ hp);
+		RunnableWithController gui = Main.instance.getGuiThread();
+		MainHUDController controller = gui.getController();
+		//controller.decreaseHealthBy(damage, getHp());
+		controller.setHealth(hp / totalHp);
+		
+		if (hp <= 0.0) {
+			die();
+		}
+	}
+
+	private void die() {
+		System.out.println("Character at "+ character.getX() +","+ character.getY() +" died");
+		character.die();
+	}
+
+	/**
+	 * @return the character
+	 */
+	public Character getCharacter() {
+		return character;
+	}
+
+	/**
+	 * @param character the character to set
+	 */
+	public void setCharacter(Character character) {
+		this.character = character;
 	}
 }

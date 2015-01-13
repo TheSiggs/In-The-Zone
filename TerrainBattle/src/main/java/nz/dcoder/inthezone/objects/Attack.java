@@ -19,9 +19,9 @@ public class Attack {
 		double dieroll = 0.9 + (0.2 * rnd);
 		if (skill.type.equals("magic")) {
 			//damage = attacker.weapon.damage - defender.Physical_Defense();
-			stats = attacker.getLvl() / b + attacker.getStr() / a;
+			stats = attacker.getLevel() / b + attacker.getStrength() / a;
 		} else {
-			damage = (skill.damage * attacker.getLvl() / c) - defender.Magical_Defense();
+			damage = (skill.damage * attacker.getLevel() / c) - defender.magicalDefence();
 			//stats = attacker.Int / a;
 		}
 		//attack = dieroll * damage * stats;

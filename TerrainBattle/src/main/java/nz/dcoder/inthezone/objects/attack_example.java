@@ -13,12 +13,12 @@ public class attack_example{
         zan.weapon = new Weapon(1); // damage 1
         zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range
         zan.armour = new Armour(0.1,0.0); // Physical 10%, magic 0%
-        zan.max_hp(); // set HP
+        zan.maxHp(); // set HP
 
         // make enemy
         Character enemy = new Character();
         enemy.armour = new Armour(0.1,0.0);
-        enemy.max_hp();
+        enemy.maxHp();
 
         // attack
         attackObj.attack(zan, enemy, zan.skills[0]); // attacker, defender, attacker.skill

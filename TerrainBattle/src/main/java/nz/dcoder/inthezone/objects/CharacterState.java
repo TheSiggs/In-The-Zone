@@ -11,62 +11,61 @@ import nz.dcoder.inthezone.jfx.MainHUDController;
  * @author jedcalkin
  */
 public class CharacterState {
-    private int ap;
-    private double hp;
+
+	private int ap;
+	private double hp;
 	private double totalHp;
-    private int level;
-    private int strength;
-    private int vitality;
-    private int intelligence;
-    private List<Skill> skills;
-    private Weapon weapon;
-    private Armour armour;
+	private int level;
+	private int strength;
+	private int vitality;
+	private int intelligence;
+	private List<Skill> skills;
+	private Weapon weapon;
+	private Armour armour;
 	private Character character;
-    
-    public CharacterState(){
-        this.weapon = null;
-        this.armour = null;
-        this.skills = new ArrayList();
-        this.level = 1;
-        this.strength = 1;
-        this.vitality = 1;
-        this.intelligence = 1;
-        this.ap = 10;
-        this.hp = 10;
-        this.totalHp = hp;
-        
-        
-        /* // basic caracter
-          CharacterState zan = new CharacterState();
-          zan.weapon = new Weapon(1); // damage 1
-          zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range
-          zan.armour = new Armour(0.1,0); // Physical 10%, magic 0%
-          zan.maxHp(); // set hp
-        */
-    
-    }
-    
-    public void maxHp(){
-      int f = 1;
-      int g = 1;
-      	setHp(getVitality() * hpMod(getLevel()) * f + g);
-    }
-    
-    public int hpMod(int Lvl){
-      // TODO Get from table
-      return Lvl;
-    }
-    
-    public double Physical_Defense(){
-      return armour.getPhysical();
-    }
-    
-    public double magicalDefence(){
-      double def = 0;
-      // sum of all items
-      def+= armour.getAntiMagic();
-      return 0;
-    }
+
+	public CharacterState() {
+		this.weapon = null;
+		this.armour = null;
+		this.skills = new ArrayList();
+		this.level = 1;
+		this.strength = 1;
+		this.vitality = 1;
+		this.intelligence = 1;
+		this.ap = 10;
+		this.hp = 10;
+		this.totalHp = hp;
+
+		/* // basic caracter
+		 CharacterState zan = new CharacterState();
+		 zan.weapon = new Weapon(1); // damage 1
+		 zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range
+		 zan.armour = new Armour(0.1,0); // Physical 10%, magic 0%
+		 zan.maxHp(); // set hp
+		 */
+	}
+
+	public void maxHp() {
+		int f = 1;
+		int g = 1;
+		setHp(getVitality() * hpMod(getLevel()) * f + g);
+	}
+
+	public int hpMod(int Lvl) {
+		// TODO Get from table
+		return Lvl;
+	}
+
+	public double Physical_Defense() {
+		return armour.getPhysical();
+	}
+
+	public double magicalDefence() {
+		double def = 0;
+		// sum of all items
+		def += armour.getAntiMagic();
+		return 0;
+	}
 
 	/**
 	 * @return the ap
@@ -165,25 +164,26 @@ public class CharacterState {
 	public void setSkills(List<Skill> skills) {
 		this.skills = skills;
 	}
+
 	public double getDamage() {
 		return 1.0;
 	}
 
 	public void decreaseHp(double damage) {
 		this.hp -= damage;
-		System.out.println("Health of character at "+ character.getX() +","+ character.getY() +" is "+ hp);
-		RunnableWithController gui = Main.instance.getGuiThread();
-		MainHUDController controller = gui.getController();
-		//controller.decreaseHealthBy(damage, getHp());
-		controller.setHealth(hp / totalHp);
-		
+
 		if (hp <= 0.0) {
 			die();
+		} else {
+			System.out.println("Health of character at " + character.getX() + "," + character.getY() + " is " + hp);
+			RunnableWithController gui = Main.instance.getGuiThread();
+			MainHUDController controller = gui.getController();
+			controller.setHealth(hp / totalHp);
 		}
 	}
 
 	private void die() {
-		System.out.println("Character at "+ character.getX() +","+ character.getY() +" died");
+		System.out.println("Character at " + character.getX() + "," + character.getY() + " died");
 		character.die();
 	}
 

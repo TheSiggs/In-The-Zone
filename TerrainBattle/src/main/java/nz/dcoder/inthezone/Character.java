@@ -7,6 +7,7 @@ package nz.dcoder.inthezone;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import nz.dcoder.inthezone.objects.CharacterState;
 
@@ -111,6 +112,9 @@ public class Character implements AnimEventListener {
 	}
 
 	public void die() {
-		this.getSpatial().getParent().detachChild(this.getSpatial());
+		Node parent = this.getSpatial().getParent();
+		if (parent != null) {
+			parent.detachChild(this.getSpatial());
+		}
 	}
 }

@@ -467,6 +467,9 @@ public class Main extends SimpleApplication {
 		private void attackCharacter(Point2i point) {
 			Character attacker = findCurrentPlayer();
 			Character defender = getCharacterAt(point.x, point.y);
+			if (attacker == null || defender == null) {
+				return;
+			}
 			BoardNode start = new BoardNode(attacker.getX(), attacker.getY(), null);
 			BoardNode goal = new BoardNode(defender.getX(), defender.getY(), null);
 			AStarSearch search = new AStarSearch(start, goal);
@@ -475,8 +478,34 @@ public class Main extends SimpleApplication {
 			CharacterState aState = attacker.getState();
 			CharacterState dState = defender.getState();
 			dState.decreaseHp(aState.getDamage());
+			if (dState.getHp() <= 0.0) {
+				die(defender);
+			}
 		}
 	};
+
+	public void die(Character character) {
+		for (Character c : team1) {
+			if (c == character) {
+				team1.remove(c);
+				Node parent = c.getSpatial().getParent();
+				if (parent != null) {
+					parent.detachChild(c.getSpatial());
+				}
+				return;
+			}
+		}
+		for (Character c : team2) {
+			if (c == character) {
+				team2.remove(c);
+				Node parent = c.getSpatial().getParent();
+				if (parent != null) {
+					parent.detachChild(c.getSpatial());
+				}
+				return;
+			}
+		}
+	}
 
 	private void initLight() {
 		/*
@@ -594,25 +623,25 @@ public class Main extends SimpleApplication {
 		JmeFxScreenContainer jmeFx = JmeFxContainer.install(this, getGuiNode(), true, null);
 		//final Main that = this;
 		/*
-		guiThread = new Runnable() {
-			private MainHUDController controller;
-			@Override
-			public void run() {
-				try {
-					URL path1 = path1 = (new MainHUDController()).getClass().getResource("mainHUD.fxml");
-					FXMLLoader loader = new FXMLLoader();
-					Parent root1 = loader.load(path1);
-					scene = new Scene(root1, 300, 275);
-					MainHUDController.app = that;
-					scene.setFill(Color.TRANSPARENT);
-					getJmefx().setScene(scene, root1);
-					controller = loader.getController();
-				} catch (IOException ex) {
-					Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-				}
-			}
-		};
-				*/
+		 guiThread = new Runnable() {
+		 private MainHUDController controller;
+		 @Override
+		 public void run() {
+		 try {
+		 URL path1 = path1 = (new MainHUDController()).getClass().getResource("mainHUD.fxml");
+		 FXMLLoader loader = new FXMLLoader();
+		 Parent root1 = loader.load(path1);
+		 scene = new Scene(root1, 300, 275);
+		 MainHUDController.app = that;
+		 scene.setFill(Color.TRANSPARENT);
+		 getJmefx().setScene(scene, root1);
+		 controller = loader.getController();
+		 } catch (IOException ex) {
+		 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		 }
+		 }
+		 };
+		 */
 		setGuiThread(new RunnableWithController(jmeFx, this));
 		Platform.runLater(getGuiThread());
 		this.guiNode.attachChild(getGuiThread().getJmeFx().getJmeNode());

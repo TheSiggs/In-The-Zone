@@ -112,9 +112,11 @@ public class Character implements AnimEventListener {
 	}
 
 	public void die() {
+		/*
 		Node parent = this.getSpatial().getParent();
 		if (parent != null) {
 			parent.detachChild(this.getSpatial());
 		}
+				*/
 	}
 }

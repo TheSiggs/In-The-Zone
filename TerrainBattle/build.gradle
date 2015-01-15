@@ -21,15 +21,16 @@ if (!hasProperty('mainClass')) {
 
 repositories {
 	mavenCentral()
+	jcenter()
 	// You may define additional repositories, or even remove "mavenCentral()".
 	// Read more about repositories here:
 	//   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
 	flatDir {
 		dirs 'libs'
 	}
-	maven {
-		url 'http://updates.jmonkeyengine.org/maven'
-	}
+	//maven {
+	//	url 'http://updates.jmonkeyengine.org/maven'
+	//}
 	//maven { url "http://dl.bintray.com/jmonkeyengine/contrib" }
 	maven { url "http://dl.bintray.com/davidb/jme3stuff" }
 }
@@ -55,23 +56,28 @@ sourceSets {
 	}
 }
 
+//def jmeGroup = 'com.jme3'
+//def jmeVersion = '3.0.+'
+def jmeGroup = 'net.sf.sociaal'
+def jmeVersion = '3.0.0.20130526'
 dependencies {
 	// You can read more about how to add dependency here:
 	//   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 	testCompile group: 'junit', name: 'junit', version: '4.10'
 	compile fileTree(dir: 'libs', include: ['*.jar'])
 	compile 'com.googlecode.aima-java:aima-core:0.11.0'
-	compile 'com.jme3:jme3-core:3.0.+'
-	compile 'com.jme3:jme3-effects:3.0.+'
-	compile 'com.jme3:jme3-networking:3.0.+'
-	compile 'com.jme3:jme3-plugins:3.0.+'
-	compile 'com.jme3:jme3-jogg:3.0.+'
-	compile 'com.jme3:jme3-terrain:3.0.+'
-	compile 'com.jme3:jme3-blender:3.0.+'
-	compile 'com.jme3:jme3-jbullet:3.0.+'
-	compile 'com.jme3:jme3-niftygui:3.0.+'
-	compile 'com.jme3:jme3-desktop:3.0.+'
-	compile 'com.jme3:jme3-lwjgl:3.0.+'
+	//compile jmeGroup +':jME3-core:'+ jmeVersion
+	//compile jmeGroup +':jME3-effects:'+ jmeVersion
+	//compile jmeGroup +':jME3-networking:'+ jmeVersion
+	//compile jmeGroup +':jME3-plugins:'+ jmeVersion
+	//compile jmeGroup +':jME3-jogg:'+ jmeVersion
+	//compile jmeGroup +':jME3-terrain:'+ jmeVersion
+	//compile jmeGroup +':jME3-blender:'+ jmeVersion
+	//compile jmeGroup +':jME3-jbullet:'+ jmeVersion
+	//compile jmeGroup +':jME3-niftygui:'+ jmeVersion
+	//compile jmeGroup +':jME3-desktop:'+ jmeVersion
+	////compile jmeGroup +':jme3-lwjgl:3.0.0.20130526'
+	//compile 'net.sf.sociaal:jME3-lwjgl:3.0.0.20130526'
 	//compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
 	compile "com.jme3x:jfx:1.+"
 }

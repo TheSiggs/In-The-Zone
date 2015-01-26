@@ -37,12 +37,12 @@ public class CharacterState {
 		this.totalHp = hp;
 
 		/* // basic caracter
-		 CharacterState zan = new CharacterState();
-		 zan.weapon = new Weapon(1); // damage 1
-		 zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range
-		 zan.armour = new Armour(0.1,0); // Physical 10%, magic 0%
-		 zan.maxHp(); // set hp
-		 */
+		CharacterState zan = new CharacterState();
+                zan.setWeapon(new Weapon(1)); // damage 1
+                zan.addSkill(new Skill("Physical",1,1)); // type(Physical,magic), damage, range
+                zan.setArmour(new Armour(0.1,0)); // Physical 10%, magic 0%
+                zan.maxHp(); // set HP
+		*/
 	}
 
 	public void maxHp() {
@@ -91,7 +91,7 @@ public class CharacterState {
 	/**
 	 * @param hp the hp to set
 	 */
-	public void setHp(int hp) {
+	public void setHp(double hp) {
 		this.hp = hp;
 	}
 
@@ -202,4 +202,28 @@ public class CharacterState {
 	public void setCharacter(Character character) {
 		this.character = character;
 	}
+        
+        /**
+         * @return the weapon
+         */
+        public Weapon getWeapon() {
+            return weapon;
+        }
+
+        /**
+         * @param weapon the weapon to set
+         */
+        public void setWeapon(Weapon weapon) {
+            this.weapon = weapon;
+        }
+        
+        
+        public Armour getArmour() {
+            return armour;
+        }
+
+        public void setArmour(Armour armour) {
+            this.armour = armour;
+        }
+
 }

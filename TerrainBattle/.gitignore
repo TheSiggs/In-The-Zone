@@ -1,3 +1,4 @@
 .nb-gradle/
 .nb-gradle-properties
 *.dll
+*.swp

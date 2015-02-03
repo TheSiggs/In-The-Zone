@@ -15,10 +15,10 @@ public class BattleObject {
 	public final boolean isObstacle;
 	public final boolean isAttackable;
 	public final boolean isPushable;
-	public final int hitsRemaining;
 	public final ObjectAbility ability;
 
 	public Position position;
+	public int hitsRemaining;
 
 	public BattleObject (
 		BattleObjectName name,

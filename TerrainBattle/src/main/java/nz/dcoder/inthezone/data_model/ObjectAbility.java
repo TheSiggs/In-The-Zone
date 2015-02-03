@@ -10,7 +10,7 @@ import nz.dcoder.inthezone.data_model.pure.BaseStats;
  * an object can do an ability, then we need to give it base stats and a level
  * as inputs to the damage formula.
  * */
-class ObjectAbility implements CanDoAbility {
+public class ObjectAbility implements CanDoAbility {
 	final Ability ability;
 
 	public ObjectAbility (Ability ability) {

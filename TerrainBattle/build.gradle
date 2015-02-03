@@ -101,6 +101,7 @@ jar {
 	}
 	from fileTree('src/main/resources').include('**/*.fxml')
 	from fileTree('src/main/java').include('**/*.fxml')
+	from fileTree('src/main/data').include('**/*.csv')
 	//from fileTree('src/main/java').include('**/*.class')
 }
 

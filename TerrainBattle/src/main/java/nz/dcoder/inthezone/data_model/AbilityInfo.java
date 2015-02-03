@@ -18,7 +18,7 @@ public class AbilityInfo {
 	public final String aClass;
 	public final EffectName effect;
 
-	AbilityInfo(
+	public AbilityInfo(
 		AbilityName name,
 		int cost,
 		int amount,

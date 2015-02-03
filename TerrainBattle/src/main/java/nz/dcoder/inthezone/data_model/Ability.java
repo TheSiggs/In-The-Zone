@@ -6,7 +6,7 @@ import nz.dcoder.inthezone.data_model.pure.EffectName;
 /**
  * Pairs an AbilityInfo with a means to apply the ability's effect.
  * */
-abstract class Ability {
+abstract public class Ability {
 	public final EffectName name;
 	public final AbilityInfo info;
 

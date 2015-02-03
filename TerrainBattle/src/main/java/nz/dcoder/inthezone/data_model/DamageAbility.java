@@ -4,8 +4,10 @@ import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 
 public class DamageAbility extends Ability {
+	public static EffectName effectName = new EffectName("damage");
+
 	public DamageAbility(AbilityInfo info) {
-		super(new EffectName("damage"), info);
+		super(effectName, info);
 	}
 
 	public void applyEffect(CanDoAbility agent, Position pos, Battle battle) {

@@ -9,6 +9,7 @@ public class attack_example{
     
         // make zan
         CharacterState zan = new CharacterState();
+        zan.setWeapon(new Weapon(1));
 		/*
         zan.weapon = new Weapon(1); // damage 1
         zan.skills[0] = new Skill("Physical",1,1); // type(Physical,magic), damage, range

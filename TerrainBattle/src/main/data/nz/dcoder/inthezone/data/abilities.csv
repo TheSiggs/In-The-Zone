@@ -1,0 +1,4 @@
+name,cost,amount,range,areaOfEffect,isPiercing,canPassObstacles,requiresMana,class,effect
+attack,5,10,1,0,FALSE,FALSE,FALSE,physcial,damage
+heal,5,10,1,0,FALSE,FALSE,FALSE,magical,heal
+teleport,5,0,3,0,FALSE,TRUE,FALSE,magical,teleport

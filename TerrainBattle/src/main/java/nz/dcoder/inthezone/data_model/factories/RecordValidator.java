@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
 
+import nz.dcoder.inthezone.data_model.pure.BaseStats;
+
 class RecordValidator {
 	private final String[] headerNames;
 
@@ -28,6 +30,40 @@ class RecordValidator {
 		} else {
 			throw new NumberFormatException("Expected a boolean value, saw " + s);
 		}
+	}
+
+	public static BaseStats parseBaseStats(CSVRecord record)
+		throws NumberFormatException, IOException
+	{
+		// validate that the record contains all the base stats
+		String[] headers = {
+			"baseAP",
+			"baseMP",
+			"strength",
+			"intelligence",
+			"dexterity",
+			"guard",
+			"spirit",
+			"vitality"
+		};
+		for (String header : headers) {
+			if (!record.isMapped(header)) {
+				throw new IOException("Missing expected header " + header);
+			}
+		}
+
+		BaseStats r = new BaseStats(
+			Integer.parseInt(record.get("baseAP")),
+			Integer.parseInt(record.get("baseMP")),
+			Integer.parseInt(record.get("strength")),
+			Integer.parseInt(record.get("intelligence")),
+			Integer.parseInt(record.get("dexterity")),
+			Integer.parseInt(record.get("guard")),
+			Integer.parseInt(record.get("spirit")),
+			Integer.parseInt(record.get("vitality"))
+		);
+
+		return r;
 	}
 }
 

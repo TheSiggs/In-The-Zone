@@ -19,9 +19,18 @@ public class LevelController {
 	// For each level, the abilities that become available at that level
 	private final Collection<Ability>[] abilitiesByLevel;
 
-	public LevelController(int[] hpMod, Collection<Ability>[] abilitiesByLevel) {
+	// For each level, the total number of exp required of the character's
+	// lifetime to reach that level.  As usual, data at index 0 is ignored.
+	private final int[] totalExpRequired;
+
+	public LevelController(
+		int[] hpMod,
+		Collection<Ability>[] abilitiesByLevel,
+		int[] totalExpRequired
+	) {
 		this.hpMod = hpMod;
 		this.abilitiesByLevel = abilitiesByLevel;
+		this.totalExpRequired = totalExpRequired;
 	}
 
 	/**

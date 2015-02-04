@@ -80,7 +80,7 @@ dependencies {
 	//compile 'net.sf.sociaal:jME3-lwjgl:3.0.0.20130526'
 	//compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
 	compile "com.jme3x:jfx:1.+"
-        compile "org.apache.commons:commons-csv:1.0"
+        //compile "org.apache.commons:commons-csv:1.0"
 }
 
 //applicationDefaultJvmArgs = ["-Dgreeting.language=en"]

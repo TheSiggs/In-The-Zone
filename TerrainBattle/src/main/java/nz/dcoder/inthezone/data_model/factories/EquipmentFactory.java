@@ -49,7 +49,7 @@ public class EquipmentFactory {
 				String[] ss = record.get("abilities").split(",");
 				List<Ability> abilities = new ArrayList<Ability>();
 				for (String s : ss) {
-					Ability a = abilityFactory.newAbility(new AbilityName(s.trim()));
+					Ability a = abilityFactory.newAbility(new AbilityName(s));
 					if (a == null) {
 						throw new DatabaseNameException("No such ability " + s);
 					} else {

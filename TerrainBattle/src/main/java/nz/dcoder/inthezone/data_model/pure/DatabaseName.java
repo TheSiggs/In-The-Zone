@@ -7,7 +7,7 @@ public abstract class DatabaseName {
 	private final String name;
 
 	public DatabaseName(String name) {
-		this.name = name;
+		this.name = name.trim();
 	}
 
 	@Override public int hashCode() {

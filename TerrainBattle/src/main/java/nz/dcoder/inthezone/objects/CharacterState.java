@@ -23,6 +23,7 @@ public class CharacterState {
 	private Weapon weapon;
 	private Armour armour;
 	private Character character;
+        private double movePoints;
 
 	public CharacterState() {
 		this.weapon = null;
@@ -35,6 +36,7 @@ public class CharacterState {
 		this.ap = 10;
 		this.hp = 10;
 		this.totalHp = hp;
+                this.movePoints = 10;
 
 		/* // basic caracter
 		 CharacterState zan = new CharacterState();
@@ -202,4 +204,8 @@ public class CharacterState {
 	public void setCharacter(Character character) {
 		this.character = character;
 	}
+        
+        public void decreaseMovementPoints(double value) {
+            
+        }
 }

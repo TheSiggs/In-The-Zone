@@ -18,7 +18,7 @@ import nz.dcoder.inthezone.data_model.pure.ItemName;
 public class ItemFactory {
 	private final Map<ItemName, Item> items;
 
-	public ItemFactory(AbilityFactory abilityFactory) {
+	public ItemFactory(AbilityFactory abilityFactory) throws DatabaseException {
 		items = new HashMap<ItemName, Item>();
 
 		RecordValidator validator = new RecordValidator(new String[] {
@@ -48,15 +48,9 @@ public class ItemFactory {
 
 				items.put(item.name, item);
 			}
-		} catch (IOException e) {
-			System.err.println("ERROR: IO error reading items.csv");
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			System.err.println("ERROR: items.csv is malformed");
-			e.printStackTrace();
-		} catch (DatabaseNameException e) {
-			System.err.println("ERROR: items.csv is malformed");
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new DatabaseException(
+				"Error reading items.csv: " + e.getMessage(), e);
 		}
 	}
 

@@ -20,7 +20,9 @@ import nz.dcoder.inthezone.data_model.pure.Position;
 public class BattleObjectFactory {
 	private final Map<BattleObjectName, BattleObjectInfo> objects;
 
-	public BattleObjectFactory(AbilityFactory abilityFactory) {
+	public BattleObjectFactory(AbilityFactory abilityFactory)
+		throws DatabaseException
+	{
 		objects = new HashMap<BattleObjectName, BattleObjectInfo>();
 
 		RecordValidator validator = new RecordValidator(new String[] {
@@ -63,15 +65,9 @@ public class BattleObjectFactory {
 
 				objects.put(info.name, info);
 			}
-		} catch (IOException e) {
-			System.err.println("ERROR: IO error reading objects.csv");
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			System.err.println("ERROR: objects.csv is malformed");
-			e.printStackTrace();
-		} catch (DatabaseNameException e) {
-			System.err.println("ERROR: objects.csv is malformed");
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new DatabaseException(
+				"Error reading objects.csv: " + e.getMessage(), e);
 		}
 
 	}

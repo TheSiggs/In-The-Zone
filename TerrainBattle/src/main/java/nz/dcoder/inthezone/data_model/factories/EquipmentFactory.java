@@ -22,7 +22,9 @@ import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 public class EquipmentFactory {
 	private final Map<EquipmentName, Equipment> equipment;
 
-	public EquipmentFactory(AbilityFactory abilityFactory) {
+	public EquipmentFactory(AbilityFactory abilityFactory)
+		throws DatabaseException
+	{
 		equipment = new HashMap<EquipmentName, Equipment>();
 
 		RecordValidator validator = new RecordValidator(new String[] {
@@ -46,16 +48,8 @@ public class EquipmentFactory {
 				validator.validate(record);
 
 				// parse the abilities list
-				String[] ss = record.get("abilities").split(",");
-				List<Ability> abilities = new ArrayList<Ability>();
-				for (String s : ss) {
-					Ability a = abilityFactory.newAbility(new AbilityName(s));
-					if (a == null) {
-						throw new DatabaseNameException("No such ability " + s);
-					} else {
-						abilities.add(a);
-					}
-				}
+				List<Ability> abilities = RecordValidator.parseAbilityList(
+					abilityFactory, record.get("abilities"));
 
 				// construct the equipment
 				Equipment item = new Equipment(
@@ -70,15 +64,9 @@ public class EquipmentFactory {
 
 				equipment.put(item.name, item);
 			}
-		} catch (IOException e) {
-			System.err.println("ERROR: IO error reading equipment.csv");
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			System.err.println("ERROR: equipment.csv is malformed");
-			e.printStackTrace();
-		} catch (DatabaseNameException e) {
-			System.err.println("ERROR: equipment.csv is malformed");
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new DatabaseException(
+				"Error reading equipment.csv: " + e.getMessage(), e);
 		}
 	}
 

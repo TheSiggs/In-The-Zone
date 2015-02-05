@@ -1,9 +1,12 @@
 package nz.dcoder.inthezone.data_model.factories;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
 
+import nz.dcoder.inthezone.data_model.Ability;
+import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 
 class RecordValidator {
@@ -64,6 +67,24 @@ class RecordValidator {
 		);
 
 		return r;
+	}
+
+	public static List<Ability> parseAbilityList(
+		AbilityFactory abilityFactory, String names
+	) throws DatabaseNameException
+	{
+		String[] ss = names.split(",");
+		List<Ability> abilities = new ArrayList<Ability>();
+		for (String s : ss) {
+			Ability a = abilityFactory.newAbility(new AbilityName(s));
+			if (a == null) {
+				throw new DatabaseNameException("No such ability " + s);
+			} else {
+				abilities.add(a);
+			}
+		}
+
+		return abilities;
 	}
 }
 

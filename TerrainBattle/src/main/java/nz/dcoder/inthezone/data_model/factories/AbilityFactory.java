@@ -22,7 +22,7 @@ import nz.dcoder.inthezone.data_model.TeleportAbility;
 public class AbilityFactory {
 	private final Map<AbilityName, Ability> abilities;
 
-	public AbilityFactory() {
+	public AbilityFactory() throws DatabaseException {
 		// the effects database
 		Map<EffectName, Function<AbilityInfo, Ability>> effects;
 		effects = new HashMap<EffectName, Function<AbilityInfo, Ability>>();
@@ -73,15 +73,9 @@ public class AbilityFactory {
 
 				abilities.put(info.name, effects.get(info.effect).apply(info));
 			}
-		} catch (IOException e) {
-			System.err.println("ERROR: IO error reading abilities.csv");
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			System.err.println("ERROR: abilities.csv is malformed");
-			e.printStackTrace();
-		} catch (DatabaseNameException e) {
-			System.err.println("ERROR: abilities.csv is malformed");
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new DatabaseException(
+				"Error reading abilities.csv: " + e.getMessage(), e);
 		}
 	}
 

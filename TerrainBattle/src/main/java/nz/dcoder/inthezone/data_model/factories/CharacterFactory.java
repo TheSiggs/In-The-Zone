@@ -6,8 +6,11 @@ import nz.dcoder.inthezone.data_model.Character;
 public class CharacterFactory {
 	private final LevelControllerFactory levelControllerFactory;
 
-	public CharacterFactory() {
-		this.levelControllerFactory = new LevelControllerFactory();
+	public CharacterFactory(AbilityFactory abilityFactory)
+		throws DatabaseException
+	{
+		this.levelControllerFactory =
+			new LevelControllerFactory(abilityFactory);
 	}
 
 	public Character newCharacter(CharacterName name) {

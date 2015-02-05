@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.data_model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
@@ -32,6 +33,10 @@ public class Character implements CanDoAbility {
 		this.description = description;
 		this.baseStats = baseStats;
 		this.level = level;
+
+		this.hp = level.maxHP;
+		this.equipment = new ArrayList<Equipment>();
+		this.position = new Position(0, 0);
 	}
 
 	/**

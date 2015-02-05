@@ -23,6 +23,7 @@ public class CharacterState {
 	private Weapon weapon;
 	private Armour armour;
 	private Character character;
+        private double movePoints;
 
 	public CharacterState() {
 		this.weapon = null;
@@ -35,6 +36,7 @@ public class CharacterState {
 		this.ap = 10;
 		this.hp = 10;
 		this.totalHp = hp;
+                this.movePoints = 10;
 
 		/* // basic caracter
 		CharacterState zan = new CharacterState();
@@ -176,11 +178,11 @@ public class CharacterState {
 		MainHUDController controller = gui.getController();
 		if (hp <= 0.0) {
 			System.out.println("Health of character at " + character.getX() + "," + character.getY() + " is " + 0);
-			controller.setHealth(0.0);
+			controller.setHealthValue(0.0);
 			die();
 		} else {
 			System.out.println("Health of character at " + character.getX() + "," + character.getY() + " is " + hp);
-			controller.setHealth(hp / totalHp);
+			controller.setHealthValue(hp / totalHp);
 		}
 	}
 
@@ -203,6 +205,9 @@ public class CharacterState {
 		this.character = character;
 	}
         
+        public void decreaseMovementPoints(double value) {
+            
+        }
         /**
          * @return the weapon
          */

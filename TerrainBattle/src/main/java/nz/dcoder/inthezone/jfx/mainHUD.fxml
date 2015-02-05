@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.canvas.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
@@ -8,15 +9,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: rgba(255,255,255,0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: rgba(255,255,255,0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
     <stylesheets>
         <URL value="@mainhud.css" />
     </stylesheets>
     <children>
-        <Button layoutX="696.0" layoutY="11.0" mnemonicParsing="false" onAction="#handleButtonAction" text="Main HUD" />
-        <Canvas fx:id="canvas" height="200.0" width="200.0" />
-        <Button fx:id="button" layoutX="144.0" layoutY="36.0" onAction="#healthUp" text="Health Up" />
-        <Button fx:id="button1" layoutX="14.0" layoutY="36.0" onAction="#healthDown" text="Health Down" />
-        <ProgressBar fx:id="health" layoutX="14.0" layoutY="14.0" prefWidth="200.0" progress="0.0" />
+        <Button layoutX="727.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleButtonAction" text="Main HUD" />
+        <ProgressBar fx:id="health" layoutX="79.0" layoutY="15.0" prefWidth="200.0" progress="1.0" />
+      <Pane disable="true" layoutY="507.0" opacity="0.0" prefHeight="94.0" prefWidth="800.0" style="-fx-background-color: grey;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="506.0">
+         <children>
+            <Button disable="true" layoutX="27.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill One" />
+            <Button disable="true" layoutX="181.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Two" />
+            <Button disable="true" layoutX="337.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Three" />
+            <Button disable="true" layoutX="487.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Four" />
+            <Button disable="true" layoutX="638.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Five" />
+         </children>
+      </Pane>
+      <ListView disable="true" layoutX="674.0" layoutY="156.0" opacity="0.0" prefHeight="206.0" prefWidth="125.0" style="-fx-background-color: Grey;" />
+      <Button disable="true" layoutX="674.0" layoutY="156.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 1" />
+      <Button disable="true" layoutX="674.0" layoutY="198.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 2" />
+      <Button disable="true" layoutX="674.0" layoutY="240.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 3" />
+      <Button disable="true" layoutX="674.0" layoutY="279.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 4" />
+      <Button disable="true" layoutX="674.0" layoutY="321.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 5" />
+      <Label layoutX="34.0" layoutY="11.0" prefHeight="25.0" prefWidth="45.0" text="Health" />
+      <ProgressBar fx:id="Mana" layoutX="79.0" layoutY="36.0" prefWidth="200.0" progress="1.0" />
+      <Label layoutX="34.0" layoutY="33.0" prefHeight="25.0" prefWidth="45.0" text="Mana" />
+      <Label layoutX="34.0" layoutY="54.0" prefHeight="25.0" prefWidth="45.0" text="MP" />
+      <ProgressBar fx:id="movePoints" layoutX="79.0" layoutY="58.0" prefWidth="200.0" progress="1.0" /> 
     </children>
+   <padding>
+      <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+   </padding>
 </AnchorPane>

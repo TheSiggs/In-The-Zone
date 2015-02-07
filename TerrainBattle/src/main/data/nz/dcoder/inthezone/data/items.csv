@@ -1,0 +1,7 @@
+name,description,ability,,Notes
+testItem,"For testing purposes, does not appear in the actual game",test,,"This line is for testing purposes, please do not alter"
+,,,,
+,,,,Description of fields
+,,,,name: The name of this consumable item
+,,,,description: A short description of what this item does
+,,,,ability: The name of an ability defined in the abilities spreadsheet.  This allows us to make items with areaOfEffect etc.

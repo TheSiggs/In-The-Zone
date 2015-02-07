@@ -37,12 +37,15 @@ public class BattleObjectFactory {
 		try {
 			InputStream in = this.getClass().getResourceAsStream(
 					"/nz/dcoder/inthezone/data/objects.csv");
-			if (in == null) throw new FileNotFoundException("objects.csv");
+			if (in == null) throw new FileNotFoundException("File not found objects.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
-			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
+			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
 
 			for(CSVRecord record : parser) {
 				validator.validate(record);
+
+				// skip blanks
+				if (record.get("name").trim().equals("")) continue;
 
 				ObjectAbility oa = null;
 				if (RecordValidator.parseBoolean(record.get("hasAbility"))) {

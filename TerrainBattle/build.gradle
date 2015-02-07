@@ -53,6 +53,12 @@ sourceSets {
 			//srcDirs = ["src/main/java"]
 			include '**/*.fxml', '**/*.java'
 		}
+
+		test {
+			java {
+				srcDirs = ["src/tests/java"]
+			}
+		}
 	}
 }
 
@@ -106,6 +112,10 @@ jar {
 	//from fileTree('src/main/java').include('**/*.class')
 }
 
+test {
+	classpath = project.sourceSets.test.runtimeClasspath + files("src/main/data")
+}
+
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.1'
 }
@@ -121,3 +131,4 @@ distZip {
 		include 'assets/**', '*.dylib', '*.so'
 	}
 }
+

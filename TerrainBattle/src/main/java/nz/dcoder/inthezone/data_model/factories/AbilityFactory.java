@@ -47,12 +47,15 @@ public class AbilityFactory {
 		try {
 			InputStream in = this.getClass().getResourceAsStream(
 					"/nz/dcoder/inthezone/data/abilities.csv");
-			if (in == null) throw new FileNotFoundException("abilities.csv");
+			if (in == null) throw new FileNotFoundException("File not found abilities.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
-			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
+			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
 
 			for(CSVRecord record : parser) {
 				validator.validate(record);
+
+				// skip blanks
+				if (record.get("name").trim().equals("")) continue;
 
 				AbilityInfo info = new AbilityInfo (
 					new AbilityName(record.get("name")),
@@ -73,6 +76,9 @@ public class AbilityFactory {
 
 				abilities.put(info.name, effects.get(info.effect).apply(info));
 			}
+		} catch (NumberFormatException e) {
+			throw new DatabaseException(
+				"Error reading abilities.csv: " + e.getMessage() + " expected number", e);
 		} catch (Exception e) {
 			throw new DatabaseException(
 				"Error reading abilities.csv: " + e.getMessage(), e);

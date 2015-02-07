@@ -58,12 +58,15 @@ class LevelControllerFactory {
 
 		InputStream in = this.getClass().getResourceAsStream(
 				"/nz/dcoder/inthezone/data/" + filename);
-		if (in == null) throw new FileNotFoundException(filename);
+		if (in == null) throw new FileNotFoundException("File not found " + filename);
 		InputStreamReader reader = new UnicodeInputReader(in);
-		CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
+		CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
 
 		for(CSVRecord record : parser) {
 			validator.validate(record);
+
+			// skip blanks
+			if (record.get("character").trim().equals("")) continue;
 
 			List<Ability> abilities = RecordValidator.parseAbilityList(
 				abilityFactory, record.get("abilities"));
@@ -100,12 +103,15 @@ class LevelControllerFactory {
 
 		InputStream in = this.getClass().getResourceAsStream(
 				"/nz/dcoder/inthezone/data/" + filename);
-		if (in == null) throw new FileNotFoundException(filename);
+		if (in == null) throw new FileNotFoundException("File not found " + filename);
 		InputStreamReader reader = new UnicodeInputReader(in);
-		CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
+		CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
 
 		for(CSVRecord record : parser) {
 			validator.validate(record);
+
+			// skip blanks
+			if (record.get("level").trim().equals("")) continue;
 
 			expMap.put(Integer.parseInt(record.get("level")),
 				Integer.parseInt(record.get("exp")));

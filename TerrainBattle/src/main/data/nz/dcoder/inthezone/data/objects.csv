@@ -1,0 +1,11 @@
+name,isObstacle,isAttackable,isPushable,hits,hasAbility,ability,,Notes
+testObj,FALSE,FALSE,FALSE,0,TRUE,test,,This line is for testing.  Please do not alter
+,,,,,,,,
+,,,,,,,,Description of fields
+,,,,,,,,name: The name of this battle object
+,,,,,,,,"isObstacle: TRUE if this object blocks movement, otherwise FALSE"
+,,,,,,,,"isAttackable: TRUE if this object can be attacked, otherwise FALSE"
+,,,,,,,,"isPushable: TRUE if this object can be pushed (i.e. corpses), otherwise FALSE"
+,,,,,,,,"hits: For attackable objects, the number of attacks required to destroy the object"
+,,,,,,,,hasAbility: TRUE if the object has some kind of effect (e.g. a trip mine)
+,,,,,,,,"ability: For objects that have an effect, the name of an ability which encodes that effect.  This way, objects like mines can have areaOfEffect etc."

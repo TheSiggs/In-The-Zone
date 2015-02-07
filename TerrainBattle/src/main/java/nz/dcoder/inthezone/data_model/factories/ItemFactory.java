@@ -27,12 +27,15 @@ public class ItemFactory {
 		try {
 			InputStream in = this.getClass().getResourceAsStream(
 					"/nz/dcoder/inthezone/data/items.csv");
-			if (in == null) throw new FileNotFoundException("items.csv");
+			if (in == null) throw new FileNotFoundException("File not found items.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
-			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
+			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
 
 			for(CSVRecord record : parser) {
 				validator.validate(record);
+
+				// skip blanks
+				if (record.get("name").trim().equals("")) continue;
 
 				AbilityName abilityName = new AbilityName(record.get("ability"));
 				Ability ability = abilityFactory.newAbility(abilityName);

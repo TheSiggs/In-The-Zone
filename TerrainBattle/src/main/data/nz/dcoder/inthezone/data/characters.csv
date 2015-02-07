@@ -1,0 +1,18 @@
+name,description,baseAP,baseMP,strength,intelligence,dexterity,guard,spirit,vitality,,Notes
+testChar,"For testing purposes, not actually part of the game",10,11,12,13,14,15,16,17,,This line is for testing.  Please do not alter
+,,,,,,,,,,,
+,,,,,,,,,,,Description of fields
+,,,,,,,,,,,name: the name of this character as it appears in the game
+,,,,,,,,,,,descripttion: A short textual description of the character
+,,,,,,,,,,,baseAP: The number of starting AP given to this character by default
+,,,,,,,,,,,baseMP: ditto
+,,,,,,,,,,,strength: strength of physical attacks
+,,,,,,,,,,,intelligence: strength of magical attacks
+,,,,,,,,,,,dexterity: ??
+,,,,,,,,,,,guard: defence against physical attacks
+,,,,,,,,,,,spirit: defence agains magial attacks
+,,,,,,,,,,,vitality: used to compute HP
+,,,,,,,,,,,
+,,,,,,,,,,,Notes
+,,,,,,,,,,,Levelling is controlled by the levels spreadsheet
+,,,,,,,,,,,Character abilities are assigned in the characterAbilities spreadsheet

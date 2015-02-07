@@ -39,12 +39,15 @@ public class CharacterFactory {
 		try {
 			InputStream in = this.getClass().getResourceAsStream(
 					"/nz/dcoder/inthezone/data/characters.csv");
-			if (in == null) throw new FileNotFoundException("characters.csv");
+			if (in == null) throw new FileNotFoundException("File not found characters.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
-			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
+			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
 
 			for(CSVRecord record : parser) {
 				validator.validate(record);
+
+				// skip blanks
+				if (record.get("name").trim().equals("")) continue;
 
 				CharacterName name = new CharacterName(record.get("name"));
 

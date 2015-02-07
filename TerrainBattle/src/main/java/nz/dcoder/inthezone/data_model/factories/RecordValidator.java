@@ -73,12 +73,14 @@ class RecordValidator {
 		AbilityFactory abilityFactory, String names
 	) throws DatabaseNameException
 	{
-		String[] ss = names.split(",");
+		String[] ss = names.trim().split(",");
+		if (names.trim().equals("")) ss = new String[0];
+
 		List<Ability> abilities = new ArrayList<Ability>();
 		for (String s : ss) {
 			Ability a = abilityFactory.newAbility(new AbilityName(s));
 			if (a == null) {
-				throw new DatabaseNameException("No such ability " + s);
+				throw new DatabaseNameException("No such ability \"" + s + "\" in \"" + names + "\"");
 			} else {
 				abilities.add(a);
 			}

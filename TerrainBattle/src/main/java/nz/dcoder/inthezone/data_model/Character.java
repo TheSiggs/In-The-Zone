@@ -75,7 +75,7 @@ public class Character implements CanDoAbility {
 
 	@Override public BaseStats getBaseStats() {
 		// TODO: implement this method
-		return null;
+		return baseStats;
 	}
 
 	@Override public int getLevel() {
@@ -85,7 +85,7 @@ public class Character implements CanDoAbility {
 
 	@Override public Collection<Equipment> getWeapons() {
 		// TODO: implement this method
-		return null;
+		return equipment;
 	}
 }
 

@@ -15,5 +15,22 @@ public class Position {
 	public Position add(Position p) {
 		return new Position(x + p.x, y + p.y);
 	}
+
+	@Override public boolean equals(Object obj) {
+		if (obj instanceof Position) {
+			Position p = (Position) obj;
+			return p.x == x && p.y == y;
+		} else {
+			return false;
+		}
+	}
+
+	@Override public int hashCode() {
+		int m = 31;
+		int r = 1;
+		r = m * r + x;
+		r = m * r + y;
+		return r;
+	}
 }
 

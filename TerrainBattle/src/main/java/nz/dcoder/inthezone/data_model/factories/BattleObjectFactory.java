@@ -27,7 +27,8 @@ public class BattleObjectFactory {
 
 		RecordValidator validator = new RecordValidator(new String[] {
 			"name",
-			"isObstacle",
+			"blocksSpace",
+			"blocksPath",
 			"isAttackable",
 			"isPushable",
 			"hits",
@@ -60,7 +61,8 @@ public class BattleObjectFactory {
 
 				BattleObjectInfo info = new BattleObjectInfo (
 					new BattleObjectName(record.get("name")),
-					RecordValidator.parseBoolean(record.get("isObstacle")),
+					RecordValidator.parseBoolean(record.get("blocksSpace")),
+					RecordValidator.parseBoolean(record.get("blocksPath")),
 					RecordValidator.parseBoolean(record.get("isAttackable")),
 					RecordValidator.parseBoolean(record.get("isPushable")),
 					oa,
@@ -80,7 +82,8 @@ public class BattleObjectFactory {
 		if (info != null) {
 			BattleObject r = new BattleObject(
 				info.name,
-				info.isObstacle,
+				info.blocksSpace,
+				info.blocksPath,
 				info.isAttackable,
 				info.isPushable,
 				info.initHits,
@@ -95,7 +98,8 @@ public class BattleObjectFactory {
 
 class BattleObjectInfo {
 	public final BattleObjectName name;
-	public final boolean isObstacle;
+	public final boolean blocksSpace;
+	public final boolean blocksPath;
 	public final boolean isAttackable;
 	public final boolean isPushable;
 	public final ObjectAbility ability;
@@ -103,14 +107,16 @@ class BattleObjectInfo {
 
 	public BattleObjectInfo (
 		BattleObjectName name,
-		boolean isObstacle,
+		boolean blocksSpace,
+		boolean blocksPath,
 		boolean isAttackable,
 		boolean isPushable,
 		ObjectAbility ability,
 		int initHits
 	) {
 		this.name = name;
-		this.isObstacle = isObstacle;
+		this.blocksSpace = blocksSpace;
+		this.blocksPath = blocksPath;
 		this.isAttackable = isAttackable;
 		this.isPushable = isPushable;
 		this.initHits = initHits;

@@ -16,6 +16,6 @@ abstract public class Ability {
 	}
 
 	public abstract void applyEffect(CanDoAbility agent, Position pos, Battle battle);
-	public abstract void canApplyEffect(CanDoAbility agent, Position pos, Battle battle);
+	public abstract boolean canApplyEffect(CanDoAbility agent, Position pos, Battle battle);
 }
 

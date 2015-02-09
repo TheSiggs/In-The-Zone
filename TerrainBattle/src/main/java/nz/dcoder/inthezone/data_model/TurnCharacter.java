@@ -163,9 +163,7 @@ public class TurnCharacter {
 	}
 
 	public Collection<Equipment> getVisibleEquipment() {
-		// This will change when we make equipment more sophisticated
-		return character.equipment.
-			stream().filter(e -> !e.isHidden).collect(Collectors.toList());
+		return character.getVisibleEquipment();
 	}
 
 	public Collection<AbilityInfo> getAbilities() {

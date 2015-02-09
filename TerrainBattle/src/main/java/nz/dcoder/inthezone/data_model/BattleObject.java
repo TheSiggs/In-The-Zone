@@ -30,7 +30,7 @@ public class BattleObject {
 		boolean isAttackable,
 		boolean isPushable,
 		int hitsRemaining,
-		ObjectAbility ability
+		Ability ability
 	) {
 		this.name = name;
 		this.blocksSpace = blocksSpace;
@@ -38,7 +38,12 @@ public class BattleObject {
 		this.isAttackable = isAttackable;
 		this.isPushable = isPushable;
 		this.hitsRemaining = hitsRemaining;
-		this.ability = ability;
+
+		if (ability == null) {
+			this.ability = null;
+		} else {
+			this.ability = new ObjectAbility(ability, this);
+		}
 	}
 
 	/**

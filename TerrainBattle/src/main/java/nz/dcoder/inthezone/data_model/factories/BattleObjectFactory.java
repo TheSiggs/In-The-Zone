@@ -12,7 +12,6 @@ import org.apache.commons.csv.CSVRecord;
 
 import nz.dcoder.inthezone.data_model.Ability;
 import nz.dcoder.inthezone.data_model.BattleObject;
-import nz.dcoder.inthezone.data_model.ObjectAbility;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -48,15 +47,14 @@ public class BattleObjectFactory {
 				// skip blanks
 				if (record.get("name").trim().equals("")) continue;
 
-				ObjectAbility oa = null;
+				Ability ability = null;
 				if (RecordValidator.parseBoolean(record.get("hasAbility"))) {
 					AbilityName abilityName = new AbilityName(record.get("ability"));
-					Ability ability = abilityFactory.newAbility(abilityName);
+					ability = abilityFactory.newAbility(abilityName);
 					if (ability == null) {
 						throw new DatabaseNameException(
 							"No such ability " + abilityName.toString());
 					}
-					oa = new ObjectAbility(ability);
 				}
 
 				BattleObjectInfo info = new BattleObjectInfo (
@@ -65,7 +63,7 @@ public class BattleObjectFactory {
 					RecordValidator.parseBoolean(record.get("blocksPath")),
 					RecordValidator.parseBoolean(record.get("isAttackable")),
 					RecordValidator.parseBoolean(record.get("isPushable")),
-					oa,
+					ability,
 					Integer.parseInt(record.get("hits")));
 
 				objects.put(info.name, info);
@@ -102,7 +100,7 @@ class BattleObjectInfo {
 	public final boolean blocksPath;
 	public final boolean isAttackable;
 	public final boolean isPushable;
-	public final ObjectAbility ability;
+	public final Ability ability;
 	public final int initHits;
 
 	public BattleObjectInfo (
@@ -111,7 +109,7 @@ class BattleObjectInfo {
 		boolean blocksPath,
 		boolean isAttackable,
 		boolean isPushable,
-		ObjectAbility ability,
+		Ability ability,
 		int initHits
 	) {
 		this.name = name;

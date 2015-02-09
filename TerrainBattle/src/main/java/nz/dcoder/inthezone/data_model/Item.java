@@ -18,5 +18,13 @@ public class Item {
 		this.description = description;
 		this.ability = ability;
 	}
+
+	@Override public boolean equals(Object obj) {
+		return name.equals(obj);
+	}
+
+	@Override public int hashCode() {
+		return name.hashCode();
+	}
 }
 

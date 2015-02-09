@@ -151,7 +151,7 @@ public class FactoryTests {
 			assertEquals("Character intelligence", 13, stats.intelligence);
 			assertEquals("Character dexterity", 14, stats.dexterity);
 			assertEquals("Character guard", 15, stats.guard);
-			assertEquals("Character spririt", 16, stats.spirit);
+			assertEquals("Character spirit", 16, stats.spirit);
 			assertEquals("Character vitality", 17, stats.vitality);
 
 			// TODO: add checks for level, HP, and abilities when those classes are

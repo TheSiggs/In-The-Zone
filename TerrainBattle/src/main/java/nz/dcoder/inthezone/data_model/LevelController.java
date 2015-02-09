@@ -8,7 +8,7 @@ import java.util.Collection;
 public class LevelController {
 	public int exp = 0;
 	public int level = 0;
-	public int maxHP = 0;
+	public int maxHP = 1;
 	public Collection<Ability> abilities;
 
 	// For these arrays, the indices represent levels, so hpMod[1] is the hpMod
@@ -52,7 +52,7 @@ public class LevelController {
                 // multi leveling
                 if(totalExpRequired[level+1]<=exp){
                     int i=level;
-                    while(i<totalExpRequired.length && totalExpRequired[level]<exp){i++;}
+                    while(i<totalExpRequired.length && totalExpRequired[i]<exp){i++;}
                     level = i;
                 }
                 

@@ -12,7 +12,10 @@ import nz.dcoder.inthezone.data_model.pure.Position;
  * */
 public class BattleObject {
 	public final BattleObjectName name;
-	public final boolean isObstacle;
+
+	public final boolean blocksSpace;  // no character can co-occupy a space with this object
+	public final boolean blocksPath;   // no path can go through this object
+
 	public final boolean isAttackable;
 	public final boolean isPushable;
 	public final ObjectAbility ability;
@@ -22,14 +25,16 @@ public class BattleObject {
 
 	public BattleObject (
 		BattleObjectName name,
-		boolean isObstacle,
+		boolean blocksSpace,
+		boolean blocksPath,
 		boolean isAttackable,
 		boolean isPushable,
 		int hitsRemaining,
 		ObjectAbility ability
 	) {
 		this.name = name;
-		this.isObstacle = isObstacle;
+		this.blocksSpace = blocksSpace;
+		this.blocksPath = blocksPath;
 		this.isAttackable = isAttackable;
 		this.isPushable = isPushable;
 		this.hitsRemaining = hitsRemaining;

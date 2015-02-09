@@ -41,7 +41,8 @@ public class FactoryTests {
 			assertNotNull("Object not null", test);
 
 			assertEquals("BattleObject name", new BattleObjectName("testObj"), test.name);
-			assertEquals("BattleObject isObstacle", false, test.isObstacle);
+			assertEquals("BattleObject blocksSpace", true, test.blocksSpace);
+			assertEquals("BattleObject blocksPath", false, test.blocksPath);
 			assertEquals("BattleObject isAttackable", false, test.isAttackable);
 			assertEquals("BattleObject isPushable", false, test.isPushable);
 			assertNotNull("BattleObjectAbility not null", test.ability);

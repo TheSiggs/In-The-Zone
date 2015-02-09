@@ -3,7 +3,7 @@ package nz.dcoder.inthezone.data_model;
 import java.util.Collection;
 
 /**
- * Controls levelling and things that vary by level
+ * Controls leveling and things that vary by level
  * */
 public class LevelController {
 	public int exp = 0;
@@ -42,8 +42,31 @@ public class LevelController {
 	 * have to top up the player's hp a bit
 	 * */
 	public int addExp(int points) {
-		// TODO: implement this method
-		return 0;
+		// exp
+                exp+=points;
+                
+                // level
+                if(totalExpRequired[level+1]<=exp){
+                    level+=1;
+                }
+                // multi leveling
+                if(totalExpRequired[level+1]<=exp){
+                    int i=level;
+                    while(i<totalExpRequired.length && totalExpRequired[level]<exp){i++;}
+                    level = i;
+                }
+                
+                // abilitys
+                abilities = abilitiesByLevel[level];
+                        
+                // HP
+                int vit = 1; // accsess the character object??
+                int hp = 1; // accsess the character object??
+                double ratio = hp/maxHP;
+                int oldMaxHp = maxHP;
+                maxHP = (int)Math.floor((vit*hpMod[level])/75);
+		return (int)ratio*(maxHP-oldMaxHp);
+                
 	}
 }
 

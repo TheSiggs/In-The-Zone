@@ -15,6 +15,7 @@ public class AbilityInfo {
 	public final boolean isPiercing;
 	public final boolean canPassObstacles;
 	public final boolean requiresMana;
+	public final int repeats;
 	public final String aClass;
 	public final EffectName effect;
 
@@ -27,6 +28,7 @@ public class AbilityInfo {
 		boolean isPiercing,
 		boolean canPassObstacles,
 		boolean requiresMana,
+		int repeats,
 		String aClass,
 		EffectName effect
 	) {
@@ -38,6 +40,7 @@ public class AbilityInfo {
 		this.isPiercing = isPiercing;
 		this.canPassObstacles = canPassObstacles;
 		this.requiresMana = requiresMana;
+		this.repeats = repeats;
 		this.aClass = aClass;
 		this.effect = effect;
 	}

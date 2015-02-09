@@ -23,6 +23,7 @@ public class FactoryTests {
 			assertEquals("Ability isPiercing", false, test.info.isPiercing);
 			assertEquals("Ability canPassObstacles", false, test.info.canPassObstacles);
 			assertEquals("Ability requiresMana", false, test.info.requiresMana);
+			assertEquals("Ability repeats", 1, test.info.repeats);
 			assertEquals("Ability class", "physical", test.info.aClass);
 			assertEquals("Ability effect", new EffectName("damage"), test.info.effect);
 			assertEquals("Ability effect2", new EffectName("damage"), test.name);

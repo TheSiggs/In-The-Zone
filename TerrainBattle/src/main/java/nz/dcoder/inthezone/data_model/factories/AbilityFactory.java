@@ -41,6 +41,7 @@ public class AbilityFactory {
 			"isPiercing",
 			"canPassObstacles",
 			"requiresMana",
+			"repeats",
 			"class",
 			"effect"});
 
@@ -66,6 +67,7 @@ public class AbilityFactory {
 					RecordValidator.parseBoolean(record.get("isPiercing")),
 					RecordValidator.parseBoolean(record.get("canPassObstacles")),
 					RecordValidator.parseBoolean(record.get("requiresMana")),
+					Integer.parseInt(record.get("repeats")),
 					record.get("class"),
 					new EffectName(record.get("effect")));
 

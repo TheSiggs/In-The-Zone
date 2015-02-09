@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.data_model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -22,8 +23,18 @@ public class GameState {
 		Collection<Character> nps,
 		BattleController controller
 	) {
-		// TODO: implement this method
-		return;
+		if (isInBattle) throw new RuntimeException(
+			"Attempted to start a new battle, but we're already in a battle");
+
+		currentBattle = new Battle(
+			controller,
+			pcs,
+			nps,
+			new ArrayList<BattleObject>(),   // no battle objects to start with
+			terrain,
+			true                             // human player goes first
+		);
+		isInBattle = true;
 	}
 }
 

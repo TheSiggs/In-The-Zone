@@ -28,14 +28,17 @@ public class Turn {
 	 * May return null
 	 * */
 	public TurnCharacter turnCharacterAt(Position pos) {
-		// TODO: implement this method
-		return null;
+		return turnCharacters.stream()
+			.filter(t -> t.getPos().equals(pos)).findFirst().orElse(null);
 	}
 
-	boolean isTurnOver() {
-		// TODO: implement this method
-		// check if turn characters have any moves left
-		return false;
+	/**
+	 * Determine if there is anything more that can be done on this turn
+	 * @param items Consumable items available to the player
+	 * @return true if there is nothing more that can be done on this turn
+	 * */
+	boolean isTurnOver(Collection<Item> items) {
+		return !turnCharacters.stream().anyMatch(t -> t.hasOptions(items));
 	}
 
 	public void endTurn() {

@@ -55,7 +55,7 @@ public class TurnCharacter {
 	 * Returns a new list every time, containing the complete path including the
 	 * contents of the "soFar" parameter.
 	 * */
-	List<Node> getMove(List<Node> soFar, Node destination) {
+	public List<Node> getMove(List<Node> soFar, Node destination) {
 		// WARNING: unsafe casting
 		BoardNode d = (BoardNode) destination;
 
@@ -83,7 +83,7 @@ public class TurnCharacter {
 		}
 	}
 
-	void doMotion(List<Node> path) {
+	public void doMotion(List<Node> path) {
 		if (path == null || path.size() > mp || path.size() < 1) {
 			// WARNING: we really should validate the path here, just to be sure
 			throw new RuntimeException("Invalid path " + path.toString());
@@ -114,48 +114,70 @@ public class TurnCharacter {
 		return new Position(bn.getX(), bn.getY());
 	}
 
-	void doAbility(AbilityName name) {
-		// TODO: implement this method
-		return;
+	private Ability getAbility(AbilityName name) {
+		return character.getAbilities().stream()
+			.filter(a -> a.info.name.equals(name)).findFirst().orElse(null);
 	}
 
-	void useItem(Item item, Position target) {
-		// TODO: implement this method
-		return;
+	public boolean canDoAbility(AbilityName name, Position target) {
+		Ability ability = getAbility(name);
+		if (ability == null || ability.info.cost > ap) return false;
+		return ability.canApplyEffect(character, target, battle);
 	}
 
-	CharacterName getName() {
+	public void doAbility(AbilityName name, Position target) {
+		Ability ability = getAbility(name);
+		if (ability == null) return;
+		ap -= ability.info.cost;
+		ability.applyEffect(character, target, battle);
+		battle.controller.onAbility.accept(new DoAbilityInfo(
+			character.position, target, ability.info));
+	}
+
+	public boolean canUseItem(Item item, Position target) {
+		if (item.ability.info.cost > ap) return false;
+		return item.ability.canApplyEffect(character, target, battle);
+	}
+
+	public void useItem(Item item, Position target) {
+		ap -= item.ability.info.cost;
+		item.ability.applyEffect(character, target, battle);
+		battle.controller.onAbility.accept(new DoAbilityInfo(
+			character.position, target, item.ability.info));
+	}
+
+	public CharacterName getName() {
 		return character.name;
 	}
 
-	Position getPos() {
+	public Position getPos() {
 		return character.position;
 	}
 
-	int getHP() {
+	public int getHP() {
 		return character.hp;
 	}
 
-	int getMaxHP() {
+	public int getMaxHP() {
 		return character.getMaxHP();
 	}
 
-	Collection<Equipment> getVisibleEquipment() {
+	public Collection<Equipment> getVisibleEquipment() {
 		// This will change when we make equipment more sophisticated
 		return character.equipment.
 			stream().filter(e -> !e.isHidden).collect(Collectors.toList());
 	}
 
-	Collection<AbilityInfo> getAbilities() {
+	public Collection<AbilityInfo> getAbilities() {
 		return character.getAbilities()
 			.stream().map(a -> a.info).collect(Collectors.toList());
 	}
 
-	boolean isOnManaZone() {
+	public boolean isOnManaZone() {
 		return battle.terrain.isManaZone(character.position);
 	}
 
-	boolean hasOptions(Collection<Item> items) {
+	public boolean hasOptions(Collection<Item> items) {
 		boolean canUseItem = items.stream()
 			.anyMatch(i -> i.ability.info.cost <= ap);
 		boolean canUseAbility = character.getAbilities().stream()

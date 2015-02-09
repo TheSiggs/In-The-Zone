@@ -10,5 +10,6 @@ public class BattleController {
 	public Consumer<Turn> onPlayerTurnStart = null;
 	public Consumer<Void> onBattleEnd = null;
 	public Consumer<DoMoveInfo> onMove = null;
+	public Consumer<DoAbilityInfo> onAbility = null;
 }
 

@@ -10,42 +10,26 @@ public class TeleportAbility extends Ability {
 		super(effectName, info);
 	}
 
-        // @override
+	@Override
 	public void applyEffect(CanDoAbility agent, Position pos, Battle battle) {
-                // TODO:
-                // - set turnCharacter as selected character
-                
-                TurnCharacter turnCharacter = battle.turn.turnCharacters.iterator().next();
-                Character targetCharacter = battle.getCharacterAt(pos);
-                
-                if(canApplyEffect(agent, pos, battle)){
-                    targetCharacter.position = pos;
-                    turnCharacter.ap = turnCharacter.ap - info.cost;
-                }
-                
-                return;
+		if (canApplyEffect(agent, pos, battle)) {
+			battle.getCharacterAt(agent.getPosition()).position = pos;
+		}
 	}
-		
-	public boolean canApplyEffect(CanDoAbility agent, Position pos, Battle battle) {
-                // TODO:
-                // - set turnCharacter as selected character
 
-                TurnCharacter turnCharacter = battle.turn.turnCharacters.iterator().next();
-                Position turnCharacterPos = turnCharacter.getPos();
-                
-                // check cost
-                if(turnCharacter.ap<info.cost){
-                    return false;
-                }
-                // check range
-                if(Math.abs(turnCharacterPos.x - pos.x) + Math.abs(turnCharacterPos.y - pos.y) > info.range ){
-                    return false;
-                }
-                // check destination is clear
-                if(battle.getObstacles().contains(pos)){
-                    return false;
-                }
-                
+	@Override
+	public boolean canApplyEffect(CanDoAbility agent, Position pos, Battle battle) {
+		Position apos = agent.getPosition();
+
+		// check range
+		if (Math.abs(apos.x - pos.x) + Math.abs(apos.y - pos.y) > info.range) {
+			return false;
+		}
+
+		if (battle.getOccupiedPositions().contains(pos)) {
+			return false;
+		}
+
 		return true;
 	}
 }

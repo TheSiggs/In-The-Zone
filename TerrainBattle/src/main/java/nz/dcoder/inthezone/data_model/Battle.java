@@ -69,13 +69,25 @@ class Battle {
 
 	/**
 	 * Get the objects that are obstacles to path-finding.
-	 * i.e. blockPath objects. blockSpace objects need to be checked for elsewhere
+	 * i.e. blockPath objects. blockSpace objects are located by getOccupiedPositions
 	 *
 	 * must not return null
 	 * */
 	public Collection<Position> getObstacles() {
 		return Stream.concat(
 			objects.stream().filter(o -> o.blocksPath).map(o -> o.position),
+			Stream.concat(players.stream(), aiPlayers.stream()).map(c -> c.position)
+		).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get the spaces that are occupied e.g. by characters.  Some of these
+	 * objects may not be path-blocking, for path-blocking obstacles, use
+	 * getObstacles
+	 * */
+	public Collection<Position> getOccupiedPositions() {
+		return Stream.concat(
+			objects.stream().filter(o -> o.blocksSpace).map(o -> o.position),
 			Stream.concat(players.stream(), aiPlayers.stream()).map(c -> c.position)
 		).collect(Collectors.toList());
 	}

@@ -19,8 +19,6 @@ import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 
 class LevelControllerFactory {
-	private static final int maxLevel = 100;
-
 	private final AbilityFactory abilityFactory;
 	private final Map<CharacterName, List<Ability>[]> characterAbilities;
 	private final LevelInfo levelInfo;
@@ -154,20 +152,22 @@ class LevelControllerFactory {
 		}
 	}
 
-	public LevelController newLevelController(
-		CharacterName character, int level
-	) {
+	public LevelController newLevelController(CharacterName character) {
 		if (!characterAbilities.containsKey(character)) return null;
-		if (level < 1 || level > 100)
-			throw new IllegalArgumentException("Level must be between 1 and 100");
 
 		LevelController lc = new LevelController(
 			levelInfo.hpMod,
 			characterAbilities.get(character),
 			levelInfo.totalExpRequired);
 
-		lc.addExp(levelInfo.totalExpRequired[level]);
 		return lc;
+	}
+
+	/**
+	 * Get the number of Exp points that a character starts with
+	 * */
+	int initExp(CharacterName character, int level) {
+		return levelInfo.totalExpRequired[level];
 	}
 }
 

@@ -154,6 +154,16 @@ public class FactoryTests {
 			assertEquals("Character guard", 15, stats.guard);
 			assertEquals("Character spirit", 16, stats.spirit);
 			assertEquals("Character vitality", 17, stats.vitality);
+			assertEquals("Character level", 2, test.getLevel());
+
+			// check abilities
+			Collection<Ability> abilities = test.getAbilities();
+			int count = 0;
+			for(Ability a : abilities) {
+				count += 1;
+				assertEquals("Character ability", new AbilityName("test"), a.info.name);
+			}
+			assertEquals("Character ability count", 1, count);
 
 			// TODO: add checks for level, HP, and abilities when those classes are
 			// implemented

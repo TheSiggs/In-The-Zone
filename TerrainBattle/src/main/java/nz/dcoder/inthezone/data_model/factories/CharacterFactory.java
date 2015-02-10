@@ -61,13 +61,18 @@ public class CharacterFactory {
 	}
 
 	public Character newCharacter(CharacterName name, int level) {
+		if (level < 1 || level > LevelController.maxLevel)
+			throw new IllegalArgumentException("Level must be between 1 and 100");
+
 		if (!descriptions.containsKey(name) || !stats.containsKey(name)) {
 			return null;
 		} else {
 			LevelController lc =
-				levelControllerFactory.newLevelController(name, level);
-			return new Character(
+				levelControllerFactory.newLevelController(name);
+			Character c = new Character(
 				name, descriptions.get(name), stats.get(name), lc);
+			c.addExp(levelControllerFactory.initExp(name, level));
+			return c;
 		}
 	}
 }

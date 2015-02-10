@@ -85,7 +85,7 @@ public class Character implements CanDoAbility {
 	 * character leveled up, and what new abilities he/she learned.
 	 * */
 	public void addExp(int points) {
-		hp += level.addExp(points);
+		hp += level.addExp(points, getBaseStats(), hp);
 	}
 
 	// These methods will change when we put restrictions on what equipment

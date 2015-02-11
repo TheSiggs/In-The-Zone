@@ -4,6 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LineOfSight {
+	/**
+	 * Get the squares that occur along the line of sight of a character.
+	 *
+	 * Returns a manhatten path, which means that diagonal moves are forbidden.
+	 *
+	 * @param p0 The position of the character
+	 * @param p1 The square the character is targeting
+	 * @param bias Sometimes there are two equally good approximations to a
+	 * straight line.  Imagine yourself standing at the same position as the
+	 * character, and facing the target square.  For cases where the bias
+	 * parameter is relevant, The manhatten line-of-sight path may run either to
+	 * the left of the euclidian line, or to the right of it.  If the bias
+	 * parameter is true, then you get the right path, otherwise you get the left
+	 * path.
+	 *
+	 * @return A manhatten path that approximates the line of sight of a
+	 * character
+	 * */
 	public static List<Position> getLOS(
 		Position p0,   // start position
 		Position p1,   // target position
@@ -142,6 +160,26 @@ public class LineOfSight {
 		}
 
 		return LineOfSight.getLOS0(p0, p1, dp, ds, (int) l);
+	}
+
+	/**
+	 * Get the perimeter of a manhatten circle (which is of course a diamond)
+	 *
+	 * @param p0 The centre of the diamond
+	 * @param size The radius of the diamond.  Radius 0 gives just the centre
+	 * point.  Radius 1 would give the four squares top, left, bottom and right
+	 * of the centre.
+	 *
+	 * @return A list of points that represent the perimeter of the diamond
+	 * */
+	public static List<Position> getDiamond(Position p0, int size) {
+		List<Position> r = new ArrayList<Position>();
+		for (int y = -size; y <= size; y++) {
+			int x = size - Math.abs(y);
+			r.add(p0.add(new Position(x, y)));
+			if (x > 0) r.add(p0.add(new Position(-x, y)));
+		}
+		return r;
 	}
 
 	private static List<Position> getLOS0(

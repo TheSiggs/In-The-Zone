@@ -77,14 +77,14 @@ public class LOSTests {
 
 	private boolean hasEndpoints(List<Position> path, Position p0, Position p1) {
 		return
-			path.stream().anyMatch(x -> x.equals(p0)) ||
+			path.stream().anyMatch(x -> x.equals(p0)) &&
 			path.stream().anyMatch(x -> x.equals(p1));
 	}
 
 	private boolean hasPoints(List<Position> path, Position p0, Position i, Position p1) {
 		return
-			path.stream().anyMatch(x -> x.equals(p0)) ||
-			path.stream().anyMatch(x -> x.equals(i)) ||
+			path.stream().anyMatch(x -> x.equals(p0)) &&
+			path.stream().anyMatch(x -> x.equals(i)) &&
 			path.stream().anyMatch(x -> x.equals(p1));
 	}
 
@@ -162,6 +162,29 @@ public class LOSTests {
 			if (!pos[i].equals(check[i])) return false;
 		}
 		return true;
+	}
+
+	@Test public void testDiamond() {
+		Position p0 = new Position(1, 1);
+		Position n = p0.add(new Position(0, 1));
+		Position s = p0.add(new Position(0, -1));
+		Position e = p0.add(new Position(1, 0));
+		Position w = p0.add(new Position(-1, 0));
+
+		List<Position> diamond;
+
+		diamond = LineOfSight.getDiamond(p0, 0);
+		assertEquals("diamond size 0 perimeter size", 1, diamond.size());
+		assertEquals("diamond size 0 perimeter", p0, diamond.get(0));
+
+		diamond = LineOfSight.getDiamond(p0, 1);
+		assertEquals("diamond size 1 perimeter size", 4, diamond.size());
+		assertTrue(
+			"diamond size 1 perimeter",
+			diamond.stream().anyMatch(x -> x.equals(n)) &&
+			diamond.stream().anyMatch(x -> x.equals(s)) &&
+			diamond.stream().anyMatch(x -> x.equals(e)) &&
+			diamond.stream().anyMatch(x -> x.equals(w)));
 	}
 }
 

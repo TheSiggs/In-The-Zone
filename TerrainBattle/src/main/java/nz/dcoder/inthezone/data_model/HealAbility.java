@@ -1,8 +1,10 @@
 package nz.dcoder.inthezone.data_model;
 
-import java.util.ArrayList;
-import nz.dcoder.inthezone.data_model.pure.Position;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
+import nz.dcoder.inthezone.data_model.pure.Position;
 
 public class HealAbility extends Ability {
 	public static EffectName effectName = new EffectName("heal");
@@ -12,66 +14,42 @@ public class HealAbility extends Ability {
 	}
 
 	@Override
-	public void applyEffect(CanDoAbility agent, Position pos, Battle battle) {
-		// NOTE: this is where the healing formula goes.
+	public void applyEffect(
+		CanDoAbility agent, Position target, Battle battle
+	) {
+		if (!canApplyEffect(agent, target, battle)) return;
 
-		// TODO:
-		// - figure out path rules
+		// 1) determine the affected squares using areaOfEffect and piercing
+		final Collection<Position> affected =
+			getAffectedArea(agent.getPosition(), target, battle);
 
-		ArrayList<Position> targetArea = null;
-		ArrayList<Character> targets = null;
-		targetArea.add(agent.getPosition());
+		// 2) find the targets (i.e. the characters on the affected squares)
+		final List<Character> targets = affected.stream()
+			.map(p -> battle.getCharacterAt(p))
+			.filter(c -> c != null).collect(Collectors.toList());
 
-		if (canApplyEffect(agent, pos, battle)) {
-			// 1) determine the affected squares using areaOfEffect and piercing
-			if (info.isPiercing) {
-				// add all in path
-			} else {
-				// move target to first Obstacle
-			}
-			// target now set so we can 
-			if (info.areaOfEffect>0) {
-				// add dimond of size aoe reletive to pos
-			}
+		// 3) gather the parameters from the agent doing the ability and
 
-			// 2) find the targets (i.e. the characters on the affected squares)
-			for (int i = 0; i > targetArea.size(); i++) {
-				if (battle.getCharacterAt(targetArea.get(i)) != null) {
-					targets.add(battle.getCharacterAt(targetArea.get(i)));
-				}
-			}
-
-			// 3) gather the parameters from the agent doing the ability and
-			double amount = 0;
-
-			// 4) apply the formula to each target.
-			for (int i = 0; i > targets.size(); i++) {
-				if ((targets.get(i).hp+amount)<=targets.get(i).getMaxHP()) {
-					targets.get(i).hp += amount;
-				} else {
-					targets.get(i).hp = targets.get(i).getMaxHP();
-				}
-			}
+		// 4) apply the formula to each target.
+		for (Character c : targets) {
+			// TODO: clarify how healing works
+			c.hp += info.amount;
+			if (c.hp > c.getMaxHP()) c.hp = c.getMaxHP();
 		}
 	}
 		
 	@Override
-	public boolean canApplyEffect(CanDoAbility agent, Position pos, Battle battle) {
-		// TODO:
-		// - set turnCharacter as selected character
-		// - search for line of sight
-
-		Position apos = agent.getPosition();
-
+	public boolean canApplyEffect(
+		CanDoAbility agent, Position target, Battle battle
+	) {
 		// check range
-		if (Math.abs(apos.x - pos.x) + Math.abs(apos.y - pos.y) > info.range) {
+		Position apos = agent.getPosition();
+		if (Math.abs(apos.x - target.x) + Math.abs(apos.y - target.y) > info.range) {
 			return false;
 		}
-
-		// check obstacles
-
-		// check destination is clear
-		if (battle.getObstacles().contains(pos)) {
+	
+		// check LOS
+		if (!info.canPassObstacles && !hasLineOfSight(apos, target, battle)) {
 			return false;
 		}
 

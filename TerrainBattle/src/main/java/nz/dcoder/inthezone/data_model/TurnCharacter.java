@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.data_model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -123,6 +124,17 @@ public class TurnCharacter {
 		Ability ability = getAbility(name);
 		if (ability == null || ability.info.cost > ap) return false;
 		return ability.canApplyEffect(character, target, battle);
+	}
+
+	public Collection<Position> getAffectedArea(
+		AbilityName name, Position target
+	) {
+		Ability ability = getAbility(name);
+		if (ability == null) {
+			return new ArrayList<Position>();
+		} else {
+			return ability.getAffectedArea(character.position, target, battle);
+		}
 	}
 
 	public void doAbility(AbilityName name, Position target) {

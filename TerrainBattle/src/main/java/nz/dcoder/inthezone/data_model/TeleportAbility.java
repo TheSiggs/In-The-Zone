@@ -1,13 +1,25 @@
 package nz.dcoder.inthezone.data_model;
 
-import nz.dcoder.inthezone.data_model.pure.Position;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
+import nz.dcoder.inthezone.data_model.pure.Position;
 
 public class TeleportAbility extends Ability {
 	public static EffectName effectName = new EffectName("teleport");
 
 	public TeleportAbility(AbilityInfo info) {
 		super(effectName, info);
+	}
+
+	@Override
+	public Collection<Position> getAffectedArea(
+		Position agentPosition, Position target, Battle battle
+	) {
+		List<Position> affected = new ArrayList<Position>();
+		affected.add(target);
+		return affected;
 	}
 
 	@Override
@@ -18,7 +30,9 @@ public class TeleportAbility extends Ability {
 	}
 
 	@Override
-	public boolean canApplyEffect(CanDoAbility agent, Position pos, Battle battle) {
+	public boolean canApplyEffect(
+		CanDoAbility agent, Position pos, Battle battle
+	) {
 		Position apos = agent.getPosition();
 
 		// check range

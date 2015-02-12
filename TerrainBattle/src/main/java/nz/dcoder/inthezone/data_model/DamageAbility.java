@@ -80,7 +80,6 @@ public class DamageAbility extends Ability {
 			return false;
 		}
 
-		// check destination is clear
 		return true;
 	}
 }

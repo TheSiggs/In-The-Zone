@@ -1,19 +1,21 @@
-name,cost,amount,range,areaOfEffect,isPiercing,canPassObstacles,repeats,requiresMana,class,effect,,Notes
-test,5,10,1,0,FALSE,FALSE,1,FALSE,physical,damage,,This line is for testing.  Please do not alter
-,,,,,,,,,,,,
-,,,,,,,,,,,,Description of fields
-,,,,,,,,,,,,name: Name of the ability as it appears in the GUI
-,,,,,,,,,,,,cost: Number of action points required to activate the ability
-,,,,,,,,,,,,"amount: Amount of effect the ability has (i.e. amount of damage, amount of healing, etc.)"
-,,,,,,,,,,,,"range: Range in squares, set to 1 for non-ranged attacks"
-,,,,,,,,,,,,"isPiercing: TRUE for piercing attacks, otherwise FALSE"
-,,,,,,,,,,,,canPassObstacles: TRUE for attacks that work through walls and other barriers.  FALSE otherwise.
-,,,,,,,,,,,,repeats:  For attacks where a single effect is repeated several times
-,,,,,,,,,,,,"requiresMana: TRUE for abilities that require the player to be on a mana zone, otherwise FALSE"
-,,,,,,,,,,,,class: This will be used for classifying abilities.
-,,,,,,,,,,,,"effect: There are several classes of effect that an ability might have, all hard-coded into the game engine"
-,,,,,,,,,,,,
-,,,,,,,,,,,,List of effects
-,,,,,,,,,,,,damage: For abilities that deal damage.
-,,,,,,,,,,,,heal: For abilities that heal
-,,,,,,,,,,,,teleport: For teleporting.  The maximum allowable teleport distance is equal to the range of the ability.  The “amount” field is ignored
+name,cost,amount,range,areaOfEffect,hasAOEShading,isPiercing,canPassObstacles,repeats,requiresMana,class,effect,,Notes
+test,5,10,1,0,FALSE,FALSE,FALSE,1,FALSE,physical,damage,,This line is for testing.  Please do not alter
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,Description of fields
+,,,,,,,,,,,,,name: Name of the ability as it appears in the GUI
+,,,,,,,,,,,,,cost: Number of action points required to activate the ability
+,,,,,,,,,,,,,"amount: Amount of effect the ability has (i.e. amount of damage, amount of healing, etc.)"
+,,,,,,,,,,,,,"range: Range in squares, set to 1 for non-ranged attacks"
+,,,,,,,,,,,,,"areaOfEffect: The area of effect of this ability, 0 if there is no AOE"
+,,,,,,,,,,,,,hasAOEShading: TRUE if obstacles can shelter  squares from area of effect attacks
+,,,,,,,,,,,,,"isPiercing: TRUE for piercing attacks, otherwise FALSE"
+,,,,,,,,,,,,,canPassObstacles: TRUE for attacks that work through walls and other barriers.  FALSE otherwise.
+,,,,,,,,,,,,,repeats:  For attacks where a single effect is repeated several times
+,,,,,,,,,,,,,"requiresMana: TRUE for abilities that require the player to be on a mana zone, otherwise FALSE"
+,,,,,,,,,,,,,class: This will be used for classifying abilities.
+,,,,,,,,,,,,,"effect: There are several classes of effect that an ability might have, all hard-coded into the game engine"
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,List of effects
+,,,,,,,,,,,,,damage: For abilities that deal damage.
+,,,,,,,,,,,,,heal: For abilities that heal
+,,,,,,,,,,,,,teleport: For teleporting.  The maximum allowable teleport distance is equal to the range of the ability.  The “amount” field is ignored

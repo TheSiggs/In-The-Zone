@@ -20,6 +20,7 @@ public class FactoryTests {
 			assertEquals("Ability amount", 10, test.info.amount);
 			assertEquals("Ability range", 1, test.info.range);
 			assertEquals("Ability areaOfEffect", 0, test.info.areaOfEffect);
+			assertEquals("Ability hasAOEShading", false, test.info.hasAOEShading);
 			assertEquals("Ability isPiercing", false, test.info.isPiercing);
 			assertEquals("Ability canPassObstacles", false, test.info.canPassObstacles);
 			assertEquals("Ability requiresMana", false, test.info.requiresMana);

@@ -12,6 +12,7 @@ public class AbilityInfo {
 	public final int amount;
 	public final int range;
 	public final int areaOfEffect;
+	public final boolean hasAOEShading;
 	public final boolean isPiercing;
 	public final boolean canPassObstacles;
 	public final boolean requiresMana;
@@ -25,6 +26,7 @@ public class AbilityInfo {
 		int amount,
 		int range,
 		int areaOfEffect,
+		boolean hasAOEShading,
 		boolean isPiercing,
 		boolean canPassObstacles,
 		boolean requiresMana,
@@ -37,6 +39,7 @@ public class AbilityInfo {
 		this.amount = amount;
 		this.range = range;
 		this.areaOfEffect = areaOfEffect;
+		this.hasAOEShading = hasAOEShading;
 		this.isPiercing = isPiercing;
 		this.canPassObstacles = canPassObstacles;
 		this.requiresMana = requiresMana;

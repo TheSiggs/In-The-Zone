@@ -163,21 +163,23 @@ public class LineOfSight {
 	}
 
 	/**
-	 * Get the perimeter of a manhatten circle (which is of course a diamond)
+	 * Get all the squares in a manhatten circle (which is of course a diamond)
 	 *
 	 * @param p0 The centre of the diamond
 	 * @param size The radius of the diamond.  Radius 0 gives just the centre
 	 * point.  Radius 1 would give the four squares top, left, bottom and right
-	 * of the centre.
+	 * of the centre, plus the centre.
 	 *
-	 * @return A list of points that represent the perimeter of the diamond
+	 * @return A list of points that represent the perimeter and area of the
+	 * diamond
 	 * */
 	public static List<Position> getDiamond(Position p0, int size) {
 		List<Position> r = new ArrayList<Position>();
 		for (int y = -size; y <= size; y++) {
-			int x = size - Math.abs(y);
-			r.add(p0.add(new Position(x, y)));
-			if (x > 0) r.add(p0.add(new Position(-x, y)));
+			int l = size - Math.abs(y);
+			for (int x = -l; x <= l; x++) {
+				r.add(p0.add(new Position(x, y)));
+			}
 		}
 		return r;
 	}

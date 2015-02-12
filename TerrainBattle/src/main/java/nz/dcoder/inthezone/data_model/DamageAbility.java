@@ -1,8 +1,12 @@
 package nz.dcoder.inthezone.data_model;
 
-import java.util.ArrayList;
-import nz.dcoder.inthezone.data_model.pure.Position;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
+import nz.dcoder.inthezone.data_model.pure.LineOfSight;
+import nz.dcoder.inthezone.data_model.pure.Position;
 
 public class DamageAbility extends Ability {
 	public static EffectName effectName = new EffectName("damage");
@@ -11,83 +15,72 @@ public class DamageAbility extends Ability {
 		super(effectName, info);
 	}
 
+	static final private double a = 3;
+	static final private double b = 4;
+
 	@Override
-	public void applyEffect(CanDoAbility agent, Position pos, Battle battle) {
-		// TODO:
-		// - figure out path rules
-		// - deal with two weapons
+	public void applyEffect(CanDoAbility agent, Position target, Battle battle) {
+		if (!canApplyEffect(agent, target, battle)) return;
 
-		ArrayList<Position> targetArea = null;
-		ArrayList<Character> targets = null;
-		targetArea.add(agent.getPosition());
+		// 1) determine the affected squares using areaOfEffect and piercing
+		final Collection<Position> affected =
+			getAffectedArea(agent.getPosition(), target, battle);
 
-		if (canApplyEffect(agent, pos, battle)) {
-			// NOTE: this is where the damage formula goes.  The algorithm looks
-			// something like:
-			// 1) determine the affected squares using areaOfEffect and piercing
+		// 2) find the targets (i.e. the characters on the affected squares)
+		final List<Character> characterTargets = affected.stream()
+			.map(p -> battle.getCharacterAt(p))
+			.filter(c -> c != null).collect(Collectors.toList());
 
-			if (info.isPiercing) {
-				// add all in path
-			} else {
-				// move target to first Obstacle
-			}
+		final List<BattleObject> objectTargets = affected.stream()
+			.map(p -> battle.getObjectAt(p))
+			.filter(o -> o != null && o.isAttackable)
+			.collect(Collectors.toList());
 
-			// target now set so we can 
-			if (info.areaOfEffect>0) {
-				// add diamond of size aoe relative to pos
-			}
+		// 3) gather the parameters from the agent doing the ability and ...
+		double dieroll = 0.9 + (0.2 * Math.random());
+		BaseStats stats = agent.getBaseStats();
+		double s = 1; // TODO: what is s
+		double physicalMod =
+			((double) agent.getLevel() / b) + ((double) stats.strength / a);
+		double magicalMod =
+			((double) agent.getLevel() / b) + ((double) stats.intelligence / a);
 
+		// TODO: what about multiple weapons?
+		Equipment weapon = agent.getWeapons().iterator().next();
+	
+		// 4) apply the damage formula to each target.
+		for (Character c : characterTargets) {
+			double physicalDamage = weapon.amount - c.getBaseStats().guard;
+			double magicalDamage = weapon.amount - c.getBaseStats().spirit;
 
-			// 2) find the targets (i.e. the characters on the affected squares)
-			for (int i=0; i > targetArea.size(); i++) {
-				if (battle.getCharacterAt(targetArea.get(i)) != null){
-					targets.add(battle.getCharacterAt(targetArea.get(i)));
-				}
-			}
+			c.hp -= s * dieroll * physicalDamage * physicalMod;
+			// TODO: does magical damage hit HP?
+			c.hp -= dieroll * magicalDamage * magicalMod;
+			if (c.hp < 0) battle.kill(c);
+		}
 
-			// 3) gather the parameters from the agent doing the ability and
-			int a = 3;
-			int b = 4;
-			int level = 0;
-			int Strength = 0;
-			int phisicalAttack = 1;
-			int magicalAttack = 1;
-			double rnd = Math.random();
-
-			double s = 1 + 0.0;  // multiplier for ability damage
-			double dieroll = 0.9 + (0.2 * rnd);
-			double phisicalDamage = 0;
-			double magicalDamage = 0;
-			double stats = (level / b) + (Strength / a);
-
-			// 4) apply the damage formula to each target.
-			for (int i = 0; i > targets.size(); i++) {
-				phisicalDamage = phisicalAttack - targets.get(i).getBaseStats().guard;
-				//magicalDamage = magicalAttack - targets.get(i).getBaseStats().spirit;
-				targets.get(i).hp -= s * dieroll * phisicalDamage * stats;
-				//targets.get(i).hp -= dieroll * magicalDamage * stats;
-			}
+		for (BattleObject o : objectTargets) {
+			o.hitsRemaining -= 1;
+			if (o.hitsRemaining < 0) o.hitsRemaining = 0;
 		}
 	}
-		
-	@Override
-	public boolean canApplyEffect(CanDoAbility agent, Position pos, Battle battle) {
-		// TODO:
-		// - search for line of sight
 
+	@Override
+	public boolean canApplyEffect(
+		CanDoAbility agent, Position target, Battle battle
+	) {
 		// check range
 		Position apos = agent.getPosition();
-		if (Math.abs(apos.x - pos.x) + Math.abs(apos.y - pos.y) > info.range) {
+		if (Math.abs(apos.x - target.x) + Math.abs(apos.y - target.y) > info.range) {
 			return false;
 		}
 	
-		// check obstacles
-
-		// check destination is clear
-		if (battle.getObstacles().contains(apos)) {
+		// check LOS
+		if (!info.canPassObstacles && !hasLineOfSight(apos, target, battle)) {
 			return false;
 		}
 
+		// check destination is clear
 		return true;
 	}
 }

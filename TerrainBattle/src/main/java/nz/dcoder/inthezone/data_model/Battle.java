@@ -12,9 +12,9 @@ import nz.dcoder.inthezone.data_model.pure.Position;
 class Battle {
 	public final BattleController controller;
 
-	public Collection<Character> players;
-	public Collection<Character> aiPlayers;
-	public Collection<BattleObject> objects;
+	private Collection<Character> players;
+	private Collection<Character> aiPlayers;
+	Collection<BattleObject> objects;
 
 	Terrain terrain;
 	Turn turn;
@@ -100,6 +100,10 @@ class Battle {
 		this.objects = objects.stream()
 			.filter(o -> !(o.isAttackable && o.hitsRemaining <= 0))
 			.collect(Collectors.toList());
+	}
+
+	public void kill(Character c) {
+		objects.add(c.die());
 	}
 
 	public void changeTurn() {

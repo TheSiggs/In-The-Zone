@@ -30,15 +30,14 @@ public class LineOfSight {
 		final int dx = p1.x - p0.x;
 		final int dy = p1.y - p0.y;
 
-		final int m = Math.abs(dx) + Math.abs(dy) + 1;
-		final double dl;
+		final double dsdp;
 
 		if (dx == 0 || dy == 0) {
-			dl = 0;
+			dsdp = 0;
 		} else if (Math.abs(dx) >= Math.abs(dy)) {
-			dl = (double) m / (double) (Math.abs(dy) + 1);
+			dsdp = Math.abs((double) dy / (double) dx);
 		} else {
-			dl = (double) m / (double) (Math.abs(dx) + 1);
+			dsdp = Math.abs((double) dx / (double) dy);
 		}
 
 		// quadrants:
@@ -51,56 +50,31 @@ public class LineOfSight {
 		//  ---+---
 		//  4/5|6\7
 
-		final double l;
 		final Position dp;
 		final Position ds;
 
 		if (dx > 0 && dy >= 0) { 
 			// quadrant 0
-			if (Math.abs(dx) > Math.abs(dy)) {
+			if (Math.abs(dx) >= Math.abs(dy)) {
 				// octant 0
 				dp = new Position(1, 0);
 				ds = new Position(0, 1);
-				if (bias) l = Math.ceil(dl); else l = Math.floor(dl);
-			} else if (Math.abs(dx) < Math.abs(dy)) {
+			} else {
 				// octant 1
 				dp = new Position(0, 1);
 				ds = new Position(1, 0);
-				if (bias) l = Math.floor(dl); else l = Math.ceil(dl);
-			} else {
-				// |dx| == |dy|
-				l = 2;
-				if (bias) {
-					dp = new Position(1, 0);
-					ds = new Position(0, 1);
-				} else {
-					dp = new Position(0, 1);
-					ds = new Position(1, 0);
-				}
 			}
 
 		} else if (dx <= 0 && dy > 0) {
 			// quadrant 1
-			if (Math.abs(dx) < Math.abs(dy)) {
+			if (Math.abs(dx) <= Math.abs(dy)) {
 				// octant 2
 				dp = new Position(0, 1);
 				ds = new Position(-1, 0);
-				if (bias) l = Math.ceil(dl); else l = Math.floor(dl);
-			} else if (Math.abs(dx) > Math.abs(dy)) {
+			} else {
 				// octant 3
 				dp = new Position(-1, 0);
 				ds = new Position(0, 1);
-				if (bias) l = Math.floor(dl); else l = Math.ceil(dl);
-			} else {
-				// |dx| == |dy|
-				l = 2;
-				if (bias) {
-					dp = new Position(0, 1);
-					ds = new Position(-1, 0);
-				} else {
-					dp = new Position(-1, 0);
-					ds = new Position(0, 1);
-				}
 			}
 
 		} else if (dx < 0 && dy <= 0) {
@@ -109,23 +83,11 @@ public class LineOfSight {
 				// octant 4
 				dp = new Position(-1, 0);
 				ds = new Position(0, -1);
-				if (bias) l = Math.ceil(dl); else l = Math.floor(dl);
-			} else if (Math.abs(dx) < Math.abs(dy)) {
+			} else {
 				// octant 5
 				dp = new Position(0, -1);
 				ds = new Position(-1, 0);
-				if (bias) l = Math.floor(dl); else l = Math.ceil(dl);
-			} else {
-				// |dx| == |dy|
-				l = 2;
-				if (bias) {
-					dp = new Position(-1, 0);
-					ds = new Position(0, -1);
-				} else {
-					dp = new Position(0, -1);
-					ds = new Position(-1, 0);
-				}
-			}
+			} 
 
 		} else if (dx >= 0 && dy < 0) {
 			// quadrant 3
@@ -133,22 +95,10 @@ public class LineOfSight {
 				// octant 6
 				dp = new Position(0, -1);
 				ds = new Position(1, 0);
-				if (bias) l = Math.ceil(dl); else l = Math.floor(dl);
-			} else if (Math.abs(dx) > Math.abs(dy)) {
+			} else {
 				// octant 7
 				dp = new Position(1, 0);
 				ds = new Position(0, -1);
-				if (bias) l = Math.floor(dl); else l = Math.ceil(dl);
-			} else {
-				// |dx| == |dy|
-				l = 2;
-				if (bias) {
-					dp = new Position(0, -1);
-					ds = new Position(1, 0);
-				} else {
-					dp = new Position(1, 0);
-					ds = new Position(0, -1);
-				}
 			}
 
 		} else {
@@ -156,10 +106,13 @@ public class LineOfSight {
 			// just make up some values in this case
 			dp = new Position(0, 0);
 			ds = new Position(0, 0);
-			l = 0;
 		}
 
-		return LineOfSight.getLOS0(p0, p1, dp, ds, (int) l);
+		if (dy >= 0) {
+			return LineOfSight.getLOS0(p0, p1, dp, ds, dsdp, bias);
+		} else {
+			return LineOfSight.getLOS0(p0, p1, dp, ds, dsdp, !bias);
+		}
 	}
 
 	/**
@@ -189,30 +142,37 @@ public class LineOfSight {
 		Position p1,   // target position
 		Position dp,   // primary displacement
 		Position ds,   // secondary displacement
-		int l          // length of line segments
+		double dsdp,   // gradient of the line
+		boolean bias   // true to prefer the primary direction
 	) {
 		final List<Position> r = new ArrayList<Position>();
-		final boolean flat;
-		if (dp.y == 0) flat = true; else flat = false;
 
+		double e = 0;
 		Position p = p0;
-
 		r.add(p);
+
+		// This is essentially Bresenham's line algorithm modified to give a
+		// manhatten path
 		while (!p.equals(p1)) {
-			for (int i = l; i > 1; i--) {
-				if (p.equals(p1)) return r;
+			e += dsdp;
+			if (e < 1) {
+				// primary direction only
 				p = p.add(dp);
 				r.add(p);
-			}
-
-			if ((flat && p.y == p1.y) || ((!flat) && p.x == p1.x)) {
-				while (!p.equals(p1)) {
+			} else {
+				// primary and secondary directions
+				if (bias) {
+					p = p.add(dp);
+					r.add(p);
+					p = p.add(ds);
+					r.add(p);
+				} else {
+					p = p.add(ds);
+					r.add(p);
 					p = p.add(dp);
 					r.add(p);
 				}
-			} else {
-				p = p.add(ds);
-				r.add(p);
+				e -= 1;
 			}
 		}
 

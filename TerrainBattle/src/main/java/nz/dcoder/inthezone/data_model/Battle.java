@@ -14,7 +14,7 @@ class Battle {
 
 	private Collection<Character> players;
 	private Collection<Character> aiPlayers;
-	Collection<BattleObject> objects;
+	private Collection<BattleObject> objects;
 
 	Terrain terrain;
 	Turn turn;
@@ -47,6 +47,12 @@ class Battle {
 		changeTurn();
 	}
 
+	public void checkTurn(int oturn) {
+		if (oturn != this.turnNumber) throw new RuntimeException(
+				"Object from turn " + oturn +
+				" used on turn " + this.turnNumber);
+	}
+
 	/**
 	 * may return null
 	 * */
@@ -65,6 +71,12 @@ class Battle {
 	public BattleObject getObjectAt(Position pos) {
 		return objects.stream()
 			.filter(o -> o.position.equals(pos)).findFirst().orElse(null);
+	}
+	
+	public Collection<BattleObject> getTriggeredObjects(Position pos) {
+		return objects.stream()
+			.filter(o -> o.mayTriggerAbilityAt(pos))
+			.collect(Collectors.toList());
 	}
 
 	/**

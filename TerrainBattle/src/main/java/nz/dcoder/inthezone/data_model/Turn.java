@@ -8,7 +8,7 @@ import nz.dcoder.inthezone.data_model.pure.Position;
  * */
 public class Turn {
 	final boolean isPlayerTurn;
-	final public Collection<TurnCharacter> turnCharacters;
+	final private Collection<TurnCharacter> turnCharacters;
 	final private Battle battle;
 	final private int turnNumber;
 
@@ -30,6 +30,13 @@ public class Turn {
 	public TurnCharacter turnCharacterAt(Position pos) {
 		return turnCharacters.stream()
 			.filter(t -> t.getPos().equals(pos)).findFirst().orElse(null);
+	}
+
+	/**
+	 * Get all the turn characters
+	 * */
+	public Collection<TurnCharacter> getCharacters() {
+		return turnCharacters;
 	}
 
 	/**

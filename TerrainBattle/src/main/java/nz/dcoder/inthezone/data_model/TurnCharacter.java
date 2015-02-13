@@ -85,27 +85,44 @@ public class TurnCharacter {
 	}
 
 	public void doMotion(List<Node> path) {
+		battle.checkTurn(turnNumber);
+
 		if (path == null || path.size() > mp || path.size() < 1) {
 			// WARNING: we really should validate the path here, just to be sure
 			throw new RuntimeException("Invalid path " + path.toString());
 		}
 
-		List<Position> ps = path.stream()
-			.map(TurnCharacter::nodeToPosition).collect(Collectors.toList());
+		List<Node> pathSoFar = new ArrayList<Node>();
+		while (path.size() > 0) {
+			Node n = path.get(0);
+			path.remove(0);
+			pathSoFar.add(n);
 
-		// trigger object abilities (such as trip mines)
-		for (Position p : ps) {
-			// TODO: complete this section
-			battle.objects.stream().filter(o -> o.mayTriggerAbilityAt(p))
-				.forEach(o -> System.err.println("Object ability activated"));
+			Position p = nodeToPosition(n);
+			Collection<BattleObject> os = battle.getTriggeredObjects(p);
+			if (os.size() > 0) {
+				doMotion0(pathSoFar);
+				for (BattleObject o : os) {
+					// trigger object abilities
+					Ability ability = o.ability.ability;
+					ability.applyEffect(o.ability, p, battle);
+					battle.controller.onAbility.accept(new DoAbilityInfo(
+						character.position, p, ability.info));
+				}
+
+				pathSoFar = new ArrayList<Node>();
+			}
 		}
 
-		Position destination = ps.get(ps.size() - 1);
+		if (pathSoFar.size() > 0) 
+			doMotion0(pathSoFar);
+		}
+	}
 
-		// update the character for this move operation
-		mp -= ps.size();
+	private void doMotion0(List<Node> path) {
+		mp -= path.size();
 		Position p0 = character.position;
-		character.position = destination;
+		character.position = nodeToPosition(path.get(path.size() - 1));
 		battle.controller.onMove.accept(new DoMoveInfo(p0, path));
 	}
 
@@ -138,6 +155,8 @@ public class TurnCharacter {
 	}
 
 	public void doAbility(AbilityName name, Position target) {
+		battle.checkTurn(turnNumber);
+
 		Ability ability = getAbility(name);
 		if (ability == null) return;
 		ap -= ability.info.cost;
@@ -152,6 +171,8 @@ public class TurnCharacter {
 	}
 
 	public void useItem(Item item, Position target) {
+		battle.checkTurn(turnNumber);
+
 		ap -= item.ability.info.cost;
 		item.ability.applyEffect(character, target, battle);
 		battle.controller.onAbility.accept(new DoAbilityInfo(
@@ -187,6 +208,10 @@ public class TurnCharacter {
 		return battle.terrain.isManaZone(character.position);
 	}
 
+	/**
+	 * Determine if this character has enough action points to carry out another
+	 * action on this turn
+	 * */
 	public boolean hasOptions(Collection<Item> items) {
 		boolean canUseItem = items.stream()
 			.anyMatch(i -> i.ability.info.cost <= ap);

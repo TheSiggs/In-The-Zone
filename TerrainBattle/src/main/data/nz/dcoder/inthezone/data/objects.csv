@@ -1,5 +1,6 @@
 name,blocksSpace,blocksPath,isAttackable,isPushable,hits,hasAbility,ability,,Notes
 testObj,TRUE,FALSE,FALSE,FALSE,0,TRUE,test,,This line is for testing.  Please do not alter
+testBody,TRUE,FALSE,FALSE,TRUE,0,FALSE,,,This line is for testing.  Please do not alter
 ,,,,,,,,,
 ,,,,,,,,,Description of fields
 ,,,,,,,,,name: The name of this battle object

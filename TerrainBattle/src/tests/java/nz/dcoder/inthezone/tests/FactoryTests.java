@@ -57,6 +57,29 @@ public class FactoryTests {
 		}
 	}
 
+	@Test public void testBattleObjects2() {
+		try {
+			AbilityFactory af = new AbilityFactory();
+			BattleObjectFactory factory = new BattleObjectFactory(af);
+			BattleObject test = factory.newBattleObject(
+				new BattleObjectName("testBody"), new Position(0, 0));
+			assertNotNull("Object not null", test);
+
+			assertEquals("BattleObject2 name", new BattleObjectName("testBody"), test.name);
+			assertEquals("BattleObject2 blocksSpace", true, test.blocksSpace);
+			assertEquals("BattleObject2 blocksPath", false, test.blocksPath);
+			assertEquals("BattleObject2 isAttackable", false, test.isAttackable);
+			assertEquals("BattleObject2 isPushable", true, test.isPushable);
+			assertNull("BattleObjectAbilitys2 is null", test.ability);
+			assertEquals("BattleObject2 position.x", 0, test.position.x);
+			assertEquals("BattleObject2 position.y", 0, test.position.y);
+			assertEquals("BattleObject2 hits", 0, test.hitsRemaining);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
 	@Test public void testEquipment1() {
 		try {
 			AbilityFactory af = new AbilityFactory();
@@ -139,7 +162,8 @@ public class FactoryTests {
 	@Test public void testCharacter() {
 		try {
 			AbilityFactory af = new AbilityFactory();
-			CharacterFactory factory = new CharacterFactory(af);
+			BattleObjectFactory bf = new BattleObjectFactory(af);
+			CharacterFactory factory = new CharacterFactory(af, bf);
 			nz.dcoder.inthezone.data_model.Character test =
 				factory.newCharacter(new CharacterName("testChar"), 2); 
 			assertNotNull("Object not null", test);
@@ -166,8 +190,12 @@ public class FactoryTests {
 			}
 			assertEquals("Character ability count", 1, count);
 
-			// TODO: add checks for level, HP, and abilities when those classes are
-			// implemented
+			// kill the character
+			BattleObject d = test.die();
+			assertEquals("Character body name", new BattleObjectName("testBody"), d.name);
+			assertTrue("Character body pushable", d.isPushable);
+			assertTrue("Character body occupies space", d.blocksSpace);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Unexpected exception: " + e.getMessage());

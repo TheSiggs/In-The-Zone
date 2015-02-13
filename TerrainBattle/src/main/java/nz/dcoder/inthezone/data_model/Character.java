@@ -2,10 +2,12 @@ package nz.dcoder.inthezone.data_model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
+import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentClass;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -18,6 +20,8 @@ public class Character implements CanDoAbility {
 	public final String description;
 	private final BaseStats baseStats;
 	private final LevelController level;
+	private final BiFunction<BattleObjectName, Position, BattleObject> makeBody;
+	private final BattleObjectName bodyName;
 
 	public int hp;
 	public Position position;
@@ -32,13 +36,17 @@ public class Character implements CanDoAbility {
 		CharacterName name,
 		String description,
 		BaseStats baseStats,
-		LevelController level
+		LevelController level,
+		BiFunction<BattleObjectName, Position, BattleObject> makeBody,
+		BattleObjectName bodyName
 	) {
 		this.name = name;
 		this.description = description;
 		this.baseStats = baseStats;
 		this.effectiveBaseStats = baseStats;
 		this.level = level;
+		this.makeBody = makeBody;
+		this.bodyName = bodyName;
 
 		this.hp = level.maxHP;
 		this.equipment = new ArrayList<Equipment>();
@@ -55,12 +63,8 @@ public class Character implements CanDoAbility {
 	 * @return A BattleObject representing the corpse of this character
 	 * */
 	public BattleObject die() {
-		// note:  remember that you use BattleObjectFactory to make a battle
-		// object.  For each character, the factory will know how to make that
-		// character's corpse
 		isDead = true;
-		// TODO: implement this method
-		return null;
+		return makeBody.apply(bodyName, this.position);
 	}
 
 	public int getMaxHP() {

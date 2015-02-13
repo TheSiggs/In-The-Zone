@@ -27,14 +27,15 @@ public class DamageAbility extends Ability {
 			getAffectedArea(agent.getPosition(), target, battle);
 
 		// 2) find the targets (i.e. the characters on the affected squares)
-		final List<Character> characterTargets = affected.stream()
-			.map(p -> battle.getCharacterAt(p))
-			.filter(c -> c != null).collect(Collectors.toList());
+		final Collection<Character> characterTargets = affected.stream()
+				.map(p -> battle.getCharacterAt(p))
+				.filter(c -> c != null)
+				.collect(Collectors.toList());
 
-		final List<BattleObject> objectTargets = affected.stream()
-			.map(p -> battle.getObjectAt(p))
-			.filter(o -> o != null && o.isAttackable)
-			.collect(Collectors.toList());
+		final Collection<BattleObject> objectTargets = affected.stream()
+				.map(p -> battle.getObjectAt(p))
+				.filter(o -> o != null && o.isAttackable)
+				.collect(Collectors.toList());
 
 		// 3) gather the parameters from the agent doing the ability and ...
 		double dieroll = 0.9 + (0.2 * Math.random());

@@ -23,6 +23,14 @@ public class TeleportAbility extends Ability {
 	}
 
 	@Override
+	public Collection<Position> getTargets(
+		Collection<Position> affected, Battle battle
+	) {
+		return affected;
+	}
+
+
+	@Override
 	public void applyEffect(CanDoAbility agent, Position pos, Battle battle) {
 		if (canApplyEffect(agent, pos, battle)) {
 			battle.getCharacterAt(agent.getPosition()).position = pos;

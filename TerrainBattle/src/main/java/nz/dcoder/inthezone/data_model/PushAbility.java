@@ -37,6 +37,16 @@ public class PushAbility extends Ability {
 	}
 
 	@Override
+	public Collection<Position> getTargets(
+		Collection<Position> affected, Battle battle
+	) {
+		List<Position> targets = new ArrayList<Position>();
+		// WARNING: assumes that getAffectedArea puts the target square first
+		targets.add(affected.iterator().next());
+		return targets;
+	}
+
+	@Override
 	public void applyEffect(CanDoAbility agent, Position target, Battle battle) {
 		if (canApplyEffect(agent, target, battle)) {
 			Position apos = agent.getPosition();

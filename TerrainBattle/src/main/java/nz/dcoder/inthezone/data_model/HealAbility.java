@@ -37,6 +37,17 @@ public class HealAbility extends Ability {
 			if (c.hp > c.getMaxHP()) c.hp = c.getMaxHP();
 		}
 	}
+
+	@Override
+	public Collection<Position> getTargets(
+		Collection<Position> affected, Battle battle
+	) {
+		return affected.stream()
+			.map(p -> battle.getCharacterAt(p))
+			.filter(c -> c != null)
+			.map(c -> c.position)
+			.collect(Collectors.toList());
+	}
 		
 	@Override
 	public boolean canApplyEffect(

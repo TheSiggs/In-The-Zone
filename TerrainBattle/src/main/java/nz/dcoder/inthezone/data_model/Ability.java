@@ -3,6 +3,8 @@ package nz.dcoder.inthezone.data_model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.LineOfSight;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -67,6 +69,21 @@ abstract public class Ability {
 		}
 
 		return affected;
+	}
+
+	public Collection<Position> getTargets(
+		Collection<Position> affected, Battle battle
+	) {
+		return Stream.concat(
+			affected.stream()
+				.map(p -> battle.getCharacterAt(p))
+				.filter(c -> c != null)
+				.map(c -> c.position),
+			affected.stream()
+				.map(p -> battle.getObjectAt(p))
+				.filter(o -> o != null && o.isAttackable)
+				.map(o -> o.position))
+			.collect(Collectors.toList());
 	}
 
 	/**

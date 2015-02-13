@@ -73,9 +73,13 @@ class Battle {
 			.filter(o -> o.position.equals(pos)).findFirst().orElse(null);
 	}
 	
+	/**
+	 * Get the objects that would be triggered if a character moved to a
+	 * particular square.
+	 * */
 	public Collection<BattleObject> getTriggeredObjects(Position pos) {
 		return objects.stream()
-			.filter(o -> o.mayTriggerAbilityAt(pos))
+			.filter(o -> o.mayTriggerAbilityAt(pos, this))
 			.collect(Collectors.toList());
 	}
 

@@ -51,9 +51,11 @@ public class BattleObject {
 	 * the position parameter, determines whether or not the object's ability is
 	 * triggered on that square.
 	 * */
-	public boolean mayTriggerAbilityAt(Position position) {
-		// TODO: implement this method
-		return false;
+	public boolean mayTriggerAbilityAt(Position position, Battle battle) {
+		return
+			ability != null &&
+			this.position.equals(position) &&
+			ability.ability.canApplyEffect(ability, position, battle);
 	}
 }
 

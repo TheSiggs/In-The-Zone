@@ -132,9 +132,7 @@ class Battle {
 			this, turnNumber);
 
 		// notify the presentation layer if they player's turn has started
-		if (isPlayerTurn && controller.onPlayerTurnStart != null) {
-			controller.onPlayerTurnStart.accept(turn);
-		}
+		if (isPlayerTurn) controller.callOnPlayerTurnStart(turn);
 	}
 
 	private Collection<TurnCharacter> turnCharacters(

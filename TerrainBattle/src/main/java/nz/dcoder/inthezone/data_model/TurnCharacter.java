@@ -119,8 +119,8 @@ public class TurnCharacter {
 					Collection<Position> targets = ability.getTargets(
 						ability.getAffectedArea(p, p, battle), battle);
 
-					battle.controller.onAbility.accept(new DoAbilityInfo(
-						character.position, targets, ability.info));
+					battle.controller.callOnAbility(
+						character.position, targets, ability.info);
 				}
 
 				pathSoFar = new ArrayList<Node>();
@@ -136,7 +136,7 @@ public class TurnCharacter {
 		mp -= path.size();
 		Position p0 = character.position;
 		character.position = nodeToPosition(path.get(path.size() - 1));
-		battle.controller.onMove.accept(new DoMoveInfo(p0, path));
+		battle.controller.callOnMove(p0, path);
 	}
 
 	private static Position nodeToPosition(Node n) {
@@ -206,8 +206,7 @@ public class TurnCharacter {
 		Collection<Position> targets = ability.getTargets(
 			ability.getAffectedArea(character.position, target, battle), battle);
 
-		battle.controller.onAbility.accept(new DoAbilityInfo(
-			character.position, targets, ability.info));
+		battle.controller.callOnAbility(character.position, targets, ability.info);
 	}
 
 	/**
@@ -253,8 +252,8 @@ public class TurnCharacter {
 			item.ability.getAffectedArea(
 				character.position, target, battle), battle);
 
-		battle.controller.onAbility.accept(new DoAbilityInfo(
-			character.position, targets, item.ability.info));
+		battle.controller.callOnAbility(
+			character.position, targets, item.ability.info);
 	}
 
 	public CharacterName getName() {

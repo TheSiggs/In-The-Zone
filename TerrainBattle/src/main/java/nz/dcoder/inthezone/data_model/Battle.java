@@ -114,25 +114,41 @@ class Battle {
 		this.aiPlayers = aiPlayers.stream()
 			.filter(c -> !c.isDead).collect(Collectors.toList());
 		this.objects = objects.stream()
-			.filter(o -> !(o.isAttackable && o.hitsRemaining <= 0))
+			.filter(o -> o.hitsRemaining > 0)
 			.collect(Collectors.toList());
 	}
 
 	public void kill(Character c) {
+		controller.callOnDeath(c);
 		objects.add(c.die());
 	}
 
 	public void changeTurn() {
-		grimReaper();
-		turnNumber += 1;
-		boolean isPlayerTurn = !turn.isPlayerTurn;
-		turn = new Turn(
-			isPlayerTurn,
-			turnCharacters(isPlayerTurn, turnNumber),
-			this, turnNumber);
+		grimReaper(); 
 
-		// notify the presentation layer if they player's turn has started
-		if (isPlayerTurn) controller.callOnPlayerTurnStart(turn);
+		if (isBattleOver()) {
+			if (aiPlayers.size() == 0) {
+				controller.callOnBattleEnd(true);
+			} else {
+				controller.callOnBattleEnd(false);
+			}
+
+		} else {
+			turnNumber += 1;
+			boolean isPlayerTurn = !turn.isPlayerTurn;
+			turn = new Turn(
+				isPlayerTurn,
+				turnCharacters(isPlayerTurn, turnNumber),
+				this, turnNumber);
+
+			// notify the presentation layer if they player's turn has started
+			if (isPlayerTurn) controller.callOnPlayerTurnStart(turn);
+		}
+	}
+
+	public boolean isBattleOver() {
+		grimReaper();
+		return players.size() == 0 || aiPlayers.size() == 0;
 	}
 
 	private Collection<TurnCharacter> turnCharacters(

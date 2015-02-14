@@ -44,10 +44,26 @@ public class Turn {
 	 * @param items Consumable items available to the player
 	 * @return true if there is nothing more that can be done on this turn
 	 * */
-	boolean isTurnOver(Collection<Item> items) {
+	public boolean isTurnOver(Collection<Item> items) {
 		return !turnCharacters.stream().anyMatch(t -> t.hasOptions(items));
 	}
 
+	/**
+	 * Determine if the battle is over.  If the battle is over, then a
+	 * onBattleEnd event will be generated the next time endTurn is called.  The
+	 * presentation layer should call endTurn to properly end the battle.
+	 * */
+	public boolean isBattleOver() {
+		return battle.isBattleOver();
+	}
+
+	/**
+	 * End this turn.  When the presentation layer calls this method, the AI
+	 * player will take a turn.  Then, if the battle is not over, the
+	 * presentation layer will be sent an onPlayerTurnStart event with a new turn
+	 * object.  If the battle is over, this method causes an onBattleEnd event to
+	 * be generated instead.
+	 * */
 	public void endTurn() {
 		battle.changeTurn();
 	}

@@ -3,7 +3,8 @@ apply plugin: 'application'
 //apply from: "src/main/resources/project.properties"
 
 def mainClass = 'nz.dcoder.inthezone.Main'
-def sceneClass = 'nz.dcoder.inthezone.Scene'
+def sceneClass = 'nz.dcoder.inthezone.MyScene'
+def blenderClass = 'nz.dcoder.inthezone.BlenderRender'
 def jmonkeyengine_version = '3.0'
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -32,6 +33,9 @@ repositories {
 	//	url 'http://updates.jmonkeyengine.org/maven'
 	//}
 	//maven { url "http://dl.bintray.com/jmonkeyengine/contrib" }
+	maven {
+        url 'http://updates.jmonkeyengine.org/maven'
+    }
 	maven { url "http://dl.bintray.com/davidb/jme3stuff" }
 }
 
@@ -72,6 +76,7 @@ dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.10'
 	compile fileTree(dir: 'libs', include: ['*.jar'])
 	compile 'com.googlecode.aima-java:aima-core:0.11.0'
+	compile 'com.jme3:jme3-blender:3.0.+'
 	//compile jmeGroup +':jME3-core:'+ jmeVersion
 	//compile jmeGroup +':jME3-effects:'+ jmeVersion
 	//compile jmeGroup +':jME3-networking:'+ jmeVersion
@@ -122,6 +127,11 @@ task wrapper(type: Wrapper) {
 
 task scene(type: JavaExec, dependsOn: classes) {
 	main sceneClass
+	classpath sourceSets.main.runtimeClasspath 
+}
+
+task blender(type: JavaExec, dependsOn: classes) {
+	main blenderClass
 	classpath sourceSets.main.runtimeClasspath 
 }
 

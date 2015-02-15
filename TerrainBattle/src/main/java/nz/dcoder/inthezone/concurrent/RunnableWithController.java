@@ -15,7 +15,7 @@ import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import nz.dcoder.inthezone.Main;
+import nz.dcoder.inthezone.OldMain;
 import nz.dcoder.inthezone.jfx.MainHUDController;
 
 /**
@@ -27,9 +27,9 @@ public class RunnableWithController implements Runnable {
 	private MainHUDController controller;
 	private Scene scene;
 	private JmeFxScreenContainer jmeFx;
-	private Main app;
+	private OldMain app;
 
-	public RunnableWithController(JmeFxScreenContainer jmeFx, Main app) {
+	public RunnableWithController(JmeFxScreenContainer jmeFx, OldMain app) {
 		this.jmeFx = jmeFx;
 		this.app = app;
 	}
@@ -52,7 +52,7 @@ public class RunnableWithController implements Runnable {
 			controller = fxmlLoader.getController();
 			this.getController().getHealth().setProgress(1.0);
 		} catch (IOException ex) {
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(OldMain.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -101,14 +101,14 @@ public class RunnableWithController implements Runnable {
 	/**
 	 * @return the app
 	 */
-	public Main getApp() {
+	public OldMain getApp() {
 		return app;
 	}
 
 	/**
 	 * @param app the app to set
 	 */
-	public void setApp(Main app) {
+	public void setApp(OldMain app) {
 		this.app = app;
 	}
 }

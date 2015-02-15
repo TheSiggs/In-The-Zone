@@ -3,7 +3,7 @@ package nz.dcoder.inthezone.objects;
 import java.util.ArrayList;
 import java.util.List;
 import nz.dcoder.inthezone.Character;
-import nz.dcoder.inthezone.Main;
+import nz.dcoder.inthezone.OldMain;
 import nz.dcoder.inthezone.concurrent.RunnableWithController;
 import nz.dcoder.inthezone.jfx.MainHUDController;
 
@@ -174,7 +174,7 @@ public class CharacterState {
 	public void decreaseHp(double damage) {
 		this.hp -= damage;
 
-		RunnableWithController gui = Main.instance.getGuiThread();
+		RunnableWithController gui = OldMain.instance.getGuiThread();
 		MainHUDController controller = gui.getController();
 		if (hp <= 0.0) {
 			System.out.println("Health of character at " + character.getX() + "," + character.getY() + " is " + 0);

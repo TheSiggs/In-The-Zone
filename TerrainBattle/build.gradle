@@ -3,6 +3,7 @@ apply plugin: 'application'
 //apply from: "src/main/resources/project.properties"
 
 def mainClass = 'nz.dcoder.inthezone.Main'
+def oldMainClass = 'nz.dcoder.inthezone.OldMain'
 def sceneClass = 'nz.dcoder.inthezone.MyScene'
 def blenderClass = 'nz.dcoder.inthezone.BlenderRender'
 def jmonkeyengine_version = '3.0'
@@ -132,6 +133,11 @@ task scene(type: JavaExec, dependsOn: classes) {
 
 task blender(type: JavaExec, dependsOn: classes) {
 	main blenderClass
+	classpath sourceSets.main.runtimeClasspath 
+}
+
+task oldMain(type: JavaExec, dependsOn: classes) {
+	main oldMainClass
 	classpath sourceSets.main.runtimeClasspath 
 }
 

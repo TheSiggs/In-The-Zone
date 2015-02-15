@@ -17,7 +17,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.paint.Color;
-import nz.dcoder.inthezone.Main;
+import nz.dcoder.inthezone.OldMain;
 
 /**
  * FXML Controller class
@@ -26,7 +26,7 @@ import nz.dcoder.inthezone.Main;
  */
 public class MainHUDController implements Initializable {
 
-    public static Main app;
+    public static OldMain app;
     @FXML
     public Canvas canvas;
 
@@ -46,10 +46,10 @@ public class MainHUDController implements Initializable {
     @FXML
     private void handleButtonAction(ActionEvent event) {
         System.out.println("You clicked me!");
-        app.enqueue(new Callable<Main>() {
+        app.enqueue(new Callable<OldMain>() {
 
             @Override
-            public Main call() throws Exception {
+            public OldMain call() throws Exception {
                 app.someMethod();
                 return app;
             }

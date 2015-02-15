@@ -17,13 +17,13 @@ import com.jme3.texture.Texture.WrapMode;
  *
  * @author denz
  */
-public class Terrain extends SimpleApplication {
+public class MyTerrain extends SimpleApplication {
 
 	private TerrainQuad terrain;
 	Material mat_terrain;
 
 	public static void main(String[] args) {
-		Terrain app = new Terrain();
+		MyTerrain app = new MyTerrain();
 		app.start();
 	}
 	@Override

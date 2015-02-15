@@ -18,16 +18,18 @@ public class Party {
 	final Collection<Character> characters;
 
 	public Party() {
-		items = new HashMap<ItemName, List<Item>>();
-		equipment = new ArrayList<Equipment>();
-		characters = new ArrayList<Character>();
+		items = new HashMap<>();
+		equipment = new ArrayList<>();
+		characters = new ArrayList<>();
 	}
 
 	/**
 	 * Information about items for the GUI
-	 * */
+	 *
+	 * @return items
+	 */
 	public Map<Item, Integer> getItemInfo() {
-		Map<Item, Integer> m = new TreeMap<Item, Integer>();
+		Map<Item, Integer> m = new TreeMap<>();
 		items.keySet().stream()
 			.forEach(i -> m.put(items.get(i).get(0), items.get(i).size()));
 		return m;

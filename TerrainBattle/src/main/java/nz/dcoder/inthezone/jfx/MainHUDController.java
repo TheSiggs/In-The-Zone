@@ -5,8 +5,6 @@
  */
 package nz.dcoder.inthezone.jfx;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
@@ -14,9 +12,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.paint.Color;
+import javax.swing.AbstractButton;
 import nz.dcoder.inthezone.Main;
 
 /**
@@ -61,6 +58,7 @@ public class MainHUDController implements Initializable {
     
     public void setHealthValue(double value) {
         health.setProgress(value);
+        
     }
 
     @FXML
@@ -83,18 +81,38 @@ public class MainHUDController implements Initializable {
     @FXML
     private ProgressBar movePoints;
     
+    public void setMovePointValue(double value) {
+        movePoints.setProgress(value);
+    }
+        
     public synchronized void decreaseMovementPoints(double value, double total) {
-       movePoints.setProgress(value/total);
+       getMovePoints().setProgress(getMovePoints().getProgress() - 0.1);
        
+       if (getMovePoints().getProgress() == 0) {
+           System.out.println("This Character cannot Move!");
+       }
+       System.out.println("This Character has Moved!");
     }
 
+    /**
+     * @return movement points
+     */
+    public ProgressBar getMovePoints(){
+        return movePoints;
+    }
+    /**
+     * @param movePoints the movePoints to set
+     */
+    public void setMovePoints(ProgressBar movePoints) {
+        this.movePoints = movePoints;
+    }
+    
     /**
      * @return the health
      */
     public ProgressBar getHealth() {
         return health;
     }
-
     /**
      * @param health the health to set
      */
@@ -102,4 +120,7 @@ public class MainHUDController implements Initializable {
         this.health = health;
     }
     
+    public void attackMenu(AbstractButton AttackButton){
+        
+    }
 }

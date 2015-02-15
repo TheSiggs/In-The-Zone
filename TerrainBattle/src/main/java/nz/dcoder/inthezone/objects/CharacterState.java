@@ -2,7 +2,7 @@ package nz.dcoder.inthezone.objects;
 
 import java.util.ArrayList;
 import java.util.List;
-import nz.dcoder.inthezone.Character;
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.OldMain;
 import nz.dcoder.inthezone.concurrent.RunnableWithController;
 import nz.dcoder.inthezone.jfx.MainHUDController;
@@ -22,7 +22,7 @@ public class CharacterState {
 	private List<Skill> skills;
 	private Weapon weapon;
 	private Armour armour;
-	private Character character;
+	private CharacterGraphics character;
         private double movePoints;
 
 	public CharacterState() {
@@ -194,14 +194,14 @@ public class CharacterState {
 	/**
 	 * @return the character
 	 */
-	public Character getCharacter() {
+	public CharacterGraphics getCharacter() {
 		return character;
 	}
 
 	/**
 	 * @param character the character to set
 	 */
-	public void setCharacter(Character character) {
+	public void setCharacter(CharacterGraphics character) {
 		this.character = character;
 	}
         

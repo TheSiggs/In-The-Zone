@@ -11,12 +11,14 @@ package nz.dcoder.inthezone;
  */
 public class Presentation {
 
+	final Main game;
 	Presentation(Main game) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		this.game = game;
 	}
 
 	void simpleUpdate(float tpf) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 	
 }

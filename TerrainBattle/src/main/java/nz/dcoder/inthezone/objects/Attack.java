@@ -1,14 +1,14 @@
 package nz.dcoder.inthezone.objects;
 
 //import nz.dcoder.inthezone.objects.CharacterState;
-import nz.dcoder.inthezone.Character;
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
 
 /**
  * @author jedcalkin
  */
 public class Attack {
 
-	public static void attack(Character attacker, Character defender, Skill skill) {
+	public static void attack(CharacterGraphics attacker, CharacterGraphics defender, Skill skill) {
 		int a = 1;
 		int b = 1;
 		int c = 1;

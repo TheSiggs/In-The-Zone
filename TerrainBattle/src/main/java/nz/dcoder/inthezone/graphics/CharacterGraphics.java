@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.dcoder.inthezone;
+package nz.dcoder.inthezone.graphics;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
@@ -15,7 +15,7 @@ import nz.dcoder.inthezone.objects.CharacterState;
  *
  * @author informatics-palmerson
  */
-public class Character implements AnimEventListener {
+public class CharacterGraphics implements AnimEventListener {
 
 	private Spatial spatial = null;
 	private int x = 0;
@@ -24,7 +24,7 @@ public class Character implements AnimEventListener {
 	private AnimControl control;
 	private CharacterState state;
 
-	public Character(Spatial spatial) {
+	public CharacterGraphics(Spatial spatial) {
 		this.spatial = spatial;
 		// 3d_objects/creatures/goblin/animations/goblin.skeleton.xml
 		control = spatial.getControl(AnimControl.class);

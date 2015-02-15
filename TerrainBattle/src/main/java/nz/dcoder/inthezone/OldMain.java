@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone;
 
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.asset.plugins.FileLocator;
@@ -68,8 +69,8 @@ public class OldMain extends SimpleApplication {
 	private int pathNode;
 	private Node sceneNode;
 	//private List<Character> players = new ArrayList<>();
-	private List<Character> team1 = new ArrayList<>();
-	private List<Character> team2 = new ArrayList<>();
+	private List<CharacterGraphics> team1 = new ArrayList<>();
+	private List<CharacterGraphics> team2 = new ArrayList<>();
 	private RunnableWithController guiThread;
 
 	public OldMain() {
@@ -194,7 +195,7 @@ public class OldMain extends SimpleApplication {
 		//TODO: add render code
 	}
 
-	private Character makeCharacter(int x, int y, String texture) {
+	private CharacterGraphics makeCharacter(int x, int y, String texture) {
 		Spatial mySpatial = assetManager.loadModel("3d_objects/creatures/goblin/goblin.mesh.xml");
 		// 3d_objects/creatures/goblin/textures/green/ogre.material
 		Material mat = new Material(
@@ -203,7 +204,7 @@ public class OldMain extends SimpleApplication {
 				assetManager.loadTexture("3d_objects/creatures/goblin/textures/" + texture));
 		mySpatial.setMaterial(mat);
 		mySpatial.scale(0.5f);
-		Character character = new Character(mySpatial);
+		CharacterGraphics character = new CharacterGraphics(mySpatial);
 		character.setX(x);
 		character.setY(y);
 		placePlayer(character.getSpatial(), x, y);
@@ -417,13 +418,13 @@ public class OldMain extends SimpleApplication {
 		}
 
 		private void selectPlayerAt(Point2i point) {
-			for (Character c : team1) {
+			for (CharacterGraphics c : team1) {
 				if (c.getX() == point.x && c.getY() == point.y) {
 					currentCharacterSpatial = c.getSpatial();
 					break;
 				}
 			}
-			for (Character c : team2) {
+			for (CharacterGraphics c : team2) {
 				if (c.getX() == point.x && c.getY() == point.y) {
 					currentCharacterSpatial = c.getSpatial();
 					break;
@@ -432,12 +433,12 @@ public class OldMain extends SimpleApplication {
 		}
 
 		private boolean isCharacterAt(int x, int y) {
-			for (Character c : team1) {
+			for (CharacterGraphics c : team1) {
 				if (c.getX() == x && c.getY() == y) {
 					return true;
 				}
 			}
-			for (Character c : team2) {
+			for (CharacterGraphics c : team2) {
 				if (c.getX() == x && c.getY() == y) {
 					return true;
 				}
@@ -446,19 +447,19 @@ public class OldMain extends SimpleApplication {
 		}
 
 		private void selectCharacterAt(int x, int y) {
-			Character c = getCharacterAt(x, y);
+			CharacterGraphics c = getCharacterAt(x, y);
 			if (c != null) {
 				currentCharacterSpatial = c.getSpatial();
 			}
 		}
 
-		private Character getCharacterAt(int x, int y) {
-			for (Character c : team1) {
+		private CharacterGraphics getCharacterAt(int x, int y) {
+			for (CharacterGraphics c : team1) {
 				if (c.getX() == x && c.getY() == y) {
 					return c;
 				}
 			}
-			for (Character c : team2) {
+			for (CharacterGraphics c : team2) {
 				if (c.getX() == x && c.getY() == y) {
 					return c;
 				}
@@ -467,8 +468,8 @@ public class OldMain extends SimpleApplication {
 		}
 
 		private void attackCharacter(Point2i point) {
-			Character attacker = findCurrentPlayer();
-			Character defender = getCharacterAt(point.x, point.y);
+			CharacterGraphics attacker = findCurrentPlayer();
+			CharacterGraphics defender = getCharacterAt(point.x, point.y);
 			if (attacker == null || defender == null) {
 				return;
 			}
@@ -486,8 +487,8 @@ public class OldMain extends SimpleApplication {
 		}
 	};
 
-	public void die(Character character) {
-		for (Character c : team1) {
+	public void die(CharacterGraphics character) {
+		for (CharacterGraphics c : team1) {
 			if (c == character) {
 				team1.remove(c);
 				Node parent = c.getSpatial().getParent();
@@ -497,7 +498,7 @@ public class OldMain extends SimpleApplication {
 				return;
 			}
 		}
-		for (Character c : team2) {
+		for (CharacterGraphics c : team2) {
 			if (c == character) {
 				team2.remove(c);
 				Node parent = c.getSpatial().getParent();
@@ -540,14 +541,14 @@ public class OldMain extends SimpleApplication {
 		front.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
 		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
 		upright.multLocal(front);
-		for (Character c : team1) {
+		for (CharacterGraphics c : team1) {
 			c.getSpatial().setLocalRotation(upright);
 		}
 		Quaternion opposite = upright.clone();
 		Quaternion turnedAround = new Quaternion();
 		turnedAround.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
 		opposite.multLocal(turnedAround);
-		for (Character c : team2) {
+		for (CharacterGraphics c : team2) {
 			c.getSpatial().setLocalRotation(opposite);
 		}
 		upright.multLocal(facing);
@@ -590,18 +591,18 @@ public class OldMain extends SimpleApplication {
 	}
 
 	private void updateCurrentCharacterLocation(int toX, int toY) {
-		Character current = findCurrentPlayer();
+		CharacterGraphics current = findCurrentPlayer();
 		current.setX(toX);
 		current.setY(toY);
 	}
 
-	private Character findCurrentPlayer() {
-		for (Character c : team1) {
+	private CharacterGraphics findCurrentPlayer() {
+		for (CharacterGraphics c : team1) {
 			if (c.getSpatial() == currentCharacterSpatial) {
 				return c;
 			}
 		}
-		for (Character c : team2) {
+		for (CharacterGraphics c : team2) {
 			if (c.getSpatial() == currentCharacterSpatial) {
 				return c;
 			}
@@ -610,7 +611,7 @@ public class OldMain extends SimpleApplication {
 	}
 
 	private void setWalkingAnimation() {
-		Character currentPlayer = findCurrentPlayer();
+		CharacterGraphics currentPlayer = findCurrentPlayer();
 		currentPlayer.setAnimation("run");
 	}
 

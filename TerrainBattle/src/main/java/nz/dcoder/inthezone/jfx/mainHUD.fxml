@@ -14,28 +14,28 @@
         <URL value="@mainhud.css" />
     </stylesheets>
     <children>
-        <Button layoutX="727.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleButtonAction" text="Main HUD" />
-        <ProgressBar fx:id="health" layoutX="79.0" layoutY="15.0" prefWidth="200.0" progress="1.0" />
-      <Pane disable="true" layoutY="507.0" opacity="0.0" prefHeight="94.0" prefWidth="800.0" style="-fx-background-color: grey;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="506.0">
+        <Button layoutX="727.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleButtonAction" text="Main HUD" visible="false" />
+        <ProgressBar id="health" fx:id="health" layoutX="88.0" layoutY="16.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Red;" styleClass="health" />
+      <Label layoutX="138.0" layoutY="15.0" prefHeight="25.0" prefWidth="45.0" text="Health" textFill="WHITE" />
+      <ProgressBar fx:id="AP" layoutX="88.0" layoutY="44.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Blue;" />
+      <Label layoutX="138.0" layoutY="43.0" prefHeight="25.0" prefWidth="72.0" text="Action Points" textFill="WHITE" />
+      <ProgressBar fx:id="movePoints" layoutX="88.0" layoutY="75.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Orange;" />
+      <Label layoutX="138.0" layoutY="74.0" prefHeight="25.0" prefWidth="100.0" text="Movement Points" textFill="WHITE" />
+      <BorderPane layoutX="20.0" layoutY="11.0" prefHeight="92.0" prefWidth="66.0" style="-fx-background-color: Grey;" />
+      <Pane layoutX="681.0" layoutY="11.0" prefHeight="139.0" prefWidth="105.0">
          <children>
-            <Button disable="true" layoutX="27.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill One" />
-            <Button disable="true" layoutX="181.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Two" />
-            <Button disable="true" layoutX="337.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Three" />
-            <Button disable="true" layoutX="487.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Four" />
-            <Button disable="true" layoutX="638.0" layoutY="16.0" mnemonicParsing="false" opacity="0.0" prefHeight="61.0" prefWidth="125.0" text="Skill Five" />
+            <Button fx:id="AttackButton" layoutX="21.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Attack" />
+            <Button layoutX="21.0" layoutY="56.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Magic" />
+            <Button layoutX="21.0" layoutY="100.0" mnemonicParsing="false" text="Use Item" />
          </children>
       </Pane>
-      <ListView disable="true" layoutX="674.0" layoutY="156.0" opacity="0.0" prefHeight="206.0" prefWidth="125.0" style="-fx-background-color: Grey;" />
-      <Button disable="true" layoutX="674.0" layoutY="156.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 1" />
-      <Button disable="true" layoutX="674.0" layoutY="198.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 2" />
-      <Button disable="true" layoutX="674.0" layoutY="240.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 3" />
-      <Button disable="true" layoutX="674.0" layoutY="279.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 4" />
-      <Button disable="true" layoutX="674.0" layoutY="321.0" mnemonicParsing="false" opacity="0.0" prefHeight="42.0" prefWidth="125.0" text="Player 5" />
-      <Label layoutX="34.0" layoutY="11.0" prefHeight="25.0" prefWidth="45.0" text="Health" />
-      <ProgressBar fx:id="Mana" layoutX="79.0" layoutY="36.0" prefWidth="200.0" progress="1.0" />
-      <Label layoutX="34.0" layoutY="33.0" prefHeight="25.0" prefWidth="45.0" text="Mana" />
-      <Label layoutX="34.0" layoutY="54.0" prefHeight="25.0" prefWidth="45.0" text="MP" />
-      <ProgressBar fx:id="movePoints" layoutX="79.0" layoutY="58.0" prefWidth="200.0" progress="1.0" /> 
+      <Pane fx:id="AttackMenu" layoutX="576.0" layoutY="10.0" prefHeight="127.0" prefWidth="105.0">
+         <children>
+            <Button layoutX="4.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Attack 1 (AP:5)" />
+            <Button layoutX="3.0" layoutY="51.0" mnemonicParsing="false" text="Attack 2 (AP:10)" />
+            <Button layoutX="3.0" layoutY="88.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Back" />
+         </children>
+      </Pane> 
     </children>
    <padding>
       <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />

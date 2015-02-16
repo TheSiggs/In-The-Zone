@@ -1,8 +1,7 @@
-package nz.dcoder.inthezone.objects;
+package nz.dcoder.inthezone.deprecated;
 
 import java.util.ArrayList;
 import java.util.List;
-import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.OldMain;
 import nz.dcoder.inthezone.concurrent.RunnableWithController;
 import nz.dcoder.inthezone.jfx.MainHUDController;

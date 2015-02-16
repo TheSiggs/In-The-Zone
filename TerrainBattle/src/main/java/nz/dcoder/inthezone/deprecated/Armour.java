@@ -1,4 +1,4 @@
-package nz.dcoder.inthezone.objects;
+package nz.dcoder.inthezone.deprecated;
 /**
  * @author jedcalkin
  */

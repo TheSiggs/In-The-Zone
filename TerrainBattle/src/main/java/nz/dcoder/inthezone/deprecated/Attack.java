@@ -1,7 +1,6 @@
-package nz.dcoder.inthezone.objects;
+package nz.dcoder.inthezone.deprecated;
 
 //import nz.dcoder.inthezone.objects.CharacterState;
-import nz.dcoder.inthezone.graphics.CharacterGraphics;
 
 /**
  * @author jedcalkin

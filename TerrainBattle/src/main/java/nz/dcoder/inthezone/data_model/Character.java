@@ -26,6 +26,7 @@ public class Character implements CanDoAbility {
 	public int hp;
 	public Position position;
 
+	private Equipment weapon;
 	private final List<Equipment> equipment;
 
 	public boolean isDead = false;
@@ -95,14 +96,45 @@ public class Character implements CanDoAbility {
 	// These methods will change when we put restrictions on what equipment
 	// characters can use
 
+	/**
+	 * Add equipment (such as armour) to this character
+	 * */
 	public void equip(Equipment e) {
 		equipment.add(e);
 		effectiveBaseStats = computeEffectiveBaseStats();
 	}
 
+	/**
+	 * Remove equipment from this character
+	 * */
 	public void unequip(Equipment e) {
 		equipment.remove(e);
 		effectiveBaseStats = computeEffectiveBaseStats();
+	}
+
+	/**
+	 * Equip a weapon.
+	 * @param e The weapon, must be of class WEAPON
+	 * @return The previous weapon, or null if this character didn't have a
+	 * weapon
+	 * */
+	public Equipment equipWeapon(Equipment e) {
+		if (e.eClass != EquipmentClass.WEAPON)
+			throw new RuntimeException(e.toString() + " is not a weapon");
+
+		Equipment r = this.weapon;
+		this.weapon = e;
+		return r;
+	}
+
+	/**
+	 * Unequip a weapon
+	 * @return The weapon, or null if this character didn't have a weapon
+	 * */
+	public Equipment unequipWeapon() {
+		Equipment r = this.weapon;
+		this.weapon = null;
+		return r;
 	}
 
 	/**
@@ -125,10 +157,13 @@ public class Character implements CanDoAbility {
 		return level.level;
 	}
 
-	@Override public Collection<Equipment> getWeapons() {
-		return equipment.stream()
-			.filter(e -> e.eClass == EquipmentClass.WEAPON)
-			.collect(Collectors.toList());
+	@Override public Equipment getWeapon() {
+		if (this.weapon == null) {
+			throw new RuntimeException("Character " + this.name.toString() +
+				" doesn't have a weapon.  This should have been check during battle setup");
+		} else {
+			return this.weapon;
+		}
 	}
 }
 

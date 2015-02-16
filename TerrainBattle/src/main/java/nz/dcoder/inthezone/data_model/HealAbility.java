@@ -33,7 +33,7 @@ public class HealAbility extends Ability {
 		// 4) apply the formula to each target.
 		for (Character c : targets) {
 			// TODO: clarify how healing works
-			c.hp += info.amount;
+			c.hp += (int) info.s;
 			if (c.hp > c.getMaxHP()) c.hp = c.getMaxHP();
 		}
 	}
@@ -60,7 +60,12 @@ public class HealAbility extends Ability {
 		}
 	
 		// check LOS
-		if (!info.canPassObstacles && !hasLineOfSight(apos, target, battle)) {
+		if (info.requiresLOS && !hasLineOfSight(apos, target, battle)) {
+			return false;
+		}
+
+		// restrict piercing to cardinal directions
+		if (info.isPiercing && apos.x != target.x && apos.y != target.y) {
 			return false;
 		}
 

@@ -34,7 +34,7 @@ public class ObjectAbility implements CanDoAbility {
 		return 0;
 	}
 
-	@Override public Collection<Equipment> getWeapons() {
+	@Override public Equipment getWeapon() {
 		// TODO: implement this method
 		return null;
 	}

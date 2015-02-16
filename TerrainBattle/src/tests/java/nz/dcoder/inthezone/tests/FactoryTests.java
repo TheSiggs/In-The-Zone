@@ -17,12 +17,12 @@ public class FactoryTests {
 
 			assertEquals("Ability name", new AbilityName("test"), test.info.name);
 			assertEquals("Ability cost", 5, test.info.cost);
-			assertEquals("Ability amount", 10, test.info.amount);
+			assertEquals("Ability s", 1.25, test.info.s, 1/128);
 			assertEquals("Ability range", 1, test.info.range);
 			assertEquals("Ability areaOfEffect", 0, test.info.areaOfEffect);
 			assertEquals("Ability hasAOEShading", false, test.info.hasAOEShading);
 			assertEquals("Ability isPiercing", false, test.info.isPiercing);
-			assertEquals("Ability canPassObstacles", false, test.info.canPassObstacles);
+			assertEquals("Ability requiresLOS", true, test.info.requiresLOS);
 			assertEquals("Ability requiresMana", false, test.info.requiresMana);
 			assertEquals("Ability repeats", 1, test.info.repeats);
 			assertEquals("Ability class", "physical", test.info.aClass);
@@ -89,7 +89,9 @@ public class FactoryTests {
 
 			assertEquals("Equipment name", new EquipmentName("testEq"), test.name);
 			assertEquals("Equipment isHidden", true, test.isHidden);
-			assertEquals("Equipment amount", 8, test.amount);
+			assertEquals("Equipment isDual", false, test.isDual);
+			assertEquals("Equipment physical", 7, test.physical);
+			assertEquals("Equipment magical", 8, test.magical);
 			assertEquals("Equipment baseAP", 9, test.buffs.baseAP);
 			assertEquals("Equipment baseMP", 10, test.buffs.baseMP);
 			assertEquals("Equipment strength", 11, test.buffs.strength);
@@ -119,7 +121,9 @@ public class FactoryTests {
 
 			assertEquals("Equipment name", new EquipmentName("testEq2"), test.name);
 			assertEquals("Equipment isHidden", true, test.isHidden);
-			assertEquals("Equipment amount", 9, test.amount);
+			assertEquals("Equipment isDual", false, test.isDual);
+			assertEquals("Equipment physical", 8, test.physical);
+			assertEquals("Equipment magical", 9, test.magical);
 			assertEquals("Equipment baseAP", 10, test.buffs.baseAP);
 			assertEquals("Equipment baseMP", 11, test.buffs.baseMP);
 			assertEquals("Equipment strength", 12, test.buffs.strength);

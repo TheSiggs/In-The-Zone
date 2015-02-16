@@ -1,6 +1,6 @@
 package nz.dcoder.inthezone;
 
-import nz.dcoder.inthezone.graphics.CharacterGraphics;
+import nz.dcoder.inthezone.deprecated.CharacterGraphics;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.asset.plugins.FileLocator;

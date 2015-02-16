@@ -14,6 +14,7 @@ import nz.dcoder.inthezone.data_model.Turn;
 public class Presentation {
 
 	final Main game;
+
 	Presentation(Main game) {
 		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
@@ -28,39 +29,30 @@ public class Presentation {
 
 
 		// start first turn
-                
+
 	}
 
 	void simpleUpdate(float tpf) {
 		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
 		// handle input
-
-
 		// update HUD
-
 		// update geometry tree
-
 		// perform next animation step
+	}
 
-            
-        }
-       
 	/**
-	 * callback methods to be called by reference by the battle controller object.
-	 * 
-	 * Turn                 onPlayerTurnStart
-	 * BattleEnd            onBattleEnd
-	 * DoMoveInfo           onMove
-	 * DoAbilityInfo        onAbility
-	 * DoCharacterDeath     onDeath
-	 * DoObjectDestruction  onDestruction
+	 * callback methods to be called by reference by the battle controller
+	 * object.
+	 *
+	 * Turn onPlayerTurnStart BattleEnd onBattleEnd DoMoveInfo onMove
+	 * DoAbilityInfo onAbility DoCharacterDeath onDeath DoObjectDestruction
+	 * onDestruction
 	 */
-        
-	private Turn playerTurnStart(Turn turn){
+	private Turn playerTurnStart(Turn turn) {
 
 		System.out.println(turn.toString());
-
+		
 		return turn;
 	}
 }

@@ -6,7 +6,7 @@ package nz.dcoder.inthezone.input;
 
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector3f;
-import nz.dcoder.inthezone.graphics.CharacterGraphics;
+import nz.dcoder.inthezone.deprecated.CharacterGraphics;
 
 /**
  *

@@ -40,7 +40,7 @@ import nz.dcoder.ai.astar.BoardState;
 import nz.dcoder.ai.astar.Tile;
 import nz.dcoder.inthezone.concurrent.RunnableWithController;
 import nz.dcoder.inthezone.data_model.Turn;
-import nz.dcoder.inthezone.objects.CharacterState;
+//import nz.dcoder.inthezone.objects.CharacterState;
 
 /**
  * test
@@ -478,12 +478,12 @@ public class OldMain extends SimpleApplication {
 			AStarSearch search = new AStarSearch(start, goal);
 			List<nz.dcoder.ai.astar.Node> myPath = search.search();
 			int length = myPath.size();
-			CharacterState aState = attacker.getState();
+			/*CharacterState aState = attacker.getState();
 			CharacterState dState = defender.getState();
 			dState.decreaseHp(aState.getDamage());
 			if (dState.getHp() <= 0.0) {
 				die(defender);
-			}
+			}*/
 		}
 	};
 

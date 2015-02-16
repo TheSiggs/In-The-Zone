@@ -7,8 +7,8 @@ package nz.dcoder.inthezone.graphics;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-//import nz.dcoder.inthezone.deprecated.CharacterState;
 
 /**
  *
@@ -21,7 +21,6 @@ public class CharacterGraphics implements AnimEventListener {
 	private int y = 0;
 	private AnimChannel channel;
 	private AnimControl control;
-	//private CharacterState state;
 
 	public CharacterGraphics(Spatial spatial) {
 		this.spatial = spatial;
@@ -30,8 +29,6 @@ public class CharacterGraphics implements AnimEventListener {
 		control.addListener(this);
 		channel = control.createChannel();
 		setAnimation("idleA");
-		//this.state = new CharacterState();
-		//state.setCharacter(this);
 	}
 
 	/**

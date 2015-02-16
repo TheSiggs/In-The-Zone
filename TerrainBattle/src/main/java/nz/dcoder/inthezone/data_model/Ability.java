@@ -37,11 +37,18 @@ abstract public class Ability {
 		Position agentPosition, Position target, Battle battle
 	) {
 		final List<Position> affected = new ArrayList<Position>();
-		affected.add(target);
 
-		if (info.isPiercing) {
-			affected.addAll(LineOfSight.getLOS(agentPosition, target, true));
-		}
+		if (!info.isPiercing) {
+			affected.add(target);
+		} else {
+			if (agentPosition.x != target.x && agentPosition.y != target.y) {
+				// piercing attacks must go in cardinal directions
+				return affected;
+			} else {
+				affected.add(target);
+				affected.addAll(LineOfSight.getLOS(agentPosition, target, true));
+			}
+		} 
 
 		if (info.areaOfEffect > 0) {
 			List<Position> diamond =
@@ -101,7 +108,8 @@ abstract public class Ability {
 
 			boolean allClear;
 			if (info.isPiercing) {
-				allClear =
+				allClear = agentPosition.x == target.x || agentPosition.y == target.y;
+				allClear &=
 					los1.stream().map(p -> battle.getObjectAt(p))
 						.noneMatch(o -> o != null && o.blocksPath && !o.isAttackable) ||
 					los2.stream().map(p -> battle.getObjectAt(p))

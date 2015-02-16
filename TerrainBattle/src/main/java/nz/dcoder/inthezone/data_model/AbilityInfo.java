@@ -9,12 +9,12 @@ import nz.dcoder.inthezone.data_model.pure.EffectName;
 public class AbilityInfo {
 	public final AbilityName name;
 	public final int cost;
-	public final int amount;
+	public final double s;
 	public final int range;
 	public final int areaOfEffect;
 	public final boolean hasAOEShading;
 	public final boolean isPiercing;
-	public final boolean canPassObstacles;
+	public final boolean requiresLOS;
 	public final boolean requiresMana;
 	public final int repeats;
 	public final String aClass;
@@ -23,12 +23,12 @@ public class AbilityInfo {
 	public AbilityInfo(
 		AbilityName name,
 		int cost,
-		int amount,
+		double s,
 		int range,
 		int areaOfEffect,
 		boolean hasAOEShading,
 		boolean isPiercing,
-		boolean canPassObstacles,
+		boolean requiresLOS,
 		boolean requiresMana,
 		int repeats,
 		String aClass,
@@ -36,12 +36,12 @@ public class AbilityInfo {
 	) {
 		this.name = name;
 		this.cost = cost;
-		this.amount = amount;
+		this.s = s;
 		this.range = range;
 		this.areaOfEffect = areaOfEffect;
 		this.hasAOEShading = hasAOEShading;
 		this.isPiercing = isPiercing;
-		this.canPassObstacles = canPassObstacles;
+		this.requiresLOS = requiresLOS;
 		this.requiresMana = requiresMana;
 		this.repeats = repeats;
 		this.aClass = aClass;

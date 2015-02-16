@@ -5,6 +5,8 @@
  */
 package nz.dcoder.inthezone;
 
+import nz.dcoder.inthezone.data_model.Turn;
+
 /**
  *
  * @author denz
@@ -14,11 +16,51 @@ public class Presentation {
 	final Main game;
 	Presentation(Main game) {
 		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		this.game = game;
+
+                this.game = game;
+                
+                // fill battle controller callback slots
+                
+                    // the line below does not work
+                    game.getBattleController().onPlayerTurnStart = this::playerTurnStart;
+
+                // init geometry
+                
+                    
+                // start first turn
+                
 	}
 
 	void simpleUpdate(float tpf) {
 		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
 	
+                // handle input
+            
+                
+                // update HUD
+            
+                // update geometry tree
+            
+                // perform next animation step
+            
+            
+        }
+       
+        /**
+	 * callback methods to be called by reference by the battle controller object.
+         * 
+         * Turn                 onPlayerTurnStart
+         * BattleEnd            onBattleEnd
+         * DoMoveInfo           onMove
+         * DoAbilityInfo        onAbility
+         * DoCharacterDeath     onDeath
+         * DoObjectDestruction  onDestruction
+	 */
+        
+	private Turn playerTurnStart(Turn turn){
+
+            System.out.println(turn.toString());
+            
+            return turn;
+        }
 }

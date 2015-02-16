@@ -40,7 +40,6 @@ public class DamageAbility extends Ability {
 		// 3) gather the parameters from the agent doing the ability and ...
 		double dieroll = 0.9 + (0.2 * Math.random());
 		BaseStats stats = agent.getBaseStats();
-		double s = 1; // TODO: what is s
 		double physicalMod =
 			((double) agent.getLevel() / b) + ((double) stats.strength / a);
 		double magicalMod =
@@ -55,7 +54,7 @@ public class DamageAbility extends Ability {
 			double physicalDamage = weapon.physical - c.getBaseStats().guard;
 			double magicalDamage = weapon.magical - c.getBaseStats().spirit;
 
-			c.hp -= s * dieroll * physicalDamage * physicalMod;
+			c.hp -= info.s * dieroll * physicalDamage * physicalMod;
 			c.hp -= dieroll * magicalDamage * magicalMod;
 			if (c.hp < 0) battle.kill(c);
 		}

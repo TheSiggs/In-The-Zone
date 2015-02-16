@@ -35,7 +35,7 @@ public class AbilityFactory {
 		RecordValidator validator = new RecordValidator(new String[] {
 			"name",
 			"cost",
-			"amount",
+			"s",
 			"range",
 			"areaOfEffect",
 			"hasAOEShading",
@@ -62,7 +62,7 @@ public class AbilityFactory {
 				AbilityInfo info = new AbilityInfo (
 					new AbilityName(record.get("name")),
 					Integer.parseInt(record.get("cost")),
-					Integer.parseInt(record.get("amount")),
+					Double.parseDouble(record.get("s")),
 					Integer.parseInt(record.get("range")),
 					Integer.parseInt(record.get("areaOfEffect")),
 					RecordValidator.parseBoolean(record.get("hasAOEShading")),

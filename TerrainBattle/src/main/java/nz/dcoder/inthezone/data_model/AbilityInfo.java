@@ -9,7 +9,7 @@ import nz.dcoder.inthezone.data_model.pure.EffectName;
 public class AbilityInfo {
 	public final AbilityName name;
 	public final int cost;
-	public final int amount;
+	public final double s;
 	public final int range;
 	public final int areaOfEffect;
 	public final boolean hasAOEShading;
@@ -23,7 +23,7 @@ public class AbilityInfo {
 	public AbilityInfo(
 		AbilityName name,
 		int cost,
-		int amount,
+		double s,
 		int range,
 		int areaOfEffect,
 		boolean hasAOEShading,
@@ -36,7 +36,7 @@ public class AbilityInfo {
 	) {
 		this.name = name;
 		this.cost = cost;
-		this.amount = amount;
+		this.s = s;
 		this.range = range;
 		this.areaOfEffect = areaOfEffect;
 		this.hasAOEShading = hasAOEShading;

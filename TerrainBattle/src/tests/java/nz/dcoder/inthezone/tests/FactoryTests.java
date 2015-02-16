@@ -17,7 +17,7 @@ public class FactoryTests {
 
 			assertEquals("Ability name", new AbilityName("test"), test.info.name);
 			assertEquals("Ability cost", 5, test.info.cost);
-			assertEquals("Ability amount", 10, test.info.amount);
+			assertEquals("Ability s", 1.25, test.info.s, 1/128);
 			assertEquals("Ability range", 1, test.info.range);
 			assertEquals("Ability areaOfEffect", 0, test.info.areaOfEffect);
 			assertEquals("Ability hasAOEShading", false, test.info.hasAOEShading);

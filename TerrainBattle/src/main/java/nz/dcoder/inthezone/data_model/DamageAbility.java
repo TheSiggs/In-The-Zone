@@ -46,16 +46,16 @@ public class DamageAbility extends Ability {
 		double magicalMod =
 			((double) agent.getLevel() / b) + ((double) stats.intelligence / a);
 
-		// TODO: what about multiple weapons?
 		Equipment weapon = agent.getWeapons().iterator().next();
 	
 		// 4) apply the damage formula to each target.
 		for (Character c : characterTargets) {
-			double physicalDamage = weapon.amount - c.getBaseStats().guard;
-			double magicalDamage = weapon.amount - c.getBaseStats().spirit;
+			// TODO: magical damage, physical damage, or both?
+			// TODO: compute defence stats properly
+			double physicalDamage = weapon.physical - c.getBaseStats().guard;
+			double magicalDamage = weapon.magical - c.getBaseStats().spirit;
 
 			c.hp -= s * dieroll * physicalDamage * physicalMod;
-			// TODO: does magical damage hit HP?
 			c.hp -= dieroll * magicalDamage * magicalMod;
 			if (c.hp < 0) battle.kill(c);
 		}

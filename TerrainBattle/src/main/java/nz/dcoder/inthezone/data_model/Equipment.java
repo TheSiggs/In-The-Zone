@@ -17,7 +17,8 @@ public class Equipment {
 	public final EquipmentName name;
 	public final String description;
 	public final boolean isHidden;
-	public final int amount;
+	public final int physical;
+	public final int magical;
 	public final BaseStats buffs;
 	public final EquipmentClass eClass;
 	public final EquipmentCategory category;
@@ -32,7 +33,8 @@ public class Equipment {
 		EquipmentName name,
 		String description,
 		boolean isHidden,
-		int amount,
+		int physical,
+		int magical,
 		BaseStats buffs,
 		EquipmentClass eClass,
 		EquipmentCategory category,
@@ -41,7 +43,8 @@ public class Equipment {
 		this.name = name;
 		this.description = description;
 		this.isHidden = isHidden;
-		this.amount = amount;
+		this.physical = physical;
+		this.magical = magical;
 		this.buffs = buffs;
 		this.eClass = eClass;
 		this.category = category;

@@ -13,6 +13,10 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
+import com.jme3.material.Material;
+import com.jme3.scene.shape.Box;
+import com.jme3.scene.Geometry;
+
 /**
  *
  * @author denz
@@ -24,6 +28,15 @@ public class BlenderRender extends SimpleApplication {
 	}
 	@Override
 	public void simpleInitApp() {
+		// blue box exmple code
+		Box b = new Box(3, 3, 3);
+		Geometry geom = new Geometry("Box", b);
+		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		mat.setColor("Color", ColorRGBA.Blue);
+		geom.setMaterial(mat);
+		geom.setName("geom");
+		rootNode.attachChild(geom);
+            
 		assetManager.registerLocator("assets", FileLocator.class);
 		//assetManager.registerLocator("assets/town.zip", ZipLocator.class);
 		viewPort.setBackgroundColor(ColorRGBA.DarkGray);

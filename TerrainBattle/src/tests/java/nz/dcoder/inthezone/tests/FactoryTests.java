@@ -89,6 +89,7 @@ public class FactoryTests {
 
 			assertEquals("Equipment name", new EquipmentName("testEq"), test.name);
 			assertEquals("Equipment isHidden", true, test.isHidden);
+			assertEquals("Equipment isDual", false, test.isDual);
 			assertEquals("Equipment physical", 7, test.physical);
 			assertEquals("Equipment magical", 8, test.magical);
 			assertEquals("Equipment baseAP", 9, test.buffs.baseAP);
@@ -120,6 +121,7 @@ public class FactoryTests {
 
 			assertEquals("Equipment name", new EquipmentName("testEq2"), test.name);
 			assertEquals("Equipment isHidden", true, test.isHidden);
+			assertEquals("Equipment isDual", false, test.isDual);
 			assertEquals("Equipment physical", 8, test.physical);
 			assertEquals("Equipment magical", 9, test.magical);
 			assertEquals("Equipment baseAP", 10, test.buffs.baseAP);

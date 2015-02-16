@@ -1,21 +1,22 @@
-name,description,isHidden,physical,magical,baseAP,baseMP,strength,intelligence,dexterity,guard,spirit,vitality,abilities,class,category,,Notes
-testEq,"Testing equipment, does not appear in the actual game",TRUE,7,8,9,10,11,12,13,14,15,16,,ARMOUR,none,,This line is for testing.  Please do not alter
-testEq2,"Testing equipment, does not appear in the actual game",TRUE,8,9,10,11,12,13,14,15,16,17,test,WEAPON,none,,This line is for testing.  Please do not alter
-,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,Description of fields
-,,,,,,,,,,,,,,,,,name: The name of this equipment as it appears in the game
-,,,,,,,,,,,,,,,,,description: A short description of this equipment
-,,,,,,,,,,,,,,,,,isHidden: TRUE if this equipment is invisible to the player
-,,,,,,,,,,,,,,,,,physical: amount of physical damage or defence this equipment provides
-,,,,,,,,,,,,,,,,,magical: amount of magical damage or defence this equipment provides
-,,,,,,,,,,,,,,,,,baseAP: Bonus action points granted by this equipment.  May be 0
-,,,,,,,,,,,,,,,,,baseMP: ditto
-,,,,,,,,,,,,,,,,,strength: ditto
-,,,,,,,,,,,,,,,,,intelligence: ditto
-,,,,,,,,,,,,,,,,,dexterity: ditto
-,,,,,,,,,,,,,,,,,guard: ditto
-,,,,,,,,,,,,,,,,,spirit: ditto
-,,,,,,,,,,,,,,,,,"vitality: ditto.  Actually, this one could be problematic"
-,,,,,,,,,,,,,,,,,"abilities: Extra abilities granted by this equipment.  Can be empty.  For more than one ability, separate with commas"
-,,,,,,,,,,,,,,,,,"class: The allowed classes are WEAPON, ARMOUR, and OTHER"
-,,,,,,,,,,,,,,,,,category: This will eventually determine which characters can equip which equipment.
+name,description,isHidden,isDual,physical,magical,baseAP,baseMP,strength,intelligence,dexterity,guard,spirit,vitality,abilities,class,category,,Notes
+testEq,"Testing equipment, does not appear in the actual game",TRUE,FALSE,7,8,9,10,11,12,13,14,15,16,,ARMOUR,none,,This line is for testing.  Please do not alter
+testEq2,"Testing equipment, does not appear in the actual game",TRUE,FALSE,8,9,10,11,12,13,14,15,16,17,test,WEAPON,none,,This line is for testing.  Please do not alter
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,Description of fields
+,,,,,,,,,,,,,,,,,,name: The name of this equipment as it appears in the game
+,,,,,,,,,,,,,,,,,,description: A short description of this equipment
+,,,,,,,,,,,,,,,,,,isHidden: TRUE if this equipment is invisible to the player
+,,,,,,,,,,,,,,,,,,"isDual: TRUE if this is actually two weapons, i.e. dual weilding"
+,,,,,,,,,,,,,,,,,,physical: amount of physical damage or defence this equipment provides
+,,,,,,,,,,,,,,,,,,magical: amount of magical damage or defence this equipment provides
+,,,,,,,,,,,,,,,,,,baseAP: Bonus action points granted by this equipment.  May be 0
+,,,,,,,,,,,,,,,,,,baseMP: ditto
+,,,,,,,,,,,,,,,,,,strength: ditto
+,,,,,,,,,,,,,,,,,,intelligence: ditto
+,,,,,,,,,,,,,,,,,,dexterity: ditto
+,,,,,,,,,,,,,,,,,,guard: ditto
+,,,,,,,,,,,,,,,,,,spirit: ditto
+,,,,,,,,,,,,,,,,,,"vitality: ditto.  Actually, this one could be problematic"
+,,,,,,,,,,,,,,,,,,"abilities: Extra abilities granted by this equipment.  Can be empty.  For more than one ability, separate with commas"
+,,,,,,,,,,,,,,,,,,"class: The allowed classes are WEAPON, ARMOUR, and OTHER"
+,,,,,,,,,,,,,,,,,,category: This will eventually determine which characters can equip which equipment.

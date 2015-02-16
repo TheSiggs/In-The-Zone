@@ -45,7 +45,7 @@ public class DamageAbility extends Ability {
 		double magicalMod =
 			((double) agent.getLevel() / b) + ((double) stats.intelligence / a);
 
-		Equipment weapon = agent.getWeapons().iterator().next();
+		Equipment weapon = agent.getWeapon();
 	
 		// 4) apply the damage formula to each target.
 		for (Character c : characterTargets) {

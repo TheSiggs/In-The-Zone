@@ -31,6 +31,7 @@ public class EquipmentFactory {
 			"name",
 			"description",
 			"isHidden",
+			"isDual",
 			"physical",
 			"magical",
 			// base stats validated separately
@@ -60,6 +61,7 @@ public class EquipmentFactory {
 					new EquipmentName(record.get("name")),
 					record.get("description"),
 					RecordValidator.parseBoolean(record.get("isHidden")),
+					RecordValidator.parseBoolean(record.get("isDual")),
 					Integer.parseInt(record.get("physical")),
 					Integer.parseInt(record.get("magical")),
 					RecordValidator.parseBaseStats(record),

@@ -17,6 +17,7 @@ public class Equipment {
 	public final EquipmentName name;
 	public final String description;
 	public final boolean isHidden;
+	public final boolean isDual;
 	public final int physical;
 	public final int magical;
 	public final BaseStats buffs;
@@ -33,6 +34,7 @@ public class Equipment {
 		EquipmentName name,
 		String description,
 		boolean isHidden,
+		boolean isDual,
 		int physical,
 		int magical,
 		BaseStats buffs,
@@ -43,6 +45,7 @@ public class Equipment {
 		this.name = name;
 		this.description = description;
 		this.isHidden = isHidden;
+		this.isDual = isDual;
 		this.physical = physical;
 		this.magical = magical;
 		this.buffs = buffs;

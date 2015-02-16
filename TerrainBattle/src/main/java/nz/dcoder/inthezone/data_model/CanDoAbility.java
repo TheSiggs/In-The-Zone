@@ -1,6 +1,5 @@
 package nz.dcoder.inthezone.data_model;
 
-import java.util.Collection;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -15,13 +14,8 @@ interface CanDoAbility {
 	public int getLevel();
 
 	/**
-	 * This is a bit of a misnomer.  For abilities that deal damage, it will
-	 * partially determine the amount of damage to do.  For healing it would
-	 * either determine the amount of healing that happens, or we might even
-	 * ignore equipment for healing abilities.  This picture gets even more
-	 * complicated when we add other kinds of ability.  Some clarification may be
-	 * needed here.
+	 * Returns the weapon that the agent is carrying.  Does not return null
 	 * */
-	public Collection<Equipment> getWeapons();
+	public Equipment getWeapon();
 }
 

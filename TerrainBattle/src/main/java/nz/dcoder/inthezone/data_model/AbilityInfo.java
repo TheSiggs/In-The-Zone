@@ -14,7 +14,7 @@ public class AbilityInfo {
 	public final int areaOfEffect;
 	public final boolean hasAOEShading;
 	public final boolean isPiercing;
-	public final boolean canPassObstacles;
+	public final boolean requiresLOS;
 	public final boolean requiresMana;
 	public final int repeats;
 	public final String aClass;
@@ -28,7 +28,7 @@ public class AbilityInfo {
 		int areaOfEffect,
 		boolean hasAOEShading,
 		boolean isPiercing,
-		boolean canPassObstacles,
+		boolean requiresLOS,
 		boolean requiresMana,
 		int repeats,
 		String aClass,
@@ -41,7 +41,7 @@ public class AbilityInfo {
 		this.areaOfEffect = areaOfEffect;
 		this.hasAOEShading = hasAOEShading;
 		this.isPiercing = isPiercing;
-		this.canPassObstacles = canPassObstacles;
+		this.requiresLOS = requiresLOS;
 		this.requiresMana = requiresMana;
 		this.repeats = repeats;
 		this.aClass = aClass;

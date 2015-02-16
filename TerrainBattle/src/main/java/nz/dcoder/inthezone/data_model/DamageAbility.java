@@ -77,7 +77,12 @@ public class DamageAbility extends Ability {
 		}
 	
 		// check LOS
-		if (!info.canPassObstacles && !hasLineOfSight(apos, target, battle)) {
+		if (info.requiresLOS && !hasLineOfSight(apos, target, battle)) {
+			return false;
+		}
+
+		// restrict piercing to cardinal directions
+		if (info.isPiercing && apos.x != target.x && apos.y != target.y) {
 			return false;
 		}
 

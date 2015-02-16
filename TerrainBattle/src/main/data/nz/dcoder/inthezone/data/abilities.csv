@@ -1,5 +1,5 @@
-name,cost,amount,range,areaOfEffect,hasAOEShading,isPiercing,canPassObstacles,repeats,requiresMana,class,effect,,Notes
-test,5,10,1,0,FALSE,FALSE,FALSE,1,FALSE,physical,damage,,This line is for testing.  Please do not alter
+name,cost,amount,range,areaOfEffect,hasAOEShading,isPiercing,requiresLOS,repeats,requiresMana,class,effect,,Notes
+test,5,10,1,0,FALSE,FALSE,TRUE,1,FALSE,physical,damage,,This line is for testing.  Please do not alter
 ,,,,,,,,,,,,,
 ,,,,,,,,,,,,,Description of fields
 ,,,,,,,,,,,,,name: Name of the ability as it appears in the GUI
@@ -9,7 +9,7 @@ test,5,10,1,0,FALSE,FALSE,FALSE,1,FALSE,physical,damage,,This line is for testin
 ,,,,,,,,,,,,,"areaOfEffect: The area of effect of this ability, 0 if there is no AOE"
 ,,,,,,,,,,,,,hasAOEShading: TRUE if obstacles can shelter  squares from area of effect attacks
 ,,,,,,,,,,,,,"isPiercing: TRUE for piercing attacks, otherwise FALSE"
-,,,,,,,,,,,,,canPassObstacles: TRUE for attacks that work through walls and other barriers.  FALSE otherwise.
+,,,,,,,,,,,,,requiresLOS: TRUE if this ability requires line of sight to the target
 ,,,,,,,,,,,,,repeats:  For attacks where a single effect is repeated several times
 ,,,,,,,,,,,,,"requiresMana: TRUE for abilities that require the player to be on a mana zone, otherwise FALSE"
 ,,,,,,,,,,,,,class: This will be used for classifying abilities.

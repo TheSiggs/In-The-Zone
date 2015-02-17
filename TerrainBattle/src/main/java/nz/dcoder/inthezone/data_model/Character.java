@@ -55,9 +55,16 @@ public class Character implements CanDoAbility {
 	}
 
 	private BaseStats computeEffectiveBaseStats() {
+		BaseStats base;
+		if (this.weapon == null) {
+			base = baseStats;
+		} else {
+			base = baseStats.add(weapon.buffs);
+		}
+
 		return equipment.stream()
 			.map(e -> e.buffs)
-			.reduce(baseStats, (b, c) -> b.add(c));
+			.reduce(base, (b, c) -> b.add(c));
 	}
 
 	/**
@@ -124,6 +131,7 @@ public class Character implements CanDoAbility {
 
 		Equipment r = this.weapon;
 		this.weapon = e;
+		effectiveBaseStats = computeEffectiveBaseStats();
 		return r;
 	}
 
@@ -134,6 +142,7 @@ public class Character implements CanDoAbility {
 	public Equipment unequipWeapon() {
 		Equipment r = this.weapon;
 		this.weapon = null;
+		effectiveBaseStats = computeEffectiveBaseStats();
 		return r;
 	}
 

@@ -61,5 +61,17 @@ public class Equipment {
 		}
 		return r;
 	}
+
+	public String toString() {
+		// this is for debugging mostly
+
+		StringBuilder r = new StringBuilder("Equipment " + name.toString() + "\n");
+		r.append("Properties:");
+		if (isHidden) r.append(" hidden");
+		if (isDual) r.append(" dual");
+		r.append("\n");
+		r.append("Physical = " + physical + ", Magical = " + magical + "\n");
+		return r.toString();
+	}
 }
 

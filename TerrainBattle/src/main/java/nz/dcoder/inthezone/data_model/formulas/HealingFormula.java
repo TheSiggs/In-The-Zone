@@ -18,8 +18,6 @@ public class HealingFormula extends Formula {
 		varTypes.put("target_guard", Integer.class);
 		varTypes.put("target_spirit", Integer.class);
 		varTypes.put("target_level", Integer.class);
-		varTypes.put("target_physicalArmour", Integer.class);
-		varTypes.put("target_magicalArmour", Integer.class);
 		varTypes.put("rnd", Double.class);
 
 		expression = Formula.parseExpression(

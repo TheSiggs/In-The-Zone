@@ -3,6 +3,11 @@ package nz.dcoder.inthezone.data_model;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import nz.dcoder.inthezone.data_model.formulas.Formula;
+import nz.dcoder.inthezone.data_model.formulas.FormulaException;
+import nz.dcoder.inthezone.data_model.formulas.MagicalDamage;
+import nz.dcoder.inthezone.data_model.formulas.PhysicalDamage;
+import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.LineOfSight;
@@ -10,6 +15,9 @@ import nz.dcoder.inthezone.data_model.pure.Position;
 
 public class DamageAbility extends Ability {
 	public static EffectName effectName = new EffectName("damage");
+
+	private final PhysicalDamage physD = new PhysicalDamage();
+	private final MagicalDamage magD = new MagicalDamage();
 
 	public DamageAbility(AbilityInfo info) {
 		super(effectName, info);
@@ -38,25 +46,53 @@ public class DamageAbility extends Ability {
 				.collect(Collectors.toList());
 
 		// 3) gather the parameters from the agent doing the ability and ...
-		double dieroll = 0.9 + (0.2 * Math.random());
 		BaseStats stats = agent.getBaseStats();
-		double physicalMod =
-			((double) agent.getLevel() / b) + ((double) stats.strength / a);
-		double magicalMod =
-			((double) agent.getLevel() / b) + ((double) stats.intelligence / a);
-
 		Equipment weapon = agent.getWeapon();
 	
 		// 4) apply the damage formula to each target.
 		for (Character c : characterTargets) {
-			// TODO: magical damage, physical damage, or both?
-			// TODO: compute defence stats properly
-			double physicalDamage = weapon.physical - c.getBaseStats().guard;
-			double magicalDamage = weapon.magical - c.getBaseStats().spirit;
+			BaseStats tstats = c.getBaseStats();
+			Collection<Equipment> armour = c.getArmour();
 
-			c.hp -= info.s * dieroll * physicalDamage * physicalMod;
-			c.hp -= dieroll * magicalDamage * magicalMod;
-			if (c.hp < 0) battle.kill(c);
+			double physDef = armour.stream()
+				.collect(Collectors.summingInt(a -> a.physical));
+			double magDef = armour.stream()
+				.collect(Collectors.summingInt(a -> a.magical));
+
+			Formula d;
+			if (info.aClass == AbilityClass.PHYSICAL) {
+				d = physD;
+			} else if (info.aClass == AbilityClass.MAGICAL) {
+				d = magD;
+			} else {
+				throw new RuntimeException(
+					"Don't know how to do damage with an ability of class "
+					+ info.aClass.toString());
+			}
+
+			d.setVariable("s", info.s);
+			d.setVariable("agent_strength", stats.strength);
+			d.setVariable("agent_intelligence", stats.intelligence);
+			d.setVariable("agent_level", agent.getLevel());
+			d.setVariable("agent_physicalWeapon", weapon.physical);
+			d.setVariable("agent_magicalWeapon", weapon.magical);
+			d.setVariable("target_guard", tstats.guard);
+			d.setVariable("target_spirit", tstats.spirit);
+			d.setVariable("target_level", c.getLevel());
+			d.setVariable("target_physicalArmour", physDef);
+			d.setVariable("target_magicalArmour", magDef);
+
+			try {
+				c.hp -= (int) d.evaluate();
+			} catch (FormulaException e) {
+				throw new RuntimeException(
+					"Error evaluating damage formula: " + e.getMessage(), e);
+			}
+
+			if (c.hp < 0) {
+				c.hp = 0;
+				battle.kill(c);
+			}
 		}
 
 		for (BattleObject o : objectTargets) {

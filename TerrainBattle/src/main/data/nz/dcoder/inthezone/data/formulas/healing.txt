@@ -12,8 +12,6 @@
 //   target_guard
 //   target_spirit
 //   target_level
-//   target_physicalArmour   // total of all physical armour
-//   target_magicalArmour    // total of all magical armour
 //
 // Extras:
 //    rnd                    // a random number in the range [0..1]

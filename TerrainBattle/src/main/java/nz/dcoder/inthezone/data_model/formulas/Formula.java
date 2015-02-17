@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import org.mvel2.compiler.CompiledExpression;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 
@@ -26,7 +27,8 @@ public abstract class Formula {
 			in.close();
 			
 			ParserContext ctx = new ParserContext();
-			ctx.setStrongTyping(true);
+			ctx.setSourceFile(filename);
+			ctx.setStrictTypeEnforcement(true);
 			ctx.setInputs(varTypes);
 
 			return MVEL.compileExpression(rawExpression.toString(), ctx);
@@ -51,17 +53,16 @@ public abstract class Formula {
 	public void setVariable(String name, Object value) {
 		Map<String, Class> varTypes = getVarTypes();
 		if (!varTypes.containsKey(name)
-			|| varTypes.get(name).isInstance(value)
+			|| !varTypes.get(name).isInstance(value)
 		) {
-			throw new RuntimeException(
-				"Error invoking damage formula with parameter " + name);
+			throw new RuntimeException("Unexpected parameter " + name);
 		}
 		vars.put(name, value);
 	}
 
 	public double evaluate() throws FormulaException {
 		try {
-			double r = (double) MVEL.executeExpression(
+			double r = MVEL.executeExpression(
 				getExpression(), vars, Double.class);
 			return r;
 		} catch (Exception e) {

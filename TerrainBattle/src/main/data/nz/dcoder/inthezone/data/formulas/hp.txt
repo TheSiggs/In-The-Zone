@@ -5,5 +5,5 @@
 //   hpMod
 //
 
-(vitality * hpmod) / 75;
+(vitality * hpMod) / 75;
 

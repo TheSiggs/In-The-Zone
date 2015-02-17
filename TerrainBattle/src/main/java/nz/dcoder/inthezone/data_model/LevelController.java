@@ -2,8 +2,9 @@ package nz.dcoder.inthezone.data_model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import nz.dcoder.inthezone.data_model.formulas.FormulaException;
+import nz.dcoder.inthezone.data_model.formulas.HPFormula;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
-
 
 /**
  * Controls leveling and things that vary by level
@@ -25,6 +26,8 @@ public class LevelController {
 	// For each level, the total number of exp required of the character's
 	// lifetime to reach that level.  As usual, data at index 0 is ignored.
 	private final int[] totalExpRequired;
+
+	private final HPFormula hpf = new HPFormula();
 
 	public static final int maxLevel = 100;
 
@@ -61,7 +64,15 @@ public class LevelController {
 		if (maxHP == 0) ratio = 1; else ratio = (double) hp / (double) maxHP;
 
 		int oldMaxHP = maxHP;
-		maxHP = (stats.vitality * hpMod[level]) / 75;
+
+		try {
+			hpf.setVariable("vitality", stats.vitality);
+			hpf.setVariable("hpMod", hpMod[level]);
+			maxHP = (int) hpf.evaluate();
+		} catch (FormulaException e) {
+			throw new RuntimeException(
+				"Runtime error in HPMod formula: " + e.getMessage(), e);
+		}
 
 		return (int) (ratio * (double) (maxHP - oldMaxHP));
 	}

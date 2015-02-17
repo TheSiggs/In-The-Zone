@@ -15,6 +15,7 @@ import nz.dcoder.inthezone.data_model.BattleObject;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.Position;
+import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
 public class BattleObjectFactory {
 	private final Map<BattleObjectName, BattleObjectInfo> objects;

@@ -14,6 +14,7 @@ import nz.dcoder.inthezone.data_model.Ability;
 import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.ItemName;
+import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
 public class ItemFactory {
 	private final Map<ItemName, Item> items;

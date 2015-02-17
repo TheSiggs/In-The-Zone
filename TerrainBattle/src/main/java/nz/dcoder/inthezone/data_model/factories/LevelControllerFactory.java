@@ -17,6 +17,7 @@ import nz.dcoder.inthezone.data_model.Ability;
 import nz.dcoder.inthezone.data_model.LevelController;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
 class LevelControllerFactory {
 	private final AbilityFactory abilityFactory;

@@ -18,6 +18,7 @@ import nz.dcoder.inthezone.data_model.HealAbility;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.TeleportAbility;
+import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
 public class AbilityFactory {
 	private final Map<AbilityName, Ability> abilities;

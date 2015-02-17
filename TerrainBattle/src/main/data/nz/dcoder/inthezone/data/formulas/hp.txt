@@ -1,0 +1,9 @@
+// Refer to physicalDamage.txt for help on how to edit this file
+//
+// Paramters:
+//   vitality
+//   hpMod
+//
+
+(vitality * hpmod) / 75
+

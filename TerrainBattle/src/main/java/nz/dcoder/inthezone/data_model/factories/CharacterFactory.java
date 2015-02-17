@@ -15,6 +15,7 @@ import nz.dcoder.inthezone.data_model.LevelController;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
 public class CharacterFactory {
 	private final LevelControllerFactory levelControllerFactory;

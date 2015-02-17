@@ -18,6 +18,7 @@ import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentCategory;
 import nz.dcoder.inthezone.data_model.pure.EquipmentClass;
 import nz.dcoder.inthezone.data_model.pure.EquipmentName;
+import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
 public class EquipmentFactory {
 	private final Map<EquipmentName, Equipment> equipment;

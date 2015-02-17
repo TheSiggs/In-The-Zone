@@ -1,5 +1,5 @@
 name,cost,s,range,areaOfEffect,hasAOEShading,isPiercing,requiresLOS,repeats,requiresMana,class,effect,,Notes
-test,5,1.25,1,0,FALSE,FALSE,TRUE,1,FALSE,physical,damage,,This line is for testing.  Please do not alter
+test,5,1.25,1,0,FALSE,FALSE,TRUE,1,FALSE,PHYSICAL,damage,,This line is for testing.  Please do not alter
 ,,,,,,,,,,,,,
 ,,,,,,,,,,,,,Description of fields
 ,,,,,,,,,,,,,name: Name of the ability as it appears in the GUI
@@ -12,7 +12,7 @@ test,5,1.25,1,0,FALSE,FALSE,TRUE,1,FALSE,physical,damage,,This line is for testi
 ,,,,,,,,,,,,,requiresLOS: TRUE if this ability requires line of sight to the target
 ,,,,,,,,,,,,,repeats:  For attacks where a single effect is repeated several times
 ,,,,,,,,,,,,,"requiresMana: TRUE for abilities that require the player to be on a mana zone, otherwise FALSE"
-,,,,,,,,,,,,,class: This will be used for classifying abilities.
+,,,,,,,,,,,,,class: Either PHYSICAL or MAGICAL
 ,,,,,,,,,,,,,"effect: There are several classes of effect that an ability might have, all hard-coded into the game engine"
 ,,,,,,,,,,,,,
 ,,,,,,,,,,,,,List of effects

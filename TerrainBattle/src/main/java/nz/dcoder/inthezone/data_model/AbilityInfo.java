@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.data_model;
 
+import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 
@@ -17,7 +18,7 @@ public class AbilityInfo {
 	public final boolean requiresLOS;
 	public final boolean requiresMana;
 	public final int repeats;
-	public final String aClass;
+	public final AbilityClass aClass;
 	public final EffectName effect;
 
 	public AbilityInfo(
@@ -31,7 +32,7 @@ public class AbilityInfo {
 		boolean requiresLOS,
 		boolean requiresMana,
 		int repeats,
-		String aClass,
+		AbilityClass aClass,
 		EffectName effect
 	) {
 		this.name = name;

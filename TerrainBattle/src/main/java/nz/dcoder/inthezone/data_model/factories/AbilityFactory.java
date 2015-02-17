@@ -15,6 +15,7 @@ import nz.dcoder.inthezone.data_model.Ability;
 import nz.dcoder.inthezone.data_model.AbilityInfo;
 import nz.dcoder.inthezone.data_model.DamageAbility;
 import nz.dcoder.inthezone.data_model.HealAbility;
+import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.TeleportAbility;
@@ -71,7 +72,7 @@ public class AbilityFactory {
 					RecordValidator.parseBoolean(record.get("requiresLOS")),
 					RecordValidator.parseBoolean(record.get("requiresMana")),
 					Integer.parseInt(record.get("repeats")),
-					record.get("class"),
+					AbilityClass.parseAbilityClass(record.get("class")),
 					new EffectName(record.get("effect")));
 
 				if (!effects.containsKey(info.effect)) {

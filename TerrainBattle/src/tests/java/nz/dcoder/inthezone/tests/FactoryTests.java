@@ -25,7 +25,7 @@ public class FactoryTests {
 			assertEquals("Ability requiresLOS", true, test.info.requiresLOS);
 			assertEquals("Ability requiresMana", false, test.info.requiresMana);
 			assertEquals("Ability repeats", 1, test.info.repeats);
-			assertEquals("Ability class", "physical", test.info.aClass);
+			assertEquals("Ability class", AbilityClass.PHYSICAL, test.info.aClass);
 			assertEquals("Ability effect", new EffectName("damage"), test.info.effect);
 			assertEquals("Ability effect2", new EffectName("damage"), test.name);
 		} catch (Exception e) {

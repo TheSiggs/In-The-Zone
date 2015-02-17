@@ -1,29 +1,29 @@
 // Refer to physicalDamage.txt for help on how to edit this file
 //
 // Parameters relating to the agent that performs the attack:
-//   agent.s                 // multiplier for ability damage
-//   agent.strength
-//   agent.intelligence
-//   agent.level
-//   agent.physicalWeapon
-//   agent.magicalWeapon
+//   agent_s                 // multiplier for ability damage
+//   agent_strength
+//   agent_intelligence
+//   agent_level
+//   agent_physicalWeapon
+//   agent_magicalWeapon
 //
 // Parameters relating to the target:
-//   target.guard
-//   target.spirit
-//   target.level
-//   target.physicalArmour   // total of all physical armour
-//   target.magicalArmour    // total of all magical armour
+//   target_guard
+//   target_spirit
+//   target_level
+//   target_physicalArmour   // total of all physical armour
+//   target_magicalArmour    // total of all magical armour
 //
 // Extras:
 //    rnd                    // a random number in the range [0..1]
 //
 
-a = 3
-b = 4
-defence = target.magicalArmour + target.spirit
+a = 3;
+b = 4;
+defence = target_magicalArmour + target_spirit;
 
 (0.9 + (0.2 * rnd))
-  * (agent.magicalWeapon - defence)
-  * ((agent.level / b) + (agent.intelligence / a))
+  * (agent_magicalWeapon - defence)
+  * ((agent_level / b) + (agent_intelligence / a));
 

@@ -2,33 +2,33 @@
 //
 // Parameters relating to the agent that performs the attack:
 //   c                       // spell strength
-//   agent.strength
-//   agent.intelligence
-//   agent.level
-//   agent.physicalWeapon
-//   agent.magicalWeapon
+//   agent_strength
+//   agent_intelligence
+//   agent_level
+//   agent_physicalWeapon
+//   agent_magicalWeapon
 //
 // Parameters relating to the target:
-//   target.guard
-//   target.spirit
-//   target.level
-//   target.physicalArmour   // total of all physical armour
-//   target.magicalArmour    // total of all magical armour
+//   target_guard
+//   target_spirit
+//   target_level
+//   target_physicalArmour   // total of all physical armour
+//   target_magicalArmour    // total of all magical armour
 //
 // Extras:
 //    rnd                    // a random number in the range [0..1]
 //
 
-a = 1
-b = 3
-d = 5
-g = 4
-h = 2
-j = 1
+a = 1;
+b = 3;
+d = 5;
+g = 4;
+h = 2;
+j = 1;
 
 (0.9 + (0.2 * rnd))
   * c * (
-      ((d * agent.level) / b)
-    + ((h * agent.magicalWeapon) / j)
-    + ((g * agent.intelligence) / a))
+      ((d * agent_level) / b)
+    + ((h * agent_magicalWeapon) / j)
+    + ((g * agent_intelligence) / a));
 

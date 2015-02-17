@@ -41,9 +41,10 @@ public class Main extends SimpleApplication {
 		Party party = new Party();
 		Terrain terrain = new Terrain();
 		gameState = new GameState(party, terrain);
+		battleController = new BattleController();
+
 		presentation = new Presentation(this);
 		userInterface = new UserInterface(this);
-		battleController = new BattleController();
 	}
 
 	/**

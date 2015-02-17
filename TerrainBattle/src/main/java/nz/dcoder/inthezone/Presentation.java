@@ -22,7 +22,6 @@ public class Presentation {
 
 		// fill battle controller callback slots
 
-			// the line below does not work
 			game.getBattleController().onPlayerTurnStart = this::playerTurnStart;
 
 		// init geometry

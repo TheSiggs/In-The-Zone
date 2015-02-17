@@ -35,9 +35,10 @@ public class BattleObjectFactory {
 			"hasAbility",
 			"ability"});
 
-		try {
+		try (
 			InputStream in = this.getClass().getResourceAsStream(
-					"/nz/dcoder/inthezone/data/objects.csv");
+				"/nz/dcoder/inthezone/data/objects.csv")
+		) {
 			if (in == null) throw new FileNotFoundException("File not found objects.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
 			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());

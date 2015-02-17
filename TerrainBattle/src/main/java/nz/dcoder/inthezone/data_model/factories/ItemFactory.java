@@ -25,9 +25,10 @@ public class ItemFactory {
 		RecordValidator validator = new RecordValidator(new String[] {
 			"name", "description", "ability"});
 
-		try {
+		try (
 			InputStream in = this.getClass().getResourceAsStream(
-					"/nz/dcoder/inthezone/data/items.csv");
+				"/nz/dcoder/inthezone/data/items.csv")
+		) {
 			if (in == null) throw new FileNotFoundException("File not found items.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
 			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());

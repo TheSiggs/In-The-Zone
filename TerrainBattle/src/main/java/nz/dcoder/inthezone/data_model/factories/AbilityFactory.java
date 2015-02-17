@@ -48,9 +48,10 @@ public class AbilityFactory {
 			"class",
 			"effect"});
 
-		try {
+		try (
 			InputStream in = this.getClass().getResourceAsStream(
-					"/nz/dcoder/inthezone/data/abilities.csv");
+				"/nz/dcoder/inthezone/data/abilities.csv")
+		) {
 			if (in == null) throw new FileNotFoundException("File not found abilities.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
 			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());

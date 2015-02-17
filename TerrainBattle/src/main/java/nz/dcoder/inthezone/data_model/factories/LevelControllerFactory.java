@@ -29,23 +29,30 @@ class LevelControllerFactory {
 	{
 		this.abilityFactory = abilityFactory;
 
-		try {
-			this.levelInfo = readLevels("levels.csv");
+		try (
+			InputStream in = this.getClass().getResourceAsStream(
+				"/nz/dcoder/inthezone/data/levels.csv")
+		) {
+			this.levelInfo = readLevels("levels.csv", in);
 		} catch (Exception e) {
 			throw new DatabaseException(
 				"Error reading levels.csv: " + e.getMessage(), e);
 		}
 
-		try {
-			this.characterAbilities = readAbilities("characterAbilities.csv");
+		try (
+			InputStream in = this.getClass().getResourceAsStream(
+				"/nz/dcoder/inthezone/data/characterAbilities.csv")
+		) {
+			this.characterAbilities = readAbilities("characterAbilities.csv", in);
 		} catch (Exception e) {
 			throw new DatabaseException(
 				"Error reading characterAbilities.csv: " + e.getMessage(), e);
 		}
 	}
 
-	private Map<CharacterName, List<Ability>[]> readAbilities(String filename)
-		throws IOException, NumberFormatException, DatabaseNameException
+	private Map<CharacterName, List<Ability>[]> readAbilities(
+		String filename, InputStream in
+	) throws IOException, NumberFormatException, DatabaseNameException
 	{
 		Map<CharacterName, Map<Integer, List<Ability>>> m =
 			new HashMap<CharacterName, Map<Integer, List<Ability>>>();
@@ -55,8 +62,6 @@ class LevelControllerFactory {
 			"level",
 			"abilities"});
 
-		InputStream in = this.getClass().getResourceAsStream(
-				"/nz/dcoder/inthezone/data/" + filename);
 		if (in == null) throw new FileNotFoundException("File not found " + filename);
 		InputStreamReader reader = new UnicodeInputReader(in);
 		CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
@@ -89,7 +94,7 @@ class LevelControllerFactory {
 		return r;
 	}
 	
-	private LevelInfo readLevels(String filename)
+	private LevelInfo readLevels(String filename, InputStream in)
 		throws IOException, NumberFormatException
 	{
 		Map<Integer, Integer> expMap = new HashMap<Integer, Integer>();
@@ -100,8 +105,6 @@ class LevelControllerFactory {
 			"exp",
 			"hpMod"});
 
-		InputStream in = this.getClass().getResourceAsStream(
-				"/nz/dcoder/inthezone/data/" + filename);
 		if (in == null) throw new FileNotFoundException("File not found " + filename);
 		InputStreamReader reader = new UnicodeInputReader(in);
 		CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());

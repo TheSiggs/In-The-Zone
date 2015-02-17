@@ -40,9 +40,10 @@ public class EquipmentFactory {
 			"class",
 			"category"});
 
-		try {
+		try (
 			InputStream in = this.getClass().getResourceAsStream(
-					"/nz/dcoder/inthezone/data/equipment.csv");
+				"/nz/dcoder/inthezone/data/equipment.csv")
+		) {
 			if (in == null) throw new FileNotFoundException("File not found equipment.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
 			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());

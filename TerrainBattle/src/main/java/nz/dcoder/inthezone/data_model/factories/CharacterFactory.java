@@ -46,9 +46,10 @@ public class CharacterFactory {
 			"deadBody"
 			});
 
-		try {
+		try (
 			InputStream in = this.getClass().getResourceAsStream(
-					"/nz/dcoder/inthezone/data/characters.csv");
+				"/nz/dcoder/inthezone/data/characters.csv")
+		) {
 			if (in == null) throw new FileNotFoundException("File not found characters.csv");
 			InputStreamReader reader = new UnicodeInputReader(in);
 			CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());

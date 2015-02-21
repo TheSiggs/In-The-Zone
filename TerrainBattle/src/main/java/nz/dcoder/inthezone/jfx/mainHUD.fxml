@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.canvas.*?>
 <?import java.lang.*?>
@@ -22,18 +23,25 @@
       <ProgressBar fx:id="movePoints" layoutX="88.0" layoutY="75.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Orange;" />
       <Label layoutX="138.0" layoutY="74.0" prefHeight="25.0" prefWidth="100.0" text="Movement Points" textFill="WHITE" />
       <BorderPane layoutX="20.0" layoutY="11.0" prefHeight="92.0" prefWidth="66.0" style="-fx-background-color: Grey;" />
-      <Pane layoutX="681.0" layoutY="11.0" prefHeight="139.0" prefWidth="105.0">
+      <Pane fx:id="ActionMenu" layoutX="706.0" layoutY="16.0" prefHeight="130.0" prefWidth="80.0">
          <children>
-            <Button fx:id="AttackButton" layoutX="21.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Attack" />
-            <Button layoutX="21.0" layoutY="56.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Magic" />
-            <Button layoutX="21.0" layoutY="100.0" mnemonicParsing="false" text="Use Item" />
+            <Button fx:id="AttackButton" layoutX="9.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#showAttackMenu" prefHeight="25.0" prefWidth="63.0" text="Attack" />
+            <Button fx:id="MagicButton" layoutX="9.0" layoutY="52.0" mnemonicParsing="false" onMouseClicked="#showMagicMenu" prefHeight="25.0" prefWidth="63.0" text="Magic" />
+            <Button layoutX="9.0" layoutY="96.0" mnemonicParsing="false" text="Use Item" />
          </children>
       </Pane>
-      <Pane fx:id="AttackMenu" layoutX="576.0" layoutY="10.0" prefHeight="127.0" prefWidth="105.0">
+      <Pane fx:id="AttackMenu" layoutX="601.0" layoutY="12.0" prefHeight="139.0" prefWidth="105.0" visible="true">
          <children>
-            <Button layoutX="4.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Attack 1 (AP:5)" />
-            <Button layoutX="3.0" layoutY="51.0" mnemonicParsing="false" text="Attack 2 (AP:10)" />
-            <Button layoutX="3.0" layoutY="88.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Back" />
+            <Button layoutX="3.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Attack 1 (AP:5)" />
+            <Button layoutX="3.0" layoutY="57.0" mnemonicParsing="false" text="Attack 2 (AP:10)" />
+            <Button fx:id="ExitAttackMenu" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#hideAttackMenu" prefHeight="25.0" prefWidth="100.0" text="Back" />
+            <Pane fx:id="MagicMenu" layoutX="1.0" prefHeight="139.0" prefWidth="105.0" visible="true">
+               <children>
+                  <Button layoutX="3.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Magic 1 " />
+                  <Button layoutX="3.0" layoutY="57.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Magic 2 " />
+                  <Button fx:id="ExitMagicMenu" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#hideMagicMenu" prefHeight="25.0" prefWidth="100.0" text="Back" />
+               </children>
+            </Pane>
          </children>
       </Pane> 
     </children>

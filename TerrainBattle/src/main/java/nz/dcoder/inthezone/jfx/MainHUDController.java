@@ -12,8 +12,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
-import javax.swing.AbstractButton;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import nz.dcoder.inthezone.Main;
 
 /**
@@ -120,7 +123,38 @@ public class MainHUDController implements Initializable {
         this.health = health;
     }
     
-    public void attackMenu(AbstractButton AttackButton){
-        
+
+    @FXML
+    private Button AttackButton = new Button();
+    @FXML
+    private Pane AttackMenu = new Pane();
+    @FXML
+    private Button MagicButton = new Button();
+    @FXML
+    private Pane MagicMenu = new Pane();
+
+    /**
+     * Show Attack Menu
+     */
+    public void showAttackMenu() {
+       AttackMenu.setVisible(true);
+     //  MagicMenu.setVisible(false);
     }
+    public void hideAttackMenu() {
+       AttackMenu.setVisible(false);
+      // MagicMenu.setVisible(false);
+    } 
+    /**
+     * Show Magic Menu
+     */   
+    public void showMagicMenu() {
+        MagicMenu.setVisible(true);
+       // AttackMenu.setVisible(false);
+    }
+    public void hideMagicMenu() {
+        MagicMenu.setVisible(false);
+       // AttackMenu.setVisible(false);
+    }
+    
+    
 }

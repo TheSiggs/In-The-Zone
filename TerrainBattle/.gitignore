@@ -2,3 +2,5 @@
 .nb-gradle-properties
 *.dll
 *.swp
+**.bin
+**.lock

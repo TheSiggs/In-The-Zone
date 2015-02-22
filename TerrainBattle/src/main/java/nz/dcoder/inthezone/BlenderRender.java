@@ -29,6 +29,7 @@ public class BlenderRender extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		// blue box exmple code
+		/*
 		Box b = new Box(3, 3, 3);
 		Geometry geom = new Geometry("Box", b);
 		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -36,6 +37,7 @@ public class BlenderRender extends SimpleApplication {
 		geom.setMaterial(mat);
 		geom.setName("geom");
 		rootNode.attachChild(geom);
+				*/
             
 		assetManager.registerLocator("assets", FileLocator.class);
 		//assetManager.registerLocator("assets/town.zip", ZipLocator.class);

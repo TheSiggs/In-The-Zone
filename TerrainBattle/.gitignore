@@ -4,5 +4,5 @@
 *.swp
 **.bin
 **.lock
-.gradle/2.1/taskArtifacts/cache.properties
-.gradle/**.properties
+#.gradle/2.1/taskArtifacts/cache.properties
+#.gradle/**.properties

@@ -19,3 +19,5 @@ test,5,1.25,1,0,FALSE,FALSE,TRUE,1,FALSE,PHYSICAL,damage,,This line is for testi
 ,,,,,,,,,,,,,damage: For abilities that deal damage.
 ,,,,,,,,,,,,,heal: For abilities that heal
 ,,,,,,,,,,,,,teleport: For teleporting.  The maximum allowable teleport distance is equal to the range of the ability.  The “amount” field is ignored
+,,,,,,,,,,,,,push: For “corpse pushing”
+,,,,,,,,,,,,,hpAdjust: Adds a fixed number of HP equal to s

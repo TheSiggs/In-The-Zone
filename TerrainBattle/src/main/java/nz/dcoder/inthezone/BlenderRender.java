@@ -34,7 +34,8 @@ public class BlenderRender extends SimpleApplication {
 
 		//load model with referenced images
 		//Spatial track = assetManager.loadModel("Scenes/zan-house.blend");
-		Spatial track = assetManager.loadModel("Models/black-canary/black canary hero185.blend");
+		//Spatial track = assetManager.loadModel("Models/black-canary/black canary hero185.blend");
+        Spatial track = assetManager.loadModel("Models/clock/clock.blend");
 		rootNode.attachChild(track);
 
 		// sunset light

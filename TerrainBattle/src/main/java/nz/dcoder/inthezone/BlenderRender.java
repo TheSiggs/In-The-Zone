@@ -7,7 +7,6 @@ package nz.dcoder.inthezone;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
-import com.jme3.asset.plugins.ZipLocator;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -24,6 +23,8 @@ public class BlenderRender extends SimpleApplication {
 	}
 	@Override
 	public void simpleInitApp() {
+		/*
+				*/
 		assetManager.registerLocator("assets", FileLocator.class);
 		//assetManager.registerLocator("assets/town.zip", ZipLocator.class);
 		viewPort.setBackgroundColor(ColorRGBA.DarkGray);

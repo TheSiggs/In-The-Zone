@@ -7,15 +7,11 @@ package nz.dcoder.inthezone;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
-import com.jme3.asset.plugins.ZipLocator;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
-import com.jme3.material.Material;
-import com.jme3.scene.shape.Box;
-import com.jme3.scene.Geometry;
 
 /**
  *

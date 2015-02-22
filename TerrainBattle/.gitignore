@@ -2,3 +2,6 @@
 .nb-gradle-properties
 *.dll
 *.swp
+.idea/
+zans-story.iml
+

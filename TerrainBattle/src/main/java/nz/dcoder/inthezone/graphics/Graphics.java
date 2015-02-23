@@ -76,7 +76,7 @@ public class Graphics {
 	 * Later, we will make a new method "addCharacter" that can add any
 	 * character.  For now we just have this method that adds goblins.
 	 * */
-	public void addGoblin(Position p, String texture) {
+	public CharacterGraphics addGoblin(Position p, String texture) {
 		Spatial spatial = assetManager.loadModel(
 			"3d_objects/creatures/goblin/goblin.mesh.xml");
 
@@ -93,6 +93,8 @@ public class Graphics {
 
 		CharacterGraphics cg = new CharacterGraphics(spatial, p);
 		characters.add(cg);
+
+		return cg;
 	}
 
 	/**

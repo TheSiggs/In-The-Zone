@@ -23,6 +23,15 @@ public class CharacterGraphics implements AnimEventListener {
 	private final Spatial spatial;
 	private final AnimChannel channel;
 	private final AnimControl control;
+	private static final Quaternion upright = new Quaternion();
+
+	// compute the upright quaternion
+	static {
+		Quaternion front = new Quaternion();
+		front.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
+		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
+		upright.multLocal(front);
+	}
 
 	private Position p;
 
@@ -31,7 +40,7 @@ public class CharacterGraphics implements AnimEventListener {
 		spatial.setUserData("p", new SaveablePosition(p));
 
 		this.setPosition(p);
-		this.rotateUpright();
+		this.spatial.setLocalRotation(upright);
 
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
@@ -55,20 +64,25 @@ public class CharacterGraphics implements AnimEventListener {
 		spatial.getParent().attachChild(spatial);
 	}
 
-	private void rotateUpright() {
-		Quaternion upright = new Quaternion();
-		Quaternion front = new Quaternion();
-		front.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
-		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
-		upright.multLocal(front);
-		this.spatial.setLocalRotation(upright);
-	}
-	
 	/**
 	 * Set the rotation of this character
 	 * @param dp The position delta, i.e. target position - start position
 	 * */
 	public void setHeading(Position dp) {
+		float mult;
+		if (dp.x > 0) mult = -1f;
+		else if (dp.x < 0) mult = 1f;
+		else if (dp.y < 0) mult = 2f;
+		else mult = 0f;
+
+		Quaternion facing = new Quaternion();
+		Vector3f myAxis = Vector3f.UNIT_Y;
+		facing.fromAngleAxis(mult * FastMath.HALF_PI, myAxis);
+
+		Quaternion r = upright.clone();
+		r.multLocal(facing);
+
+		spatial.setLocalRotation(r);
 	}
 
 	/**

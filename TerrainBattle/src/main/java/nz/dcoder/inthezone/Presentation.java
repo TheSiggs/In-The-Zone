@@ -18,6 +18,7 @@ import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.input.GameActionListener;
 
@@ -57,12 +58,15 @@ public class Presentation {
 		List<Character> pcs = new ArrayList<Character>();
 		List<Character> npcs = new ArrayList<Character>();
 
+		Position headingN = new Position(0, 1);
+		Position headingS = new Position(0, -1);
+
 		for (int x = 0; x < 5; ++x) {
-			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png"));
+			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png", headingN));
 		}
 
 		for (int x = 0; x < 5; ++x) {
-			npcs.add(initGoblin(new Position(x * 2, 0), "green/D.png"));
+			npcs.add(initGoblin(new Position(x * 2, 0), "green/D.png", headingS));
 		}
 
 		gameState.makeBattle(pcs, npcs, game.getBattleController());
@@ -72,8 +76,9 @@ public class Presentation {
 	 * When we get more sophisticated, we will add another method to init actual
 	 * players rather than just goblins.
 	 * */
-	Character initGoblin(Position p, String texture) {
-		graphics.addGoblin(p, texture);
+	Character initGoblin(Position p, String texture, Position dp) {
+		CharacterGraphics cg = graphics.addGoblin(p, texture);
+		cg.setHeading(dp);
 
 		Character r = characterFactory.newCharacter(
 			new CharacterName("goblin"), 1);

@@ -1,6 +1,6 @@
 name,description,baseAP,baseMP,strength,intelligence,dexterity,guard,spirit,vitality,deadBody,,Notes
 testChar,"For testing purposes, not actually part of the game",10,11,12,13,14,15,16,17,testBody,,This line is for testing.  Please do not alter
-,,,,,,,,,,,,
+goblin,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,
 ,,,,,,,,,,,,Description of fields
 ,,,,,,,,,,,,name: the name of this character as it appears in the game
 ,,,,,,,,,,,,descripttion: A short textual description of the character

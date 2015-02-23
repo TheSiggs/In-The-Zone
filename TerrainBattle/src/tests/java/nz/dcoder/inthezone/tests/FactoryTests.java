@@ -50,7 +50,7 @@ public class FactoryTests {
 			assertNotNull("BattleObjectAbility not null", test.ability);
 			assertEquals("BattleObject position.x", 0, test.position.x);
 			assertEquals("BattleObject position.y", 0, test.position.y);
-			assertEquals("BattleObject hits", 0, test.hitsRemaining);
+			assertEquals("BattleObject hits", 1, test.hitsRemaining);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Unexpected exception: " + e.getMessage());
@@ -73,7 +73,7 @@ public class FactoryTests {
 			assertNull("BattleObjectAbilitys2 is null", test.ability);
 			assertEquals("BattleObject2 position.x", 0, test.position.x);
 			assertEquals("BattleObject2 position.y", 0, test.position.y);
-			assertEquals("BattleObject2 hits", 0, test.hitsRemaining);
+			assertEquals("BattleObject2 hits", 1, test.hitsRemaining);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Unexpected exception: " + e.getMessage());

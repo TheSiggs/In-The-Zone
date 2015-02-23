@@ -1,13 +1,13 @@
 name,blocksSpace,blocksPath,isAttackable,isPushable,hits,hasAbility,ability,,Notes
-testObj,TRUE,FALSE,FALSE,FALSE,0,TRUE,test,,This line is for testing.  Please do not alter
-testBody,TRUE,FALSE,FALSE,TRUE,0,FALSE,,,This line is for testing.  Please do not alter
-,,,,,,,,,
+testObj,TRUE,FALSE,FALSE,FALSE,1,TRUE,test,,This line is for testing.  Please do not alter
+testBody,TRUE,FALSE,FALSE,TRUE,1,FALSE,,,This line is for testing.  Please do not alter
+goblinBody,TRUE,FALSE,FALSE,TRUE,1,FALSE,,,
 ,,,,,,,,,Description of fields
 ,,,,,,,,,name: The name of this battle object
 ,,,,,,,,,blocksSpace: TRUE if no character or object can occupy the same space as this object
 ,,,,,,,,,"blocksPath: TRUE if no path can go through this object, otherwise FALSE"
 ,,,,,,,,,"isAttackable: TRUE if this object can be attacked, otherwise FALSE"
 ,,,,,,,,,"isPushable: TRUE if this object can be pushed (i.e. corpses), otherwise FALSE"
-,,,,,,,,,"hits: For attackable objects, the number of attacks required to destroy the object"
+,,,,,,,,,hits: The number of attacks required to destroy the object.  Set to 1 for non-attackable objects
 ,,,,,,,,,hasAbility: TRUE if the object has some kind of effect (e.g. a trip mine)
 ,,,,,,,,,"ability: For objects that have an effect, the name of an ability which encodes that effect.  This way, objects like mines can have areaOfEffect etc."

@@ -1,6 +1,6 @@
 character,level,abilities,,Notes
 testChar,1,test,,"This line is for testing purposes, please do not alter"
-,,,,
+goblin,1,attack,,
 ,,,,Description of fields
 ,,,,character: The name of the character
 ,,,,level: The level of the character

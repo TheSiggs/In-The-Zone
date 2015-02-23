@@ -1,9 +1,9 @@
 package nz.dcoder.inthezone.data_model;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import nz.dcoder.ai.astar.BoardState;
-import nz.dcoder.ai.astar.Tile;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -14,23 +14,29 @@ public class Terrain {
 	// where the mana zones are, and we might put elevation information in this
 	// class also
 
-	// public for now.  This will probably change when A* gets refactored
-	public final SortedSet<Tile> defaultBoardTiles = new TreeSet<>();
-
 	private final BoardState boardState;
+	private final List<Position> obstacles = new ArrayList<Position>();
 
 	public Terrain() {
 		boardState = new BoardState().load("board.map");
 
 		int width = boardState.getWidth();
 		int height = boardState.getHeight();
-		for (int x = 0; x < width; ++x) {
-			for (int y = 0; y < height; ++y) {
-				if (boardState.get(x, y) == 0) {
-					defaultBoardTiles.add(new Tile(x, y));
+
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (boardState.get(x, y) != 0) {
+					obstacles.add(new Position(x, y));
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get positions on the terrain where players cannot go.
+	 * */
+	public Collection<Position> getObstacles() {
+		return obstacles;
 	}
 
 	/**

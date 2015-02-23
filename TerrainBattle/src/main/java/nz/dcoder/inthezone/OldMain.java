@@ -86,7 +86,7 @@ public class OldMain extends SimpleApplication {
 				}
 			}
 		}
-		BoardNode.tiles = boardTiles;
+		//BoardNode.tiles = boardTiles;
 		OldMain.instance = this;
 	}
 
@@ -243,14 +243,14 @@ public class OldMain extends SimpleApplication {
 			BoardNode bn;
 			if (pathNode < size) {
 				bn = (BoardNode) path.get(pathNode);
-				startX = beginX = bn.getX();
-				startY = beginY = bn.getY();
+				//startX = beginX = bn.getX();
+				//startY = beginY = bn.getY();
 				pathNode++;
 			}
 			if (pathNode < size) {
 				bn = (BoardNode) path.get(pathNode);
-				endX = targetX = bn.getX();
-				endY = targetY = bn.getY();
+				//endX = targetX = bn.getX();
+				//endY = targetY = bn.getY();
 			} else {
 				flags &= ~PLAYER_MOVING;
 				findCurrentPlayer().setAnimation("idleA");
@@ -310,10 +310,10 @@ public class OldMain extends SimpleApplication {
 				|| (percentAlong > 0f && percentAlong < 1f)) {
 			return;
 		}
-		BoardNode start = new BoardNode(fromX, fromY, null);
-		BoardNode goal = new BoardNode(toX, toY, null);
-		AStarSearch search = new AStarSearch(start, goal);
-		path = search.search();
+		//BoardNode start = new BoardNode(fromX, fromY, null);
+		//BoardNode goal = new BoardNode(toX, toY, null);
+		//AStarSearch search = new AStarSearch(start, goal);
+		//path = search.search();
 		System.out.println(path);
 		pathNode = 0;
 		flags |= PLAYER_MOVING;
@@ -473,11 +473,11 @@ public class OldMain extends SimpleApplication {
 			if (attacker == null || defender == null) {
 				return;
 			}
-			BoardNode start = new BoardNode(attacker.getX(), attacker.getY(), null);
-			BoardNode goal = new BoardNode(defender.getX(), defender.getY(), null);
-			AStarSearch search = new AStarSearch(start, goal);
-			List<nz.dcoder.ai.astar.Node> myPath = search.search();
-			int length = myPath.size();
+			//BoardNode start = new BoardNode(attacker.getX(), attacker.getY(), null);
+			//BoardNode goal = new BoardNode(defender.getX(), defender.getY(), null);
+			//AStarSearch search = new AStarSearch(start, goal);
+			//List<nz.dcoder.ai.astar.Node> myPath = search.search();
+			//int length = myPath.size();
 			/*CharacterState aState = attacker.getState();
 			CharacterState dState = defender.getState();
 			dState.decreaseHp(aState.getDamage());

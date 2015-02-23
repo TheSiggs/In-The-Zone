@@ -3,7 +3,6 @@ package nz.dcoder.inthezone.data_model;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.List;
-import nz.dcoder.ai.astar.Node;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -25,7 +24,7 @@ public class BattleController {
 		if (onBattleEnd != null) onBattleEnd.accept(new DoBattleEnd(playerWins));
 	}
 
-	void callOnMove(Position start, List<Node> path) {
+	void callOnMove(Position start, List<Position> path) {
 		if (onMove != null) onMove.accept(new DoMoveInfo(start, path));
 	}
 

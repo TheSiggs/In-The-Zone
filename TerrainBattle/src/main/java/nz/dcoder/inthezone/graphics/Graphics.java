@@ -19,6 +19,8 @@ import java.util.Collection;
 
 public class Graphics {
 	public static final float scale = 0.8f;
+	public static final float rotationSpeed = 1.5f;
+	public static final float travelSpeed = 4f;
 
 	private final AssetManager assetManager;
 	private final Camera cam;
@@ -33,6 +35,8 @@ public class Graphics {
 		this.rootNode = app.getRootNode();
 		this.assetManager = app.getAssetManager();
 		this.cam = app.getCamera();
+
+		app.getFlyByCamera().setEnabled(false);
 
 		assetManager.registerLocator("assets", FileLocator.class);
 
@@ -70,6 +74,16 @@ public class Graphics {
 		DirectionalLight southLight = new DirectionalLight();
 		southLight.setDirection(new Vector3f(0f, -1f, -1f).normalizeLocal());
 		rootNode.addLight(southLight);
+	}
+
+	Quaternion quat = new Quaternion();
+
+	/**
+	 * Rotate the view about the z-axis
+	 * */
+	public void rotateView(float angle) {
+		quat.fromAngleAxis(angle, Vector3f.UNIT_Z);
+		sceneNode.rotate(quat);
 	}
 
 	/**

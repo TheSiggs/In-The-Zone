@@ -21,6 +21,7 @@ import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.input.GameActionListener;
+import nz.dcoder.inthezone.input.Rotating;
 
 /**
  *
@@ -91,6 +92,13 @@ public final class Presentation {
 	}
 
 	void simpleUpdate(float tpf) {
+		Rotating viewRotating = input.getViewRotating();
+		if (viewRotating == Rotating.LEFT) {
+			graphics.rotateView(tpf * Graphics.rotationSpeed);
+		} else if (viewRotating == Rotating.RIGHT) {
+			graphics.rotateView(-tpf * Graphics.rotationSpeed);
+		}
+
 		// handle input
 		// update HUD
 		// update geometry tree

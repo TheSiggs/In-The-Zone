@@ -12,16 +12,11 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.math.Vector3f;
 
-import nz.dcoder.inthezone.graphics.CharacterGraphics;
-
 /**
  *
  * @author denz
  */
 public class GameActionListener implements ActionListener {
-
-	public CharacterGraphics characterGraphics;
-
 	private final InputManager inputManager;
 
 	public GameActionListener(InputManager inputManager) {
@@ -38,7 +33,6 @@ public class GameActionListener implements ActionListener {
 		inputManager.addMapping("Attack",
 				new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
-		// TODO: fix these mappings so they match onAction
 		inputManager.addListener(this,
 				"ForwardsMove",
 				"RightMove",
@@ -48,6 +42,16 @@ public class GameActionListener implements ActionListener {
 				"RightView",
 				"CharacterSelect",
 				"Attack");
+	}
+
+	private Rotating viewRotating = Rotating.NONE;
+	private Rotating oldViewRotating = Rotating.NONE;
+
+	/**
+	 * Determine if the view is currently rotating, and in which direction.
+	 * */
+	public Rotating getViewRotating() {
+		return viewRotating;
 	}
 
 	/**
@@ -61,11 +65,14 @@ public class GameActionListener implements ActionListener {
 	 */
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
-		Vector3f pos = characterGraphics.getSpatial().getLocalTranslation();
 		if (isPressed) {
 			if (name.equals("LeftView")) {
+				if (viewRotating != Rotating.LEFT) oldViewRotating = viewRotating;
+				viewRotating = Rotating.LEFT;
 			}
 			if (name.equals("RightView")) {
+				if (viewRotating != Rotating.RIGHT) oldViewRotating = viewRotating;
+				viewRotating = Rotating.RIGHT;
 			}
 			if (name.equals("ForwardsMove")) {
 			}
@@ -81,9 +88,14 @@ public class GameActionListener implements ActionListener {
 			}
 		} else {
 			if (name.equals("LeftView")) {
+				viewRotating = oldViewRotating;
+				oldViewRotating = Rotating.NONE;
 			}
 			if (name.equals("RightView")) {
+				viewRotating = oldViewRotating;
+				oldViewRotating = Rotating.NONE;
 			}
 		}
 	}
 }
+

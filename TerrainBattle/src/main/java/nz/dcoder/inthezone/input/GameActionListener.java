@@ -19,6 +19,7 @@ import nz.dcoder.inthezone.graphics.CharacterGraphics;
  * @author denz
  */
 public class GameActionListener implements ActionListener {
+
 	public CharacterGraphics characterGraphics;
 
 	private final InputManager inputManager;
@@ -26,36 +27,34 @@ public class GameActionListener implements ActionListener {
 	public GameActionListener(InputManager inputManager) {
 		this.inputManager = inputManager;
 
-		inputManager.addMapping("Up", new KeyTrigger(KeyInput.KEY_UP));
-		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_RIGHT));
-		inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_DOWN));
-		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_LEFT));
-		inputManager.addMapping("A", new KeyTrigger(KeyInput.KEY_A));
-		inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D));
-		inputManager.addMapping("C", new KeyTrigger(KeyInput.KEY_C));
-		inputManager.addMapping("LeftMouse",
-			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		inputManager.addMapping("RightMouse",
-			new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+		inputManager.addMapping("ForwardsMove", new KeyTrigger(KeyInput.KEY_UP));
+		inputManager.addMapping("RightMove", new KeyTrigger(KeyInput.KEY_RIGHT));
+		inputManager.addMapping("BackwardsMove", new KeyTrigger(KeyInput.KEY_DOWN));
+		inputManager.addMapping("LeftMove", new KeyTrigger(KeyInput.KEY_LEFT));
+		inputManager.addMapping("LeftView", new KeyTrigger(KeyInput.KEY_Q));
+		inputManager.addMapping("RightView", new KeyTrigger(KeyInput.KEY_E));
+		inputManager.addMapping("CharacterSelect",
+				new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+		inputManager.addMapping("Attack",
+				new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
 		// TODO: fix these mappings so they match onAction
 		inputManager.addListener(this,
-			"Up",
-			"Right",
-			"Down",
-			"Left",
-			"LeftMouse",
-			"RightMouse",
-			"A",
-			"C",
-			"D");
+				"ForwardsMove",
+				"RightMove",
+				"BackwardsMove",
+				"LeftMove",
+				"LeftView",
+				"RightView",
+				"CharacterSelect",
+				"Attack");
 	}
-	
+
 	/**
-	 * TODO: Think about action names and possible key mappings.
-	 *       Should be customisable later but can be static for a start.
-	 *       Maybe better names than just the key names, because these are
-	 *       actions.
+	 * TODO: Think about action names and possible key mappings. Should be
+	 * customisable later but can be static for a start. Maybe better names than
+	 * just the key names, because these are actions.
+	 *
 	 * @param name Action name like "ForwardsView"
 	 * @param isPressed whether the key is pressed or not
 	 * @param tpf time per frame
@@ -76,14 +75,14 @@ public class GameActionListener implements ActionListener {
 			}
 			if (name.equals("LeftMove")) {
 			}
-			if (name.equals("CharacterSelect")) { // can be mouse?!
+			if (name.equals("CharacterSelect")) { // left mouse
 			}
-			if (name.equals("Attack")) {
+			if (name.equals("Attack")) { // right mouse
 			}
 		} else {
-			if (name.equals("LeftViewUp")) {
+			if (name.equals("LeftView")) {
 			}
-			if (name.equals("RightViewUp")) {
+			if (name.equals("RightView")) {
 			}
 		}
 	}

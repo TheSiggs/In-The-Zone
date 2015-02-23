@@ -26,7 +26,7 @@ import nz.dcoder.inthezone.input.GameActionListener;
  *
  * @author denz
  */
-public class Presentation {
+public final class Presentation {
 
 	final GameActionListener input;
 	final GameState gameState;
@@ -83,8 +83,9 @@ public class Presentation {
 		Character r = characterFactory.newCharacter(
 			new CharacterName("goblin"), 1);
 
-		if (r == null) throw new RuntimeException(
-			"Could not create goblin character");
+		if (r == null) {
+			throw new RuntimeException("Could not create goblin character");
+		}
 
 		return r;
 	}

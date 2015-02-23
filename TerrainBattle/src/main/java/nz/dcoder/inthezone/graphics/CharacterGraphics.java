@@ -61,7 +61,6 @@ public class CharacterGraphics implements AnimEventListener {
 		float bz = 0.2f * Graphics.scale;
 		Vector3f translation = new Vector3f(bx, by, bz);
 		spatial.setLocalTranslation(translation);
-		spatial.getParent().attachChild(spatial);
 	}
 
 	/**

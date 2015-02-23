@@ -14,7 +14,7 @@ import nz.dcoder.inthezone.concurrent.RunnableWithController;
 
 /**
  *
- * @author denz
+ * @author inthezone
  */
 public class UserInterface {
 	private final RunnableWithController guiThread;

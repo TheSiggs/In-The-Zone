@@ -1,6 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
  */
 package nz.dcoder.inthezone.deprecated;
 
@@ -11,7 +9,7 @@ import com.jme3.scene.Spatial;
 
 /**
  *
- * @author informatics-palmerson
+ * @author inthezone
  */
 public class CharacterGraphics implements AnimEventListener {
 

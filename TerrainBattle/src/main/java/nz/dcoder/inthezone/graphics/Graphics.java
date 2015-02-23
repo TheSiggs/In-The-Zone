@@ -36,8 +36,6 @@ public class Graphics {
 		this.assetManager = app.getAssetManager();
 		this.cam = app.getCamera();
 
-		app.getFlyByCamera().setEnabled(false);
-
 		assetManager.registerLocator("assets", FileLocator.class);
 
 		Spatial scene = assetManager.loadModel("Scenes/sample.j3o");

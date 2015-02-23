@@ -5,6 +5,7 @@
 package nz.dcoder.inthezone;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AppState;
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.GameState;
@@ -24,6 +25,10 @@ public class Main extends SimpleApplication {
 	private Presentation presentation = null;
 	private UserInterface userInterface = null;
 	private BattleController battleController = null;
+
+	public Main() {
+		super((AppState) null);
+	}
 
 	/**
 	 * Standard main method to get things started

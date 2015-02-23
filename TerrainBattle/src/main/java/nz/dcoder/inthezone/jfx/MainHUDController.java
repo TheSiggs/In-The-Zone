@@ -5,21 +5,20 @@
  */
 package nz.dcoder.inthezone.jfx;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
+import com.jme3.app.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
-//import javax.swing.AbstractButton;
-import nz.dcoder.inthezone.OldMain;
 import javafx.scene.layout.Pane;
-//import javafx.scene.text.Text;
-//import javafx.scene.text.TextFlow;
-//import nz.dcoder.inthezone.Main;
+import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.ResourceBundle;
+
+import nz.dcoder.inthezone.Main;
+import nz.dcoder.inthezone.OldMain;
 
 /**
  * FXML Controller class
@@ -28,7 +27,7 @@ import javafx.scene.layout.Pane;
  */
 public class MainHUDController implements Initializable {
 
-    public static OldMain app;
+    public static Application app;
     @FXML
     public Canvas canvas;
 
@@ -48,11 +47,17 @@ public class MainHUDController implements Initializable {
     @FXML
     private void handleButtonAction(ActionEvent event) {
         System.out.println("You clicked me!");
-        app.enqueue(new Callable<OldMain>() {
+        app.enqueue(new Callable<Application>() {
 
             @Override
-            public OldMain call() throws Exception {
-                app.someMethod();
+            public Application call() throws Exception {
+                // some casting nonsense to maintain compatibility with
+                // OldMain.  This should be removed at first opportunity
+                if (app instanceof Main) {
+                    ((Main) app).someMethod();
+                } else if (app instanceof OldMain) {
+                    ((OldMain) app).someMethod();
+                }
                 return app;
             }
         });

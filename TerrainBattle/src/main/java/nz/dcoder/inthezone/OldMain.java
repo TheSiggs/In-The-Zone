@@ -38,7 +38,7 @@ import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.BoardNode;
 import nz.dcoder.ai.astar.BoardState;
 import nz.dcoder.ai.astar.Tile;
-import nz.dcoder.inthezone.concurrent.RunnableWithController;
+import nz.dcoder.inthezone.deprecated.RunnableWithController;
 import nz.dcoder.inthezone.data_model.Turn;
 //import nz.dcoder.inthezone.objects.CharacterState;
 

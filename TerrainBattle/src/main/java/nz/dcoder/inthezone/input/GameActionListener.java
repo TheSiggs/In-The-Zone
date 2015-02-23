@@ -5,16 +5,51 @@
 package nz.dcoder.inthezone.input;
 
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.InputManager;
+import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.math.Vector3f;
-import nz.dcoder.inthezone.deprecated.CharacterGraphics;
+
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
 
 /**
  *
  * @author denz
  */
 public class GameActionListener implements ActionListener {
-
 	public CharacterGraphics characterGraphics;
+
+	private final InputManager inputManager;
+
+	public GameActionListener(InputManager inputManager) {
+		this.inputManager = inputManager;
+
+		inputManager.addMapping("Up", new KeyTrigger(KeyInput.KEY_UP));
+		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_RIGHT));
+		inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_DOWN));
+		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_LEFT));
+		inputManager.addMapping("A", new KeyTrigger(KeyInput.KEY_A));
+		inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D));
+		inputManager.addMapping("C", new KeyTrigger(KeyInput.KEY_C));
+		inputManager.addMapping("LeftMouse",
+			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+		inputManager.addMapping("RightMouse",
+			new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+
+		// TODO: fix these mappings so they match onAction
+		inputManager.addListener(this,
+			"Up",
+			"Right",
+			"Down",
+			"Left",
+			"LeftMouse",
+			"RightMouse",
+			"A",
+			"C",
+			"D");
+	}
 	
 	/**
 	 * TODO: Think about action names and possible key mappings.

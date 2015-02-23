@@ -10,21 +10,26 @@ import com.jme3.animation.AnimEventListener;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+import nz.dcoder.inthezone.data_model.pure.Position;
+
 /**
  *
  * @author informatics-palmerson
  */
 public class CharacterGraphics implements AnimEventListener {
+	private final Spatial spatial;
+	private final AnimChannel channel;
+	private final AnimControl control;
 
-	private Spatial spatial = null;
-	private int x = 0;
-	private int y = 0;
-	private AnimChannel channel;
-	private AnimControl control;
+	public Position p;
 
 	public CharacterGraphics(Spatial spatial) {
+		this(spatial, new Position(0, 0));
+	}
+
+	public CharacterGraphics(Spatial spatial, Position p) {
 		this.spatial = spatial;
-		// 3d_objects/creatures/goblin/animations/goblin.skeleton.xml
+		this.p = p;
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
 		channel = control.createChannel();
@@ -36,41 +41,6 @@ public class CharacterGraphics implements AnimEventListener {
 	 */
 	public Spatial getSpatial() {
 		return spatial;
-	}
-
-	/**
-	 * @param spatial the spatial to set
-	 */
-	public void setSpatial(Spatial spatial) {
-		this.spatial = spatial;
-	}
-
-	/**
-	 * @return the x
-	 */
-	public int getX() {
-		return x;
-	}
-
-	/**
-	 * @param x the x to set
-	 */
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	/**
-	 * @return the y
-	 */
-	public int getY() {
-		return y;
-	}
-
-	/**
-	 * @param y the y to set
-	 */
-	public void setY(int y) {
-		this.y = y;
 	}
 
 	@Override

@@ -123,6 +123,10 @@ test {
 	classpath = project.sourceSets.test.runtimeClasspath + files("src/main/data")
 }
 
+run {
+	classpath = project.sourceSets.test.runtimeClasspath + files("src/main/data")
+}
+
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.1'
 }

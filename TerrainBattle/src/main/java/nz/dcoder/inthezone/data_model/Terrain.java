@@ -17,8 +17,10 @@ public class Terrain {
 	// public for now.  This will probably change when A* gets refactored
 	public final SortedSet<Tile> defaultBoardTiles = new TreeSet<>();
 
+	private final BoardState boardState;
+
 	public Terrain() {
-		BoardState boardState = new BoardState().load("board.map");
+		boardState = new BoardState().load("board.map");
 
 		int width = boardState.getWidth();
 		int height = boardState.getHeight();
@@ -29,6 +31,22 @@ public class Terrain {
 				}
 			}
 		}
+	}
+
+	/**
+	 * These will have to be replaced with something more sophisticated in the
+	 * actual game.
+	 * */
+	public int getBoardState(int x, int y) {
+		return boardState.get(x, y);
+	}
+
+	public int getWidth() {
+		return boardState.getWidth();
+	}
+
+	public int getHeight() {
+		return boardState.getHeight();
 	}
 
 	public boolean isManaZone(Position pos) {

@@ -6,6 +6,7 @@ package nz.dcoder.inthezone;
 
 import com.jme3.app.SimpleApplication;
 import nz.dcoder.inthezone.data_model.BattleController;
+import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.Party;
 import nz.dcoder.inthezone.data_model.Terrain;
@@ -43,7 +44,14 @@ public class Main extends SimpleApplication {
 		gameState = new GameState(party, terrain);
 		battleController = new BattleController();
 
-		presentation = new Presentation(this);
+		try {
+			presentation = new Presentation(this);
+		} catch (DatabaseException e) {
+			System.err.println("Error reading data files: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 		userInterface = new UserInterface(this);
 	}
 
@@ -82,5 +90,9 @@ public class Main extends SimpleApplication {
 	 */
 	public BattleController getBattleController() {
 		return battleController;
+	}
+
+	public void someMethod() {
+		System.out.println("hello from javafx");
 	}
 }

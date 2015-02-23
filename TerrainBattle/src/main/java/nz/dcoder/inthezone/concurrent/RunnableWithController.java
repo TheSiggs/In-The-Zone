@@ -6,17 +6,18 @@
 package nz.dcoder.inthezone.concurrent;
 
 import com.jme3x.jfx.JmeFxScreenContainer;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.paint.Color;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.JavaFXBuilderFactory;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import nz.dcoder.inthezone.OldMain;
+
 import nz.dcoder.inthezone.jfx.MainHUDController;
+import nz.dcoder.inthezone.Main;
 
 /**
  *
@@ -27,9 +28,9 @@ public class RunnableWithController implements Runnable {
 	private MainHUDController controller;
 	private Scene scene;
 	private JmeFxScreenContainer jmeFx;
-	private OldMain app;
+	private Main app;
 
-	public RunnableWithController(JmeFxScreenContainer jmeFx, OldMain app) {
+	public RunnableWithController(JmeFxScreenContainer jmeFx, Main app) {
 		this.jmeFx = jmeFx;
 		this.app = app;
 	}
@@ -52,7 +53,7 @@ public class RunnableWithController implements Runnable {
 			controller = fxmlLoader.getController();
 			this.getController().getHealth().setProgress(1.0);
 		} catch (IOException ex) {
-			Logger.getLogger(OldMain.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -101,14 +102,14 @@ public class RunnableWithController implements Runnable {
 	/**
 	 * @return the app
 	 */
-	public OldMain getApp() {
+	public Main getApp() {
 		return app;
 	}
 
 	/**
 	 * @param app the app to set
 	 */
-	public void setApp(OldMain app) {
+	public void setApp(Main app) {
 		this.app = app;
 	}
 }

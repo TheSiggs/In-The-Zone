@@ -5,7 +5,21 @@
  */
 package nz.dcoder.inthezone;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nz.dcoder.inthezone.data_model.BattleController;
+import nz.dcoder.inthezone.data_model.Character;
+import nz.dcoder.inthezone.data_model.factories.AbilityFactory;
+import nz.dcoder.inthezone.data_model.factories.BattleObjectFactory;
+import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
+import nz.dcoder.inthezone.data_model.factories.DatabaseException;
+import nz.dcoder.inthezone.data_model.GameState;
+import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
+import nz.dcoder.inthezone.graphics.Graphics;
+import nz.dcoder.inthezone.input.GameActionListener;
 
 /**
  *
@@ -13,45 +27,77 @@ import nz.dcoder.inthezone.data_model.Turn;
  */
 public class Presentation {
 
+	final GameActionListener input;
+	final GameState gameState;
+	final Graphics graphics;
 	final Main game;
 
-	Presentation(Main game) {
-		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	final AbilityFactory abilityFactory;
+	final BattleObjectFactory battleObjectFactory;
+	final CharacterFactory characterFactory;
 
+	Presentation(Main game) throws DatabaseException {
 		this.game = game;
+		this.gameState = game.getGameState();
+		this.graphics = new Graphics(game, gameState.terrain);
+		this.input = new GameActionListener(game.getInputManager());
 
-		// fill battle controller callback slots
+		abilityFactory = new AbilityFactory();
+		battleObjectFactory = new BattleObjectFactory(abilityFactory);
+		characterFactory = new CharacterFactory(
+			abilityFactory, battleObjectFactory);
 
-			game.getBattleController().onPlayerTurnStart = this::playerTurnStart;
+		initBattleController();
+		startBattle();
+	}
 
-		// init geometry
+	void startBattle() {
+		// create the characters for this battle (ignore the Party class for now)
 
+		List<Character> pcs = new ArrayList<Character>();
+		List<Character> npcs = new ArrayList<Character>();
 
-		// start first turn
+		for (int x = 0; x < 5; ++x) {
+			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png"));
+		}
 
+		for (int x = 0; x < 5; ++x) {
+			npcs.add(initGoblin(new Position(x * 2, 0), "green/D.png"));
+		}
+
+		gameState.makeBattle(pcs, npcs, game.getBattleController());
+	}
+
+	/**
+	 * When we get more sophisticated, we will add another method to init actual
+	 * players rather than just goblins.
+	 * */
+	Character initGoblin(Position p, String texture) {
+		graphics.addGoblin(p, texture);
+
+		Character r = characterFactory.newCharacter(
+			new CharacterName("goblin"), 1);
+
+		if (r == null) throw new RuntimeException(
+			"Could not create goblin character");
+
+		return r;
 	}
 
 	void simpleUpdate(float tpf) {
-		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-
 		// handle input
 		// update HUD
 		// update geometry tree
 		// perform next animation step
 	}
 
-	/**
-	 * callback methods to be called by reference by the battle controller
-	 * object.
-	 *
-	 * Turn onPlayerTurnStart BattleEnd onBattleEnd DoMoveInfo onMove
-	 * DoAbilityInfo onAbility DoCharacterDeath onDeath DoObjectDestruction
-	 * onDestruction
-	 */
-	private Turn playerTurnStart(Turn turn) {
+	void initBattleController() {
+		BattleController controller = game.getBattleController();
+		controller.onPlayerTurnStart = this::playerTurnStart;
+	}
 
-		System.out.println(turn.toString());
-		
-		return turn;
+	private void playerTurnStart(Turn turn) {
+		System.out.println("Player turn starts");
 	}
 }
+

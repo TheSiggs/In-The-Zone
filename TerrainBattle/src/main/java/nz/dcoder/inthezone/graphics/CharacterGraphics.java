@@ -7,6 +7,7 @@ package nz.dcoder.inthezone.graphics;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
@@ -21,19 +22,34 @@ public class CharacterGraphics implements AnimEventListener {
 	private final AnimChannel channel;
 	private final AnimControl control;
 
-	public Position p;
-
-	public CharacterGraphics(Spatial spatial) {
-		this(spatial, new Position(0, 0));
-	}
+	private Position p;
 
 	public CharacterGraphics(Spatial spatial, Position p) {
 		this.spatial = spatial;
-		this.p = p;
+		spatial.setUserData("p", new SaveablePosition(p));
+
+		this.setPosition(p);
+
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
 		channel = control.createChannel();
 		setAnimation("idleA");
+	}
+
+	public Position getPosition() {
+		return p;
+	}
+
+	public void setPosition(Position p) {
+		this.p = p;
+		((SaveablePosition) this.spatial.getUserData("p")).setPosition(p);
+
+		float bx = ((float) p.x) * Graphics.scale;
+		float by = ((float) -p.y) * Graphics.scale;
+		float bz = 0.2f * Graphics.scale;
+		Vector3f translation = new Vector3f(bx, by, bz);
+		spatial.setLocalTranslation(translation);
+		spatial.getParent().attachChild(spatial);
 	}
 
 	/**
@@ -72,3 +88,4 @@ public class CharacterGraphics implements AnimEventListener {
 				*/
 	}
 }
+

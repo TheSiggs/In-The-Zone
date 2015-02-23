@@ -14,15 +14,20 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Graphics {
-	private static final float scale = 0.8f;
+	public static final float scale = 0.8f;
 
 	private final AssetManager assetManager;
 	private final Camera cam;
 	private final Node boardNode;
 	private final Node rootNode;
 	private final Node sceneNode = new Node();
+
+	private final Collection<CharacterGraphics> characters =
+		new ArrayList<CharacterGraphics>();
 
 	public Graphics(SimpleApplication app, Terrain terrain) {
 		this.rootNode = app.getRootNode();
@@ -43,7 +48,7 @@ public class Graphics {
 
 		initLight();
 
-		boardNode = new BoardGraphics(terrain, assetManager, scale).getBoardNode();
+		boardNode = new BoardGraphics(terrain, assetManager).getBoardNode();
 		int width = terrain.getWidth();
 		int height = terrain.getHeight();
 		boardNode.setLocalTranslation(-scale * width / 2 + scale / 2,
@@ -83,23 +88,20 @@ public class Graphics {
 		spatial.setMaterial(mat);
 		spatial.scale(0.5f);
 
-		setLocation(spatial, p);
+		// need to do this before constructing the CharacterGraphics object
+		boardNode.attachChild(spatial);
+
+		CharacterGraphics cg = new CharacterGraphics(spatial, p);
+		characters.add(cg);
 	}
 
 	/**
-	 * For setting the visible location of a character or other object
+	 * Get the character at a given position
 	 * */
-	public void setLocation(Spatial spatial, float x, float y) {
-		float bx = x * scale;
-		float by = -y * scale;
-		float bz = 0.2f * scale;
-		Vector3f translation = new Vector3f(bx, by, bz);
-		spatial.setLocalTranslation(translation);
-		boardNode.attachChild(spatial);
-	}
-
-	public void setLocation(Spatial spatial, Position p) {
-		setLocation(spatial, (float) p.x, (float) p.y);
+	public CharacterGraphics getCharacterByPosition(Position p) {
+		return characters.stream()
+			.filter(c -> c.getPosition().equals(p))
+			.findFirst().orElse(null);
 	}
 }
 

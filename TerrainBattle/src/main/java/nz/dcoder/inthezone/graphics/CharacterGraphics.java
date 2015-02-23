@@ -7,6 +7,8 @@ package nz.dcoder.inthezone.graphics;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -29,6 +31,7 @@ public class CharacterGraphics implements AnimEventListener {
 		spatial.setUserData("p", new SaveablePosition(p));
 
 		this.setPosition(p);
+		this.rotateUpright();
 
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
@@ -50,6 +53,22 @@ public class CharacterGraphics implements AnimEventListener {
 		Vector3f translation = new Vector3f(bx, by, bz);
 		spatial.setLocalTranslation(translation);
 		spatial.getParent().attachChild(spatial);
+	}
+
+	private void rotateUpright() {
+		Quaternion upright = new Quaternion();
+		Quaternion front = new Quaternion();
+		front.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
+		upright.fromAngles(FastMath.HALF_PI, 0f, 0f);
+		upright.multLocal(front);
+		this.spatial.setLocalRotation(upright);
+	}
+	
+	/**
+	 * Set the rotation of this character
+	 * @param dp The position delta, i.e. target position - start position
+	 * */
+	public void setHeading(Position dp) {
 	}
 
 	/**

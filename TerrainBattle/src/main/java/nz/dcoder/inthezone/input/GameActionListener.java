@@ -10,7 +10,11 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
+import java.util.List;
 
+import nz.dcoder.inthezone.data_model.pure.Position;
+import nz.dcoder.inthezone.data_model.Turn;
+import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 
@@ -45,11 +49,27 @@ public class GameActionListener implements ActionListener {
 				"LeftView",
 				"RightView",
 				"CharacterSelect",
-				"Attack");
+				"Move");
 	}
 
 	private Rotating viewRotating = Rotating.NONE;
 	private Rotating oldViewRotating = Rotating.NONE;
+	private CharacterGraphics walking = null;
+	private boolean isCharacterWalking = false;
+
+	public void startCharacterWalking(CharacterGraphics cg) {
+		walking = cg;
+		isCharacterWalking = true;
+	}
+
+	public void stopCharacterWalking(CharacterGraphics cg) {
+		walking = null;
+		isCharacterWalking = false;
+	}
+
+	public boolean getIsCharacterWalking() {
+		return isCharacterWalking;
+	}
 
 	/**
 	 * Determine if the view is currently rotating, and in which direction.
@@ -58,9 +78,31 @@ public class GameActionListener implements ActionListener {
 		return viewRotating;
 	}
 
+	private Turn turn = null;
+	private TurnCharacter selectedTurnCharacter;
 	private CharacterGraphics selectedCharacter;
+
 	public CharacterGraphics getSelectedCharacter() {
 		return selectedCharacter;
+	}
+
+	public void selectCharacter(CharacterGraphics cg) {
+		// TODO: notify GUI
+		selectedCharacter = cg;
+		if (cg == null) {
+			selectedTurnCharacter = null;
+		} else {
+			selectedTurnCharacter = turn.turnCharacterAt(cg.getPosition());
+			if (selectedTurnCharacter == null) {
+				// TODO: notify GUI?
+				System.out.println("cannot select enemy characters");
+				selectedCharacter = null;
+			}
+		}
+	}
+
+	public void setTurn(Turn turn) {
+		this.turn = turn;
 	}
 
 	/**
@@ -91,11 +133,12 @@ public class GameActionListener implements ActionListener {
 			}
 			if (name.equals("LeftMove")) {
 			}
-			if (name.equals("CharacterSelect")) { // left mouse
-				selectedCharacter = graphics.getCharacterByMouse(
-					inputManager.getCursorPosition());
+			if (name.equals("CharacterSelect") && !isCharacterWalking) {
+				// left mouse
 
-				// TODO: notify GUI
+				selectCharacter(graphics.getCharacterByMouse(
+					inputManager.getCursorPosition()));
+
 				if (selectedCharacter == null) {
 					System.out.println("Deselected character");
 				} else {
@@ -103,7 +146,22 @@ public class GameActionListener implements ActionListener {
 						selectedCharacter.getPosition().toString());
 				}
 			}
-			if (name.equals("Move")) { // right mouse
+			if (name.equals("Move") && !isCharacterWalking) {
+				// right mouse, for now
+
+				Position destination =
+					graphics.getBoardByMouse(inputManager.getCursorPosition());
+
+				if (selectedTurnCharacter != null && destination != null) {
+					List<Position> path = selectedTurnCharacter.getMove(
+						null, destination);
+					if (path == null) {
+						System.out.println("Bad path or not enough MP");
+					} else {
+						selectedTurnCharacter.doMotion(path);
+					}
+				}
+
 			}
 		} else {
 			if (name.equals("LeftView")) {

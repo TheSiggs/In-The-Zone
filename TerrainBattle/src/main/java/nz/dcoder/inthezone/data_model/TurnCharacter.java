@@ -63,6 +63,18 @@ public class TurnCharacter {
 		Set<Position> obstacles = new HashSet<Position>(battle.getObstacles());
 		obstacles.addAll(battle.terrain.getObstacles());
 
+		int width = battle.terrain.getWidth();
+		int height = battle.terrain.getHeight();
+
+		// ensure that the destination is valid
+		if (
+			destination.x >= width || destination.x < 0 ||
+			destination.y >= height || destination.y < 0 ||
+			obstacles.contains(destination)
+		) {
+			return null;
+		}
+
 		Position startPos;
 		if (soFar != null && soFar.size() > 0) {
 			startPos = soFar.get(soFar.size() - 1);
@@ -71,19 +83,21 @@ public class TurnCharacter {
 		}
 
 		Node<Position> start = new AStarPositionNode(null,
-			obstacles,
-			battle.terrain.getWidth(),
-			battle.terrain.getHeight(),
-			startPos,
-			destination);
+			obstacles, width, height, startPos, destination);
 
 		AStarSearch search = new AStarSearch(start);
 		List<Node<Position>> npath = search.search();
 		List<Position> path = npath.stream()
 			.map(n -> n.getPosition()).collect(Collectors.toList());
 
-		if (npath.size() + soFar.size() > mp) {
+		int totalLength = npath.size();
+		if (soFar != null) totalLength += soFar.size();
+
+		if (totalLength > mp) {
 			return null;
+		} else if (soFar == null) {
+			return npath.stream().map(n -> n.getPosition())
+				.collect(Collectors.toList());
 		} else {
 			return Stream.concat(
 				soFar.stream(),

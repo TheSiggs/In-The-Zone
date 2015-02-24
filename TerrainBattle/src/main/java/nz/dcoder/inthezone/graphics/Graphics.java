@@ -173,6 +173,34 @@ public class Graphics {
 		return cg;
 	}
 
+	/**
+	 * Get the grid position at the mouse cursor
+	 * */
+	public Position getBoardByMouse(Vector2f cursor) {
+		CollisionResults rs = getMouseCollision(cursor);
+
+		for (CollisionResult r : rs) {
+				Spatial spatial = r.getGeometry();
+
+				Node parent = null;
+				Object okind = spatial.getUserData("kind");
+				while (
+					(okind == null || !okind.equals("board")) &&
+					(parent = spatial.getParent()) != null
+				) {
+					spatial = parent;
+					okind = spatial.getUserData("kind");
+				}
+
+				Object op = spatial.getUserData("p");
+				if (op != null) {
+					return ((SaveablePosition) op).getPosition();
+				}
+		}
+
+		return null;
+	}
+
 	private CollisionResults getMouseCollision(Vector2f cursor) {
 		Vector3f click3d = cam.getWorldCoordinates(
 				new Vector2f(cursor.x, cursor.y), 0f).clone();
@@ -184,6 +212,5 @@ public class Graphics {
 		boardNode.collideWith(ray, results);
 		return results;
 	}
-
 }
 

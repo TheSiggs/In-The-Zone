@@ -20,6 +20,10 @@ public class Position {
 		return new Position(x + p.x, y + p.y);
 	}
 
+	public Position sub(Position p) {
+		return new Position(x - p.x, y - p.y);
+	}
+
 	@Override public boolean equals(Object obj) {
 		if (obj instanceof Position) {
 			Position p = (Position) obj;

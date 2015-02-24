@@ -10,6 +10,7 @@ import java.util.List;
 
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
+import nz.dcoder.inthezone.data_model.DoMoveInfo;
 import nz.dcoder.inthezone.data_model.factories.AbilityFactory;
 import nz.dcoder.inthezone.data_model.factories.BattleObjectFactory;
 import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
@@ -59,8 +60,8 @@ public final class Presentation {
 		List<Character> pcs = new ArrayList<Character>();
 		List<Character> npcs = new ArrayList<Character>();
 
-		Position headingN = new Position(0, 1);
-		Position headingS = new Position(0, -1);
+		Position headingN = new Position(0, -1);
+		Position headingS = new Position(0, 1);
 
 		for (int x = 0; x < 5; ++x) {
 			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png", headingN));
@@ -83,6 +84,7 @@ public final class Presentation {
 
 		Character r = characterFactory.newCharacter(
 			new CharacterName("goblin"), 1);
+		r.position = p;
 
 		if (r == null) {
 			throw new RuntimeException("Could not create goblin character");
@@ -108,10 +110,32 @@ public final class Presentation {
 	void initBattleController() {
 		BattleController controller = game.getBattleController();
 		controller.onPlayerTurnStart = this::playerTurnStart;
+		controller.onMove = this::move;
 	}
 
 	private void playerTurnStart(Turn turn) {
-		System.out.println("Player turn starts");
+		input.setTurn(turn);
+	}
+
+	private boolean isCharacterMoving = false;
+	private List<Position> path = null;
+	private float moveTileProgress = 0f;
+
+	private void move(DoMoveInfo move) {
+		// make sure the path starts with the start position
+		// TODO: this should be fixed elsewhere
+		if (move.path.size() == 0 || !move.path.get(0).equals(move.start)) {
+			move.path.add(0, move.start);
+		}
+
+		if (move.path.size() >= 2) {
+			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
+
+			input.startCharacterWalking(cg);
+			cg.walk(move.path, input::stopCharacterWalking);
+		} else {
+			System.out.println("Short path (length less than 2).  This shouldn't happen");
+		}
 	}
 }
 

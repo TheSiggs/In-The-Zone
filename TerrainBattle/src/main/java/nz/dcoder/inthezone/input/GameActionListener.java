@@ -10,7 +10,9 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
-import com.jme3.math.Vector3f;
+
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
+import nz.dcoder.inthezone.graphics.Graphics;
 
 /**
  *
@@ -18,9 +20,11 @@ import com.jme3.math.Vector3f;
  */
 public class GameActionListener implements ActionListener {
 	private final InputManager inputManager;
+	private final Graphics graphics;
 
-	public GameActionListener(InputManager inputManager) {
+	public GameActionListener(InputManager inputManager, Graphics graphics) {
 		this.inputManager = inputManager;
+		this.graphics = graphics;
 
 		inputManager.addMapping("ForwardsMove", new KeyTrigger(KeyInput.KEY_UP));
 		inputManager.addMapping("RightMove", new KeyTrigger(KeyInput.KEY_RIGHT));
@@ -30,7 +34,7 @@ public class GameActionListener implements ActionListener {
 		inputManager.addMapping("RightView", new KeyTrigger(KeyInput.KEY_E));
 		inputManager.addMapping("CharacterSelect",
 				new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		inputManager.addMapping("Attack",
+		inputManager.addMapping("Move",
 				new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
 		inputManager.addListener(this,
@@ -52,6 +56,11 @@ public class GameActionListener implements ActionListener {
 	 * */
 	public Rotating getViewRotating() {
 		return viewRotating;
+	}
+
+	private CharacterGraphics selectedCharacter;
+	public CharacterGraphics getSelectedCharacter() {
+		return selectedCharacter;
 	}
 
 	/**
@@ -83,8 +92,18 @@ public class GameActionListener implements ActionListener {
 			if (name.equals("LeftMove")) {
 			}
 			if (name.equals("CharacterSelect")) { // left mouse
+				selectedCharacter = graphics.getCharacterByMouse(
+					inputManager.getCursorPosition());
+
+				// TODO: notify GUI
+				if (selectedCharacter == null) {
+					System.out.println("Deselected character");
+				} else {
+					System.out.println("Selected character at " +
+						selectedCharacter.getPosition().toString());
+				}
 			}
-			if (name.equals("Attack")) { // right mouse
+			if (name.equals("Move")) { // right mouse
 			}
 		} else {
 			if (name.equals("LeftView")) {
@@ -97,5 +116,6 @@ public class GameActionListener implements ActionListener {
 			}
 		}
 	}
+
 }
 

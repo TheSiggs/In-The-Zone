@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package nz.dcoder.inthezone.graphics;
 
 import com.jme3.animation.AnimChannel;
@@ -37,7 +33,9 @@ public class CharacterGraphics implements AnimEventListener {
 
 	public CharacterGraphics(Spatial spatial, Position p) {
 		this.spatial = spatial;
+
 		spatial.setUserData("p", new SaveablePosition(p));
+		spatial.setUserData("kind", "character");
 
 		this.setPosition(p);
 		this.spatial.setLocalRotation(upright);

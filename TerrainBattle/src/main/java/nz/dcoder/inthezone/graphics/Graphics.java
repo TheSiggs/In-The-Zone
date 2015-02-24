@@ -6,10 +6,14 @@ import nz.dcoder.inthezone.data_model.Terrain;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.FileLocator;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
@@ -17,6 +21,17 @@ import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Manages all scene graph transformations.  Other classes should not
+ * manipulate the scene graph directly, but should instead call methods in this
+ * class.
+ *
+ * Note:
+ *   Two pieces of user data will be added to every Spatial in the scene graph:
+ *     kind = "character" for character nodes, "board" for board tiles
+ *     p = A SaveablePosition object that contains the position of the spatial
+ *     in grid co-ordinates
+ * */
 public class Graphics {
 	public static final float scale = 0.8f;
 	public static final float rotationSpeed = 1.5f;
@@ -117,5 +132,58 @@ public class Graphics {
 			.filter(c -> c.getPosition().equals(p))
 			.findFirst().orElse(null);
 	}
+
+	/**
+	 * Get the character under the mouse cursor
+	 * */
+	public CharacterGraphics getCharacterByMouse(Vector2f cursor) {
+		CollisionResults rs = getMouseCollision(cursor);
+
+		CharacterGraphics cg = null;
+		float closestDistance = Float.MAX_VALUE;
+
+		for (CollisionResult r : rs) {
+			float thisDistance = r.getDistance();
+
+			if (thisDistance < closestDistance) {
+				Spatial spatial = r.getGeometry();
+
+				// The collision detection only gives us leaf nodes, but for character
+				// models we need the internal Node that represents the entire
+				// character.  This while loop finds the required internal node by
+				// walking up the tree until it finds something with a Position object.
+				Node parent = null;
+				Object op = spatial.getUserData("p");
+				while (op == null && (parent = spatial.getParent()) != null) {
+					spatial = parent;
+					op = spatial.getUserData("p");
+				}
+				
+				if (op != null) {
+					Position p = ((SaveablePosition) op).getPosition();
+					CharacterGraphics cg1 = getCharacterByPosition(p);
+					if (cg1 != null) {
+						cg = cg1;
+						closestDistance = thisDistance;
+					}
+				}
+			}
+		}
+
+		return cg;
+	}
+
+	private CollisionResults getMouseCollision(Vector2f cursor) {
+		Vector3f click3d = cam.getWorldCoordinates(
+				new Vector2f(cursor.x, cursor.y), 0f).clone();
+		Vector3f dir = cam.getWorldCoordinates(
+				new Vector2f(cursor.x, cursor.y), 1f).subtractLocal(click3d).normalizeLocal();
+		Ray ray = new Ray(click3d, dir);
+
+		CollisionResults results = new CollisionResults();
+		boardNode.collideWith(ray, results);
+		return results;
+	}
+
 }
 

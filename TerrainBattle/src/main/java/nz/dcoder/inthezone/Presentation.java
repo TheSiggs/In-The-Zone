@@ -42,7 +42,7 @@ public final class Presentation {
 		this.game = game;
 		this.gameState = game.getGameState();
 		this.graphics = new Graphics(game, gameState.terrain);
-		this.input = new GameActionListener(game.getInputManager());
+		this.input = new GameActionListener(game.getInputManager(), this.graphics);
 
 		abilityFactory = new AbilityFactory();
 		battleObjectFactory = new BattleObjectFactory(abilityFactory);

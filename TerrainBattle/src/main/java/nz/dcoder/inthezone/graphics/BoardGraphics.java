@@ -14,6 +14,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 
+import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Terrain;
 
 /**
@@ -37,33 +38,31 @@ public class BoardGraphics {
 		this.height = terrain.getHeight();
 		this.assetManager = assetManager;
 
-		float x, y, z;
-		z = 0;
 		for (int i = 0; i < width; ++i) {
 			for (int j = 0; j < height; ++j) {
-				x = i * Graphics.scale;
-				y = -j * Graphics.scale;
-				String name = i + "," + j;
-				addBox(name, new Vector3f(x, y, z),
-						colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
-						terrain.getBoardState(i, j));
+				addBox(new Position(i, j),
+					colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
+					terrain.getBoardState(i, j));
 			}
 		}
 	}
 
 	private void addBox(
-		String name,
-		Vector3f translation,
+		Position p,
 		ColorRGBA color,
 		int boardValue
 	) {
 		float offsetZ = boardValue * 0.5f;
 
+		float x = p.x * Graphics.scale;
+		float y = -p.y * Graphics.scale;
+		Vector3f translation = new Vector3f(x, y, 0);
+
 		Box b = new Box(
 			Graphics.scale / 2, Graphics.scale / 2,
 			0.1f * Graphics.scale + offsetZ);
 
-		Geometry geom = new Geometry(name, b);
+		Geometry geom = new Geometry("board", b);
 		Material mat =
 			new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 
@@ -79,6 +78,8 @@ public class BoardGraphics {
 		geom.setMaterial(mat);
 		geom.setLocalTranslation(translation);
 
+		geom.setUserData("kind", "board");
+		geom.setUserData("p", new SaveablePosition(p));
 		boardNode.attachChild(geom);
 	}
 

@@ -111,32 +111,38 @@ public class CharacterGraphics implements AnimEventListener {
 	) {
 		MotionPath mpath = new MotionPath();
 		List<Position> headings = new ArrayList<Position>();
+		// headings[i] = the heading to use when running to waypoint i
 
-		// compute the first heading
-		Position p0 = path.remove(0);
-
-		for (Position p : path) {
-			mpath.addWayPoint(positionToVector(p));
-			headings.add(p.sub(p0));
-			p0 = p;
+		Position p = path.get(0);
+		for (Position p1 : path) {
+			mpath.addWayPoint(positionToVector(p1));
+			headings.add(p1.sub(p));
+			p = p1;
 		}
 
-		setPositionInternal(p0);
+		// p now equals the final position
+		setPositionInternal(p);
 
 		MotionEvent motionControl = new MotionEvent(spatial, mpath);
 		motionControl.setDirectionType(MotionEvent.Direction.Rotation);
-		motionControl.setRotation(computeHeading(headings.get(0)));
 		motionControl.setInitialDuration(
 			((float) (path.size() - 1)) / Graphics.travelSpeed);
 
-		setAnimation("walk");
+		motionControl.setRotation(computeHeading(headings.get(1)));
+
+		setAnimation("run");
 
 		CharacterGraphics instance = this;
 		mpath.addListener(new MotionPathListener() {
+
+			/**
+			 * @param wayPointIndex The index of the waypoint reached
+			 * */
 			public void onWayPointReach(MotionEvent control, int wayPointIndex) {
 				if (mpath.getNbWayPoints() == wayPointIndex + 1) {
-					// HACK.  This shouldn't be necessary.  It might be a bug in JME to
-					// do with very low framerates.  We shall have to investigate
+					// HACK:  If the framerate is low, then JME may not properly complete
+					// the motion.  This statement ensures that the character always ends
+					// up at the correct location, no matter the framerate.
 					spatial.setLocalTranslation(
 						mpath.getWayPoint(mpath.getNbWayPoints() - 1));
 

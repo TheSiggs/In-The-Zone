@@ -122,12 +122,6 @@ public final class Presentation {
 	private float moveTileProgress = 0f;
 
 	private void move(DoMoveInfo move) {
-		// make sure the path starts with the start position
-		// TODO: this should be fixed elsewhere
-		if (move.path.size() == 0 || !move.path.get(0).equals(move.start)) {
-			move.path.add(0, move.start);
-		}
-
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
 

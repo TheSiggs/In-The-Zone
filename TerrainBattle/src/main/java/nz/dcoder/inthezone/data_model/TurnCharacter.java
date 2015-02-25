@@ -57,7 +57,7 @@ public class TurnCharacter {
 	 * @return null if there is no path for this character to the destination, or
 	 * if this character does not have enough MP to reach the destination.
 	 * Returns a new list every time, containing the complete path including the
-	 * contents of the "soFar" parameter.
+	 * start position and the contents of the "soFar" parameter.
 	 * */
 	public List<Position> getMove(List<Position> soFar, Position destination) {
 		Set<Position> obstacles = new HashSet<Position>(battle.getObstacles());
@@ -75,29 +75,28 @@ public class TurnCharacter {
 			return null;
 		}
 
+		if (soFar == null) {
+			soFar = new ArrayList<Position>();
+		}
+
 		Position startPos;
-		if (soFar != null && soFar.size() > 0) {
-			startPos = soFar.get(soFar.size() - 1);
+		if (soFar.size() > 0) {
+			int last = soFar.size() - 1;
+			startPos = soFar.remove(last);
 		} else {
 			startPos = character.position;
 		}
+
+		if (startPos.equals(destination)) return soFar;
 
 		Node<Position> start = new AStarPositionNode(null,
 			obstacles, width, height, startPos, destination);
 
 		AStarSearch search = new AStarSearch(start);
 		List<Node<Position>> npath = search.search();
-		List<Position> path = npath.stream()
-			.map(n -> n.getPosition()).collect(Collectors.toList());
 
-		int totalLength = npath.size();
-		if (soFar != null) totalLength += soFar.size();
-
-		if (totalLength > mp) {
+		if (npath.size() + soFar.size() > mp) {
 			return null;
-		} else if (soFar == null) {
-			return npath.stream().map(n -> n.getPosition())
-				.collect(Collectors.toList());
 		} else {
 			return Stream.concat(
 				soFar.stream(),
@@ -118,20 +117,22 @@ public class TurnCharacter {
 	public void doMotion(List<Position> path) {
 		battle.checkTurn(turnNumber);
 
-		if (path == null || path.size() > mp || path.size() < 1) {
-			// WARNING: we really should validate the path here, just to be sure
+		if (path == null) {
+			throw new RuntimeException("Path is null");
+		} else if (path.size() > mp || path.size() < 2) {
 			throw new RuntimeException("Invalid path " + path.toString());
 		}
 
 		List<Position> pathSoFar = new ArrayList<Position>();
 		while (path.size() > 0) {
-			Position p = path.get(0);
-			path.remove(0);
+			Position p = path.remove(0);
 			pathSoFar.add(p);
 
 			Collection<BattleObject> os = battle.getTriggeredObjects(p);
 			if (os.size() > 0) {
+				path.add(0, p);
 				doMotion0(pathSoFar);
+
 				for (BattleObject o : os) {
 					// trigger object abilities
 					Ability ability = o.ability.ability;

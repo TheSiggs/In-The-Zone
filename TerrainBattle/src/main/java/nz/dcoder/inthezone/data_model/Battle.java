@@ -88,11 +88,18 @@ class Battle {
 	 * i.e. blockPath objects. blockSpace objects are located by getOccupiedPositions
 	 *
 	 * must not return null
+	 *
+	 * @param isPlayer true if we are getting obstacles to the player's team.
+	 * false if we are getting obstacles to the ai Player's team.
 	 * */
-	public Collection<Position> getObstacles() {
+	public Collection<Position> getObstacles(boolean isPlayer) {
+		Collection<Character> characters;
+		if (isPlayer) characters = aiPlayers;
+		else characters = players;
+
 		return Stream.concat(
 			objects.stream().filter(o -> o.blocksPath).map(o -> o.position),
-			Stream.concat(players.stream(), aiPlayers.stream()).map(c -> c.position)
+			characters.stream().map(c -> c.position)
 		).collect(Collectors.toList());
 	}
 

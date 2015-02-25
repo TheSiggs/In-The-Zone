@@ -60,16 +60,17 @@ public class TurnCharacter {
 	 * start position and the contents of the "soFar" parameter.
 	 * */
 	public List<Position> getMove(List<Position> soFar, Position destination) {
-		Set<Position> obstacles = new HashSet<Position>(battle.getObstacles());
-		obstacles.addAll(battle.terrain.getObstacles());
-
 		int width = battle.terrain.getWidth();
 		int height = battle.terrain.getHeight();
+
+		Set<Position> obstacles =
+			new HashSet<Position>(battle.terrain.getObstacles());
 
 		// ensure that the destination is valid
 		if (
 			destination.x >= width || destination.x < 0 ||
 			destination.y >= height || destination.y < 0 ||
+			battle.getOccupiedPositions().contains(destination) ||
 			obstacles.contains(destination)
 		) {
 			return null;
@@ -88,6 +89,9 @@ public class TurnCharacter {
 		}
 
 		if (startPos.equals(destination)) return soFar;
+
+		// start of pathfinding code
+		obstacles.addAll(battle.getObstacles(battle.turn.isPlayerTurn));
 
 		Node<Position> start = new AStarPositionNode(null,
 			obstacles, width, height, startPos, destination);

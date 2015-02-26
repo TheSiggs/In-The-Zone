@@ -25,7 +25,9 @@ public class CharacterGraphics implements AnimEventListener {
 	private final Spatial spatial;
 	private final AnimChannel channel;
 	private final AnimControl control;
-	private static final Quaternion upright = new Quaternion();
+	private final CharacterWalkControl walkControl;
+
+	public static final Quaternion upright = new Quaternion();
 
 	// compute the upright quaternion
 	static {
@@ -37,7 +39,7 @@ public class CharacterGraphics implements AnimEventListener {
 
 	private Position p;
 
-	public CharacterGraphics(Spatial spatial, Position p) {
+	public CharacterGraphics(Graphics graphics, Spatial spatial, Position p) {
 		this.spatial = spatial;
 
 		spatial.setUserData("p", new SaveablePosition(p));
@@ -50,13 +52,17 @@ public class CharacterGraphics implements AnimEventListener {
 		control.addListener(this);
 		channel = control.createChannel();
 		setAnimation("idleA");
+
+		walkControl = new CharacterWalkControl(graphics, this);
+		walkControl.setSpatial(spatial);
+		spatial.addControl(walkControl);
 	}
 
 	public Position getPosition() {
 		return p;
 	}
 
-	private void setPositionInternal(Position p) {
+	void setPositionInternal(Position p) {
 		this.p = p;
 		((SaveablePosition) this.spatial.getUserData("p")).setPosition(p);
 	}
@@ -64,15 +70,8 @@ public class CharacterGraphics implements AnimEventListener {
 	public void setPosition(Position p) {
 		setPositionInternal(p);
 
-		Vector3f translation = positionToVector(p);
+		Vector3f translation = Graphics.positionToVector(p);
 		spatial.setLocalTranslation(translation);
-	}
-
-	public static Vector3f positionToVector(Position p) {
-		float bx = ((float) p.x) * Graphics.scale;
-		float by = ((float) -p.y) * Graphics.scale;
-		float bz = 0.2f * Graphics.scale;
-		return new Vector3f(bx, by, bz);
 	}
 
 	/**
@@ -99,63 +98,8 @@ public class CharacterGraphics implements AnimEventListener {
 		return r;
 	}
 
-	/**
-	 * Walk along a set path
-	 * @param path A list of all the positions the character will walk across,
-	 * including the current position and the target position.
-	 * @param endNotify A method reference that will be invoked when the walk
-	 * action ends
-	 * */
-	public void walk(
-		List<Position> path, Consumer<CharacterGraphics> endNotify
-	) {
-		MotionPath mpath = new MotionPath();
-		List<Position> headings = new ArrayList<Position>();
-		// headings[i] = the heading to use when running to waypoint i
-
-		Position p = path.get(0);
-		for (Position p1 : path) {
-			mpath.addWayPoint(positionToVector(p1));
-			headings.add(p1.sub(p));
-			p = p1;
-		}
-
-		// p now equals the final position
-		setPositionInternal(p);
-
-		MotionEvent motionControl = new MotionEvent(spatial, mpath);
-		motionControl.setDirectionType(MotionEvent.Direction.Rotation);
-		motionControl.setInitialDuration(
-			((float) (path.size() - 1)) / Graphics.travelSpeed);
-
-		motionControl.setRotation(computeHeading(headings.get(1)));
-
-		setAnimation("run");
-
-		CharacterGraphics instance = this;
-		mpath.addListener(new MotionPathListener() {
-
-			/**
-			 * @param wayPointIndex The index of the waypoint reached
-			 * */
-			public void onWayPointReach(MotionEvent control, int wayPointIndex) {
-				if (mpath.getNbWayPoints() == wayPointIndex + 1) {
-					// HACK:  If the framerate is low, then JME may not properly complete
-					// the motion.  This statement ensures that the character always ends
-					// up at the correct location, no matter the framerate.
-					spatial.setLocalTranslation(
-						mpath.getWayPoint(mpath.getNbWayPoints() - 1));
-
-					setAnimation("idleA");
-					endNotify.accept(instance);
-				} else {
-					motionControl.setRotation(
-						computeHeading(headings.get(wayPointIndex + 1)));
-				}
-			}
-		});
-
-		motionControl.play();
+	public CharacterWalkControl getWalkControl() {
+		return walkControl;
 	}
 
 	/**

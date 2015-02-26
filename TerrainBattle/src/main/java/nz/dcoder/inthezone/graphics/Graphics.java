@@ -99,6 +99,13 @@ public class Graphics {
 		sceneNode.rotate(quat);
 	}
 
+	public static Vector3f positionToVector(Position p) {
+		float bx = ((float) p.x) * Graphics.scale;
+		float by = ((float) -p.y) * Graphics.scale;
+		float bz = 0.2f * Graphics.scale;
+		return new Vector3f(bx, by, bz);
+	}
+
 	/**
 	 * Later, we will make a new method "addCharacter" that can add any
 	 * character.  For now we just have this method that adds goblins.
@@ -118,7 +125,7 @@ public class Graphics {
 		// need to do this before constructing the CharacterGraphics object
 		boardNode.attachChild(spatial);
 
-		CharacterGraphics cg = new CharacterGraphics(spatial, p);
+		CharacterGraphics cg = new CharacterGraphics(this, spatial, p);
 		characters.add(cg);
 
 		return cg;

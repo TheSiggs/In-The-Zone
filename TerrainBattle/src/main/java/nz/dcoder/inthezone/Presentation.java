@@ -100,11 +100,6 @@ public final class Presentation {
 		} else if (viewRotating == Rotating.RIGHT) {
 			graphics.rotateView(-tpf * Graphics.rotationSpeed);
 		}
-
-		// handle input
-		// update HUD
-		// update geometry tree
-		// perform next animation step
 	}
 
 	void initBattleController() {
@@ -126,7 +121,8 @@ public final class Presentation {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
 
 			input.startCharacterWalking(cg);
-			cg.walk(move.path, input::stopCharacterWalking);
+			cg.getWalkControl().doWalk(move.path, input::stopCharacterWalking);
+
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");
 		}

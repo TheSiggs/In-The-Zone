@@ -139,6 +139,7 @@ task scene(type: JavaExec, dependsOn: classes) {
 
 task blender(type: JavaExec, dependsOn: classes) {
 	main blenderClass
+    args = ['scene.csv']
 	classpath sourceSets.main.runtimeClasspath 
 }
 

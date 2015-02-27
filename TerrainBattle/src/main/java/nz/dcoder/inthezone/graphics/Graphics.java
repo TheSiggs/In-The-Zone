@@ -1,5 +1,7 @@
 package nz.dcoder.inthezone.graphics;
 
+import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
+import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Terrain;
 
@@ -45,6 +47,9 @@ public class Graphics {
 
 	private final Collection<CharacterGraphics> characters =
 		new ArrayList<CharacterGraphics>();
+	
+	private final Collection<ObjectGraphics> objects =
+		new ArrayList<ObjectGraphics>();
 
 	public Graphics(SimpleApplication app, Terrain terrain) {
 		this.rootNode = app.getRootNode();
@@ -107,8 +112,7 @@ public class Graphics {
 	}
 
 	/**
-	 * Later, we will make a new method "addCharacter" that can add any
-	 * character.  For now we just have this method that adds goblins.
+	 * Add a goblin character.  For testing purposes only.
 	 * */
 	public CharacterGraphics addGoblin(Position p, String texture) {
 		Spatial spatial = assetManager.loadModel(
@@ -132,11 +136,64 @@ public class Graphics {
 	}
 
 	/**
-	 * Get the character at a given position
+	 * Add a character to the board.  This method loads the appropriate assets,
+	 * creates a CharacterGraphics object, and registers everything
+	 * appropriately.  See addGoblin for an example.
+	 * */
+	public CharacterGraphics addCharacter(Position p, CharacterName name) {
+		// TODO: implement this method
+		return null;
+	}
+
+	/**
+	 * Add an object to the board, such as a body, a boulder, or a trip mine.
+	 * */
+	public ObjectGraphics addObject(Position p, BattleObjectName name) {
+		// TODO: implement this method
+		return null;
+	}
+
+	/**
+	 * Kill a character.  Removes the character from the field and replaces it
+	 * with a body.  Also invokes the death animation (so characters go out with
+	 * a bang).
+	 * */
+	public ObjectGraphics killCharacter(
+		CharacterGraphics cg, BattleObjectName body
+	) {
+		Position p = cg.getPosition();
+		boardNode.detachChild(cg.getSpatial());
+		characters.remove(cg);
+		ObjectGraphics r = addObject(p, body);
+		r.setAnimation("die");
+		return r;
+	}
+
+	/**
+	 * Remove an object from the battle (in dramatic fashion).
+	 * */
+	public void destroyObject(ObjectGraphics og) {
+		objects.remove(og);
+		og.setAnimation("destroy");
+	}
+
+	/**
+	 * Get the character at a given position.
+	 * @return null if there is no character at this position
 	 * */
 	public CharacterGraphics getCharacterByPosition(Position p) {
 		return characters.stream()
 			.filter(c -> c.getPosition().equals(p))
+			.findFirst().orElse(null);
+	}
+
+	/**
+	 * Get the object at a given position.
+	 * @return null if there is no object at this position
+	 * */
+	public ObjectGraphics getObjectByPosition(Position p) {
+		return objects.stream()
+			.filter(o -> o.getPosition().equals(p))
 			.findFirst().orElse(null);
 	}
 

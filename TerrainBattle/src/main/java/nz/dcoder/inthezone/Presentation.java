@@ -10,7 +10,11 @@ import java.util.List;
 
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
+import nz.dcoder.inthezone.data_model.DoAbilityInfo;
+import nz.dcoder.inthezone.data_model.DoBattleEnd;
+import nz.dcoder.inthezone.data_model.DoCharacterDeath;
 import nz.dcoder.inthezone.data_model.DoMoveInfo;
+import nz.dcoder.inthezone.data_model.DoObjectDestruction;
 import nz.dcoder.inthezone.data_model.factories.AbilityFactory;
 import nz.dcoder.inthezone.data_model.factories.BattleObjectFactory;
 import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
@@ -93,6 +97,10 @@ public final class Presentation {
 		return r;
 	}
 
+	/**
+	 * Main update loop for the game.  Try to avoid putting things in here, use
+	 * controllers instead.
+	 * */
 	void simpleUpdate(float tpf) {
 		Rotating viewRotating = input.getViewRotating();
 		if (viewRotating == Rotating.LEFT) {
@@ -105,17 +113,34 @@ public final class Presentation {
 	void initBattleController() {
 		BattleController controller = game.getBattleController();
 		controller.onPlayerTurnStart = this::playerTurnStart;
+		controller.onBattleEnd = this::endBattle;
 		controller.onMove = this::move;
+		controller.onAbility = this::ability;
+		controller.onDeath = this::death;
+		controller.onDestruction = this::destruction;
 	}
 
+	/**
+	 * Handle the start of the player's turn.
+	 * */
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
 	}
 
-	private boolean isCharacterMoving = false;
-	private List<Position> path = null;
-	private float moveTileProgress = 0f;
+	/**
+	 * Handle end conditions.
+	 * */
+	private void endBattle(DoBattleEnd end) {
+		if (end.playerWins) {
+			System.out.println("You win the battle!");
+		} else {
+			System.out.println("You lose, loser!");
+		}
+	}
 
+	/**
+	 * Handle a move event.
+	 * */
 	private void move(DoMoveInfo move) {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
@@ -126,6 +151,31 @@ public final class Presentation {
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");
 		}
+	}
+
+	/**
+	 * Handle ability effects
+	 * */
+	private void ability(DoAbilityInfo action) {
+		// TODO: this one needs some thought
+		System.err.println("Character at position " + action.agentPos.toString()
+			+ " uses " + action.ability.name.toString()
+			+ " targeting " + action.targets.toString());
+	}
+
+	/**
+	 * Handle a character death event
+	 * */
+	private void death(DoCharacterDeath d) {
+		CharacterGraphics cg = graphics.getCharacterByPosition(d.position);
+		graphics.killCharacter(cg, d.body);
+	}
+
+	/**
+	 * Handle the destruction of an object
+	 * */
+	private void destruction(DoObjectDestruction d) {
+		graphics.destroyObject(graphics.getObjectByPosition(d.position));
 	}
 }
 

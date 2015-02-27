@@ -126,8 +126,9 @@ class Battle {
 	}
 
 	public void kill(Character c) {
-		controller.callOnDeath(c);
-		objects.add(c.die());
+		BattleObject body = c.die();
+		objects.add(body);
+		controller.callOnDeath(body);
 	}
 
 	public void changeTurn() {

@@ -3,17 +3,10 @@ package nz.dcoder.inthezone.graphics;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
-import com.jme3.cinematic.events.MotionEvent;
-import com.jme3.cinematic.MotionPath;
-import com.jme3.cinematic.MotionPathListener;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import java.util.ArrayList;
-import java.util.function.Consumer;
-import java.util.List;
 
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -111,13 +104,6 @@ public class CharacterGraphics implements AnimEventListener {
 
 	@Override
 	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
-		/*
-		if (animName.equals("walk")) {
-			channel.setAnim("idleA", 0.50f);
-			channel.setLoopMode(LoopMode.DontLoop);
-			channel.setSpeed(1f);
-		}
-		*/
 	}
 
 	@Override
@@ -129,13 +115,5 @@ public class CharacterGraphics implements AnimEventListener {
 		channel.setAnim(name);
 	}
 
-	public void die() {
-		/*
-		Node parent = this.getSpatial().getParent();
-		if (parent != null) {
-			parent.detachChild(this.getSpatial());
-		}
-				*/
-	}
 }
 

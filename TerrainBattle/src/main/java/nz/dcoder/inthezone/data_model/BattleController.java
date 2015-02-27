@@ -37,9 +37,9 @@ public class BattleController {
 			new DoAbilityInfo(agentPos, targets, ability));
 	}
 
-	void callOnDeath(Character character) {
+	void callOnDeath(BattleObject body) {
 		if (onDeath != null) onDeath.accept(
-			new DoCharacterDeath(character.position));
+			new DoCharacterDeath(body.position, body.name));
 	}
 
 	void callOnDestruction(BattleObject object) {

@@ -53,7 +53,7 @@ public class CharacterWalkControl extends AbstractControl {
 			spline0.addControlPoint(Graphics.positionToVector(p));
 		}
 		spline0.setType(Spline.SplineType.CatmullRom);
-		spline0.setCurveTension(0.6f);
+		spline0.setCurveTension(0.2f);
 
 		spline = adjustSplineForCharacters(path, spline0);
 
@@ -85,13 +85,13 @@ public class CharacterWalkControl extends AbstractControl {
 				Vector3f tangent = p1.subtract(p0);
 				Vector3f norm = new Vector3f(
 					-tangent.getY(), tangent.getX(), tangent.getZ());
-				norm.normalizeLocal().multLocal(Graphics.scale);
+				norm.normalizeLocal().multLocal(Graphics.scale * 0.25f);
 
 				// adjust path to go around the other character
 				r.addControlPoint(controlPoints.get(i).add(norm));
 				norm.negateLocal();
 				// and make the other character jump out of the way
-				c.getSpatial().setLocalTranslation(norm);
+				c.getSpatial().move(norm);
 			}
 		}
 
@@ -111,7 +111,7 @@ public class CharacterWalkControl extends AbstractControl {
 	}
 
 	@Override protected void controlUpdate(float tpf) {
-		if (!this.isEnabled()) return;
+		if (!enabled) return;
 
 		t += tpf * Graphics.travelSpeed;
 		while (t > 1) {
@@ -154,8 +154,13 @@ public class CharacterWalkControl extends AbstractControl {
 			// rotate the character
 			Quaternion r = CharacterGraphics.upright.clone();
 			Quaternion facing = new Quaternion();
-			facing.fromAngleAxis(
-				tangent.angleBetween(Vector3f.UNIT_Z), Vector3f.UNIT_Y);
+			if (tangent.getX() > 0) {
+				facing.fromAngleAxis(
+					0 - Vector3f.UNIT_Y.angleBetween(tangent), Vector3f.UNIT_Y);
+			} else {
+				facing.fromAngleAxis(
+					Vector3f.UNIT_Y.angleBetween(tangent), Vector3f.UNIT_Y);
+			}
 			r.multLocal(facing);
 			spatial.setLocalRotation(r);
 		}

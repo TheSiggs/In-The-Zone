@@ -26,9 +26,10 @@ public class GameActionListener implements ActionListener {
 	private final UserInterface ui;
 
 	/**
-	 * Any method that reads or writes this field must be synchronized
+	 * Any method that reads or writes these fields must be synchronized
 	 * */
 	private InputMode leftButtonMode = InputMode.SELECT;
+	private Turn turn = null;
 
 	public GameActionListener(
 		InputManager inputManager, Graphics graphics, UserInterface ui
@@ -85,7 +86,6 @@ public class GameActionListener implements ActionListener {
 		return viewRotating;
 	}
 
-	private Turn turn = null;
 	private TurnCharacter selectedTurnCharacter;
 	private CharacterGraphics selectedCharacter;
 
@@ -93,15 +93,26 @@ public class GameActionListener implements ActionListener {
 		return selectedCharacter;
 	}
 
-	public void setTurn(Turn turn) {
+	/**
+	 * Set the current turn object.
+	 * */
+	public synchronized void setTurn(Turn turn) {
 		this.turn = turn;
 	}
 
 	/**
 	 * Set the kind of action that will be carried out by the left mouse button.
+	 * To be called by the GUI.
 	 * */
 	public synchronized void setLeftButtonMode(InputMode mode) {
 		leftButtonMode = mode;
+	}
+
+	/**
+	 * End the current turn.  To be called by the GUI.
+	 * */
+	public synchronized void endTurn() {
+		turn.endTurn();
 	}
 
 	/**
@@ -213,7 +224,7 @@ public class GameActionListener implements ActionListener {
 		}
 	}
 
-	private void selectCharacter(CharacterGraphics cg) {
+	private synchronized void selectCharacter(CharacterGraphics cg) {
 		selectedCharacter = cg;
 		if (cg == null) {
 			selectedTurnCharacter = null;

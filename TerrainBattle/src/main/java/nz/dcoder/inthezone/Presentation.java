@@ -67,7 +67,7 @@ public final class Presentation {
 		Position headingS = new Position(0, 1);
 
 		for (int x = 0; x < 5; ++x) {
-			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png", headingN));
+			pcs.add(initGoblin(new Position(x * 2, 9), x + 1, headingN));
 		}
 
 		Collection<CharacterName> npcNames = new ArrayList<>();
@@ -75,8 +75,7 @@ public final class Presentation {
 		Collection<Integer> npcLevels = new ArrayList<>();
 
 		for (int x = 0; x < 5; ++x) {
-			Character npc = initGoblin(
-				new Position(x * 2, 0), "green/D.png", headingS);
+			Character npc = initGoblin(new Position(x * 2, 0), x + 6, headingS);
 			npcs.add(npc);
 			npcNames.add(npc.name);
 			npcHPs.add(new Points(npc.getMaxHP(), npc.hp));
@@ -92,17 +91,19 @@ public final class Presentation {
 	 * When we get more sophisticated, we will add another method to init actual
 	 * players rather than just goblins.
 	 * */
-	Character initGoblin(Position p, String texture, Position dp) {
-		CharacterGraphics cg = graphics.addGoblin(p, texture);
+	Character initGoblin(Position p, int i, Position dp) {
+		CharacterGraphics cg = graphics.addGoblin(p, i);
 		cg.setHeading(dp);
 
-		Character r = characterFactory.newCharacter(
-			new CharacterName("goblin"), 1);
-		r.position = p;
+		CharacterName name = new CharacterName("goblin " + i);
+		Character r = characterFactory.newCharacter(name, 1);
 
 		if (r == null) {
-			throw new RuntimeException("Could not create goblin character");
+			throw new RuntimeException(
+				"Could not create character " + name.toString());
 		}
+
+		r.position = p;
 
 		return r;
 	}

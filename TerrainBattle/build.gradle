@@ -3,6 +3,19 @@ apply plugin: 'application'
 apply plugin: 'idea'
 //apply from: "src/main/resources/project.properties"
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        //classpath group: 'commons-codec', name: 'commons-codec', version: '1.2'
+        //classpath 'com.badlogicgames.packr:packr:1.2'
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+    }
+}
+
+apply plugin: 'eu.appsatori.fatjar'
+
 def mainClass = 'nz.dcoder.inthezone.Main'
 def oldMainClass = 'nz.dcoder.inthezone.OldMain'
 def sceneClass = 'nz.dcoder.inthezone.MyScene'
@@ -73,6 +86,7 @@ sourceSets {
 def jmeGroup = 'net.sf.sociaal'
 def jmeVersion = '3.0.0.20130526'
 dependencies {
+
 	// You can read more about how to add dependency here:
 	//   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 	testCompile group: 'junit', name: 'junit', version: '4.10'
@@ -94,6 +108,7 @@ dependencies {
 	//compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
 	compile "com.jme3x:jfx:1.+"
         //compile "org.apache.commons:commons-csv:1.0"
+    compile 'com.badlogicgames.packr:packr:1.2'
 }
 
 //applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
@@ -102,8 +117,26 @@ startScripts {
 	classpath  = files('lib/terrain-battle-0.0.1.jar')
 }
 jar {
+    enabled = true
+    baseName = "terrain-battle"
+    version = '0.0.1'
+    manifest {
+        def manifestCp = configurations.runtime.files.collect  {
+            File file = it
+            "${file.name}"
+        }.join(' ')
+        attributes 'Class-Path': manifestCp
+        attributes 'Main-Class': mainClass
+    }
+    from fileTree('src/main/resources').include('**/*.fxml')
+    from fileTree('src/main/java').include('**/*.fxml')
+    from fileTree('src/main/data').include('**/*.csv')
+    from fileTree('src/main/data').include('**/*.txt')
+    //from fileTree('src/main/java').include('**/*.class')
+}
+fatJar {
 	enabled = true
-	baseName = "terrain-battle"
+	baseName = "fat-jar"
 	version = '0.0.1'
 	manifest {
 		def manifestCp = configurations.runtime.files.collect  {
@@ -148,10 +181,69 @@ task oldMain(type: JavaExec, dependsOn: classes) {
 	classpath sourceSets.main.runtimeClasspath 
 }
 
+task createStartScript {
+    doLast {
+        def f = new File('zans-story')
+        f.text = '''#!/bin/sh
+./bin/zans-story'''
+        def batch = new File('zans-story.bat')
+        batch.text = '''bin/zans-story.bat'''
+    }
+}
+task createBlenderScripts {
+    doLast {
+        def f = new File('scene-loader')
+        f.text = '''#!/bin/sh
+./bin/scene-loader'''
+        def batch = new File('scene-loader.bat')
+        batch.text = '''bin/scene-loader.bat'''
+    }
+}
 distZip {
+    dependsOn createStartScript
 	into(project.name) {
 		from '.'
-		include 'assets/**', '*.dylib', '*.so'
+		include 'assets/**', '*.dylib', '*.so', '*.map'
 	}
+    into(project.name) {
+        from('.') {
+            include 'zans-story', 'zans-story.bat'
+            fileMode = 0755
+        }
+    }
 }
 
+task distBlender(type: Zip) {
+    dependsOn createBlenderScripts, jar, build, distZip
+    def name = 'show-scene'
+    //main blenderClass
+    baseName name
+    into("$name/lib") {
+        from "$buildDir/libs"
+        include '**'
+    }
+    into(name) {
+        from '.'
+        include 'libs/**'
+    }
+    into("${name}/bin") {
+        from "${buildDir}/scripts"
+        include '**'
+    }
+    into(name) {
+        from '.'
+        include 'assets/**', '*.dylib', '*.so', '*.map'
+    }
+    into(name) {
+        from('.') {
+            include 'scene-loader', 'scene-loader.bat'
+            fileMode = 0755
+        }
+    }
+}
+
+task packageApp(type: Exec) {
+    dependsOn fatJar
+    commandLine 'java', '-jar', 'tools/packr.jar'
+    args 'packr-linux.json'
+}

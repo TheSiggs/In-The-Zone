@@ -9,3 +9,6 @@ zans-story.iml
 **.lock
 #.gradle/2.1/taskArtifacts/cache.properties
 #.gradle/**.properties
+gitignore/
+*.ipr
+*.iws

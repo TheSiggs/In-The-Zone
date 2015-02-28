@@ -1,0 +1,1 @@
+bin/zans-story.bat

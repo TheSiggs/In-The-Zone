@@ -12,10 +12,11 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  *
@@ -41,23 +42,7 @@ public class BlenderRender extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		assetManager.registerLocator("assets", FileLocator.class);
-		//assetManager.registerLocator("assets/town.zip", ZipLocator.class);
 		viewPort.setBackgroundColor(ColorRGBA.DarkGray);
-
-		//load model with packed images
-		//Spatial ogre = assetManager.loadModel("Blender/2.4x/Sinbad.blend");
-		//rootNode.attachChild(ogre);
-
-		//load model with referenced images
-		//Spatial track = assetManager.loadModel("Scenes/zan-house.blend");
-		//Spatial track = assetManager.loadModel("Models/black-canary/black canary hero185.blend");
-        //Spatial track = assetManager.loadModel("Models/clock/clock.blend");
-        /*
-        Spatial track = assetManager.loadModel("Models/basement/Basement_02.blend");
-        Spatial player = assetManager.loadModel("Models/zan/zan_texturing.blend");
-		rootNode.attachChild(track);
-        rootNode.attachChild(player);
-        */
         try {
             loadCsv(csvName);
         } catch (IOException e) {

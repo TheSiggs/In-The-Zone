@@ -8,11 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.dcoder.ai.astar.AStarSearch;
-import nz.dcoder.ai.astar.BoardNode;
 import nz.dcoder.ai.astar.Node;
-import nz.dcoder.ai.astar.Tile;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -284,12 +283,19 @@ public class TurnCharacter {
 		return character.position;
 	}
 
-	public int getHP() {
-		return character.hp;
+	public int getLevel() {
+		return character.getLevel();
 	}
 
-	public int getMaxHP() {
-		return character.getMaxHP();
+	public Points getHP() {
+		return new Points(character.getMaxHP(), character.hp);
+	}
+
+	public Points getAP() {
+		return new Points(maxAP, ap);
+	}
+	public Points getMP() {
+		return new Points(maxMP, mp);
 	}
 
 	public Collection<Equipment> getVisibleEquipment() {

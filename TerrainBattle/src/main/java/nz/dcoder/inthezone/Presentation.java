@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nz.dcoder.inthezone;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import nz.dcoder.inthezone.data_model.BattleController;
@@ -21,8 +17,10 @@ import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
 import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
+import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.input.GameActionListener;
@@ -37,6 +35,7 @@ public final class Presentation {
 	final GameActionListener input;
 	final GameState gameState;
 	final Graphics graphics;
+	final UserInterface ui;
 	final Main game;
 
 	final AbilityFactory abilityFactory;
@@ -47,7 +46,9 @@ public final class Presentation {
 		this.game = game;
 		this.gameState = game.getGameState();
 		this.graphics = new Graphics(game, gameState.terrain);
-		this.input = new GameActionListener(game.getInputManager(), this.graphics);
+		this.ui = game.getUserInterface();
+		this.input =
+			new GameActionListener(game.getInputManager(), this.graphics, this.ui);
 
 		abilityFactory = new AbilityFactory();
 		battleObjectFactory = new BattleObjectFactory(abilityFactory);
@@ -71,9 +72,20 @@ public final class Presentation {
 			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png", headingN));
 		}
 
+		Collection<CharacterName> npcNames = new ArrayList<>();
+		Collection<Points> npcHPs = new ArrayList<>();
+		Collection<Integer> npcLevels = new ArrayList<>();
+
 		for (int x = 0; x < 5; ++x) {
-			npcs.add(initGoblin(new Position(x * 2, 0), "green/D.png", headingS));
+			Character npc = initGoblin(
+				new Position(x * 2, 0), "green/D.png", headingS);
+			npcs.add(npc);
+			npcNames.add(npc.name);
+			npcHPs.add(new Points(npc.getMaxHP(), npc.hp));
+			npcLevels.add(npc.getLevel());
 		}
+
+		ui.battleStart(npcNames, npcHPs, npcLevels);
 
 		gameState.makeBattle(pcs, npcs, game.getBattleController());
 	}
@@ -125,6 +137,27 @@ public final class Presentation {
 	 * */
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
+
+		Collection<CharacterName> playerCharacters = new ArrayList<>();
+		Collection<Integer> playerLevels = new ArrayList<>();
+		Collection<Points> playerMPs = new ArrayList<>();
+		Collection<Points> playerAPs = new ArrayList<>();
+		Collection<Points> playerHPs = new ArrayList<>();
+		Collection<TurnCharacter> tcs = turn.getCharacters();
+		for (TurnCharacter tc : tcs) {
+			playerCharacters.add(tc.getName());
+			playerLevels.add(tc.getLevel());
+			playerMPs.add(tc.getMP());
+			playerAPs.add(tc.getAP());
+			playerHPs.add(tc.getHP());
+		}
+
+		ui.turnStart(
+			playerCharacters,
+			playerLevels,
+			playerMPs,
+			playerAPs,
+			playerHPs);
 	}
 
 	/**

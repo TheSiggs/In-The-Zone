@@ -16,9 +16,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import nz.dcoder.inthezone.data_model.AbilityInfo;
+import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.jfx.MainHUDController;
 import nz.dcoder.inthezone.Main;
 
@@ -33,6 +37,50 @@ public class UserInterface {
 		JmeFxScreenContainer jmeFx = JmeFxContainer.install(game, guiNode, true, null);
 		Platform.runLater(new LaunchJavaFxGUI(jmeFx, game));
 		guiNode.attachChild(jmeFx.getJmeNode());
+	}
+
+	public void battleStart(
+		Collection<CharacterName> npcs,
+		Collection<Points> npcHPs,
+		Collection<Integer> npcLevels
+	) {
+		// TODO: pass this on to the GUI
+	}
+
+	public void turnStart(
+		Collection<CharacterName> playerCharacters,
+		Collection<Integer> playerLevels,
+		Collection<Points> playerMPs,
+		Collection<Points> playerAPs,
+		Collection<Points> playerHPs
+	) {
+		// TODO: pass this on to the GUI
+	}
+
+	public void selectCharacter(
+		CharacterName name,
+		Points mp,
+		Points ap,
+		Points hp,
+		Collection<AbilityInfo> abilities
+	) {
+		// TODO: pass this on to the GUI
+	}
+
+	public void deselectCharacter() {
+		// TODO: pass this on to the GUI
+	}
+
+	public void updateMP(CharacterName name, Points mp) {
+		// TODO: pass this on to the GUI
+	}
+
+	public void updateAP(CharacterName name, Points ap) {
+		// TODO: pass this on to the GUI
+	}
+	
+	public void updateHP(CharacterName name, Points hp) {
+		// TODO: pass this on to the GUI
 	}
 }
 

@@ -1,0 +1,36 @@
+<!-- Bold elements are required -->
+<!-- %VAR% expands environment/special variables and registry keys -->
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile>build/windows/zans-story.exe</outfile>
+  <jar>build/libs/fat-jar-0.0.1.jar</jar>
+  <dontWrapJar>false</dontWrapJar>
+  <errTitle>text</errTitle>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>url</supportUrl>
+  <cmdLine>text</cmdLine>
+  <chdir></chdir>
+  <priority>high</priority>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <icon></icon>
+  <classPath>
+    <mainClass>nz.dcoder.inthezone.Main</mainClass>
+  </classPath>
+  <singleInstance>
+    <mutexName>text</mutexName>
+    <windowTitle>text</windowTitle>
+  </singleInstance> 
+  <jre>
+    <!-- Specify one of the following or both -->
+    <path>D:\jdk-8\jre</path>
+    <bundledJre64Bit>true</bundledJre64Bit>
+    <bundledJreAsFallback>true</bundledJreAsFallback>
+    <!--
+    <minVersion>x.x.x[_xx]</minVersion>
+    <maxVersion>x.x.x[_xx]</maxVersion>
+    -->
+    <jdkPreference>jreOnly</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+</launch4jConfig>

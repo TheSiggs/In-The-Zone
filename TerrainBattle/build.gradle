@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
 //apply from: "src/main/resources/project.properties"
+apply plugin: 'launch4j'
 
 buildscript {
     repositories {
@@ -11,6 +12,7 @@ buildscript {
         //classpath group: 'commons-codec', name: 'commons-codec', version: '1.2'
         //classpath 'com.badlogicgames.packr:packr:1.2'
         classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+        classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
     }
 }
 
@@ -246,4 +248,39 @@ task packageApp(type: Exec) {
     dependsOn fatJar
     commandLine 'java', '-jar', 'tools/packr.jar'
     args 'packr-linux.json'
+}
+task packageWindows(type: Exec) {
+    doLast {
+    }
+    commandLine 'echo', 'Hello', 'World'
+    args 'arg1'
+}
+
+launch4j {
+    //dependsOn fatJar
+    mainClassName = mainClass
+    jar = "$buildDir/libs/terrain-battle-0.0.1.jar"
+    //icon = 'icons/myApp.ico'
+}
+
+task buildExe(type: Exec) {
+    dependsOn fatJar
+    commandLine './Launch4j/launch4j'
+    args '../launch4j.xml'
+}
+
+task gatherWindowsFiles(type: Copy) {
+	dependsOn buildExe
+	from('.') {
+		include 'assets/**', 'board.map', 'scene.csv', 'scene.bat'
+	}
+	into "$buildDir/windows"
+}
+
+task zipWindows(type: Zip) {
+	dependsOn gatherWindowsFiles
+	baseName project.name
+	from("$buildDir/windows") {
+		include '**'
+	}
 }

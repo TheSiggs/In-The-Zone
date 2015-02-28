@@ -149,8 +149,12 @@ class Battle {
 				turnCharacters(isPlayerTurn, turnNumber),
 				this, turnNumber);
 
-			// notify the presentation layer if they player's turn has started
-			if (isPlayerTurn) controller.callOnPlayerTurnStart(turn);
+			// notify the presentation layer that a new turn has started
+			if (isPlayerTurn) {
+				controller.callOnPlayerTurnStart(turn);
+			} else {
+				controller.callOnAIPlayerTurnStart(turn);
+			}
 		}
 	}
 

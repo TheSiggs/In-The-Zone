@@ -12,9 +12,9 @@ import nz.dcoder.inthezone.data_model.pure.Position;
 class Battle {
 	public final BattleController controller;
 
-	private Collection<Character> players;
-	private Collection<Character> aiPlayers;
-	private Collection<BattleObject> objects;
+	Collection<Character> players;
+	Collection<Character> aiPlayers;
+	Collection<BattleObject> objects;
 
 	Terrain terrain;
 	Turn turn;

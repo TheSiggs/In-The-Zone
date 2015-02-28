@@ -3,6 +3,7 @@ package nz.dcoder.inthezone;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
@@ -70,20 +71,16 @@ public final class Presentation {
 			pcs.add(initGoblin(new Position(x * 2, 9), x + 1, headingN));
 		}
 
-		Collection<CharacterName> npcNames = new ArrayList<>();
-		Collection<Points> npcHPs = new ArrayList<>();
-		Collection<Integer> npcLevels = new ArrayList<>();
-
 		for (int x = 0; x < 5; ++x) {
-			Character npc = initGoblin(new Position(x * 2, 0), x + 6, headingS);
-			npcs.add(npc);
-			npcNames.add(npc.name);
-			npcHPs.add(new Points(npc.getMaxHP(), npc.hp));
-			npcLevels.add(npc.getLevel());
+			npcs.add(initGoblin(new Position(x * 2, 0), x + 6, headingS));
 		}
 
-		ui.battleStart(npcNames, npcHPs, npcLevels);
-
+		ui.battleStart(
+			pcs.stream().map(c -> c.getCharacterInfo())
+				.collect(Collectors.toList()),
+			npcs.stream().map(c -> c.getCharacterInfo())
+				.collect(Collectors.toList()));
+		
 		gameState.makeBattle(pcs, npcs, controller);
 	}
 
@@ -138,26 +135,11 @@ public final class Presentation {
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
 
-		Collection<CharacterName> playerCharacters = new ArrayList<>();
-		Collection<Integer> playerLevels = new ArrayList<>();
-		Collection<Points> playerMPs = new ArrayList<>();
-		Collection<Points> playerAPs = new ArrayList<>();
-		Collection<Points> playerHPs = new ArrayList<>();
-		Collection<TurnCharacter> tcs = turn.getCharacters();
-		for (TurnCharacter tc : tcs) {
-			playerCharacters.add(tc.getName());
-			playerLevels.add(tc.getLevel());
-			playerMPs.add(tc.getMP());
-			playerAPs.add(tc.getAP());
-			playerHPs.add(tc.getHP());
-		}
-
 		ui.turnStart(
-			playerCharacters,
-			playerLevels,
-			playerMPs,
-			playerAPs,
-			playerHPs);
+			turn.getCharacters().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
+			turn.getNPCs().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()));
 	}
 
 	/**

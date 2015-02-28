@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import nz.dcoder.inthezone.ai.AIPlayer;
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
 import nz.dcoder.inthezone.data_model.DoAbilityInfo;
@@ -75,7 +76,7 @@ public final class Presentation {
 			npcs.add(initGoblin(new Position(x * 2, 0), x + 6, headingS));
 		}
 
-		gameState.makeBattle(pcs, npcs, controller);
+		gameState.makeBattle(pcs, npcs, controller, new AIPlayer());
 	}
 
 	/**

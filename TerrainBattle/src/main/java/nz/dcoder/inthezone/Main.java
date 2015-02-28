@@ -25,7 +25,6 @@ public class Main extends SimpleApplication {
 	private GameState gameState = null;
 	private Presentation presentation = null;
 	private UserInterface userInterface = null;
-	private BattleController battleController = null;
 	private Graphics graphics = null;
 
 	public Main() {
@@ -49,13 +48,12 @@ public class Main extends SimpleApplication {
 		Party party = new Party();
 		Terrain terrain = new Terrain();
 		gameState = new GameState(party, terrain);
-		battleController = new BattleController();
 
 		graphics = new Graphics(this, gameState.terrain);
 		userInterface = new UserInterface(this, graphics);
 
 		try {
-			presentation = new Presentation(this, graphics);
+			presentation = new Presentation(gameState, graphics, userInterface);
 		} catch (DatabaseException e) {
 			System.err.println("Error reading data files: " + e.getMessage());
 			e.printStackTrace();
@@ -70,35 +68,7 @@ public class Main extends SimpleApplication {
 	 */
 	@Override
 	public void simpleUpdate(float tpf) {
-		getPresentation().simpleUpdate(tpf);
-	}
-
-	/**
-	 * @return the gameState
-	 */
-	public GameState getGameState() {
-		return gameState;
-	}
-
-	/**
-	 * @return the presentation
-	 */
-	public Presentation getPresentation() {
-		return presentation;
-	}
-
-	/**
-	 * @return the userInterface
-	 */
-	public UserInterface getUserInterface() {
-		return userInterface;
-	}
-
-	/**
-	 * @return the battleController
-	 */
-	public BattleController getBattleController() {
-		return battleController;
+		presentation.simpleUpdate(tpf);
 	}
 
 	public void someMethod() {

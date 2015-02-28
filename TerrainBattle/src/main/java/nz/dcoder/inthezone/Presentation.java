@@ -31,21 +31,21 @@ import nz.dcoder.inthezone.input.Rotating;
  * @author denz
  */
 public final class Presentation {
-	private final GameActionListener input;
 	private final GameState gameState;
+	private final GameActionListener input;
 	private final Graphics graphics;
 	private final UserInterface ui;
-	private final Main game;
 
 	private final AbilityFactory abilityFactory;
 	private final BattleObjectFactory battleObjectFactory;
 	private final CharacterFactory characterFactory;
 
-	Presentation(Main game, Graphics graphics) throws DatabaseException {
-		this.game = game;
-		this.gameState = game.getGameState();
+	Presentation(
+		GameState gameState, Graphics graphics, UserInterface ui
+	) throws DatabaseException {
+		this.gameState = gameState;
 		this.graphics = graphics;
-		this.ui = game.getUserInterface();
+		this.ui = ui;
 		this.input = ui.getGameActionListener();
 
 		abilityFactory = new AbilityFactory();
@@ -85,7 +85,7 @@ public final class Presentation {
 
 		ui.battleStart(npcNames, npcHPs, npcLevels);
 
-		gameState.makeBattle(pcs, npcs, game.getBattleController());
+		gameState.makeBattle(pcs, npcs, controller);
 	}
 
 	/**
@@ -120,8 +120,9 @@ public final class Presentation {
 		}
 	}
 
-	void initBattleController() {
-		BattleController controller = game.getBattleController();
+	private final BattleController controller = new BattleController();
+
+	private void initBattleController() {
 		controller.onPlayerTurnStart = this::playerTurnStart;
 		controller.onBattleEnd = this::endBattle;
 		controller.onMove = this::move;

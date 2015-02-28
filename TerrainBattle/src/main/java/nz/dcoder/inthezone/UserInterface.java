@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import nz.dcoder.inthezone.data_model.AbilityInfo;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.graphics.Graphics;

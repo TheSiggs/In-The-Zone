@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nz.dcoder.inthezone.data_model.formulas.FormulaException;
 import nz.dcoder.inthezone.data_model.formulas.HealingFormula;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.Position;

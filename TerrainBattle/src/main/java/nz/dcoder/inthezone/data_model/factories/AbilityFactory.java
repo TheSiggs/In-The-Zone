@@ -12,10 +12,10 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import nz.dcoder.inthezone.data_model.Ability;
-import nz.dcoder.inthezone.data_model.AbilityInfo;
 import nz.dcoder.inthezone.data_model.DamageAbility;
 import nz.dcoder.inthezone.data_model.HealAbility;
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.TeleportAbility;

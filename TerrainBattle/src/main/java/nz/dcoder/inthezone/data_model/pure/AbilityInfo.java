@@ -1,8 +1,4 @@
-package nz.dcoder.inthezone.data_model;
-
-import nz.dcoder.inthezone.data_model.pure.AbilityClass;
-import nz.dcoder.inthezone.data_model.pure.AbilityName;
-import nz.dcoder.inthezone.data_model.pure.EffectName;
+package nz.dcoder.inthezone.data_model.pure;
 
 /**
  * Static information about abilities

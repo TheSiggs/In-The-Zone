@@ -3,6 +3,7 @@ package nz.dcoder.inthezone.data_model;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.List;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**

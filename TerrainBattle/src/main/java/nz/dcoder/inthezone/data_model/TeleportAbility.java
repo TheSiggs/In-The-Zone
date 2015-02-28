@@ -3,6 +3,7 @@ package nz.dcoder.inthezone.data_model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 

@@ -27,13 +27,13 @@ public class BlenderRender extends SimpleApplication {
 	public static void main(String args[]) {
 		BlenderRender app = new BlenderRender();
         System.out.println("number of args = "+ args.length);
-        if (args.length < 1) {
-            args = new String[]{"scene.csv"};
+        if (args.length < 2) {
+            args = new String[]{args[0], "scene.csv"};
         }
-        if (args.length != 1) {
+        if (args.length != 2) {
             throw new RuntimeException("usage: blender <csvName>");
         }
-        app.setCsvName(args[0]);
+        app.setCsvName(args[1]);
 		app.start();
 	}
     public void setCsvName(String name) {

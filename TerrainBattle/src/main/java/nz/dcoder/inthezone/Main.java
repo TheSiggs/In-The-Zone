@@ -36,8 +36,12 @@ public class Main extends SimpleApplication {
 	 * @param args 
 	 */
 	public static void main(String args[]) {
-		Main app = new Main();
-		app.start();
+        if (args.length > 1) {
+            BlenderRender.main(args);
+        } else {
+            Main app = new Main();
+            app.start();
+        }
 	}
 
 	/**

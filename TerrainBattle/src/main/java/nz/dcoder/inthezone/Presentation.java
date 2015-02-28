@@ -31,24 +31,22 @@ import nz.dcoder.inthezone.input.Rotating;
  * @author denz
  */
 public final class Presentation {
+	private final GameActionListener input;
+	private final GameState gameState;
+	private final Graphics graphics;
+	private final UserInterface ui;
+	private final Main game;
 
-	final GameActionListener input;
-	final GameState gameState;
-	final Graphics graphics;
-	final UserInterface ui;
-	final Main game;
+	private final AbilityFactory abilityFactory;
+	private final BattleObjectFactory battleObjectFactory;
+	private final CharacterFactory characterFactory;
 
-	final AbilityFactory abilityFactory;
-	final BattleObjectFactory battleObjectFactory;
-	final CharacterFactory characterFactory;
-
-	Presentation(Main game) throws DatabaseException {
+	Presentation(Main game, Graphics graphics) throws DatabaseException {
 		this.game = game;
 		this.gameState = game.getGameState();
-		this.graphics = new Graphics(game, gameState.terrain);
+		this.graphics = graphics;
 		this.ui = game.getUserInterface();
-		this.input =
-			new GameActionListener(game.getInputManager(), this.graphics, this.ui);
+		this.input = ui.getGameActionListener();
 
 		abilityFactory = new AbilityFactory();
 		battleObjectFactory = new BattleObjectFactory(abilityFactory);

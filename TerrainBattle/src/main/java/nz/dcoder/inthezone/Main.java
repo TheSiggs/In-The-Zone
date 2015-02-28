@@ -11,6 +11,7 @@ import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.Party;
 import nz.dcoder.inthezone.data_model.Terrain;
+import nz.dcoder.inthezone.graphics.Graphics;
 
 /**
  * Please change sparingly and only to attach new objects dependencies which are
@@ -25,6 +26,7 @@ public class Main extends SimpleApplication {
 	private Presentation presentation = null;
 	private UserInterface userInterface = null;
 	private BattleController battleController = null;
+	private Graphics graphics = null;
 
 	public Main() {
 		super((AppState) null);
@@ -49,15 +51,17 @@ public class Main extends SimpleApplication {
 		gameState = new GameState(party, terrain);
 		battleController = new BattleController();
 
+		graphics = new Graphics(this, gameState.terrain);
+		userInterface = new UserInterface(this, graphics);
+
 		try {
-			presentation = new Presentation(this);
+			presentation = new Presentation(this, graphics);
 		} catch (DatabaseException e) {
 			System.err.println("Error reading data files: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
 		}
 
-		userInterface = new UserInterface(this);
 	}
 
 	/**

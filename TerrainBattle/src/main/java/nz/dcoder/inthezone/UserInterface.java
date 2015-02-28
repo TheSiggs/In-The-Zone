@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import nz.dcoder.inthezone.data_model.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
+import nz.dcoder.inthezone.graphics.Graphics;
+import nz.dcoder.inthezone.input.GameActionListener;
 import nz.dcoder.inthezone.jfx.MainHUDController;
 import nz.dcoder.inthezone.Main;
 
@@ -31,12 +33,20 @@ import nz.dcoder.inthezone.Main;
  * @author inthezone
  */
 public class UserInterface {
-	public UserInterface(Main game) {
+	final GameActionListener input;
+
+	public UserInterface(Main game, Graphics g) {
+		this.input = new GameActionListener(game.getInputManager(), g, this);
+
 		Node guiNode = game.getGuiNode();
 
 		JmeFxScreenContainer jmeFx = JmeFxContainer.install(game, guiNode, true, null);
-		Platform.runLater(new LaunchJavaFxGUI(jmeFx, game));
+		Platform.runLater(new LaunchJavaFxGUI(jmeFx, input, game));
 		guiNode.attachChild(jmeFx.getJmeNode());
+	}
+
+	public GameActionListener getGameActionListener() {
+		return input;
 	}
 
 	public void battleStart(
@@ -91,11 +101,18 @@ public class UserInterface {
 class LaunchJavaFxGUI implements Runnable {
 	private MainHUDController controller;
 	private Scene scene;
-	private JmeFxScreenContainer jmeFx;
-	private Main app;
 
-	public LaunchJavaFxGUI(JmeFxScreenContainer jmeFx, Main app) {
+	private final JmeFxScreenContainer jmeFx;
+	private final GameActionListener input;
+	private final Main app;
+
+	public LaunchJavaFxGUI(
+		JmeFxScreenContainer jmeFx,
+		GameActionListener input,
+		Main app
+	) {
 		this.jmeFx = jmeFx;
+		this.input = input;
 		this.app = app;
 	}
 
@@ -114,6 +131,7 @@ class LaunchJavaFxGUI implements Runnable {
 
 			this.scene = new Scene(root, 300, 275);
 			MainHUDController.app = this.app;
+			// TODO: give GUI a reference to the GameActionListener
 			scene.setFill(Color.TRANSPARENT);
 			jmeFx.setScene(getScene(), root);
 

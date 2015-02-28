@@ -75,12 +75,6 @@ public final class Presentation {
 			npcs.add(initGoblin(new Position(x * 2, 0), x + 6, headingS));
 		}
 
-		ui.battleStart(
-			pcs.stream().map(c -> c.getCharacterInfo())
-				.collect(Collectors.toList()),
-			npcs.stream().map(c -> c.getCharacterInfo())
-				.collect(Collectors.toList()));
-		
 		gameState.makeBattle(pcs, npcs, controller);
 	}
 
@@ -135,7 +129,20 @@ public final class Presentation {
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
 
-		ui.turnStart(
+		ui.turnStart(true,
+			turn.getCharacters().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
+			turn.getNPCs().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()));
+	}
+
+	private void aiPlayerTurnStart(Turn turn) {
+		// normally we would invoke the AI with the new turn object.  Instead,
+		// we'll make let the human player take this turn for now.
+		
+		input.setTurn(turn);
+
+		ui.turnStart(false,
 			turn.getCharacters().stream()
 				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
 			turn.getNPCs().stream()

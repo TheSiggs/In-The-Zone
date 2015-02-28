@@ -49,14 +49,8 @@ public class UserInterface {
 		return input;
 	}
 
-	public void battleStart(
-		Collection<CharacterInfo> players,
-		Collection<CharacterInfo> npcs
-	) {
-		// TODO: pass this on to the GUI
-	}
-
 	public void turnStart(
+		boolean isPlayerTurn,
 		Collection<CharacterInfo> players,
 		Collection<CharacterInfo> npcs
 	) {

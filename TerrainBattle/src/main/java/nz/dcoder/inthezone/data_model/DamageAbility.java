@@ -8,6 +8,7 @@ import nz.dcoder.inthezone.data_model.formulas.FormulaException;
 import nz.dcoder.inthezone.data_model.formulas.MagicalDamage;
 import nz.dcoder.inthezone.data_model.formulas.PhysicalDamage;
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.LineOfSight;

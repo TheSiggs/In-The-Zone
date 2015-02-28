@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.Node;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -302,9 +303,14 @@ public class TurnCharacter {
 		return character.getVisibleEquipment();
 	}
 
-	public Collection<AbilityInfo> getAbilities() {
-		return character.getAbilities()
-			.stream().map(a -> a.info).collect(Collectors.toList());
+	/**
+	 * Get a copy of essential information about a character
+	 * */
+	public CharacterInfo getCharacterInfo() {
+		CharacterInfo info = character.getCharacterInfo();
+		info.mp = getMP();
+		info.ap = getAP();
+		return info;
 	}
 
 	public boolean isOnManaZone() {

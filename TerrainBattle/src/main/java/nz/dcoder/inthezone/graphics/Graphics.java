@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Manages all scene graph transformations.  Other classes should not
+ * Manages all scene graph transformations.  Other packages should not
  * manipulate the scene graph directly, but should instead call methods in this
  * class.
  *
@@ -113,8 +113,17 @@ public class Graphics {
 
 	/**
 	 * Add a goblin character.  For testing purposes only.
+	 * @param i The goblin to create (1 - 10 where 1 - 5 are the player goblins
+	 * and 6 - 10 are the enemy goblins)
 	 * */
-	public CharacterGraphics addGoblin(Position p, String texture) {
+	public CharacterGraphics addGoblin(Position p, int i) {
+		String texture;
+		if (i <= 5) {
+			texture = "belt/D.png";
+		} else {
+			texture = "green/D.png";
+		}
+
 		Spatial spatial = assetManager.loadModel(
 			"3d_objects/creatures/goblin/goblin.mesh.xml");
 

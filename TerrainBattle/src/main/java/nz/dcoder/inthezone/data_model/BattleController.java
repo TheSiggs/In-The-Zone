@@ -3,6 +3,7 @@ package nz.dcoder.inthezone.data_model;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.List;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -10,6 +11,7 @@ import nz.dcoder.inthezone.data_model.pure.Position;
  * */
 public class BattleController {
 	public Consumer<Turn> onPlayerTurnStart = null;
+	public Consumer<Turn> onAIPlayerTurnStart = null;
 	public Consumer<DoBattleEnd> onBattleEnd = null;
 	public Consumer<DoMoveInfo> onMove = null;
 	public Consumer<DoAbilityInfo> onAbility = null;
@@ -18,6 +20,10 @@ public class BattleController {
 
 	void callOnPlayerTurnStart(Turn turn) {
 		if (onPlayerTurnStart != null) onPlayerTurnStart.accept(turn);
+	}
+
+	void callOnAIPlayerTurnStart(Turn turn) {
+		if (onAIPlayerTurnStart != null) onAIPlayerTurnStart.accept(turn);
 	}
 
 	void callOnBattleEnd(boolean playerWins) {

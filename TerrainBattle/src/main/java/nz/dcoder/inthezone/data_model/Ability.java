@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.LineOfSight;
 import nz.dcoder.inthezone.data_model.pure.Position;

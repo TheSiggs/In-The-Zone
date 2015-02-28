@@ -1,6 +1,7 @@
 package nz.dcoder.inthezone.data_model;
 
 import java.util.Collection;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 public class DoAbilityInfo {

@@ -1,15 +1,15 @@
 name,description,baseAP,baseMP,strength,intelligence,dexterity,guard,spirit,vitality,deadBody,,Notes
 testChar,"For testing purposes, not actually part of the game",10,11,12,13,14,15,16,17,testBody,,This line is for testing.  Please do not alter
-goblin,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,
-,,,,,,,,,,,,Description of fields
-,,,,,,,,,,,,name: the name of this character as it appears in the game
-,,,,,,,,,,,,descripttion: A short textual description of the character
-,,,,,,,,,,,,baseAP: The number of starting AP given to this character by default
-,,,,,,,,,,,,baseMP: ditto
-,,,,,,,,,,,,strength: strength of physical attacks
-,,,,,,,,,,,,intelligence: strength of magical attacks
-,,,,,,,,,,,,dexterity: ??
-,,,,,,,,,,,,guard: defence against physical attacks
+goblin 1,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,
+goblin 2,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,Description of fields
+goblin 3,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,name: the name of this character as it appears in the game
+goblin 4,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,descripttion: A short textual description of the character
+goblin 5,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,baseAP: The number of starting AP given to this character by default
+goblin 6,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,baseMP: ditto
+goblin 7,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,strength: strength of physical attacks
+goblin 8,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,intelligence: strength of magical attacks
+goblin 9,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,dexterity: ??
+goblin 10,Part of the prototype,10,10,10,10,10,10,10,10,goblinBody,,guard: defence against physical attacks
 ,,,,,,,,,,,,spirit: defence agains magial attacks
 ,,,,,,,,,,,,vitality: used to compute HP
 ,,,,,,,,,,,,deadBody: name of the object that represents the dead version of this character

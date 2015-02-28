@@ -192,12 +192,7 @@ public class GameActionListener implements ActionListener {
 			System.out.println("Deselected character");
 
 		} else {
-			ui.selectCharacter(
-				selectedTurnCharacter.getName(),
-				selectedTurnCharacter.getMP(),
-				selectedTurnCharacter.getAP(),
-				selectedTurnCharacter.getHP(),
-				selectedTurnCharacter.getAbilities());
+			ui.selectCharacter(selectedTurnCharacter.getCharacterInfo());
 
 			System.out.println("Selected character at " +
 				selectedCharacter.getPosition().toString());

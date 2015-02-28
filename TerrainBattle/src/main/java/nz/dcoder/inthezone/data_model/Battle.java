@@ -12,9 +12,9 @@ import nz.dcoder.inthezone.data_model.pure.Position;
 class Battle {
 	public final BattleController controller;
 
-	private Collection<Character> players;
-	private Collection<Character> aiPlayers;
-	private Collection<BattleObject> objects;
+	Collection<Character> players;
+	Collection<Character> aiPlayers;
+	Collection<BattleObject> objects;
 
 	Terrain terrain;
 	Turn turn;
@@ -149,8 +149,12 @@ class Battle {
 				turnCharacters(isPlayerTurn, turnNumber),
 				this, turnNumber);
 
-			// notify the presentation layer if they player's turn has started
-			if (isPlayerTurn) controller.callOnPlayerTurnStart(turn);
+			// notify the presentation layer that a new turn has started
+			if (isPlayerTurn) {
+				controller.callOnPlayerTurnStart(turn);
+			} else {
+				controller.callOnAIPlayerTurnStart(turn);
+			}
 		}
 	}
 

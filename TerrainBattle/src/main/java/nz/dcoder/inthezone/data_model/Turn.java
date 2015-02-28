@@ -39,6 +39,10 @@ public class Turn {
 		return turnCharacters;
 	}
 
+	public Collection<Character> getNPCs() {
+		return battle.aiPlayers;
+	}
+
 	/**
 	 * Determine if there is anything more that can be done on this turn
 	 * @param items Consumable items available to the player

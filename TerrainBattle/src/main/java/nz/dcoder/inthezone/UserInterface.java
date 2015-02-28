@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import nz.dcoder.inthezone.data_model.AbilityInfo;
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.graphics.Graphics;
@@ -49,31 +49,15 @@ public class UserInterface {
 		return input;
 	}
 
-	public void battleStart(
-		Collection<CharacterName> npcs,
-		Collection<Points> npcHPs,
-		Collection<Integer> npcLevels
-	) {
-		// TODO: pass this on to the GUI
-	}
-
 	public void turnStart(
-		Collection<CharacterName> playerCharacters,
-		Collection<Integer> playerLevels,
-		Collection<Points> playerMPs,
-		Collection<Points> playerAPs,
-		Collection<Points> playerHPs
+		boolean isPlayerTurn,
+		Collection<CharacterInfo> players,
+		Collection<CharacterInfo> npcs
 	) {
 		// TODO: pass this on to the GUI
 	}
 
-	public void selectCharacter(
-		CharacterName name,
-		Points mp,
-		Points ap,
-		Points hp,
-		Collection<AbilityInfo> abilities
-	) {
+	public void selectCharacter(CharacterInfo info) {
 		// TODO: pass this on to the GUI
 	}
 

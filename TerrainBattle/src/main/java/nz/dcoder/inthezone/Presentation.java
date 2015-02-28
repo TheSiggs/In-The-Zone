@@ -3,7 +3,9 @@ package nz.dcoder.inthezone;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import nz.dcoder.inthezone.ai.AIPlayer;
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
 import nz.dcoder.inthezone.data_model.DoAbilityInfo;
@@ -67,42 +69,33 @@ public final class Presentation {
 		Position headingS = new Position(0, 1);
 
 		for (int x = 0; x < 5; ++x) {
-			pcs.add(initGoblin(new Position(x * 2, 9), "belt/D.png", headingN));
+			pcs.add(initGoblin(new Position(x * 2, 9), x + 1, headingN));
 		}
-
-		Collection<CharacterName> npcNames = new ArrayList<>();
-		Collection<Points> npcHPs = new ArrayList<>();
-		Collection<Integer> npcLevels = new ArrayList<>();
 
 		for (int x = 0; x < 5; ++x) {
-			Character npc = initGoblin(
-				new Position(x * 2, 0), "green/D.png", headingS);
-			npcs.add(npc);
-			npcNames.add(npc.name);
-			npcHPs.add(new Points(npc.getMaxHP(), npc.hp));
-			npcLevels.add(npc.getLevel());
+			npcs.add(initGoblin(new Position(x * 2, 0), x + 6, headingS));
 		}
 
-		ui.battleStart(npcNames, npcHPs, npcLevels);
-
-		gameState.makeBattle(pcs, npcs, controller);
+		gameState.makeBattle(pcs, npcs, controller, new AIPlayer());
 	}
 
 	/**
 	 * When we get more sophisticated, we will add another method to init actual
 	 * players rather than just goblins.
 	 * */
-	Character initGoblin(Position p, String texture, Position dp) {
-		CharacterGraphics cg = graphics.addGoblin(p, texture);
+	Character initGoblin(Position p, int i, Position dp) {
+		CharacterGraphics cg = graphics.addGoblin(p, i);
 		cg.setHeading(dp);
 
-		Character r = characterFactory.newCharacter(
-			new CharacterName("goblin"), 1);
-		r.position = p;
+		CharacterName name = new CharacterName("goblin " + i);
+		Character r = characterFactory.newCharacter(name, 1);
 
 		if (r == null) {
-			throw new RuntimeException("Could not create goblin character");
+			throw new RuntimeException(
+				"Could not create character " + name.toString());
 		}
+
+		r.position = p;
 
 		return r;
 	}
@@ -137,26 +130,24 @@ public final class Presentation {
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
 
-		Collection<CharacterName> playerCharacters = new ArrayList<>();
-		Collection<Integer> playerLevels = new ArrayList<>();
-		Collection<Points> playerMPs = new ArrayList<>();
-		Collection<Points> playerAPs = new ArrayList<>();
-		Collection<Points> playerHPs = new ArrayList<>();
-		Collection<TurnCharacter> tcs = turn.getCharacters();
-		for (TurnCharacter tc : tcs) {
-			playerCharacters.add(tc.getName());
-			playerLevels.add(tc.getLevel());
-			playerMPs.add(tc.getMP());
-			playerAPs.add(tc.getAP());
-			playerHPs.add(tc.getHP());
-		}
+		ui.turnStart(true,
+			turn.getCharacters().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
+			turn.getNPCs().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()));
+	}
 
-		ui.turnStart(
-			playerCharacters,
-			playerLevels,
-			playerMPs,
-			playerAPs,
-			playerHPs);
+	private void aiPlayerTurnStart(Turn turn) {
+		// normally we would invoke the AI with the new turn object.  Instead,
+		// we'll make let the human player take this turn for now.
+		
+		input.setTurn(turn);
+
+		ui.turnStart(false,
+			turn.getCharacters().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
+			turn.getNPCs().stream()
+				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()));
 	}
 
 	/**

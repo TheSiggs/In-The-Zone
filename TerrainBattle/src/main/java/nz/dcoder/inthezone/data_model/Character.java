@@ -8,8 +8,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentClass;
+import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -52,6 +54,16 @@ public class Character implements CanDoAbility {
 		this.hp = level.maxHP;
 		this.equipment = new ArrayList<Equipment>();
 		this.position = new Position(0, 0);
+	}
+
+	public CharacterInfo getCharacterInfo() {
+		return new CharacterInfo(
+			name,
+			description,
+			getLevel(),
+			new Points(getMaxHP(), hp),
+			getAbilities().stream()
+				.map(a -> a.info).collect(Collectors.toList()));
 	}
 
 	private BaseStats computeEffectiveBaseStats() {

@@ -1,0 +1,21 @@
+{
+    "platform": "windows",
+    "jdk": "gitignore/oracle-jdk-8.zip",
+    "executable": "zans-story",
+    "appjar": "build/libs/fat-jar-0.0.1.jar",
+    "mainclass": "nz/dcoder/inthezone/Main",
+    "vmargs": [
+       "-Xmx2G"
+    ],
+    "resources": [
+        "assets",
+        "board.map",
+        "liblwjgl64.so",
+        "liblwjgl.dylib",
+        "libopenal64.so",
+        "openal.dylib",
+        "scene.csv"
+    ],
+    "minimizejre": "soft",
+    "outdir": "build/tmp/out-linux"
+}

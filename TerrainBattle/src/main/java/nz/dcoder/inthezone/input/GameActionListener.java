@@ -8,6 +8,7 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import java.util.List;
 
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
@@ -63,20 +64,18 @@ public class GameActionListener implements ActionListener {
 	private Rotating viewRotating = Rotating.NONE;
 	private Rotating oldViewRotating = Rotating.NONE;
 	private CharacterGraphics walking = null;
-	private boolean isCharacterWalking = false;
+	private boolean isAnimating = false;
 
-	public void startCharacterWalking(CharacterGraphics cg) {
-		walking = cg;
-		isCharacterWalking = true;
+	public void notifyAnimationStart() {
+		isAnimating = true;
 	}
 
-	public void stopCharacterWalking(CharacterGraphics cg) {
-		walking = null;
-		isCharacterWalking = false;
+	public void notifyAnimationEnd() {
+		isAnimating = false;
 	}
 
-	public boolean getIsCharacterWalking() {
-		return isCharacterWalking;
+	public boolean getIsAnimating() {
+		return isAnimating;
 	}
 
 	/**
@@ -143,7 +142,7 @@ public class GameActionListener implements ActionListener {
 			// actions that are mutually exclusive.  For example walking: while a
 			// character is walking, nothing else is allowed to happen
 			// ==================================================================
-			if (isCharacterWalking) return;
+			if (isAnimating) return;
 
 			if (name.equals("ForwardsMove")) {
 			}
@@ -192,10 +191,16 @@ public class GameActionListener implements ActionListener {
 			System.out.println("Deselected character");
 
 		} else {
-			ui.selectCharacter(selectedTurnCharacter.getCharacterInfo());
+			CharacterInfo info = selectedTurnCharacter.getCharacterInfo();
+			ui.selectCharacter(info);
 
-			System.out.println("Selected character at " +
+			System.out.println("Selected character " +
+				selectedTurnCharacter.getName().toString() + " at " +
 				selectedCharacter.getPosition().toString());
+			System.out.println(
+				"mp: " + info.mp.toString() +
+				", ap: " + info.ap.toString() +
+				", hp: " + info.hp.toString());
 		}
 	}
 

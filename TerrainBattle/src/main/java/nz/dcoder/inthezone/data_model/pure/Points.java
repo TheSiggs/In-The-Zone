@@ -12,5 +12,9 @@ public class Points {
 		this.max = max;
 		this.total = total;
 	}
+
+	@Override public String toString() {
+		return "" + total + " / " + max;
+	}
 }
 

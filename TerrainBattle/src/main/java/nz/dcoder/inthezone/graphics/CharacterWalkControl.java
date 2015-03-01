@@ -6,7 +6,6 @@ import com.jme3.math.Spline;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;
@@ -16,20 +15,20 @@ import java.util.List;
 
 import nz.dcoder.inthezone.data_model.pure.Position;
 
-public class CharacterWalkControl extends AbstractControl {
+public class CharacterWalkControl extends ChainableController {
 	private final Graphics graphics;
 	private final CharacterGraphics cg;
 
 	// the path
 	private Spline spline = null;
 	private int nControlPoints = 0;
-	private Consumer<CharacterGraphics> endNotify = null;
 	private Collection<CharacterGraphics> charactersToRestore = null;
 	// progress along the path
 	private int controlPoint = 0;
 	private float t = 0;
 
 	public CharacterWalkControl (Graphics graphics, CharacterGraphics cg) {
+		super(graphics.getControllerChain());
 		this.graphics = graphics;
 		this.cg = cg;
 		this.setEnabled(false);
@@ -42,11 +41,7 @@ public class CharacterWalkControl extends AbstractControl {
 	 * @param endNotify A method reference that will be invoked when the walk
 	 * action ends
 	 * */
-	public void doWalk(
-		List<Position> path, Consumer<CharacterGraphics> endNotify
-	) {
-		this.endNotify = endNotify;
-
+	public void doWalk(List<Position> path) {
 		Spline spline0 = new Spline();
 		nControlPoints = path.size();
 		for (Position p : path) {
@@ -129,8 +124,7 @@ public class CharacterWalkControl extends AbstractControl {
 
 			// clean up and notify presentation layer that we're done
 			charactersToRestore = null;
-			this.setEnabled(false);
-			if (endNotify != null) endNotify.accept(cg);
+			endControl();
 		} else {
 			Vector3f p0 = spline.interpolate(t, controlPoint, null);
 			spatial.setLocalTranslation(p0);

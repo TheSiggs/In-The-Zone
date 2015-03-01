@@ -11,7 +11,9 @@ import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.Party;
 import nz.dcoder.inthezone.data_model.Terrain;
+import nz.dcoder.inthezone.graphics.ControllerChain;
 import nz.dcoder.inthezone.graphics.Graphics;
+import nz.dcoder.inthezone.input.GameActionListener;
 
 /**
  * Please change sparingly and only to attach new objects dependencies which are
@@ -36,12 +38,12 @@ public class Main extends SimpleApplication {
 	 * @param args 
 	 */
 	public static void main(String args[]) {
-        if (args.length > 1) {
-            BlenderRender.main(args);
-        } else {
-            Main app = new Main();
-            app.start();
-        }
+		if (args.length > 1) {
+			BlenderRender.main(args);
+		} else {
+			Main app = new Main();
+			app.start();
+		}
 	}
 
 	/**
@@ -55,6 +57,10 @@ public class Main extends SimpleApplication {
 
 		graphics = new Graphics(this, gameState.terrain);
 		userInterface = new UserInterface(this, graphics);
+		GameActionListener input = userInterface.getGameActionListener();
+		graphics.setControllerChain(new ControllerChain(
+			input::notifyAnimationStart,
+			input::notifyAnimationEnd));
 
 		try {
 			presentation = new Presentation(gameState, graphics, userInterface);

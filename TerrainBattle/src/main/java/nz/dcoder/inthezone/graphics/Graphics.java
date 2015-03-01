@@ -22,6 +22,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Manages all scene graph transformations.  Other packages should not
@@ -50,7 +51,7 @@ public class Graphics {
 	
 	private final Collection<ObjectGraphics> objects =
 		new ArrayList<ObjectGraphics>();
-
+	
 	public Graphics(SimpleApplication app, Terrain terrain) {
 		this.rootNode = app.getRootNode();
 		this.assetManager = app.getAssetManager();
@@ -92,6 +93,19 @@ public class Graphics {
 		DirectionalLight southLight = new DirectionalLight();
 		southLight.setDirection(new Vector3f(0f, -1f, -1f).normalizeLocal());
 		rootNode.addLight(southLight);
+	}
+
+	private ControllerChain controllerChain;
+
+	/**
+	 * Not to be invoked outside of the graphics package.
+	 * */
+	ControllerChain getControllerChain() {
+		return controllerChain;
+	}
+
+	public void setControllerChain(ControllerChain chain) {
+		this.controllerChain = chain;
 	}
 
 	Quaternion quat = new Quaternion();
@@ -160,6 +174,13 @@ public class Graphics {
 	public ObjectGraphics addObject(Position p, BattleObjectName name) {
 		// TODO: implement this method
 		return null;
+	}
+
+	/**
+	 * Animate a character walking along a path
+	 * */
+	public void doWalk(CharacterGraphics cg, List<Position> path) {
+		controllerChain.queueAnimation(() -> cg.getWalkControl().doWalk(path));
 	}
 
 	/**

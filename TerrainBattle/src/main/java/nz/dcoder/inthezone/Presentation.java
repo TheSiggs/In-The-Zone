@@ -130,6 +130,8 @@ public final class Presentation {
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
 
+		System.out.println("Player turn starts");
+
 		ui.turnStart(true,
 			turn.getCharacters().stream()
 				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
@@ -141,6 +143,7 @@ public final class Presentation {
 		// normally we would invoke the AI with the new turn object.  Instead,
 		// we'll make let the human player take this turn for now.
 		
+		System.out.println("AI turn starts");
 		input.setTurn(turn);
 
 		ui.turnStart(false,
@@ -167,9 +170,7 @@ public final class Presentation {
 	private void move(DoMoveInfo move) {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
-
-			input.startCharacterWalking(cg);
-			cg.getWalkControl().doWalk(move.path, input::stopCharacterWalking);
+			graphics.doWalk(cg, move.path);
 
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");

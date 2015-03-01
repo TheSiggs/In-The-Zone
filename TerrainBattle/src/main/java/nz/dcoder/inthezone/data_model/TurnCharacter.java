@@ -99,7 +99,7 @@ public class TurnCharacter {
 		AStarSearch search = new AStarSearch(start);
 		List<Node<Position>> npath = search.search();
 
-		if (npath.size() + soFar.size() > mp) {
+		if (npath.size() + soFar.size() - 1 > mp) {
 			return null;
 		} else {
 			return Stream.concat(
@@ -123,7 +123,7 @@ public class TurnCharacter {
 
 		if (path == null) {
 			throw new RuntimeException("Path is null");
-		} else if (path.size() > mp || path.size() < 2) {
+		} else if (path.size() - 1 > mp || path.size() < 2) {
 			throw new RuntimeException("Invalid path " + path.toString());
 		}
 
@@ -158,8 +158,12 @@ public class TurnCharacter {
 		}
 	}
 
+	/**
+	 * Assumes that the first element of path is the current position of the
+	 * character.
+	 * */
 	private void doMotion0(List<Position> path) {
-		mp -= path.size();
+		mp -= path.size() - 1;
 		Position p0 = character.position;
 		character.position = path.get(path.size() - 1);
 		battle.controller.callOnMove(p0, path);

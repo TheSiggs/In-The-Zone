@@ -13,12 +13,15 @@ import nz.dcoder.inthezone.data_model.DoBattleEnd;
 import nz.dcoder.inthezone.data_model.DoCharacterDeath;
 import nz.dcoder.inthezone.data_model.DoMoveInfo;
 import nz.dcoder.inthezone.data_model.DoObjectDestruction;
+import nz.dcoder.inthezone.data_model.Equipment;
 import nz.dcoder.inthezone.data_model.factories.AbilityFactory;
 import nz.dcoder.inthezone.data_model.factories.BattleObjectFactory;
 import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
 import nz.dcoder.inthezone.data_model.factories.DatabaseException;
+import nz.dcoder.inthezone.data_model.factories.EquipmentFactory;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
@@ -41,6 +44,7 @@ public final class Presentation {
 	private final AbilityFactory abilityFactory;
 	private final BattleObjectFactory battleObjectFactory;
 	private final CharacterFactory characterFactory;
+	private final EquipmentFactory equipmentFactory;
 
 	Presentation(
 		GameState gameState, Graphics graphics, UserInterface ui
@@ -54,6 +58,7 @@ public final class Presentation {
 		battleObjectFactory = new BattleObjectFactory(abilityFactory);
 		characterFactory = new CharacterFactory(
 			abilityFactory, battleObjectFactory);
+		equipmentFactory = new EquipmentFactory(abilityFactory);
 
 		initBattleController();
 		startBattle();
@@ -89,6 +94,9 @@ public final class Presentation {
 
 		CharacterName name = new CharacterName("goblin " + i);
 		Character r = characterFactory.newCharacter(name, 1);
+		Equipment weapon = equipmentFactory.newEquipment(
+			new EquipmentName("simple weapon"));
+		r.equipWeapon(weapon);
 
 		if (r == null) {
 			throw new RuntimeException(

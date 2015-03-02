@@ -16,10 +16,13 @@ public class ObjectGraphics implements AnimEventListener {
 	private final Spatial spatial;
 	private final AnimChannel channel;
 	private final AnimControl control;
+	private final ControllerChain controllerChain;
 
 	private Position p;
 
-	public ObjectGraphics(Spatial spatial, Position p) {
+	public ObjectGraphics(Graphics graphics, Spatial spatial, Position p) {
+		this.controllerChain = graphics.getControllerChain();
+
 		this.spatial = spatial;
 
 		spatial.setUserData("p", new SaveablePosition(p));
@@ -57,16 +60,37 @@ public class ObjectGraphics implements AnimEventListener {
 
 	@Override
 	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
+		if (limitedAnimation) {
+			animRepeats -= 1;
+			if (animRepeats < 1) {
+				limitedAnimation = false;
+				controllerChain.nextAnimation();
+			}
+		}
 	}
 
 	@Override
 	public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-
 	}
 
+	/**
+	 * Set an animation to run until cancelled
+	 * */
 	public void setAnimation(String name) {
+		limitedAnimation = false;
 		channel.setAnim(name);
 	}
 
+	private boolean limitedAnimation = false;
+	private int animRepeats = 0;
+
+	/**
+	 * Set an animation to run n times, and notify when done
+	 * */
+	public void setAnimation(String name, int n) {
+		limitedAnimation = true;
+		animRepeats = n;
+		channel.setAnim(name);
+	}
 }
 

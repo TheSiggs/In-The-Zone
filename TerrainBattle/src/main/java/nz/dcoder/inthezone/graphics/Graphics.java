@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.graphics;
 
+import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -195,7 +196,7 @@ public class Graphics {
 		boardNode.detachChild(cg.getSpatial());
 		characters.remove(cg);
 		ObjectGraphics r = addObject(p, body);
-		r.setAnimation("die");
+		controllerChain.queueAnimation(() -> r.setAnimation("die", 1));
 		return r;
 	}
 
@@ -204,7 +205,15 @@ public class Graphics {
 	 * */
 	public void destroyObject(ObjectGraphics og) {
 		objects.remove(og);
-		og.setAnimation("destroy");
+		controllerChain.queueAnimation(() -> og.setAnimation("destroy", 1));
+	}
+
+	/**
+	 * Animate a character doing an ability.
+	 * */
+	public void doAbility(CharacterGraphics cg, AbilityName name) {
+		// TODO: implement this method.  Keep in mind that any animations or custom
+		// controllers must be queued up in the controllerChain.
 	}
 
 	/**

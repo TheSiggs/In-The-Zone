@@ -19,6 +19,7 @@ public class CharacterGraphics implements AnimEventListener {
 	private final AnimChannel channel;
 	private final AnimControl control;
 	private final CharacterWalkControl walkControl;
+	private final ControllerChain controllerChain;
 
 	public static final Quaternion upright = new Quaternion();
 
@@ -33,6 +34,8 @@ public class CharacterGraphics implements AnimEventListener {
 	private Position p;
 
 	public CharacterGraphics(Graphics graphics, Spatial spatial, Position p) {
+		this.controllerChain = graphics.getControllerChain();
+
 		this.spatial = spatial;
 
 		spatial.setUserData("p", new SaveablePosition(p));
@@ -104,14 +107,36 @@ public class CharacterGraphics implements AnimEventListener {
 
 	@Override
 	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
+		if (limitedAnimation) {
+			animRepeats -= 1;
+			if (animRepeats < 1) {
+				limitedAnimation = false;
+				controllerChain.nextAnimation();
+			}
+		}
 	}
 
 	@Override
 	public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-
 	}
 
+	/**
+	 * Set an animation to run until cancelled
+	 * */
 	public void setAnimation(String name) {
+		limitedAnimation = false;
+		channel.setAnim(name);
+	}
+
+	private boolean limitedAnimation = false;
+	private int animRepeats = 0;
+
+	/**
+	 * Set an animation to run n times, and notify when done
+	 * */
+	public void setAnimation(String name, int n) {
+		limitedAnimation = true;
+		animRepeats = n;
 		channel.setAnim(name);
 	}
 

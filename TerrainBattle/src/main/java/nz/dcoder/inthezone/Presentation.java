@@ -20,6 +20,7 @@ import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
 import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.factories.EquipmentFactory;
 import nz.dcoder.inthezone.data_model.GameState;
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 import nz.dcoder.inthezone.data_model.pure.Points;
@@ -45,6 +46,8 @@ public final class Presentation {
 	private final BattleObjectFactory battleObjectFactory;
 	private final CharacterFactory characterFactory;
 	private final EquipmentFactory equipmentFactory;
+
+	private Turn turn;
 
 	Presentation(
 		GameState gameState, Graphics graphics, UserInterface ui
@@ -137,14 +140,13 @@ public final class Presentation {
 	 * */
 	private void playerTurnStart(Turn turn) {
 		input.setTurn(turn);
+		this.turn = turn;
 
 		System.out.println("Player turn starts");
 
 		ui.turnStart(true,
-			turn.getCharacters().stream()
-				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
-			turn.getNPCs().stream()
-				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()));
+			turn.getPlayerInfo().stream().collect(Collectors.toList()),
+			turn.getNPCInfo().stream().collect(Collectors.toList()));
 	}
 
 	private void aiPlayerTurnStart(Turn turn) {
@@ -153,12 +155,11 @@ public final class Presentation {
 		
 		System.out.println("AI turn starts");
 		input.setTurn(turn);
+		this.turn = turn;
 
-		ui.turnStart(false,
-			turn.getCharacters().stream()
-				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()),
-			turn.getNPCs().stream()
-				.map(c -> c.getCharacterInfo()).collect(Collectors.toList()));
+		ui.turnStart(true,
+			turn.getPlayerInfo().stream().collect(Collectors.toList()),
+			turn.getNPCInfo().stream().collect(Collectors.toList()));
 	}
 
 	/**
@@ -178,7 +179,7 @@ public final class Presentation {
 	private void move(DoMoveInfo move) {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
-			graphics.doWalk(cg, move.path);
+			graphics.doWalk(cg, move.path, null);
 
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");
@@ -189,7 +190,23 @@ public final class Presentation {
 	 * Handle ability effects
 	 * */
 	private void ability(DoAbilityInfo action) {
-		// TODO: this one needs some thought
+		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
+
+		// special handling for compound, complex, and repeating abilities.
+		Runnable continuation = null;
+		if (action.ability.repeats > 1) {
+			continuation = () -> input.repeatTarget();
+		}
+
+		graphics.doAbility(cg, action.ability.name, continuation);
+
+		for (Position p : action.targets) {
+			CharacterInfo target = turn.getCharacterAt(p);
+			if (target != null) {
+				ui.updateHP(target.name, target.hp);
+			}
+		}
+
 		System.err.println("Character at position " + action.agentPos.toString()
 			+ " uses " + action.ability.name.toString()
 			+ " targeting " + action.targets.toString());

@@ -8,6 +8,7 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import java.util.List;
 
+import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -31,6 +32,8 @@ public class GameActionListener implements ActionListener {
 	 * */
 	private InputMode leftButtonMode = InputMode.SELECT;
 	private Turn turn = null;
+	private AbilityName attackWith = null;
+	private int repeats = 0;
 
 	public GameActionListener(
 		InputManager inputManager, Graphics graphics, UserInterface ui
@@ -100,11 +103,29 @@ public class GameActionListener implements ActionListener {
 	}
 
 	/**
-	 * Set the kind of action that will be carried out by the left mouse button.
-	 * To be called by the GUI.
+	 * Notify input handler (this) that the user selected the move action.
 	 * */
-	public synchronized void setLeftButtonMode(InputMode mode) {
-		leftButtonMode = mode;
+	public synchronized void notifyMove() {
+		leftButtonMode = InputMode.MOVE;
+	}
+
+	/**
+	 * Notify input handler (this) that the user selected the attack action.
+	 * */
+	public synchronized void notifyTarget(AbilityName ability, int repeats) {
+		attackWith = ability;
+		leftButtonMode = InputMode.TARGET;
+		repeats = repeats - 1;
+	}
+
+	/**
+	 * Notify input handler (this) that an ability is repeating.
+	 * */
+	public synchronized void repeatTarget() {
+		if (repeats > 0) {
+			leftButtonMode = InputMode.TARGET;
+			repeats -= 1;
+		}
 	}
 
 	/**
@@ -159,9 +180,11 @@ public class GameActionListener implements ActionListener {
 						break;
 					case MOVE:
 						moveCharacterToMouse();
+						leftButtonMode = InputMode.SELECT;
 						break;
 					case TARGET:
-						// TODO: implement this
+						targetMouse();
+						leftButtonMode = InputMode.SELECT;
 						break;
 				}
 			}
@@ -220,6 +243,23 @@ public class GameActionListener implements ActionListener {
 				ui.updateMP(
 					selectedTurnCharacter.getName(),
 					selectedTurnCharacter.getMP());
+			}
+		}
+	}
+
+	private void targetMouse() {
+		Position target =	
+			graphics.getBoardByMouse(inputManager.getCursorPosition());
+
+		if (selectedTurnCharacter != null && target != null) {
+			if (!selectedTurnCharacter.canDoAbility(attackWith, target)) {
+				System.out.println("Cannot target " + target.toString()
+					+ " with ability " + attackWith.toString());
+			} else {
+				selectedTurnCharacter.doAbility(attackWith, target);
+				ui.updateAP(
+					selectedTurnCharacter.getName(),
+					selectedTurnCharacter.getAP());
 			}
 		}
 	}

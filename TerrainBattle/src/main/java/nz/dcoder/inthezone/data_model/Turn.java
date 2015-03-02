@@ -1,6 +1,8 @@
 package nz.dcoder.inthezone.data_model;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -32,15 +34,18 @@ public class Turn {
 			.filter(t -> t.getPos().equals(pos)).findFirst().orElse(null);
 	}
 
-	/**
-	 * Get all the turn characters
-	 * */
-	public Collection<TurnCharacter> getCharacters() {
-		return turnCharacters;
+	public Collection<CharacterInfo> getPlayerInfo() {
+		return turnCharacters.stream()
+			.map(c -> c.getCharacterInfo()).collect(Collectors.toList());
 	}
 
-	public Collection<Character> getNPCs() {
-		return battle.aiPlayers;
+	public Collection<CharacterInfo> getNPCInfo() {
+		return battle.aiPlayers.stream()
+			.map(c -> c.getCharacterInfo()).collect(Collectors.toList());
+	}
+
+	public CharacterInfo getCharacterAt(Position pos) {
+		return battle.getCharacterAt(pos).getCharacterInfo();
 	}
 
 	/**

@@ -179,9 +179,15 @@ public class Graphics {
 
 	/**
 	 * Animate a character walking along a path
+	 * @param continuation May be null for simple walk actions
 	 * */
-	public void doWalk(CharacterGraphics cg, List<Position> path) {
+	public void doWalk(
+		CharacterGraphics cg,
+		List<Position> path,
+		Runnable continuation
+	) {
 		controllerChain.queueAnimation(() -> cg.getWalkControl().doWalk(path));
+		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 
 	/**
@@ -211,9 +217,18 @@ public class Graphics {
 	/**
 	 * Animate a character doing an ability.
 	 * */
-	public void doAbility(CharacterGraphics cg, AbilityName name) {
+	public void doAbility(
+		CharacterGraphics cg,
+		AbilityName name,
+		Runnable continuation
+	) {
 		// TODO: implement this method.  Keep in mind that any animations or custom
 		// controllers must be queued up in the controllerChain.
+
+		// This is a placeholder.  Ideally we would have an "attack" animation.
+		controllerChain.queueAnimation(() -> cg.setAnimation("idleA", 1));
+
+		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 
 	/**

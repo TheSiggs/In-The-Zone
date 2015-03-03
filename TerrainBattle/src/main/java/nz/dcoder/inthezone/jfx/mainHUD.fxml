@@ -21,7 +21,7 @@
     </stylesheets>
 
     <children>
-        <Pane fx:id="SelectedCharacter" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20">
+        <Pane fx:id="selectedCharacter" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20" visible="false">
         <children>
             <Pane fx:id="selectedCharacterPortrait" layoutX="0" layoutY="0" prefHeight="92" prefWidth="56" />
 
@@ -42,7 +42,8 @@
         </children>
         </Pane>
 
-        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL">
+        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+          visible="false" >
         <children>
             <Button text="Move" fx:id="topMove" mnemonicParsing="false"        prefHeight="24" prefWidth="120" />
             <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    prefHeight="24" prefWidth="120" />

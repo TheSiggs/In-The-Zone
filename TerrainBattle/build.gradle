@@ -204,11 +204,15 @@ task createBlenderScripts {
     }
 }
 distZip {
-    dependsOn createStartScript
-	into(project.name) {
-		from '.'
-		include 'assets/**', '*.dylib', '*.so', '*.map'
-	}
+    //dependsOn createStartScript
+    into(project.name) {
+    	from '.'
+    	include 'assets/**', '*.dylib', '*.so', '*.map', 'scene.csv'
+    }
+    into(project.name) {
+        from 'gitignore'
+        include 'jre**/**'
+    }
     into(project.name) {
         from('.') {
             include 'zans-story', 'zans-story.bat'

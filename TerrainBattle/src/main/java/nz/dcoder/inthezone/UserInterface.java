@@ -17,6 +17,8 @@ import javafx.scene.Scene;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +36,7 @@ import nz.dcoder.inthezone.Main;
  */
 public class UserInterface {
 	final GameActionListener input;
+	final MainHUDController controller;
 
 	public UserInterface(Main game, Graphics g) {
 		this.input = new GameActionListener(game.getInputManager(), g, this);
@@ -41,8 +44,21 @@ public class UserInterface {
 		Node guiNode = game.getGuiNode();
 
 		JmeFxScreenContainer jmeFx = JmeFxContainer.install(game, guiNode, true, null);
-		Platform.runLater(new LaunchJavaFxGUI(jmeFx, input, game));
 		guiNode.attachChild(jmeFx.getJmeNode());
+
+		// The CompletableFuture allows us to safely move a single piece of data
+		// between two threads
+		CompletableFuture<MainHUDController> hud = new CompletableFuture<>();
+
+		LaunchJavaFxGUI launcher = new LaunchJavaFxGUI(jmeFx, input, hud);
+		Platform.runLater(launcher);
+		try {
+			this.controller = hud.get(5, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			throw new RuntimeException(
+				"Failed to create GUI because: " + e.getMessage(), e);
+		}
+
 	}
 
 	public GameActionListener getGameActionListener() {
@@ -54,27 +70,27 @@ public class UserInterface {
 		Collection<CharacterInfo> players,
 		Collection<CharacterInfo> npcs
 	) {
-		// TODO: pass this on to the GUI
+		Platform.runLater(() -> controller.turnStart(isPlayerTurn, players, npcs));
 	}
 
 	public void selectCharacter(CharacterInfo info) {
-		// TODO: pass this on to the GUI
+		Platform.runLater(() -> controller.selectCharacter(info));
 	}
 
 	public void deselectCharacter() {
-		// TODO: pass this on to the GUI
+		Platform.runLater(() -> controller.deselectCharacter());
 	}
 
 	public void updateMP(CharacterName name, Points mp) {
-		// TODO: pass this on to the GUI
+		Platform.runLater(() -> controller.updateMP(name, mp));
 	}
 
 	public void updateAP(CharacterName name, Points ap) {
-		// TODO: pass this on to the GUI
+		Platform.runLater(() -> controller.updateAP(name, ap));
 	}
 	
 	public void updateHP(CharacterName name, Points hp) {
-		// TODO: pass this on to the GUI
+		Platform.runLater(() -> controller.updateHP(name, hp));
 	}
 }
 
@@ -83,21 +99,19 @@ public class UserInterface {
  * GUI's controller object (and the Scene in case we need it).
  * */
 class LaunchJavaFxGUI implements Runnable {
-	private MainHUDController controller;
-	private Scene scene;
-
 	private final JmeFxScreenContainer jmeFx;
 	private final GameActionListener input;
-	private final Main app;
+
+	private final CompletableFuture<MainHUDController> hud;
 
 	public LaunchJavaFxGUI(
 		JmeFxScreenContainer jmeFx,
 		GameActionListener input,
-		Main app
+		CompletableFuture<MainHUDController> hud
 	) {
 		this.jmeFx = jmeFx;
 		this.input = input;
-		this.app = app;
+		this.hud = hud;
 	}
 
 	/**
@@ -113,35 +127,20 @@ class LaunchJavaFxGUI implements Runnable {
 
 			Parent root = (Parent) fxmlLoader.load(location.openStream());
 
-			this.scene = new Scene(root, 300, 275);
-			MainHUDController.app = this.app;
-			// TODO: give GUI a reference to the GameActionListener
+			Scene scene = new Scene(root, 300, 275);
 			scene.setFill(Color.TRANSPARENT);
-			//String css = LaunchJavaFxGUI.class.getResource("/nz/dcoder/inthezone/jfx/mainhud.css")
-			//scene.
-			jmeFx.setScene(getScene(), root);
+			jmeFx.setScene(scene, root);
 
-			this.controller = fxmlLoader.getController();
-
-			// controller.getHealth().setProgress(1.0);
+			MainHUDController controller = fxmlLoader.getController();
+			controller.setGameInput(input);
+			hud.complete(controller);
 
 		} catch (IOException ex) {
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		} finally {
+			// cancel returning the HUD controller if it hasn't already been returned
+			hud.cancel(true);
 		}
-	}
-
-	/**
-	 * @return the controller
-	 */
-	public synchronized MainHUDController getController() {
-		return controller;
-	}
-
-	/**
-	 * @return the scene
-	 */
-	public synchronized Scene getScene() {
-		return scene;
 	}
 }
 

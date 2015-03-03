@@ -10,12 +10,16 @@
 	-fx-background-color: Gray;
 }
 
-#HP {
-	-fx-accent: Green;
+.progressLabel {
+	-fx-text-fill: Black;
+}
+
+.HP_bar {
+	-fx-accent: limegreen;
 }
 
 .AP_bar {
-	-fx-accent: Blue;
+	-fx-accent: deepskyblue;
 }
 
 .MP_bar {

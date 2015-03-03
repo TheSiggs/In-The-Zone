@@ -25,44 +25,46 @@
         <children>
             <Pane fx:id="selectedCharacterPortrait" layoutX="0" layoutY="0" prefHeight="92" prefWidth="56" />
 
-            <ProgressBar fx:id="HP"  layoutX="60" layoutY="5" prefHeight="24.0" prefWidth="200" styleClass="HP_bar" progress="1.0"/>
-            <Label text="Hit points" layoutX="70" layoutY="4" prefHeight="24.0" textFill="WHITE" />
-            <Label text="33 / 33"    layoutX="60" layoutY="4" prefHeight="24.0" textFill="WHITE" prefWidth="190" alignment="BASELINE_RIGHT"
-                fx:id="HP_label" />
+            <ProgressBar fx:id="hp"  layoutX="60" layoutY="5" prefHeight="24" prefWidth="200" styleClass="HP_bar" progress="1.0"/>
+            <Label text="Hit points" layoutX="70" layoutY="4" prefHeight="24" styleClass="progressLabel" />
+            <Label text="33 / 33"    layoutX="60" layoutY="4" prefHeight="24" prefWidth="190" alignment="BASELINE_RIGHT"
+                fx:id="hpLabel" styleClass="progressLabel" />
 
-            <ProgressBar fx:id="AP"     layoutX="60" layoutY="34" prefHeight="24.0" prefWidth="200" styleClass="AP_bar" progress="1.0"/>
-            <Label text="Action points" layoutX="70" layoutY="33" prefHeight="24.0" textFill="WHITE" />
-            <Label text="10 / 10"       layoutX="60" layoutY="33" prefHeight="24.0" textFill="WHITE" prefWidth="190" alignment="BASELINE_RIGHT"
-                fx:id="AP_label" />
+            <ProgressBar fx:id="ap"     layoutX="60" layoutY="34" prefHeight="24" prefWidth="200" styleClass="AP_bar" progress="1.0"/>
+            <Label text="Action points" layoutX="70" layoutY="33" prefHeight="24" styleClass="progressLabel" />
+            <Label text="10 / 10"       layoutX="60" layoutY="33" prefHeight="24" prefWidth="190" alignment="BASELINE_RIGHT"
+                fx:id="apLabel" styleClass="progressLabel" />
 
-            <ProgressBar fx:id="MP"       layoutX="60" layoutY="63" prefHeight="24.0" prefWidth="200" styleClass="MP_bar" progress="1.0"/>
-            <Label text="Movement points" layoutX="70" layoutY="62" prefHeight="24.0" textFill="WHITE" />
-            <Label text="10 / 10"         layoutX="60" layoutY="62" prefHeight="24.0" textFill="WHITE" prefWidth="190" alignment="BASELINE_RIGHT"
-                fx:id="MP_label" />
+            <ProgressBar fx:id="mp"       layoutX="60" layoutY="63" prefHeight="24" prefWidth="200" styleClass="MP_bar" progress="1.0"/>
+            <Label text="Movement points" layoutX="70" layoutY="62" prefHeight="24" styleClass="progressLabel" />
+            <Label text="10 / 10"         layoutX="60" layoutY="62" prefHeight="24" prefWidth="190" alignment="BASELINE_RIGHT"
+                fx:id="mpLabel" styleClass="progressLabel" />
         </children>
         </Pane>
 
-        <Pane fx:id="TopMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120">
+        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL">
         <children>
-            <Button text="Move" fx:id="topMove" mnemonicParsing="false"        layoutY="0"   prefHeight="24" prefWidth="120" />
-            <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    layoutY="26"  prefHeight="24" prefWidth="120" />
-            <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      layoutY="52"  prefHeight="24" prefWidth="120" />
-            <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    layoutY="78"  prefHeight="24" prefWidth="120" />
-            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" layoutY="104" prefHeight="24" prefWidth="120" />
+            <Button text="Move" fx:id="topMove" mnemonicParsing="false"        prefHeight="24" prefWidth="120" />
+            <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    prefHeight="24" prefWidth="120" />
+            <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      prefHeight="24" prefWidth="120" />
+            <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    prefHeight="24" prefWidth="120" />
+            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
         </children>
-        </Pane>
+        </TilePane>
 
-        <Pane fx:id="AttackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="105.0" visible="false">
+        <TilePane fx:id="attackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+            visible="false">
         <children>
-            <Button text="Back" fx:id="attackExit" layoutY="0" mnemonicParsing="false" prefHeight="24" prefWidth="100" />
+            <Button text="Back" fx:id="attackExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
         </children>
-        </Pane> 
+        </TilePane> 
 
-        <Pane fx:id="MagicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="105.0" visible="false">
+        <TilePane fx:id="magicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+            visible="false">
         <children>
-            <Button text="Back" fx:id="magicExit" layoutY="0" mnemonicParsing="false" prefHeight="24" prefWidth="100" />
+            <Button text="Back" fx:id="magicExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
         </children>
-        </Pane>
+        </TilePane>
 
     </children>
 </AnchorPane>

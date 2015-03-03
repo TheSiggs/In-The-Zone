@@ -5,20 +5,21 @@
  */
 package nz.dcoder.inthezone.jfx;
 
-import com.jme3.app.Application;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
 import java.net.URL;
-import java.util.concurrent.Callable;
 import java.util.ResourceBundle;
+import java.util.Collection;
 
-import nz.dcoder.inthezone.Main;
-import nz.dcoder.inthezone.OldMain;
+import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
+import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.Points;
+import nz.dcoder.inthezone.input.GameActionListener;
 
 /**
  * FXML Controller class
@@ -26,142 +27,49 @@ import nz.dcoder.inthezone.OldMain;
  * @author denz
  */
 public class MainHUDController implements Initializable {
-
-    public static Application app;
-    @FXML
-    public Canvas canvas;
+    @FXML public Canvas canvas;
 
     /**
      * Initializes the controller class.
      */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        /* 
-         GraphicsContext ctx = canvas.getGraphicsContext2D();
-         ctx.setFill(new Color(1.0, 0.0, 0.0, 1.0));
-         ctx.rect(10, 10, 50, 50);
-         ctx.fill();
-         */
+    @Override public void initialize(URL url, ResourceBundle rb) {
     }
 
-    @FXML
-    private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-        app.enqueue(new Callable<Application>() {
+		private GameActionListener input;
+		public void setGameInput(GameActionListener input) {
+			this.input = input;
+		}
 
-            @Override
-            public Application call() throws Exception {
-                // some casting nonsense to maintain compatibility with
-                // OldMain.  This should be removed at first opportunity
-                if (app instanceof Main) {
-                    ((Main) app).someMethod();
-                } else if (app instanceof OldMain) {
-                    ((OldMain) app).someMethod();
-                }
-                return app;
-            }
-        });
-    }
+		public void turnStart(
+			boolean isPlayerTurn,
+			Collection<CharacterInfo> players,
+			Collection<CharacterInfo> npcs
+		) {
+		}
 
-    @FXML
-    private ProgressBar health;
-    
-    public void setHealthValue(double value) {
-        health.setProgress(value);
-        
-    }
+		public void selectCharacter(CharacterInfo info) {
+		}
 
-    @FXML
-    private void healthUp(ActionEvent event) {
-        getHealth().setProgress(getHealth().getProgress() + 0.1);
+		public void deselectCharacter() {
+		}
 
-        System.out.println("Health Up!");
-    }
+		public void updateMP(CharacterName name, Points mp) {
+		}
 
-    @FXML
-    private void healthDown(ActionEvent event) {
-        getHealth().setProgress(getHealth().getProgress() - 0.1);
+		public void updateAP(CharacterName name, Points ap) {
+		}
+		
+		public void updateHP(CharacterName name, Points hp) {
+		}
 
-        if (getHealth().getProgress() == 0) {
-            System.out.println("This Character is Dead!");
-        }
-        System.out.println("Health Down!");
-    }
-    
-    @FXML
-    private ProgressBar movePoints;
-    
-    public void setMovePointValue(double value) {
-        movePoints.setProgress(value);
-    }
-        
-    public synchronized void decreaseMovementPoints(double value, double total) {
-       getMovePoints().setProgress(getMovePoints().getProgress() - 0.1);
-       
-       if (getMovePoints().getProgress() == 0) {
-           System.out.println("This Character cannot Move!");
-       }
-       System.out.println("This Character has Moved!");
-    }
-
-    /**
-     * @return movement points
-     */
-    public ProgressBar getMovePoints(){
-        return movePoints;
-    }
-    /**
-     * @param movePoints the movePoints to set
-     */
-    public void setMovePoints(ProgressBar movePoints) {
-        this.movePoints = movePoints;
-    }
-    
-    /**
-     * @return the health
-     */
-    public ProgressBar getHealth() {
-        return health;
-    }
-    /**
-     * @param health the health to set
-     */
-    public void setHealth(ProgressBar health) {
-        this.health = health;
-    }
-    
-
-    @FXML
-    private Button AttackButton = new Button();
-    @FXML
-    private Pane AttackMenu = new Pane();
-    @FXML
-    private Button MagicButton = new Button();
-    @FXML
-    private Pane MagicMenu = new Pane();
-
-    /**
-     * Show Attack Menu
-     */
-    public void showAttackMenu() {
-       AttackMenu.setVisible(true);
-     //  MagicMenu.setVisible(false);
-    }
-    public void hideAttackMenu() {
-       AttackMenu.setVisible(false);
-      // MagicMenu.setVisible(false);
-    } 
-    /**
-     * Show Magic Menu
-     */   
-    public void showMagicMenu() {
-        MagicMenu.setVisible(true);
-       // AttackMenu.setVisible(false);
-    }
-    public void hideMagicMenu() {
-        MagicMenu.setVisible(false);
-       // AttackMenu.setVisible(false);
-    }
-    
+    @FXML private ProgressBar hp;
+    @FXML private ProgressBar ap;
+    @FXML private ProgressBar mp;
+		@FXML private Label hpLabel;
+		@FXML private Label apLabel;
+		@FXML private Label mpLabel;
+		@FXML private TilePane topMenu;
+		@FXML private TilePane AttackMenu;
+		@FXML private TilePane MagicMenu;
     
 }

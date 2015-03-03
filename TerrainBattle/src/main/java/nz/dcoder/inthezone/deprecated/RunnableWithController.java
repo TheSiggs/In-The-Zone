@@ -46,11 +46,11 @@ public class RunnableWithController implements Runnable {
 			Parent root1 = (Parent) fxmlLoader.load(location.openStream());
 
 			setScene(new Scene(root1, 300, 275));
-			MainHUDController.app = getApp();
+			//MainHUDController.app = getApp();
 			getScene().setFill(Color.TRANSPARENT);
 			getJmeFx().setScene(getScene(), root1);
 			controller = fxmlLoader.getController();
-			this.getController().getHealth().setProgress(1.0);
+			//this.getController().getHealth().setProgress(1.0);
 		} catch (IOException ex) {
 			Logger.getLogger(OldMain.class.getName()).log(Level.SEVERE, null, ex);
 		}

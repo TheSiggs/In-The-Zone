@@ -10,42 +10,60 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: rgba(255,255,255,0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
+<AnchorPane id="AnchorPane"
+  style="-fx-background-color: rgba(255,255,255,0);"
+  styleClass="mainFxmlClass"
+  xmlns="http://javafx.com/javafx/8"
+  xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
     <stylesheets>
         <URL value="@mainhud.css" />
     </stylesheets>
+
     <children>
-        <Button layoutX="727.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleButtonAction" text="Main HUD" visible="false" />
-        <ProgressBar id="health" fx:id="health" layoutX="88.0" layoutY="16.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Red;" styleClass="health" />
-      <Label layoutX="138.0" layoutY="15.0" prefHeight="25.0" prefWidth="45.0" text="Health" textFill="WHITE" />
-      <ProgressBar fx:id="AP" layoutX="88.0" layoutY="44.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Blue;" />
-      <Label layoutX="138.0" layoutY="43.0" prefHeight="25.0" prefWidth="72.0" text="Action Points" textFill="WHITE" />
-      <ProgressBar fx:id="movePoints" layoutX="88.0" layoutY="75.0" prefHeight="25.0" prefWidth="200.0" progress="1.0" style="-fx-accent: Orange;" />
-      <Label layoutX="138.0" layoutY="74.0" prefHeight="25.0" prefWidth="100.0" text="Movement Points" textFill="WHITE" />
-      <BorderPane layoutX="20.0" layoutY="11.0" prefHeight="92.0" prefWidth="66.0" style="-fx-background-color: Grey;" />
-      <Pane fx:id="ActionMenu" layoutX="706.0" layoutY="16.0" prefHeight="130.0" prefWidth="80.0">
-         <children>
-            <Button fx:id="AttackButton" layoutX="9.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#showAttackMenu" prefHeight="25.0" prefWidth="63.0" text="Attack" />
-            <Button fx:id="MagicButton" layoutX="9.0" layoutY="52.0" mnemonicParsing="false" onMouseClicked="#showMagicMenu" prefHeight="25.0" prefWidth="63.0" text="Magic" />
-            <Button layoutX="9.0" layoutY="96.0" mnemonicParsing="false" text="Use Item" />
-         </children>
-      </Pane>
-      <Pane fx:id="AttackMenu" layoutX="601.0" layoutY="12.0" prefHeight="139.0" prefWidth="105.0" visible="true">
-         <children>
-            <Button layoutX="3.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Attack 1 (AP:5)" />
-            <Button layoutX="3.0" layoutY="57.0" mnemonicParsing="false" text="Attack 2 (AP:10)" />
-            <Button fx:id="ExitAttackMenu" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#hideAttackMenu" prefHeight="25.0" prefWidth="100.0" text="Back" />
-            <Pane fx:id="MagicMenu" layoutX="1.0" prefHeight="139.0" prefWidth="105.0" visible="true">
-               <children>
-                  <Button layoutX="3.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Magic 1 " />
-                  <Button layoutX="3.0" layoutY="57.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Magic 2 " />
-                  <Button fx:id="ExitMagicMenu" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#hideMagicMenu" prefHeight="25.0" prefWidth="100.0" text="Back" />
-               </children>
-            </Pane>
-         </children>
-      </Pane> 
+        <Pane fx:id="SelectedCharacter" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20">
+        <children>
+            <Pane fx:id="selectedCharacterPortrait" layoutX="0" layoutY="0" prefHeight="92" prefWidth="56" />
+
+            <ProgressBar fx:id="HP"  layoutX="60" layoutY="5" prefHeight="24.0" prefWidth="200" styleClass="HP_bar" progress="1.0"/>
+            <Label text="Hit points" layoutX="70" layoutY="4" prefHeight="24.0" textFill="WHITE" />
+            <Label text="33 / 33"    layoutX="60" layoutY="4" prefHeight="24.0" textFill="WHITE" prefWidth="190" alignment="BASELINE_RIGHT"
+                fx:id="HP_label" />
+
+            <ProgressBar fx:id="AP"     layoutX="60" layoutY="34" prefHeight="24.0" prefWidth="200" styleClass="AP_bar" progress="1.0"/>
+            <Label text="Action points" layoutX="70" layoutY="33" prefHeight="24.0" textFill="WHITE" />
+            <Label text="10 / 10"       layoutX="60" layoutY="33" prefHeight="24.0" textFill="WHITE" prefWidth="190" alignment="BASELINE_RIGHT"
+                fx:id="AP_label" />
+
+            <ProgressBar fx:id="MP"       layoutX="60" layoutY="63" prefHeight="24.0" prefWidth="200" styleClass="MP_bar" progress="1.0"/>
+            <Label text="Movement points" layoutX="70" layoutY="62" prefHeight="24.0" textFill="WHITE" />
+            <Label text="10 / 10"         layoutX="60" layoutY="62" prefHeight="24.0" textFill="WHITE" prefWidth="190" alignment="BASELINE_RIGHT"
+                fx:id="MP_label" />
+        </children>
+        </Pane>
+
+        <Pane fx:id="TopMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120">
+        <children>
+            <Button text="Move" fx:id="topMove" mnemonicParsing="false"        layoutY="0"   prefHeight="24" prefWidth="120" />
+            <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    layoutY="26"  prefHeight="24" prefWidth="120" />
+            <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      layoutY="52"  prefHeight="24" prefWidth="120" />
+            <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    layoutY="78"  prefHeight="24" prefWidth="120" />
+            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" layoutY="104" prefHeight="24" prefWidth="120" />
+        </children>
+        </Pane>
+
+        <Pane fx:id="AttackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="105.0" visible="false">
+        <children>
+            <Button text="Back" fx:id="attackExit" layoutY="0" mnemonicParsing="false" prefHeight="24" prefWidth="100" />
+        </children>
+        </Pane> 
+
+        <Pane fx:id="MagicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="105.0" visible="false">
+        <children>
+            <Button text="Back" fx:id="magicExit" layoutY="0" mnemonicParsing="false" prefHeight="24" prefWidth="100" />
+        </children>
+        </Pane>
+
     </children>
-   <padding>
-      <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-   </padding>
 </AnchorPane>
+

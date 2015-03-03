@@ -117,6 +117,8 @@ class LaunchJavaFxGUI implements Runnable {
 			MainHUDController.app = this.app;
 			// TODO: give GUI a reference to the GameActionListener
 			scene.setFill(Color.TRANSPARENT);
+			//String css = LaunchJavaFxGUI.class.getResource("/nz/dcoder/inthezone/jfx/mainhud.css")
+			//scene.
 			jmeFx.setScene(getScene(), root);
 
 			this.controller = fxmlLoader.getController();

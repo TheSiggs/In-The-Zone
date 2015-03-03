@@ -67,12 +67,12 @@ sourceSets {
 			//srcDirs = ["$projectDir/src/main/resources", "$projectDir/src/assets", "$projectDir/assets"]
 			srcDirs = ["src/main/java", "src/main/resources", "src/assets", "assets"]
 			//include '*.csv'
-			include '*.properties', '**/*.fxml'
+			include '*.properties', '**/*.fxml', '**/*.css'
 			output.resourcesDir = 'build/resources/main'
 		}
 		java {
 			//srcDirs = ["src/main/java"]
-			include '**/*.fxml', '**/*.java'
+			include '**/*.fxml', '**/*.java', '**/*.css'
 		}
 
 		test {
@@ -132,6 +132,7 @@ jar {
     }
     from fileTree('src/main/resources').include('**/*.fxml')
     from fileTree('src/main/java').include('**/*.fxml')
+    from fileTree('src/main/java').include('**/*.css')
     from fileTree('src/main/data').include('**/*.csv')
     from fileTree('src/main/data').include('**/*.txt')
     //from fileTree('src/main/java').include('**/*.class')
@@ -150,6 +151,7 @@ fatJar {
 	}
 	from fileTree('src/main/resources').include('**/*.fxml')
 	from fileTree('src/main/java').include('**/*.fxml')
+	from fileTree('src/main/data').include('**/*.css')
 	from fileTree('src/main/data').include('**/*.csv')
 	from fileTree('src/main/data').include('**/*.txt')
 	//from fileTree('src/main/java').include('**/*.class')

@@ -5,3 +5,20 @@
 .mainFxmlClass {
 	
 }
+
+#selectedCharacterPortrait {
+	-fx-background-color: Gray;
+}
+
+#HP {
+	-fx-accent: Green;
+}
+
+.AP_bar {
+	-fx-accent: Blue;
+}
+
+.MP_bar {
+	-fx-accent: Orange;
+}
+

@@ -1,8 +1,8 @@
 name,blocksSpace,blocksPath,isAttackable,isPushable,hits,hasAbility,ability,,Notes
 testObj,TRUE,FALSE,FALSE,FALSE,1,TRUE,test,,This line is for testing.  Please do not alter
 testBody,TRUE,FALSE,FALSE,TRUE,1,FALSE,,,This line is for testing.  Please do not alter
-goblinBody,TRUE,FALSE,FALSE,TRUE,1,FALSE,,,
-,,,,,,,,,Description of fields
+goblinBody1,TRUE,FALSE,FALSE,TRUE,1,FALSE,,,
+goblinBody2,TRUE,FALSE,FALSE,TRUE,1,FALSE,,,Description of fields
 ,,,,,,,,,name: The name of this battle object
 ,,,,,,,,,blocksSpace: TRUE if no character or object can occupy the same space as this object
 ,,,,,,,,,"blocksPath: TRUE if no path can go through this object, otherwise FALSE"

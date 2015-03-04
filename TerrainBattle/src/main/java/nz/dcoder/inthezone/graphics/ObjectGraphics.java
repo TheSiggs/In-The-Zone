@@ -1,8 +1,10 @@
 package nz.dcoder.inthezone.graphics;
 
+import com.jme3.animation.Animation;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
+import com.jme3.animation.LoopMode;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
@@ -33,6 +35,14 @@ public class ObjectGraphics implements AnimEventListener {
 		control = spatial.getControl(AnimControl.class);
 		control.addListener(this);
 		channel = control.createChannel();
+	}
+
+	/**
+	 * Hack to allow extending a model with animations that weren't supplied by
+	 * the artist.  This should be removed at first opportunity.
+	 * */
+	void addAnim(Animation anim) {
+		control.addAnim(anim);
 	}
 
 	public Position getPosition() {
@@ -78,6 +88,7 @@ public class ObjectGraphics implements AnimEventListener {
 	 * */
 	public void setAnimation(String name) {
 		limitedAnimation = false;
+		channel.setLoopMode(LoopMode.Loop);
 		channel.setAnim(name);
 	}
 
@@ -90,6 +101,11 @@ public class ObjectGraphics implements AnimEventListener {
 	public void setAnimation(String name, int n) {
 		limitedAnimation = true;
 		animRepeats = n;
+		if (n == 1) {
+			channel.setLoopMode(LoopMode.DontLoop);
+		} else {
+			channel.setLoopMode(LoopMode.Loop);
+		}
 		channel.setAnim(name);
 	}
 }

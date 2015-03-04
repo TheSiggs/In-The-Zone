@@ -6,6 +6,8 @@ import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Terrain;
 
+import com.jme3.animation.Animation;
+import com.jme3.animation.SpatialTrack;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.FileLocator;
@@ -126,12 +128,7 @@ public class Graphics {
 		return new Vector3f(bx, by, bz);
 	}
 
-	/**
-	 * Add a goblin character.  For testing purposes only.
-	 * @param i The goblin to create (1 - 10 where 1 - 5 are the player goblins
-	 * and 6 - 10 are the enemy goblins)
-	 * */
-	public CharacterGraphics addGoblin(Position p, int i) {
+	private Spatial addGoblinSpatial(Position p, int i) {
 		String texture;
 		if (i <= 5) {
 			texture = "belt/D.png";
@@ -153,10 +150,56 @@ public class Graphics {
 		// need to do this before constructing the CharacterGraphics object
 		boardNode.attachChild(spatial);
 
+		return spatial;
+	}
+
+	/**
+	 * Add a goblin character.  For testing purposes only.
+	 * @param i The goblin to create (1 - 10 where 1 - 5 are the player goblins
+	 * and 6 - 10 are the enemy goblins)
+	 * */
+	public CharacterGraphics addGoblin(Position p, int i) {
+		Spatial spatial = addGoblinSpatial(p, i);
+
 		CharacterGraphics cg = new CharacterGraphics(this, spatial, p);
 		characters.add(cg);
 
 		return cg;
+	}
+
+	/**
+	 * Add a dead goblin object.  For testing purposes only.
+	 * */
+	public ObjectGraphics addDeadGoblin(Position p, int i) {
+		Spatial spatial = addGoblinSpatial(p, i);
+
+		// BEGIN HACK: construct "die" animation since goblin model doesn't have it
+		Animation die = new Animation("die", 1f);
+
+		float[] times = new float[2];
+		Vector3f[] translations = new Vector3f[2];
+		Quaternion[] rotations = new Quaternion[2];
+		Vector3f[] scales = new Vector3f[2];
+
+		times[0] = 0;
+		translations[0] = positionToVector(p).addLocal(0, -((scale / 2) + 0.1f), -0.2f);
+		rotations[0] = new Quaternion();
+		scales[0] = new Vector3f(0.5f, 0.5f, 0.5f);
+		times[1] = 1;
+		translations[1] = positionToVector(p).addLocal(0, -((scale / 2) + 0.1f), -0.2f);
+		rotations[1] = new Quaternion();
+		scales[1] = new Vector3f(0.5f, 0.5f, 0.5f);
+
+		rotations[0].fromAngles(FastMath.HALF_PI, 0f, 0f);
+		rotations[1].fromAngles(FastMath.HALF_PI * 0.1f, 0f, 0f);
+		die.addTrack(new SpatialTrack(times, translations, rotations, scales));
+		// END HACK
+
+		ObjectGraphics og = new ObjectGraphics(this, spatial, p);
+		og.addAnim(die);
+		objects.add(og);
+
+		return og;
 	}
 
 	/**
@@ -169,11 +212,24 @@ public class Graphics {
 		return null;
 	}
 
+	private static final BattleObjectName deadGoblin1 =
+		new BattleObjectName("goblinBody1");
+
+	private static final BattleObjectName deadGoblin2 =
+		new BattleObjectName("goblinBody2");
+
 	/**
 	 * Add an object to the board, such as a body, a boulder, or a trip mine.
 	 * */
 	public ObjectGraphics addObject(Position p, BattleObjectName name) {
 		// TODO: implement this method
+
+		// this is a special case for testing purposes, not a general mechanism.
+		if (name.equals(deadGoblin1)) {
+			return addDeadGoblin(p, 1);
+		} else if (name.equals(deadGoblin2)) {
+			return addDeadGoblin(p, 6);
+		}
 		return null;
 	}
 
@@ -202,7 +258,7 @@ public class Graphics {
 		boardNode.detachChild(cg.getSpatial());
 		characters.remove(cg);
 		ObjectGraphics r = addObject(p, body);
-		//controllerChain.queueAnimation(() -> r.setAnimation("die", 1));
+		controllerChain.queueAnimation(() -> r.setAnimation("die", 1));
 		return r;
 	}
 

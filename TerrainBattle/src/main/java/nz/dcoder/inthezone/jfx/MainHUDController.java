@@ -142,6 +142,8 @@ public class MainHUDController implements Initializable {
 	}
 
 	public void selectCharacter(CharacterInfo info) {
+		deselectCharacter();
+
 		currentCharacter = info.name;
 		setPoints(hp, hpLabel, info.hp);
 		setPoints(ap, apLabel, info.ap);
@@ -151,6 +153,29 @@ public class MainHUDController implements Initializable {
 		selectedCharacter.setVisible(true);
 		currentMenu = topMenu;
 		currentMenu.setVisible(true);
+	}
+
+	public void deselectCharacter() {
+		selectedCharacter.setVisible(false);
+		hideMenus();
+	}
+
+	public void updateMP(CharacterName name, Points points) {
+		if (name.equals(currentCharacter)) {
+			setPoints(mp, mpLabel, points);
+		}
+	}
+
+	public void updateAP(CharacterName name, Points points) {
+		if (name.equals(currentCharacter)) {
+			setPoints(ap, apLabel, points);
+		}
+	}
+
+	public void updateHP(CharacterName name, Points points) {
+		if (name.equals(currentCharacter)) {
+			setPoints(hp, hpLabel, points);
+		}
 	}
 
 	private void rebuildMenus(Collection<AbilityInfo> abilities) {
@@ -183,27 +208,5 @@ public class MainHUDController implements Initializable {
 		magic.add(magicExit);
 	}
 
-	public void deselectCharacter() {
-		selectedCharacter.setVisible(false);
-		hideMenus();
-	}
-
-	public void updateMP(CharacterName name, Points points) {
-		if (name.equals(currentCharacter)) {
-			setPoints(mp, mpLabel, points);
-		}
-	}
-
-	public void updateAP(CharacterName name, Points points) {
-		if (name.equals(currentCharacter)) {
-			setPoints(ap, apLabel, points);
-		}
-	}
-
-	public void updateHP(CharacterName name, Points points) {
-		if (name.equals(currentCharacter)) {
-			setPoints(hp, hpLabel, points);
-		}
-	}
 }
 

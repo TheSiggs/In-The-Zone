@@ -73,6 +73,7 @@ public class ObjectGraphics implements AnimEventListener {
 		if (limitedAnimation) {
 			animRepeats -= 1;
 			if (animRepeats < 1) {
+				channel.setLoopMode(LoopMode.DontLoop);
 				limitedAnimation = false;
 				controllerChain.nextAnimation();
 			}
@@ -88,7 +89,6 @@ public class ObjectGraphics implements AnimEventListener {
 	 * */
 	public void setAnimation(String name) {
 		limitedAnimation = false;
-		channel.setLoopMode(LoopMode.Loop);
 		channel.setAnim(name);
 	}
 
@@ -101,11 +101,6 @@ public class ObjectGraphics implements AnimEventListener {
 	public void setAnimation(String name, int n) {
 		limitedAnimation = true;
 		animRepeats = n;
-		if (n == 1) {
-			channel.setLoopMode(LoopMode.DontLoop);
-		} else {
-			channel.setLoopMode(LoopMode.Loop);
-		}
 		channel.setAnim(name);
 	}
 }

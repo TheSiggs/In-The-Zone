@@ -182,16 +182,17 @@ public class Graphics {
 		Vector3f[] scales = new Vector3f[2];
 
 		times[0] = 0;
-		translations[0] = positionToVector(p).addLocal(0, -((scale / 2) + 0.1f), -0.2f);
+		translations[0] = positionToVector(p).addLocal(0, -((scale / 2) + 0.2f), 0f);
 		rotations[0] = new Quaternion();
 		scales[0] = new Vector3f(0.5f, 0.5f, 0.5f);
+
 		times[1] = 1;
-		translations[1] = positionToVector(p).addLocal(0, -((scale / 2) + 0.1f), -0.2f);
+		translations[1] = positionToVector(p).addLocal(0, -((scale / 2) + 0.2f), -0.2f);
 		rotations[1] = new Quaternion();
 		scales[1] = new Vector3f(0.5f, 0.5f, 0.5f);
 
 		rotations[0].fromAngles(FastMath.HALF_PI, 0f, 0f);
-		rotations[1].fromAngles(FastMath.HALF_PI * 0.1f, 0f, 0f);
+		rotations[1].fromAngles(FastMath.HALF_PI * 0.2f, 0f, 0f);
 		die.addTrack(new SpatialTrack(times, translations, rotations, scales));
 		// END HACK
 

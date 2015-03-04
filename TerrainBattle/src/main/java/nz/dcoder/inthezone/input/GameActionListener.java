@@ -119,6 +119,13 @@ public class GameActionListener implements ActionListener {
 	}
 
 	/**
+	 * End the current turn.  To be called by the GUI.
+	 * */
+	public synchronized void notifyEndTurn() {
+		turn.endTurn();
+	}
+
+	/**
 	 * Notify input handler (this) that an ability is repeating.
 	 * */
 	public synchronized void repeatTarget() {
@@ -126,13 +133,6 @@ public class GameActionListener implements ActionListener {
 			leftButtonMode = InputMode.TARGET;
 			repeats -= 1;
 		}
-	}
-
-	/**
-	 * End the current turn.  To be called by the GUI.
-	 * */
-	public synchronized void endTurn() {
-		turn.endTurn();
 	}
 
 	/**
@@ -189,9 +189,6 @@ public class GameActionListener implements ActionListener {
 				}
 			}
 			if (name.equals("RightMouse")) {
-				// this is temporary.  Later I presume we will use the right mouse
-				// button for something else (cancel or confirm perhaps).
-				moveCharacterToMouse();
 			}
 		} else {
 			if (name.equals("LeftView")) {

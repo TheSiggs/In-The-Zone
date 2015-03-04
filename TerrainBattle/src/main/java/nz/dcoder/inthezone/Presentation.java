@@ -128,6 +128,7 @@ public final class Presentation {
 
 	private void initBattleController() {
 		controller.onPlayerTurnStart = this::playerTurnStart;
+		controller.onAIPlayerTurnStart = this::aiPlayerTurnStart;
 		controller.onBattleEnd = this::endBattle;
 		controller.onMove = this::move;
 		controller.onAbility = this::ability;

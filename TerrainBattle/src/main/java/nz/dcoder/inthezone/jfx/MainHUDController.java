@@ -5,17 +5,20 @@
  */
 package nz.dcoder.inthezone.jfx;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
 import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
@@ -30,11 +33,30 @@ import nz.dcoder.inthezone.input.GameActionListener;
 public class MainHUDController implements Initializable {
     @FXML public Canvas canvas;
 
+		// a stack of sub menus to simplify the implementation of the back buttons.
+		// Prepend to the start of the list to add a new menu to the stack.  Remove
+		// from the start of the list to pop menus off the stack.
+		Pane currentMenu = null;
+		private List<Pane> subMenus = new LinkedList<>();
+
+		private GameActionListener input;
+		public void setGameInput(GameActionListener input) {
+			this.input = input;
+		}
+
     /**
      * Initializes the controller class.
      */
     @Override public void initialize(URL url, ResourceBundle rb) {
+			currentMenu = topMenu;
     }
+
+		private void pushMenu(Pane menu) {
+			subMenus.add(0, currentMenu);
+			currentMenu.setVisible(false);
+			currentMenu = menu;
+			currentMenu.setVisible(true);
+		}
 
     @FXML private ProgressBar hp;
     @FXML private ProgressBar ap;
@@ -45,11 +67,35 @@ public class MainHUDController implements Initializable {
 		@FXML private TilePane topMenu;
 		@FXML private TilePane attackMenu;
 		@FXML private TilePane magicMenu;
+		@FXML private TilePane itemMenu;
 		@FXML private Pane selectedCharacter;
 
-		private GameActionListener input;
-		public void setGameInput(GameActionListener input) {
-			this.input = input;
+		@FXML protected void onMoveButton(ActionEvent event) {
+			input.notifyMove();
+		}
+
+		@FXML protected void onAttackButton(ActionEvent event) {
+			pushMenu(attackMenu);
+		}
+
+		@FXML protected void onMagicButton(ActionEvent event) {
+			pushMenu(magicMenu);
+		}
+
+		@FXML protected void onItemButton(ActionEvent event) {
+			pushMenu(itemMenu);
+		}
+
+		@FXML protected void onEndButton(ActionEvent event) {
+			input.notifyEndTurn();
+		}
+
+		@FXML protected void onBackButton(ActionEvent event) {
+			if (subMenus.size() > 0) {
+				currentMenu.setVisible(false);
+				currentMenu = subMenus.remove(0);
+				currentMenu.setVisible(true);
+			}
 		}
 
 		public void turnStart(
@@ -57,6 +103,8 @@ public class MainHUDController implements Initializable {
 			Collection<CharacterInfo> players,
 			Collection<CharacterInfo> npcs
 		) {
+			selectedCharacter.setVisible(false);
+			topMenu.setVisible(false);
 		}
 
 		CharacterName currentCharacter = null;

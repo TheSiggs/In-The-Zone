@@ -10,6 +10,11 @@
 	-fx-background-color: Gray;
 }
 
+.button:disabled {
+	-fx-opacity: 1;
+	-fx-text-fill: Gray;
+}
+
 .progressLabel {
 	-fx-text-fill: Black;
 }

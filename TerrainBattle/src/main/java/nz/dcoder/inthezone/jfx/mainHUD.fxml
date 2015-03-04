@@ -56,6 +56,7 @@
         <TilePane fx:id="attackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
             visible="false">
         <children>
+            <Button text="No attacks" fx:id="noAttacks" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
             <Button text="Back" fx:id="attackExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onBackButton" />
         </children>
         </TilePane> 
@@ -63,6 +64,7 @@
         <TilePane fx:id="magicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
             visible="false">
         <children>
+            <Button text="No magic" fx:id="noMagic" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
             <Button text="Back" fx:id="magicExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onBackButton" />
         </children>
         </TilePane>
@@ -70,6 +72,7 @@
         <TilePane fx:id="itemMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
             visible="false">
         <children>
+            <Button text="No items" fx:id="noItems" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
             <Button text="Back" fx:id="itemExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onBackButton" />
         </children>
         </TilePane>

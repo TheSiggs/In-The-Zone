@@ -55,6 +55,9 @@ public class MainHUDController implements Initializable {
 	*/
 	@Override public void initialize(URL url, ResourceBundle rb) {
 		currentMenu = topMenu;
+		noAttacks.setDisable(true);
+		noMagic.setDisable(true);
+		noItems.setDisable(true);
 	}
 
 	private void pushMenu(Pane menu) {
@@ -62,6 +65,15 @@ public class MainHUDController implements Initializable {
 		currentMenu.setVisible(false);
 		currentMenu = menu;
 		currentMenu.setVisible(true);
+	}
+
+	private void hideMenus() {
+		currentMenu.setVisible(false);
+		for (Pane m : subMenus) {
+			m.setVisible(false);
+			currentMenu = m;
+		}
+		subMenus.clear();
 	}
 
 	@FXML private ProgressBar hp;
@@ -79,6 +91,10 @@ public class MainHUDController implements Initializable {
 	@FXML private Button attackExit;
 	@FXML private Button magicExit;
 	@FXML private Button itemExit;
+
+	@FXML private Button noAttacks;
+	@FXML private Button noMagic;
+	@FXML private Button noItems;
 
 	@FXML protected void onMoveButton(ActionEvent event) {
 		input.notifyMove();
@@ -114,7 +130,7 @@ public class MainHUDController implements Initializable {
 		Collection<CharacterInfo> npcs
 	) {
 		selectedCharacter.setVisible(false);
-		topMenu.setVisible(false);
+		hideMenus();
 	}
 
 	CharacterName currentCharacter = null;
@@ -132,7 +148,8 @@ public class MainHUDController implements Initializable {
 		rebuildMenus(info.abilities);
 
 		selectedCharacter.setVisible(true);
-		topMenu.setVisible(true);
+		currentMenu = topMenu;
+		currentMenu.setVisible(true);
 	}
 
 	private void rebuildMenus(Collection<AbilityInfo> abilities) {
@@ -154,13 +171,16 @@ public class MainHUDController implements Initializable {
 			}
 		}
 
+		if (attack.size() == 0) attack.add(noAttacks);
+		if (magic.size() == 0) magic.add(noMagic);
+
 		attack.add(attackExit);
 		magic.add(magicExit);
 	}
 
 	public void deselectCharacter() {
 		selectedCharacter.setVisible(false);
-		topMenu.setVisible(false);
+		hideMenus();
 	}
 
 	public void updateMP(CharacterName name, Points points) {

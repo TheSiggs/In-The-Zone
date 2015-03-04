@@ -55,9 +55,9 @@ public class DamageAbility extends Ability {
 			BaseStats tstats = c.getBaseStats();
 			Collection<Equipment> armour = c.getArmour();
 
-			double physDef = armour.stream()
+			int physDef = armour.stream()
 				.collect(Collectors.summingInt(a -> a.physical));
-			double magDef = armour.stream()
+			int magDef = armour.stream()
 				.collect(Collectors.summingInt(a -> a.magical));
 
 			Formula d;
@@ -84,7 +84,9 @@ public class DamageAbility extends Ability {
 			d.setVariable("target_magicalArmour", magDef);
 
 			try {
-				c.hp -= (int) d.evaluate();
+				int damage = (int) d.evaluate();
+				System.err.println("damage: " + damage);
+				c.hp -= damage;
 			} catch (FormulaException e) {
 				throw new RuntimeException(
 					"Error evaluating damage formula: " + e.getMessage(), e);
@@ -99,6 +101,7 @@ public class DamageAbility extends Ability {
 		for (BattleObject o : objectTargets) {
 			o.hitsRemaining -= 1;
 			if (o.hitsRemaining < 0) o.hitsRemaining = 0;
+			battle.grimReaper();
 		}
 	}
 
@@ -109,6 +112,11 @@ public class DamageAbility extends Ability {
 		// check range
 		Position apos = agent.getPosition();
 		if (Math.abs(apos.x - target.x) + Math.abs(apos.y - target.y) > info.range) {
+			return false;
+		}
+
+		// You can't attack yourself
+		if (apos.equals(target)) {
 			return false;
 		}
 	

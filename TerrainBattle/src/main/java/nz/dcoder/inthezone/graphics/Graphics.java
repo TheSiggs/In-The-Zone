@@ -202,7 +202,7 @@ public class Graphics {
 		boardNode.detachChild(cg.getSpatial());
 		characters.remove(cg);
 		ObjectGraphics r = addObject(p, body);
-		controllerChain.queueAnimation(() -> r.setAnimation("die", 1));
+		//controllerChain.queueAnimation(() -> r.setAnimation("die", 1));
 		return r;
 	}
 

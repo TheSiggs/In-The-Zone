@@ -95,7 +95,8 @@ abstract public class Ability {
 	}
 
 	/**
-	 * Determine if an agent has line of sight to a target square for this ability
+	 * Determine if an agent has line of sight to a target square for this ability.
+	 * Assumes that agentPosition != target
 	 * @param agentPosition The position of the agent doing the ability
 	 * @param target The square the agent is targeting
 	 * @param battle The current battle
@@ -106,6 +107,9 @@ abstract public class Ability {
 	) {
 			List<Position> los1 = LineOfSight.getLOS(agentPosition, target, true);
 			List<Position> los2 = LineOfSight.getLOS(agentPosition, target, false);
+
+			los1.remove(0);
+			los2.remove(0);
 
 			boolean allClear;
 			if (info.isPiercing) {

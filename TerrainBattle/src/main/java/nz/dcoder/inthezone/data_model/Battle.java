@@ -115,25 +115,27 @@ class Battle {
 		).collect(Collectors.toList());
 	}
 
-	private void grimReaper() {
-		this.players = players.stream()
-			.filter(c -> !c.isDead).collect(Collectors.toList());
-		this.aiPlayers = aiPlayers.stream()
-			.filter(c -> !c.isDead).collect(Collectors.toList());
+	/**
+	 * Remove destroyed objects.
+	 * */
+	public void grimReaper() {
 		this.objects = objects.stream()
 			.filter(o -> o.hitsRemaining > 0)
 			.collect(Collectors.toList());
 	}
 
+	/**
+	 * Kill a character and remove from the board.
+	 * */
 	public void kill(Character c) {
 		BattleObject body = c.die();
 		objects.add(body);
+		players.remove(c);
+		aiPlayers.remove(c);
 		controller.callOnDeath(body);
 	}
 
 	public void changeTurn() {
-		grimReaper(); 
-
 		if (isBattleOver()) {
 			if (aiPlayers.size() == 0) {
 				controller.callOnBattleEnd(true);

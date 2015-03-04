@@ -52,6 +52,7 @@ public class HPAdjustAbility extends Ability {
 			for (BattleObject o : objectTargets) {
 				o.hitsRemaining -= 1;
 				if (o.hitsRemaining < 0) o.hitsRemaining = 0;
+				battle.grimReaper();
 			}
 		}
 	}

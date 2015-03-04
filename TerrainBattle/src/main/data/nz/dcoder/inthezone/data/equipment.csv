@@ -1,7 +1,7 @@
 name,description,isHidden,isDual,physical,magical,baseAP,baseMP,strength,intelligence,dexterity,guard,spirit,vitality,abilities,class,category,,Notes
 testEq,"Testing equipment, does not appear in the actual game",TRUE,FALSE,7,8,9,10,11,12,13,14,15,16,,ARMOUR,none,,This line is for testing.  Please do not alter
 testEq2,"Testing equipment, does not appear in the actual game",TRUE,FALSE,8,9,10,11,12,13,14,15,16,17,test,WEAPON,none,,This line is for testing.  Please do not alter
-simple weapon,The weapon carried by the prototype goblins,FALSE,FALSE,10,0,0,0,0,0,0,0,0,0,,WEAPON,none,,
+simple weapon,The weapon carried by the prototype goblins,FALSE,FALSE,14,4,0,0,0,0,0,0,0,0,,WEAPON,none,,
 ,,,,,,,,,,,,,,,,,,Description of fields
 ,,,,,,,,,,,,,,,,,,name: The name of this equipment as it appears in the game
 ,,,,,,,,,,,,,,,,,,description: A short description of this equipment

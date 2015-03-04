@@ -4,5 +4,5 @@ JAVA_HOME=$wd/jre1.8.0_31.jre/Contents/Home
 OLD_PATH=$PATH
 export PATH=$JAVA_HOME/bin:$PATH
 cd $wd
-./bin/zans-story $@
+./bin/zans-story scene.csv
 export PATH=$OLD_PATH

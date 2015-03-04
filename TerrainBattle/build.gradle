@@ -3,6 +3,7 @@ apply plugin: 'application'
 apply plugin: 'idea'
 //apply from: "src/main/resources/project.properties"
 apply plugin: 'launch4j'
+//apply plugin: 'distribution'
 
 buildscript {
     repositories {
@@ -109,7 +110,7 @@ dependencies {
 	//compile 'net.sf.sociaal:jME3-lwjgl:3.0.0.20130526'
 	//compile 'com.jme3x:jfx:1.126.2014-12-31_141919-8231852'
 	compile "com.jme3x:jfx:1.+"
-        //compile "org.apache.commons:commons-csv:1.0"
+	//compile "org.apache.commons:commons-csv:1.0"
     compile 'com.badlogicgames.packr:packr:1.2'
 }
 
@@ -183,6 +184,7 @@ task oldMain(type: JavaExec, dependsOn: classes) {
 	classpath sourceSets.main.runtimeClasspath 
 }
 
+/*
 task createStartScript {
     doLast {
         def f = new File('zans-story')
@@ -192,6 +194,7 @@ task createStartScript {
         batch.text = '''bin/zans-story.bat'''
     }
 }
+*/
 task createBlenderScripts {
     doLast {
         def f = new File('scene-loader')
@@ -202,7 +205,7 @@ task createBlenderScripts {
     }
 }
 distZip {
-    //dependsOn createStartScript
+    //dependsOn fatJar
     into(project.name) {
     	from '.'
     	include 'assets/**', '*.dylib', '*.so', '*.map', 'scene.csv'
@@ -213,11 +216,26 @@ distZip {
     }
     into(project.name) {
         from('.') {
-            include 'zans-story', 'zans-story.bat'
+            include 'zans-story', 'zans-story.bat', 'scene'
             fileMode = 0755
         }
     }
 }
+
+/*
+task copyFiles(type: Copy) {
+    def dir = "$buildDir/"+ project.name
+    from('.') {
+    	include 'assets/**', '*.dylib', '*.so', '*.map', 'scene.csv'
+        include 'jre**'
+    }
+    from('.') {
+        include 'zans-story', 'zans-story.bat', 'scene'
+        fileMode = 0755
+    }
+    destinationDir = file(dir)
+}
+*/
 
 task distBlender(type: Zip) {
     dependsOn createBlenderScripts, jar, build, distZip
@@ -287,4 +305,19 @@ task zipWindows(type: Zip) {
 	from("$buildDir/windows") {
 		include '**'
 	}
+}
+
+task unzipDist(type: Copy) {
+    dependsOn distZip
+    def zipFile = file("${buildDir}/distributions/${project.name}.zip")
+    def outputDir = file("${buildDir}")
+    from zipTree(zipFile)
+    into outputDir
+}
+
+task distDmg(type: Exec) {
+	dependsOn unzipDist
+    commandLine 'hdiutil'
+	args 'create', "${buildDir}/${project.name}.dmg", \
+		'-volname', 'ZansStory', '-srcfolder', "${buildDir}/zans-story"
 }

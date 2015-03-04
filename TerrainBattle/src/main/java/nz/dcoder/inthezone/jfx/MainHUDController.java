@@ -13,6 +13,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.Node;
@@ -163,6 +164,10 @@ public class MainHUDController implements Initializable {
 			Button b = new Button(ability.name.toString() + " (AP " + ability.cost + ")");
 			b.setOnAction(event -> input.notifyTarget(ability.name, ability.repeats));
 			b.setPrefWidth(menuWidth);
+
+			b.setTooltip(new Tooltip(
+				"Range: " + ability.range +
+				", Area of effect: " + ability.areaOfEffect));
 
 			if (ability.aClass == AbilityClass.PHYSICAL) {
 				attack.add(b);

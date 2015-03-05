@@ -140,13 +140,15 @@ public class TurnCharacter {
 				for (BattleObject o : os) {
 					// trigger object abilities
 					Ability ability = o.ability.ability;
-					ability.applyEffect(o.ability, p, battle);
+					Position op0 = o.position;
 
 					Collection<Position> targets = ability.getTargets(
 						ability.getAffectedArea(p, p, battle), battle);
 
+					ability.applyEffect(o.ability, p, battle);
+
 					battle.controller.callOnAbility(
-						character.position, targets, ability.info);
+						op0, character.position, targets, ability.info);
 				}
 
 				pathSoFar = new ArrayList<Position>();
@@ -224,13 +226,14 @@ public class TurnCharacter {
 		Ability ability = getAbility(name);
 		if (ability == null) return;
 		ap -= ability.info.cost;
-		ability.applyEffect(character, target, battle);
-
+		Position p0 = character.position;
 
 		Collection<Position> targets = ability.getTargets(
 			ability.getAffectedArea(character.position, target, battle), battle);
 
-		battle.controller.callOnAbility(character.position, targets, ability.info);
+		ability.applyEffect(character, target, battle);
+
+		battle.controller.callOnAbility(p0, character.position, targets, ability.info);
 	}
 
 	/**
@@ -270,14 +273,17 @@ public class TurnCharacter {
 		battle.checkTurn(turnNumber);
 
 		ap -= item.ability.info.cost;
-		item.ability.applyEffect(character, target, battle);
+
+		Position p0 = character.position;
 
 		Collection<Position> targets = item.ability.getTargets(
 			item.ability.getAffectedArea(
 				character.position, target, battle), battle);
 
+		item.ability.applyEffect(character, target, battle);
+
 		battle.controller.callOnAbility(
-			character.position, targets, item.ability.info);
+			p0, character.position, targets, item.ability.info);
 	}
 
 	public CharacterName getName() {

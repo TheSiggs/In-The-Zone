@@ -36,11 +36,12 @@ public class BattleController {
 
 	void callOnAbility(
 		Position agentPos,
+		Position agentTarget,
 		Collection<Position> targets,
 		AbilityInfo ability
 	) {
 		if (onAbility != null) onAbility.accept(
-			new DoAbilityInfo(agentPos, targets, ability));
+			new DoAbilityInfo(agentPos, agentTarget, targets, ability));
 	}
 
 	void callOnDeath(BattleObject body) {

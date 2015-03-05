@@ -175,34 +175,50 @@ public class Graphics {
 	public ObjectGraphics addDeadGoblin(Position p, int i) {
 		Spatial spatial = addGoblinSpatial(p, i);
 
-		// BEGIN HACK: construct "die" animation since goblin model doesn't have it
-		Animation die = new Animation("die", 1f);
-
-		float[] times = new float[2];
-		Vector3f[] translations = new Vector3f[2];
-		Quaternion[] rotations = new Quaternion[2];
-		Vector3f[] scales = new Vector3f[2];
-
-		times[0] = 0;
-		translations[0] = positionToVector(p).addLocal(0, -((scale / 2) + 0.2f), 0f);
-		rotations[0] = new Quaternion();
-		scales[0] = new Vector3f(0.5f, 0.5f, 0.5f);
-
-		times[1] = 1;
-		translations[1] = positionToVector(p).addLocal(0, -((scale / 2) + 0.2f), -0.2f);
-		rotations[1] = new Quaternion();
-		scales[1] = new Vector3f(0.5f, 0.5f, 0.5f);
-
-		rotations[0].fromAngles(FastMath.HALF_PI, 0f, 0f);
-		rotations[1].fromAngles(FastMath.HALF_PI * 0.2f, 0f, 0f);
-		die.addTrack(new SpatialTrack(times, translations, rotations, scales));
-		// END HACK
-
 		ObjectGraphics og = new ObjectGraphics(this, spatial, p);
-		og.addAnim(die);
+		og.addAnim(goblinDieAnimation(p, true));
 		objects.add(og);
 
 		return og;
+	}
+
+	/**
+	 * HACK.  Construct a "die" animation.  This is a really bad way of doing
+	 * things.  I use it here only to get around the lack of a suitable animation
+	 * in the goblin object.  This animation must be reconstructed every time the
+	 * dead goblin moves.
+	 *
+	 * @param p The position of the goblin
+	 * @param animate true to generate an animation, false to generate a static
+	 * transformation
+	 * */
+	private Animation goblinDieAnimation(Position p, boolean animate) {
+		Animation die = new Animation("die", animate? 1f : 0f);
+
+		int frames = animate? 2 : 1;
+		float[] times = new float[frames];
+		Vector3f[] translations = new Vector3f[frames];
+		Quaternion[] rotations = new Quaternion[frames];
+		Vector3f[] scales = new Vector3f[frames];
+
+		int i = 0;
+
+		if (animate) {
+			times[i] = i;
+			translations[i] = positionToVector(p).addLocal(0, -((scale / 2) + 0.2f), 0f);
+			rotations[i] = new Quaternion().fromAngles(FastMath.HALF_PI, 0f, 0f);
+			scales[i] = new Vector3f(0.5f, 0.5f, 0.5f);
+			i++;
+		}
+
+		times[i] = i;
+		translations[i] = positionToVector(p).addLocal(0, -((scale / 2) + 0.2f), -0.2f);
+		rotations[i] = new Quaternion().fromAngles(FastMath.HALF_PI * 0.2f, 0f, 0f);
+		scales[i] = new Vector3f(0.5f, 0.5f, 0.5f);
+
+		die.addTrack(new SpatialTrack(times, translations, rotations, scales));
+
+		return die;
 	}
 
 	/**
@@ -287,6 +303,51 @@ public class Graphics {
 		// This is a placeholder.  Ideally we would have an "attack" animation.
 		controllerChain.queueAnimation(() -> cg.setAnimation("idleA", 1));
 
+		if (continuation != null) controllerChain.queueContinuation(continuation);
+	}
+
+	/**
+	 * Animate a push action
+	 * */
+	public void doPush(
+		CharacterGraphics cg,
+		ObjectGraphics og,
+		Position target,
+		Runnable continuation
+	) {
+		Position dp = target.sub(cg.getPosition());
+		Position objectTarget = og.getPosition().add(dp);
+
+		List<Position> characterPath = new ArrayList<>();
+		List<Position> objectPath = new ArrayList<>();
+
+		characterPath.add(cg.getPosition());
+		characterPath.add(target);
+
+		objectPath.add(og.getPosition());
+		objectPath.add(objectTarget);
+
+		controllerChain.queueAnimation(() -> {
+			cg.getPathController().doWalk(characterPath, true);
+			og.getPathController().doSlide(objectPath, WALK_SPEED, false);
+		});
+
+		// HACK: part of the workaround for no "die" animation in the goblin model
+		// This should be removed as soon as possible.
+		controllerChain.queueAnimation(() -> {
+			og.replaceAnim(goblinDieAnimation(objectTarget, false));
+			og.setAnimation("die", 1);
+		});
+		if (continuation != null) controllerChain.queueContinuation(continuation);
+	}
+
+	/**
+	 * Animate a teleport
+	 * */
+	public void doTeleport(
+		CharacterGraphics cg, Position target, Runnable continuation
+	) {
+		controllerChain.queueAnimation(() -> cg.setPosition(target));
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 

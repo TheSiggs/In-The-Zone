@@ -45,7 +45,9 @@ public class Turn {
 	}
 
 	public CharacterInfo getCharacterAt(Position pos) {
-		return battle.getCharacterAt(pos).getCharacterInfo();
+		Character c = battle.getCharacterAt(pos);
+		if (c == null) return null;
+		return c.getCharacterInfo();
 	}
 
 	/**

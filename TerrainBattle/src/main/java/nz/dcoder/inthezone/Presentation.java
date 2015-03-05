@@ -22,6 +22,7 @@ import nz.dcoder.inthezone.data_model.factories.EquipmentFactory;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -29,6 +30,7 @@ import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
+import nz.dcoder.inthezone.graphics.ObjectGraphics;
 import nz.dcoder.inthezone.input.GameActionListener;
 import nz.dcoder.inthezone.input.Rotating;
 
@@ -187,24 +189,42 @@ public final class Presentation {
 		}
 	}
 
+	// effects that need special handling
+	EffectName pushEffect = new EffectName("push");
+	EffectName teleportEffect = new EffectName("teleport");
+
 	/**
 	 * Handle ability effects
 	 * */
 	private void ability(DoAbilityInfo action) {
 		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
 
-		// special handling for compound, complex, and repeating abilities.
 		Runnable continuation = null;
-		if (action.ability.repeats > 1) {
-			continuation = () -> input.repeatTarget();
-		}
 
-		graphics.doAbility(cg, action.ability.name, continuation);
+		if (action.ability.effect.equals(pushEffect)) {
+			// corpse pushing
+			ObjectGraphics og = graphics.getObjectByPosition(
+				action.targets.iterator().next());
+			graphics.doPush(cg, og, action.agentTarget, continuation);
 
-		for (Position p : action.targets) {
-			CharacterInfo target = turn.getCharacterAt(p);
-			if (target != null) {
-				ui.updateHP(target.name, target.hp);
+		} else if (action.ability.effect.equals(teleportEffect)) {
+			// basic teleporting
+			graphics.doTeleport(cg, action.agentTarget, continuation);
+
+		} else {
+			// all other effects
+
+			if (action.ability.repeats > 1) {
+				continuation = () -> input.repeatTarget();
+			}
+
+			graphics.doAbility(cg, action.ability.name, continuation);
+
+			for (Position p : action.targets) {
+				CharacterInfo target = turn.getCharacterAt(p);
+				if (target != null) {
+					ui.updateHP(target.name, target.hp);
+				}
 			}
 		}
 

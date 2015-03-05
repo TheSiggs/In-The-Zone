@@ -30,5 +30,16 @@ public class ObjectGraphics extends ModelGraphics {
 	void addAnim(Animation anim) {
 		this.control.addAnim(anim);
 	}
+
+	/**
+	 * Even worse hack to allow replacing one of those extra animations.
+	 * Required because the hack animations operate in world coordinates instead
+	 * of model coordinates.
+	 * */
+	void replaceAnim(Animation anim) {
+		setAnimation("idleA"); // Extremely hacky, but we have to set valid animation here.
+		this.control.removeAnim(this.control.getAnim(anim.getName()));
+		addAnim(anim);
+	}
 }
 

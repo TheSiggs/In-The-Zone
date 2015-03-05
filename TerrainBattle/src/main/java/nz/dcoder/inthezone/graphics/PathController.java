@@ -56,10 +56,11 @@ public class PathController extends ChainableController {
 		activate(path, true);
 	}
 
-	public void doSlide(List<Position> path, boolean rotate) {
+	public void doSlide(List<Position> path, float speed, boolean rotate) {
 		animation = null;
 		restoreAnimation = null;
 		this.rotate = rotate;
+		this.speed = speed;
 		activate(path, false);
 	}
 
@@ -143,8 +144,11 @@ public class PathController extends ChainableController {
 			// we're at the end of the path
 			// centre the characters on their squares
 			mg.setPosition(finalPosition);
-			for (CharacterGraphics c : charactersToRestore) {
-				c.setPosition(c.getPosition());
+
+			if (charactersToRestore != null) {
+				for (CharacterGraphics c : charactersToRestore) {
+					c.setPosition(c.getPosition());
+				}
 			}
 
 			// clean up and notify presentation layer that we're done

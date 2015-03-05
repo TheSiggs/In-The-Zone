@@ -38,7 +38,7 @@ import nz.dcoder.inthezone.input.GameActionListener;
  * @author denz
  */
 public class MainHUDController implements Initializable {
-	private static final int menuWidth = 120;
+	private static final int menuWidth = 160;
 
 	@FXML public Canvas canvas;
 
@@ -62,10 +62,7 @@ public class MainHUDController implements Initializable {
 	* Initializes the controller class.
 	*/
 	@Override public void initialize(URL url, ResourceBundle rb) {
-		currentMenu = topMenu;
-		noAttacks.setDisable(true);
-		noMagic.setDisable(true);
-		noItems.setDisable(true);
+		currentMenu = topTopMenu;
 	}
 
 	private void pushMenu(Pane menu) {
@@ -81,6 +78,7 @@ public class MainHUDController implements Initializable {
 			m.setVisible(false);
 			currentMenu = m;
 		}
+		currentMenu.setVisible(true);  // always leave one visible menu
 		subMenus.clear();
 	}
 
@@ -90,6 +88,7 @@ public class MainHUDController implements Initializable {
 	@FXML private Label hpLabel;
 	@FXML private Label apLabel;
 	@FXML private Label mpLabel;
+	@FXML private TilePane topTopMenu;
 	@FXML private TilePane topMenu;
 	@FXML private TilePane attackMenu;
 	@FXML private TilePane magicMenu;
@@ -169,8 +168,7 @@ public class MainHUDController implements Initializable {
 		rebuildMenus(info.abilities);
 
 		selectedCharacter.setVisible(true);
-		currentMenu = topMenu;
-		currentMenu.setVisible(true);
+		pushMenu(topMenu);
 	}
 
 	public void deselectCharacter() {

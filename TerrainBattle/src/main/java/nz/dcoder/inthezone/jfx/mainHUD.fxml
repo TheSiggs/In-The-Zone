@@ -42,39 +42,47 @@
         </children>
         </Pane>
 
-        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" prefRows="6" orientation="VERTICAL"
-          visible="false" >
+        <TilePane fx:id="topTopMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" prefRows="6" orientation="VERTICAL"
+          visible="true" >
         <children>
-            <Button text="Move" fx:id="topMove" mnemonicParsing="false"        prefHeight="24" prefWidth="120" onAction="#onMoveButton" />
-            <Button text="Push" fx:id="topPush" mnemonicParsing="false"        prefHeight="24" prefWidth="120" onAction="#onPushButton" />
-            <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    prefHeight="24" prefWidth="120" onAction="#onAttackButton" />
-            <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      prefHeight="24" prefWidth="120" onAction="#onMagicButton" />
-            <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    prefHeight="24" prefWidth="120" onAction="#onItemButton" />
-            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onEndButton" />
+            <Button text="Select character" mnemonicParsing="false"    prefHeight="24" prefWidth="160" disable="true" />
+            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onEndButton" />
         </children>
         </TilePane>
 
-        <TilePane fx:id="attackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" prefRows="6" orientation="VERTICAL"
+          visible="false" >
+        <children>
+            <Button text="Move" fx:id="topMove" mnemonicParsing="false"        prefHeight="24" prefWidth="160" onAction="#onMoveButton" />
+            <Button text="Push" fx:id="topPush" mnemonicParsing="false"        prefHeight="24" prefWidth="160" onAction="#onPushButton" />
+            <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    prefHeight="24" prefWidth="160" onAction="#onAttackButton" />
+            <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      prefHeight="24" prefWidth="160" onAction="#onMagicButton" />
+            <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    prefHeight="24" prefWidth="160" onAction="#onItemButton" />
+            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onEndButton" />
+        </children>
+        </TilePane>
+
+        <TilePane fx:id="attackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" orientation="VERTICAL"
             visible="false">
         <children>
-            <Button text="No attacks" fx:id="noAttacks" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
-            <Button text="Back" fx:id="attackExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onBackButton" />
+            <Button text="No attacks" fx:id="noAttacks" mnemonicParsing="false" prefHeight="24" prefWidth="160" disable="true" />
+            <Button text="Back" fx:id="attackExit" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onBackButton" />
         </children>
         </TilePane> 
 
-        <TilePane fx:id="magicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+        <TilePane fx:id="magicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" orientation="VERTICAL"
             visible="false">
         <children>
-            <Button text="No magic" fx:id="noMagic" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
-            <Button text="Back" fx:id="magicExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onBackButton" />
+            <Button text="No magic" fx:id="noMagic" mnemonicParsing="false" prefHeight="24" prefWidth="160" disable="true" />
+            <Button text="Back" fx:id="magicExit" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onBackButton" />
         </children>
         </TilePane>
 
-        <TilePane fx:id="itemMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+        <TilePane fx:id="itemMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" orientation="VERTICAL"
             visible="false">
         <children>
-            <Button text="No items" fx:id="noItems" mnemonicParsing="false" prefHeight="24" prefWidth="120" />
-            <Button text="Back" fx:id="itemExit" mnemonicParsing="false" prefHeight="24" prefWidth="120" onAction="#onBackButton" />
+            <Button text="No items" fx:id="noItems" mnemonicParsing="false" prefHeight="24" prefWidth="160" disable="true" />
+            <Button text="Back" fx:id="itemExit" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onBackButton" />
         </children>
         </TilePane>
 

@@ -202,10 +202,14 @@ public final class Presentation {
 		Runnable continuation = null;
 
 		if (action.ability.effect.equals(pushEffect)) {
+			TurnCharacter tc = turn.turnCharacterAt(action.agentTarget);
+
 			// corpse pushing
 			ObjectGraphics og = graphics.getObjectByPosition(
 				action.targets.iterator().next());
 			graphics.doPush(cg, og, action.agentTarget, continuation);
+
+			ui.updateMP(tc.getName(), tc.getMP());
 
 		} else if (action.ability.effect.equals(teleportEffect)) {
 			// basic teleporting

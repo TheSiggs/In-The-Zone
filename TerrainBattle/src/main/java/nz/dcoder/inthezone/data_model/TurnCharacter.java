@@ -12,6 +12,7 @@ import nz.dcoder.ai.astar.Node;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
+import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -176,12 +177,20 @@ public class TurnCharacter {
 			.filter(a -> a.info.name.equals(name)).findFirst().orElse(null);
 	}
 
+	private final EffectName pushEffect = new EffectName("push");
+
 	/**
 	 * Determine if this character can perform an ability with a given target
 	 * */
 	public boolean canDoAbility(AbilityName name, Position target) {
 		Ability ability = getAbility(name);
-		if (ability == null || ability.info.cost > ap) return false;
+		if (ability.info.effect.equals(pushEffect)) {
+			// The push effect costs MP
+			if (ability == null || ability.info.cost > mp) return false;
+		} else {
+			// All other effects cost AP
+			if (ability == null || ability.info.cost > ap) return false;
+		}
 		return ability.canApplyEffect(character, target, battle);
 	}
 
@@ -225,7 +234,11 @@ public class TurnCharacter {
 
 		Ability ability = getAbility(name);
 		if (ability == null) return;
-		ap -= ability.info.cost;
+		if (ability.info.effect.equals(pushEffect)) {
+			mp -= ability.info.cost;
+		} else {
+			ap -= ability.info.cost;
+		}
 		Position p0 = character.position;
 
 		Collection<Position> targets = ability.getTargets(

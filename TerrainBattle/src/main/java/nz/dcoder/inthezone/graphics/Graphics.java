@@ -439,6 +439,19 @@ public class Graphics {
 		return null;
 	}
 
+	/**
+	 * Get the target of an ability at the mouse cursor.
+	 * */
+	public Position getTargetByMouse(Vector2f cursor) {
+		// TODO: rewrite this to be more efficient, and to handle object targets
+		CharacterGraphics character = getCharacterByMouse(cursor);
+		if (character != null) {
+			return character.getPosition();
+		} else {
+			return getBoardByMouse(cursor);
+		}
+	}
+
 	private CollisionResults getMouseCollision(Vector2f cursor) {
 		Vector3f click3d = cam.getWorldCoordinates(
 				new Vector2f(cursor.x, cursor.y), 0f).clone();

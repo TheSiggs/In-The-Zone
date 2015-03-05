@@ -247,7 +247,7 @@ public class GameActionListener implements ActionListener {
 
 	private void targetMouse() {
 		Position target =	
-			graphics.getBoardByMouse(inputManager.getCursorPosition());
+			graphics.getTargetByMouse(inputManager.getCursorPosition());
 
 		if (selectedTurnCharacter != null && target != null) {
 			if (!selectedTurnCharacter.canDoAbility(attackWith, target)) {

@@ -133,6 +133,7 @@ class LaunchJavaFxGUI implements Runnable {
 
 			MainHUDController controller = fxmlLoader.getController();
 			controller.setGameInput(input);
+			controller.setContainer(jmeFx);
 			hud.complete(controller);
 
 		} catch (IOException ex) {

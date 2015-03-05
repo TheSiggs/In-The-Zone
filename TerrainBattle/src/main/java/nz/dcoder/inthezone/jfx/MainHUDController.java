@@ -5,6 +5,7 @@
  */
 package nz.dcoder.inthezone.jfx;
 
+import com.jme3x.jfx.JmeFxContainer;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -50,6 +51,11 @@ public class MainHUDController implements Initializable {
 	private GameActionListener input;
 	public void setGameInput(GameActionListener input) {
 		this.input = input;
+	}
+
+	private JmeFxContainer jmeFx = null;
+	public void setContainer(JmeFxContainer jmeFx) {
+		this.jmeFx = jmeFx;
 	}
 
 	/**
@@ -105,22 +111,27 @@ public class MainHUDController implements Initializable {
 	AbilityName pushAbility = new AbilityName("push");
 	@FXML protected void onPushButton(ActionEvent event) {
 		input.notifyTarget(pushAbility, 1);
+		jmeFx.loseFocus();
 	}
 
 	@FXML protected void onAttackButton(ActionEvent event) {
 		pushMenu(attackMenu);
+		jmeFx.loseFocus();
 	}
 
 	@FXML protected void onMagicButton(ActionEvent event) {
 		pushMenu(magicMenu);
+		jmeFx.loseFocus();
 	}
 
 	@FXML protected void onItemButton(ActionEvent event) {
 		pushMenu(itemMenu);
+		jmeFx.loseFocus();
 	}
 
 	@FXML protected void onEndButton(ActionEvent event) {
 		input.notifyEndTurn();
+		jmeFx.loseFocus();
 	}
 
 	@FXML protected void onBackButton(ActionEvent event) {
@@ -129,6 +140,7 @@ public class MainHUDController implements Initializable {
 			currentMenu = subMenus.remove(0);
 			currentMenu.setVisible(true);
 		}
+		jmeFx.loseFocus();
 	}
 
 	public void turnStart(
@@ -193,7 +205,11 @@ public class MainHUDController implements Initializable {
 
 		for (AbilityInfo ability : abilities) {
 			Button b = new Button(ability.name.toString() + " (AP " + ability.cost + ")");
-			b.setOnAction(event -> input.notifyTarget(ability.name, ability.repeats));
+			b.setMnemonicParsing(false);
+			b.setOnAction(event -> {
+				input.notifyTarget(ability.name, ability.repeats);
+				jmeFx.loseFocus();
+			});
 			b.setPrefWidth(menuWidth);
 
 			b.setTooltip(new Tooltip(

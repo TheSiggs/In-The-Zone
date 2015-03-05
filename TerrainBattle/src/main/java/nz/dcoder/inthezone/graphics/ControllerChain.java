@@ -23,8 +23,8 @@ public class ControllerChain {
 			chain.add(animation);
 		} else {
 			running = true;
-			animation.run();
 			chainStart.run();
+			animation.run();
 		}
 	}
 

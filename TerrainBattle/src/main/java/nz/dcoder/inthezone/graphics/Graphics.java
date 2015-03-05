@@ -299,11 +299,10 @@ public class Graphics {
 	) {
 		// TODO: implement this method.  Keep in mind that any animations or custom
 		// controllers must be queued up in the controllerChain.
-
-		// This is a placeholder.  Ideally we would have an "attack" animation.
-		controllerChain.queueAnimation(() -> cg.setAnimation("idleA", 1));
-
-		if (continuation != null) controllerChain.queueContinuation(continuation);
+		//
+		// Like this for example:
+		// controllerChain.queueAnimation(() -> cg.setAnimation("attack"));
+		// if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 
 	/**

@@ -27,7 +27,6 @@ import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
-import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.graphics.ObjectGraphics;
@@ -202,14 +201,10 @@ public final class Presentation {
 		Runnable continuation = null;
 
 		if (action.ability.effect.equals(pushEffect)) {
-			TurnCharacter tc = turn.turnCharacterAt(action.agentTarget);
-
 			// corpse pushing
 			ObjectGraphics og = graphics.getObjectByPosition(
 				action.targets.iterator().next());
 			graphics.doPush(cg, og, action.agentTarget, continuation);
-
-			ui.updateMP(tc.getName(), tc.getMP());
 
 		} else if (action.ability.effect.equals(teleportEffect)) {
 			// basic teleporting

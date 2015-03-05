@@ -65,7 +65,8 @@ public class GameActionListener implements ActionListener {
 	}
 
 	private Rotating viewRotating = Rotating.NONE;
-	private Rotating oldViewRotating = Rotating.NONE;
+	private boolean viewLDown = false;
+	private boolean viewRDown = false;
 	private CharacterGraphics walking = null;
 	private boolean isAnimating = false;
 
@@ -136,6 +137,8 @@ public class GameActionListener implements ActionListener {
 		}
 	}
 
+	private int clickCount = 0;
+
 	/**
 	 * TODO: Think about action names and possible key mappings. Should be
 	 * customisable later but can be static for a start. Maybe better names than
@@ -153,12 +156,12 @@ public class GameActionListener implements ActionListener {
 			// actions that work at any time
 			// =============================
 			if (name.equals("LeftView")) {
-				if (viewRotating != Rotating.LEFT) oldViewRotating = viewRotating;
 				viewRotating = Rotating.LEFT;
+				viewLDown = true;
 			}
 			if (name.equals("RightView")) {
-				if (viewRotating != Rotating.RIGHT) oldViewRotating = viewRotating;
 				viewRotating = Rotating.RIGHT;
+				viewRDown = true;
 			}
 
 			// actions that are mutually exclusive.  For example walking: while a
@@ -193,12 +196,20 @@ public class GameActionListener implements ActionListener {
 			}
 		} else {
 			if (name.equals("LeftView")) {
-				viewRotating = oldViewRotating;
-				oldViewRotating = Rotating.NONE;
+				viewLDown = false;
+				if (viewRDown) {
+					viewRotating = Rotating.RIGHT;
+				} else {
+					viewRotating = Rotating.NONE;
+				}
 			}
 			if (name.equals("RightView")) {
-				viewRotating = oldViewRotating;
-				oldViewRotating = Rotating.NONE;
+				viewRDown = false;
+				if (viewLDown) {
+					viewRotating = Rotating.LEFT;
+				} else {
+					viewRotating = Rotating.NONE;
+				}
 			}
 		}
 	}
@@ -258,6 +269,9 @@ public class GameActionListener implements ActionListener {
 				ui.updateAP(
 					selectedTurnCharacter.getName(),
 					selectedTurnCharacter.getAP());
+				ui.updateMP(
+					selectedTurnCharacter.getName(),
+					selectedTurnCharacter.getMP());
 			}
 		}
 	}

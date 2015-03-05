@@ -1,12 +1,12 @@
 character,level,abilities,,Notes
 testChar,1,test,,"This line is for testing purposes, please do not alter"
-goblin 1,1,attack,,
-goblin 2,1,attack,,Description of fields
-goblin 3,1,attack,,character: The name of the character
-goblin 4,1,attack,,level: The level of the character
-goblin 5,1,attack,,"abilities: A list of abilities to learn at this level, separated by commas"
-goblin 6,1,attack,,
-goblin 7,1,attack,,Notes
-goblin 8,1,attack,,"It is not necessary to list every level for every character, only those levels at which a character actually learns a new ability"
-goblin 9,1,attack,,
-goblin 10,1,attack,,
+goblin 1,1,"attack,push",,
+goblin 2,1,"attack,push",,Description of fields
+goblin 3,1,"attack,push",,character: The name of the character
+goblin 4,1,"attack,push",,level: The level of the character
+goblin 5,1,"attack,push",,"abilities: A list of abilities to learn at this level, separated by commas"
+goblin 6,1,"attack,push",,
+goblin 7,1,"attack,push",,Notes
+goblin 8,1,"attack,push",,"It is not necessary to list every level for every character, only those levels at which a character actually learns a new ability"
+goblin 9,1,"attack,push",,
+goblin 10,1,"attack,push",,

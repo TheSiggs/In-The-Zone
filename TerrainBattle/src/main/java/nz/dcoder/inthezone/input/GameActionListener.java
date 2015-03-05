@@ -130,6 +130,7 @@ public class GameActionListener implements ActionListener {
 	 * */
 	public synchronized void repeatTarget() {
 		if (repeats > 0) {
+      System.out.println("Ability repeats");
 			leftButtonMode = InputMode.TARGET;
 			repeats -= 1;
 		}

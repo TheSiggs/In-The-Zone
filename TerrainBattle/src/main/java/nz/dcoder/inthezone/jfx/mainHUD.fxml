@@ -42,10 +42,11 @@
         </children>
         </Pane>
 
-        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" orientation="VERTICAL"
+        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="120" prefRows="6" orientation="VERTICAL"
           visible="false" >
         <children>
             <Button text="Move" fx:id="topMove" mnemonicParsing="false"        prefHeight="24" prefWidth="120" onAction="#onMoveButton" />
+            <Button text="Push" fx:id="topPush" mnemonicParsing="false"        prefHeight="24" prefWidth="120" onAction="#onPushButton" />
             <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    prefHeight="24" prefWidth="120" onAction="#onAttackButton" />
             <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      prefHeight="24" prefWidth="120" onAction="#onMagicButton" />
             <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    prefHeight="24" prefWidth="120" onAction="#onItemButton" />

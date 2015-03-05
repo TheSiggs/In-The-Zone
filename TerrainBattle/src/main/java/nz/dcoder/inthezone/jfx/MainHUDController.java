@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
+import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
@@ -99,6 +100,11 @@ public class MainHUDController implements Initializable {
 
 	@FXML protected void onMoveButton(ActionEvent event) {
 		input.notifyMove();
+	}
+
+	AbilityName pushAbility = new AbilityName("push");
+	@FXML protected void onPushButton(ActionEvent event) {
+		input.notifyTarget(pushAbility, 1);
 	}
 
 	@FXML protected void onAttackButton(ActionEvent event) {

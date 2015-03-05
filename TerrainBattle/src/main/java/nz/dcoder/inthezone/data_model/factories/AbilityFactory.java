@@ -14,10 +14,12 @@ import org.apache.commons.csv.CSVRecord;
 import nz.dcoder.inthezone.data_model.Ability;
 import nz.dcoder.inthezone.data_model.DamageAbility;
 import nz.dcoder.inthezone.data_model.HealAbility;
+import nz.dcoder.inthezone.data_model.HPAdjustAbility;
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
+import nz.dcoder.inthezone.data_model.PushAbility;
 import nz.dcoder.inthezone.data_model.TeleportAbility;
 import nz.dcoder.inthezone.data_model.utils.UnicodeInputReader;
 
@@ -31,6 +33,8 @@ public class AbilityFactory {
 		effects.put(DamageAbility.effectName, DamageAbility::new);
 		effects.put(HealAbility.effectName, HealAbility::new);
 		effects.put(TeleportAbility.effectName, TeleportAbility::new);
+		effects.put(PushAbility.effectName, PushAbility::new);
+		effects.put(HPAdjustAbility.effectName, HPAdjustAbility::new);
 
 		abilities = new HashMap<AbilityName, Ability>();
 

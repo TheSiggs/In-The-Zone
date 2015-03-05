@@ -62,9 +62,15 @@ public class PushAbility extends Ability {
 		CanDoAbility agent, Position target, Battle battle
 	) {
 		Position apos = agent.getPosition();
+		System.out.println("checking push");
 
 		// check range
-		if (Math.abs(apos.x - target.x) != 1 || Math.abs(apos.y - target.y) != 1) {
+		if (Math.abs(apos.x - target.x) + Math.abs(apos.y - target.y) > info.range) {
+			return false;
+		}
+
+		// check direction
+		if (!(apos.x == target.x || apos.y == target.y)) {
 			return false;
 		}
 

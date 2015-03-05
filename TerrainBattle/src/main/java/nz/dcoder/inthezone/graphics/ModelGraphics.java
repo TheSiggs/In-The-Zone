@@ -88,11 +88,13 @@ public abstract class ModelGraphics implements AnimEventListener {
 	}
 
 	/**
-	 * Set an animation to run until cancelled
+	 * Set an animation to run until cancelled.  This can be queued at the end of
+	 * a controller chain to restore the idle animation.
 	 * */
 	public void setAnimation(String name) {
 		limitedAnimation = false;
 		channel.setAnim(name);
+		controllerChain.nextAnimation();
 	}
 
 	private boolean limitedAnimation = false;

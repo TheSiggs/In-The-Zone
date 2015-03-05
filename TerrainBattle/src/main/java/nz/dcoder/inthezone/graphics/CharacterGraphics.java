@@ -1,8 +1,5 @@
 package nz.dcoder.inthezone.graphics;
 
-import com.jme3.animation.AnimChannel;
-import com.jme3.animation.AnimControl;
-import com.jme3.animation.AnimEventListener;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -14,13 +11,7 @@ import nz.dcoder.inthezone.data_model.pure.Position;
  *
  * @author informatics-palmerson
  */
-public class CharacterGraphics implements AnimEventListener {
-	private final Spatial spatial;
-	private final AnimChannel channel;
-	private final AnimControl control;
-	private final CharacterWalkControl walkControl;
-	private final ControllerChain controllerChain;
-
+public class CharacterGraphics extends ModelGraphics {
 	public static final Quaternion upright = new Quaternion();
 
 	// compute the upright quaternion
@@ -31,43 +22,13 @@ public class CharacterGraphics implements AnimEventListener {
 		upright.multLocal(front);
 	}
 
-	private Position p;
-
 	public CharacterGraphics(Graphics graphics, Spatial spatial, Position p) {
-		this.controllerChain = graphics.getControllerChain();
-
-		this.spatial = spatial;
-
-		spatial.setUserData("p", new SaveablePosition(p));
-		spatial.setUserData("kind", "character");
-
-		this.setPosition(p);
-		this.spatial.setLocalRotation(upright);
-
-		control = spatial.getControl(AnimControl.class);
-		control.addListener(this);
-		channel = control.createChannel();
+		super(graphics, spatial, p, "character");
 		setAnimation("idleA");
-
-		walkControl = new CharacterWalkControl(graphics, this);
-		walkControl.setSpatial(spatial);
-		spatial.addControl(walkControl);
 	}
 
-	public Position getPosition() {
-		return p;
-	}
-
-	void setPositionInternal(Position p) {
-		this.p = p;
-		((SaveablePosition) this.spatial.getUserData("p")).setPosition(p);
-	}
-
-	public void setPosition(Position p) {
-		setPositionInternal(p);
-
-		Vector3f translation = Graphics.positionToVector(p);
-		spatial.setLocalTranslation(translation);
+  public Quaternion getUprightRotation() {
+		return upright;
 	}
 
 	/**
@@ -93,52 +54,5 @@ public class CharacterGraphics implements AnimEventListener {
 		r.multLocal(facing);
 		return r;
 	}
-
-	public CharacterWalkControl getWalkControl() {
-		return walkControl;
-	}
-
-	/**
-	 * @return the spatial
-	 */
-	public Spatial getSpatial() {
-		return spatial;
-	}
-
-	@Override
-	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
-		if (limitedAnimation) {
-			animRepeats -= 1;
-			if (animRepeats < 1) {
-				limitedAnimation = false;
-				controllerChain.nextAnimation();
-			}
-		}
-	}
-
-	@Override
-	public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-	}
-
-	/**
-	 * Set an animation to run until cancelled
-	 * */
-	public void setAnimation(String name) {
-		limitedAnimation = false;
-		channel.setAnim(name);
-	}
-
-	private boolean limitedAnimation = false;
-	private int animRepeats = 0;
-
-	/**
-	 * Set an animation to run n times, and notify when done
-	 * */
-	public void setAnimation(String name, int n) {
-		limitedAnimation = true;
-		animRepeats = n;
-		channel.setAnim(name);
-	}
-
 }
 

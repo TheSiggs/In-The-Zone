@@ -180,7 +180,7 @@ public final class Presentation {
 	private void move(DoMoveInfo move) {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
-			graphics.doWalk(cg, move.path, null);
+			graphics.doRun(cg, move.path, null);
 
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");

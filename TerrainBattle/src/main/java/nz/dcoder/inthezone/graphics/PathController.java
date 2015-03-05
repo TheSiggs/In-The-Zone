@@ -15,33 +15,55 @@ import java.util.List;
 
 import nz.dcoder.inthezone.data_model.pure.Position;
 
-public class CharacterWalkControl extends ChainableController {
+public class PathController extends ChainableController {
 	private final Graphics graphics;
-	private final CharacterGraphics cg;
+	private final ModelGraphics mg;
 
 	// the path
 	private Spline spline = null;
 	private int nControlPoints = 0;
 	private Collection<CharacterGraphics> charactersToRestore = null;
+  private Position finalPosition = null;
 	// progress along the path
 	private int controlPoint = 0;
 	private float t = 0;
 
-	public CharacterWalkControl (Graphics graphics, CharacterGraphics cg) {
+	public PathController (Graphics graphics, ModelGraphics mg) {
 		super(graphics.getControllerChain());
 		this.graphics = graphics;
-		this.cg = cg;
+		this.mg = mg;
 		this.setEnabled(false);
 	}
 
-	/**
-	 * Walk along a set path
-	 * @param path A list of all the positions the character will walk across,
-	 * including the current position and the target position.
-	 * @param endNotify A method reference that will be invoked when the walk
-	 * action ends
-	 * */
-	public void doWalk(List<Position> path) {
+  private String animation = null;
+  private String restoreAnimation = null;
+	private boolean rotate;
+	private float speed = 1f;
+
+	public void doWalk(List<Position> path, boolean rotate) {
+		animation = "walk";
+		restoreAnimation = mg.getAnimation();
+		this.rotate = rotate;
+		this.speed = Graphics.WALK_SPEED;
+		activate(path, true);
+	}
+
+	public void doRun(List<Position> path, boolean rotate) {
+		animation = "run";
+		restoreAnimation = mg.getAnimation();
+		this.rotate = rotate;
+		this.speed = Graphics.RUN_SPEED;
+		activate(path, true);
+	}
+
+	public void doSlide(List<Position> path, boolean rotate) {
+		animation = null;
+		restoreAnimation = null;
+		this.rotate = rotate;
+		activate(path, false);
+	}
+
+	private void activate(List<Position> path, boolean walkAroundCharacters) {
 		Spline spline0 = new Spline();
 		nControlPoints = path.size();
 		for (Position p : path) {
@@ -50,13 +72,16 @@ public class CharacterWalkControl extends ChainableController {
 		spline0.setType(Spline.SplineType.CatmullRom);
 		spline0.setCurveTension(0.2f);
 
-		spline = adjustSplineForCharacters(path, spline0);
+		if (walkAroundCharacters) {
+			spline = adjustSplineForCharacters(path, spline0);
+		} else {
+			spline = spline0;
+		}
 
 		controlPoint = 0;
 		t = 0;
 
-		// do this after adjusting the spline
-		this.cg.setPositionInternal(path.get(path.size() - 1));
+		finalPosition = path.get(path.size() - 1);
 		this.setEnabled(true);
 	}
 
@@ -99,16 +124,16 @@ public class CharacterWalkControl extends ChainableController {
 	@Override public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		if (enabled) {
-			cg.setAnimation("run");
+			if (animation != null) mg.setAnimation(animation);
 		} else {
-			cg.setAnimation("idleA");
+			if (restoreAnimation != null) mg.setAnimation(restoreAnimation);
 		}
 	}
 
 	@Override protected void controlUpdate(float tpf) {
 		if (!enabled) return;
 
-		t += tpf * Graphics.travelSpeed;
+		t += tpf * speed;
 		while (t > 1) {
 			controlPoint += 1;
 			t -= 1;
@@ -117,7 +142,7 @@ public class CharacterWalkControl extends ChainableController {
 		if (controlPoint + 1 >= nControlPoints) {
 			// we're at the end of the path
 			// centre the characters on their squares
-			cg.setPosition(cg.getPosition());
+			mg.setPosition(finalPosition);
 			for (CharacterGraphics c : charactersToRestore) {
 				c.setPosition(c.getPosition());
 			}
@@ -131,7 +156,7 @@ public class CharacterWalkControl extends ChainableController {
 
 			// compute the heading
 			int c1 = controlPoint;
-			float t1 = t + (tpf * Graphics.travelSpeed);
+			float t1 = t + (tpf * speed);
 			while (t1 > 1) {
 				t1 -= 1;
 				c1 += 1;
@@ -146,17 +171,19 @@ public class CharacterWalkControl extends ChainableController {
 			tangent.normalizeLocal();
 
 			// rotate the character
-			Quaternion r = CharacterGraphics.upright.clone();
-			Quaternion facing = new Quaternion();
-			if (tangent.getX() > 0) {
-				facing.fromAngleAxis(
-					0 - Vector3f.UNIT_Y.angleBetween(tangent), Vector3f.UNIT_Y);
-			} else {
-				facing.fromAngleAxis(
-					Vector3f.UNIT_Y.angleBetween(tangent), Vector3f.UNIT_Y);
+			if (rotate) {
+				Quaternion r = mg.getUprightRotation().clone();
+				Quaternion facing = new Quaternion();
+				if (tangent.getX() > 0) {
+					facing.fromAngleAxis(
+						0 - Vector3f.UNIT_Y.angleBetween(tangent), Vector3f.UNIT_Y);
+				} else {
+					facing.fromAngleAxis(
+						Vector3f.UNIT_Y.angleBetween(tangent), Vector3f.UNIT_Y);
+				}
+				r.multLocal(facing);
+				spatial.setLocalRotation(r);
 			}
-			r.multLocal(facing);
-			spatial.setLocalRotation(r);
 		}
 	}
 
@@ -168,7 +195,12 @@ public class CharacterWalkControl extends ChainableController {
 		CharacterGraphics c = graphics.getCharacterByPosition(
 			((SaveablePosition) spatial.getUserData("p")).getPosition());
 
-		final CharacterWalkControl control = new CharacterWalkControl(graphics, c);
+		ObjectGraphics o = graphics.getObjectByPosition(
+			((SaveablePosition) spatial.getUserData("p")).getPosition());
+
+		ModelGraphics g = (c != null)? c : o;
+
+		final PathController control = new PathController(graphics, g);
 		control.setSpatial(spatial);
 		return control;
 	}

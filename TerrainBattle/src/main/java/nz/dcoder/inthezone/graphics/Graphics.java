@@ -41,7 +41,9 @@ import java.util.List;
 public class Graphics {
 	public static final float scale = 0.8f;
 	public static final float rotationSpeed = 1.5f;
-	public static final float travelSpeed = 4f;
+
+	public static final float RUN_SPEED = 4f;
+	public static final float WALK_SPEED = 1f;
 
 	private final AssetManager assetManager;
 	private final Camera cam;
@@ -238,12 +240,12 @@ public class Graphics {
 	 * Animate a character walking along a path
 	 * @param continuation May be null for simple walk actions
 	 * */
-	public void doWalk(
+	public void doRun(
 		CharacterGraphics cg,
 		List<Position> path,
 		Runnable continuation
 	) {
-		controllerChain.queueAnimation(() -> cg.getWalkControl().doWalk(path));
+		controllerChain.queueAnimation(() -> cg.getPathController().doRun(path, true));
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 

@@ -10,82 +10,73 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane"
-  style="-fx-background-color: rgba(255,255,255,0);"
-  styleClass="mainFxmlClass"
-  xmlns="http://javafx.com/javafx/8"
-  xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: rgba(255,255,255,0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
     <stylesheets>
         <URL value="@mainhud.css" />
     </stylesheets>
 
     <children>
-        <Pane fx:id="selectedCharacter" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20" visible="false">
+        <Pane fx:id="selectedCharacter" visible="false" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20">
         <children>
             <Pane fx:id="selectedCharacterPortrait" layoutX="0" layoutY="0" prefHeight="92" prefWidth="56" />
 
-            <ProgressBar fx:id="hp"  layoutX="60" layoutY="5" prefHeight="24" prefWidth="200" styleClass="HP_bar" progress="1.0"/>
-            <Label text="Hit points" layoutX="70" layoutY="4" prefHeight="24" styleClass="progressLabel" />
-            <Label text="33 / 33"    layoutX="60" layoutY="4" prefHeight="24" prefWidth="190" alignment="BASELINE_RIGHT"
-                fx:id="hpLabel" styleClass="progressLabel" />
+            <ProgressBar fx:id="hp" layoutX="60" layoutY="5" prefHeight="24" prefWidth="200" progress="1.0" styleClass="HP_bar" />
+            <Label layoutX="70" layoutY="4" prefHeight="24" styleClass="progressLabel" text="Hit points" />
+            <Label fx:id="hpLabel" alignment="BASELINE_RIGHT" layoutX="60" layoutY="4" prefHeight="24" prefWidth="190" styleClass="progressLabel" text="33 / 33" />
 
-            <ProgressBar fx:id="ap"     layoutX="60" layoutY="34" prefHeight="24" prefWidth="200" styleClass="AP_bar" progress="1.0"/>
-            <Label text="Action points" layoutX="70" layoutY="33" prefHeight="24" styleClass="progressLabel" />
-            <Label text="10 / 10"       layoutX="60" layoutY="33" prefHeight="24" prefWidth="190" alignment="BASELINE_RIGHT"
-                fx:id="apLabel" styleClass="progressLabel" />
+            <ProgressBar fx:id="ap" layoutX="60" layoutY="34" prefHeight="24" prefWidth="200" progress="1.0" styleClass="AP_bar" />
+            <Label layoutX="70" layoutY="33" prefHeight="24" styleClass="progressLabel" text="Action points" />
+            <Label fx:id="apLabel" alignment="BASELINE_RIGHT" layoutX="60" layoutY="33" prefHeight="24" prefWidth="190" styleClass="progressLabel" text="10 / 10" />
 
-            <ProgressBar fx:id="mp"       layoutX="60" layoutY="63" prefHeight="24" prefWidth="200" styleClass="MP_bar" progress="1.0"/>
-            <Label text="Movement points" layoutX="70" layoutY="62" prefHeight="24" styleClass="progressLabel" />
-            <Label text="10 / 10"         layoutX="60" layoutY="62" prefHeight="24" prefWidth="190" alignment="BASELINE_RIGHT"
-                fx:id="mpLabel" styleClass="progressLabel" />
+            <ProgressBar fx:id="mp" layoutX="60" layoutY="63" prefHeight="24" prefWidth="200" progress="1.0" styleClass="MP_bar" />
+            <Label layoutX="70" layoutY="62" prefHeight="24" styleClass="progressLabel" text="Movement points" />
+            <Label fx:id="mpLabel" alignment="BASELINE_RIGHT" layoutX="60" layoutY="62" prefHeight="24" prefWidth="190" styleClass="progressLabel" text="10 / 10" />
         </children>
         </Pane>
 
-        <TilePane fx:id="topTopMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" prefRows="6" orientation="VERTICAL"
-          visible="true" >
+        <TilePane fx:id="topTopMenu" orientation="VERTICAL" prefRows="6" prefWidth="160" visible="true" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
         <children>
-            <Button text="Select character" mnemonicParsing="false"    prefHeight="24" prefWidth="160" disable="true" />
-            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onEndButton" />
+            <Button disable="true" mnemonicParsing="false" prefHeight="24" prefWidth="160" text="Select character" />
+            <Button fx:id="topEndTurn" mnemonicParsing="false" onAction="#onEndButton" prefHeight="24" prefWidth="160" text="End Turn" />
         </children>
         </TilePane>
 
-        <TilePane fx:id="topMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" prefRows="6" orientation="VERTICAL"
-          visible="false" >
+        <TilePane fx:id="topMenu" orientation="VERTICAL" prefRows="6" prefWidth="160" visible="false" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
         <children>
-            <Button text="Move" fx:id="topMove" mnemonicParsing="false"        prefHeight="24" prefWidth="160" onAction="#onMoveButton" />
-            <Button text="Push" fx:id="topPush" mnemonicParsing="false"        prefHeight="24" prefWidth="160" onAction="#onPushButton" />
-            <Button text="Attack" fx:id="topAttack" mnemonicParsing="false"    prefHeight="24" prefWidth="160" onAction="#onAttackButton" />
-            <Button text="Magic" fx:id="topMagic" mnemonicParsing="false"      prefHeight="24" prefWidth="160" onAction="#onMagicButton" />
-            <Button text="Use Item" fx:id="topItem" mnemonicParsing="false"    prefHeight="24" prefWidth="160" onAction="#onItemButton" />
-            <Button text="End Turn" fx:id="topEndTurn" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onEndButton" />
+            <Button fx:id="topMove" mnemonicParsing="false" onAction="#onMoveButton" prefHeight="24" prefWidth="160" text="Move" />
+            <Button fx:id="topPush" mnemonicParsing="false" onAction="#onPushButton" prefHeight="24" prefWidth="160" text="Push" />
+            <Button fx:id="topAttack" mnemonicParsing="false" onAction="#onAttackButton" prefHeight="24" prefWidth="160" text="Attack" />
+            <Button fx:id="topMagic" mnemonicParsing="false" onAction="#onMagicButton" prefHeight="24" prefWidth="160" text="Magic" />
+            <Button fx:id="topItem" mnemonicParsing="false" onAction="#onItemButton" prefHeight="24" prefWidth="160" text="Use Item" />
+            <Button fx:id="topEndTurn" mnemonicParsing="false" onAction="#onEndButton" prefHeight="24" prefWidth="160" text="End Turn" />
         </children>
         </TilePane>
 
-        <TilePane fx:id="attackMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" orientation="VERTICAL"
-            visible="false">
+        <TilePane fx:id="attackMenu" orientation="VERTICAL" prefWidth="160" visible="false" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
         <children>
-            <Button text="No attacks" fx:id="noAttacks" mnemonicParsing="false" prefHeight="24" prefWidth="160" disable="true" />
-            <Button text="Back" fx:id="attackExit" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onBackButton" />
+            <Button fx:id="noAttacks" disable="true" mnemonicParsing="false" prefHeight="24" prefWidth="160" text="No attacks" />
+            <Button fx:id="attackExit" mnemonicParsing="false" onAction="#onBackButton" prefHeight="24" prefWidth="160" text="Back" />
         </children>
         </TilePane> 
 
-        <TilePane fx:id="magicMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" orientation="VERTICAL"
-            visible="false">
+        <TilePane fx:id="magicMenu" orientation="VERTICAL" prefWidth="160" visible="false" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
         <children>
-            <Button text="No magic" fx:id="noMagic" mnemonicParsing="false" prefHeight="24" prefWidth="160" disable="true" />
-            <Button text="Back" fx:id="magicExit" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onBackButton" />
+            <Button fx:id="noMagic" disable="true" mnemonicParsing="false" prefHeight="24" prefWidth="160" text="No magic" />
+            <Button fx:id="magicExit" mnemonicParsing="false" onAction="#onBackButton" prefHeight="24" prefWidth="160" text="Back" />
         </children>
         </TilePane>
 
-        <TilePane fx:id="itemMenu" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20" prefWidth="160" orientation="VERTICAL"
-            visible="false">
+        <TilePane fx:id="itemMenu" orientation="VERTICAL" prefWidth="160" visible="false" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
         <children>
-            <Button text="No items" fx:id="noItems" mnemonicParsing="false" prefHeight="24" prefWidth="160" disable="true" />
-            <Button text="Back" fx:id="itemExit" mnemonicParsing="false" prefHeight="24" prefWidth="160" onAction="#onBackButton" />
+            <Button fx:id="noItems" disable="true" mnemonicParsing="false" prefHeight="24" prefWidth="160" text="No items" />
+            <Button fx:id="itemExit" mnemonicParsing="false" onAction="#onBackButton" prefHeight="24" prefWidth="160" text="Back" />
         </children>
         </TilePane>
+      <Text fx:id="textPrompt" layoutX="183.0" layoutY="562.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hello Person" textAlignment="CENTER" wrappingWidth="433.13671875">
+         <font>
+            <Font name="Comic Sans MS" size="16.0" />
+         </font>
+      </Text>
 
     </children>
 </AnchorPane>
-

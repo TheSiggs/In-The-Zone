@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.scene.text.Text;
 
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
@@ -30,7 +31,9 @@ import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
+import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.input.GameActionListener;
+
 
 /**
  * FXML Controller class
@@ -88,6 +91,7 @@ public class MainHUDController implements Initializable {
 	@FXML private Label hpLabel;
 	@FXML private Label apLabel;
 	@FXML private Label mpLabel;
+        @FXML private Text textPrompt;
 	@FXML private TilePane topTopMenu;
 	@FXML private TilePane topMenu;
 	@FXML private TilePane attackMenu;
@@ -104,9 +108,9 @@ public class MainHUDController implements Initializable {
 	@FXML private Button noItems;
 
 	@FXML protected void onMoveButton(ActionEvent event) {
-		input.notifyMove();
+		input.notifyMove();                 
 	}
-
+        
 	AbilityName pushAbility = new AbilityName("push");
 	@FXML protected void onPushButton(ActionEvent event) {
 		input.notifyTarget(pushAbility, 1);
@@ -226,7 +230,17 @@ public class MainHUDController implements Initializable {
 
 		attack.add(attackExit);
 		magic.add(magicExit);
-	}
-
+	}   
+        
+        public void textPrompt(CharacterName name, Points points) { 
+            //JLabel characterSelected = new JLabel(currentCharacter + "Has been selected!", JLabel.BOTTOM);
+            //JTextField characterSelected = new JTextField(currentCharacter + "Has been selected!");
+            //JTextField characterHP = new JTextField(currentCharacter + "Now has " + hp + " health left!");
+            //JTextField characterPush = new JTextField(currentCharacter + "Used " + pushAbility + "!");
+            
+            if (name.equals (currentCharacter) ) {
+                textPrompt.setText(currentCharacter + "Has been selected!");    
+            }            
+        }
 }
 

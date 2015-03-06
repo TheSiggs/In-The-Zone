@@ -114,10 +114,7 @@ class LaunchJavaFxGUI implements Runnable {
 		this.hud = hud;
 	}
 
-	/**
-	 * Synchronized to avoid race conditions with getController and getScene.
-	 * */
-	@Override public synchronized void run() {
+	@Override public void run() {
 		try {
 			URL location = MainHUDController.class.getResource("mainHUD.fxml");
 

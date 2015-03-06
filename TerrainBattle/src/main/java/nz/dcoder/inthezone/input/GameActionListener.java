@@ -1,12 +1,16 @@
 package nz.dcoder.inthezone.input;
 
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
+import com.jme3.math.Vector2f;
 import java.util.List;
+import java.util.Collection;
 
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
@@ -14,6 +18,7 @@ import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
+import nz.dcoder.inthezone.graphics.BoardGraphics;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.UserInterface;
@@ -22,7 +27,7 @@ import nz.dcoder.inthezone.UserInterface;
  *
  * @author denz
  */
-public class GameActionListener implements ActionListener {
+public class GameActionListener implements ActionListener, AnalogListener {
 	private final InputManager inputManager;
 	private final Graphics graphics;
 	private final UserInterface ui;
@@ -49,9 +54,14 @@ public class GameActionListener implements ActionListener {
 		inputManager.addMapping("LeftView", new KeyTrigger(KeyInput.KEY_Q));
 		inputManager.addMapping("RightView", new KeyTrigger(KeyInput.KEY_E));
 		inputManager.addMapping("LeftMouse",
-				new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 		inputManager.addMapping("RightMouse",
-				new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+			new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+
+		inputManager.addMapping("MouseMove", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+		inputManager.addMapping("MouseMove", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+		inputManager.addMapping("MouseMove", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+		inputManager.addMapping("MouseMove", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
 
 		inputManager.addListener(this,
 				"ForwardsMove",
@@ -61,7 +71,8 @@ public class GameActionListener implements ActionListener {
 				"LeftView",
 				"RightView",
 				"LeftMouse",
-				"RightMouse");
+				"RightMouse",
+				"MouseMove");
 	}
 
 	private Rotating viewRotating = Rotating.NONE;
@@ -184,10 +195,14 @@ public class GameActionListener implements ActionListener {
 						break;
 					case MOVE:
 						moveCharacterToMouse();
+
+						graphics.getBoardGraphics().clearHighlighting();
 						leftButtonMode = InputMode.SELECT;
 						break;
 					case TARGET:
 						targetMouse();
+
+						graphics.getBoardGraphics().clearHighlighting();
 						leftButtonMode = InputMode.SELECT;
 						break;
 				}
@@ -211,6 +226,51 @@ public class GameActionListener implements ActionListener {
 					viewRotating = Rotating.NONE;
 				}
 			}
+		}
+	}
+
+	private Position lastMouse = new Position(0, 0);
+
+	@Override
+	public synchronized void onAnalog(String name, float value, float tpf) {
+		if (name.equals("MouseMove")) {
+			Vector2f mouse = inputManager.getCursorPosition();
+
+			if (leftButtonMode == InputMode.MOVE) {
+				Position p = graphics.getBoardByMouse(mouse);
+
+				if (p == null) {
+					graphics.getBoardGraphics().clearHighlighting();
+
+				} else if(!p.equals(lastMouse)) {
+					lastMouse = p;
+
+					List<Position> path = selectedTurnCharacter.getMove(null, p);
+					graphics.getBoardGraphics().highlightTiles(
+						path, BoardGraphics.PATH_COLOR);
+				}
+
+			} else if (leftButtonMode == InputMode.TARGET) {
+				Position p = graphics.getTargetByMouse(mouse);
+				
+				if (p == null) {
+					graphics.getBoardGraphics().clearHighlighting();
+
+				} else if (!p.equals(lastMouse)) {
+					lastMouse = p;
+
+					if (!selectedTurnCharacter.canDoAbility(attackWith, p)) {
+						graphics.getBoardGraphics().clearHighlighting();
+						
+					} else {
+						Collection<Position> aoe =
+							selectedTurnCharacter.getAffectedArea(attackWith, p);
+						graphics.getBoardGraphics().highlightTiles(
+							aoe, BoardGraphics.TARGET_COLOR);
+					}
+				}
+			}
+
 		}
 	}
 

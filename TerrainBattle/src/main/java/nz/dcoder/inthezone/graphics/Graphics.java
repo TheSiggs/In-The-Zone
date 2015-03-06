@@ -57,6 +57,8 @@ public class Graphics {
 	private final Collection<ObjectGraphics> objects =
 		new ArrayList<ObjectGraphics>();
 	
+	private final BoardGraphics boardGraphics;
+	
 	public Graphics(SimpleApplication app, Terrain terrain) {
 		this.rootNode = app.getRootNode();
 		this.assetManager = app.getAssetManager();
@@ -76,7 +78,8 @@ public class Graphics {
 
 		initLight();
 
-		boardNode = new BoardGraphics(terrain, assetManager).getBoardNode();
+		boardGraphics = new BoardGraphics(terrain, assetManager);
+		boardNode = boardGraphics.getBoardNode();
 		int width = terrain.getWidth();
 		int height = terrain.getHeight();
 		boardNode.setLocalTranslation(-scale * width / 2 + scale / 2,
@@ -98,6 +101,13 @@ public class Graphics {
 		DirectionalLight southLight = new DirectionalLight();
 		southLight.setDirection(new Vector3f(0f, -1f, -1f).normalizeLocal());
 		rootNode.addLight(southLight);
+	}
+
+	/**
+	 * Get the BoardGraphics, which manages highlighting etc.
+	 * */
+	public BoardGraphics getBoardGraphics() {
+		return boardGraphics;
 	}
 
 	private ControllerChain controllerChain;

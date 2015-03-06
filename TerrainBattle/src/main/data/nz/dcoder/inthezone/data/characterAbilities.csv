@@ -1,6 +1,6 @@
 character,level,abilities,,Notes
 testChar,1,test,,"This line is for testing purposes, please do not alter"
-goblin 1,1,"attack,push",,
+goblin 1,1,"attack,push,heal,teleport",,
 goblin 2,1,"attack,push",,Description of fields
 goblin 3,1,"attack,push",,character: The name of the character
 goblin 4,1,"attack,push",,level: The level of the character

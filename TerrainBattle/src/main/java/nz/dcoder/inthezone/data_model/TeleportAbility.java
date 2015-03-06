@@ -49,7 +49,12 @@ public class TeleportAbility extends Ability {
 			return false;
 		}
 
-		if (battle.getOccupiedPositions().contains(pos)) {
+		Collection<Position> obstacles = battle.terrain.getObstacles();
+
+		if (
+			battle.getOccupiedPositions().contains(pos) ||
+			obstacles.contains(pos)
+		) {
 			return false;
 		}
 

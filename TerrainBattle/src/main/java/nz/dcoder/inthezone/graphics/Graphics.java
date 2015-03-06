@@ -346,7 +346,11 @@ public class Graphics {
 	public void doTeleport(
 		CharacterGraphics cg, Position target, Runnable continuation
 	) {
-		controllerChain.queueAnimation(() -> cg.setPosition(target));
+		controllerChain.queueAnimation(() -> {
+			cg.setPosition(target);
+			controllerChain.nextAnimation();  // this line is required when we don't
+			                                  // actually have an animation to queue
+		});
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 

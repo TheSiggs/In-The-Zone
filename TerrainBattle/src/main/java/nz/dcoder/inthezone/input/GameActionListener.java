@@ -12,16 +12,12 @@ import com.jme3.math.Vector2f;
 import java.util.List;
 import java.util.Collection;
 
+import nz.dcoder.inthezone.control.GameDriver;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
-import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
-import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
-import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.BoardGraphics;
-import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
-import nz.dcoder.inthezone.UserInterface;
 
 /**
  *
@@ -30,22 +26,15 @@ import nz.dcoder.inthezone.UserInterface;
 public class GameActionListener implements ActionListener, AnalogListener {
 	private final InputManager inputManager;
 	private final Graphics graphics;
-	private final UserInterface ui;
 
-	/**
-	 * Any method that reads or writes these fields must be synchronized
-	 * */
-	private InputMode leftButtonMode = InputMode.SELECT;
-	private Turn turn = null;
-	private AbilityName attackWith = null;
-	private int repeats = 0;
+	private final GameDriver driver;
 
 	public GameActionListener(
-		InputManager inputManager, Graphics graphics, UserInterface ui
+		InputManager inputManager, Graphics graphics, GameDriver driver
 	) {
 		this.inputManager = inputManager;
 		this.graphics = graphics;
-		this.ui = ui;
+		this.driver = driver;
 
 		inputManager.addMapping("ForwardsMove", new KeyTrigger(KeyInput.KEY_UP));
 		inputManager.addMapping("RightMove", new KeyTrigger(KeyInput.KEY_RIGHT));
@@ -64,27 +53,32 @@ public class GameActionListener implements ActionListener, AnalogListener {
 		inputManager.addMapping("MouseMove", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
 
 		inputManager.addListener(this,
-				"ForwardsMove",
-				"RightMove",
-				"BackwardsMove",
-				"LeftMove",
-				"LeftView",
-				"RightView",
-				"LeftMouse",
-				"RightMouse",
-				"MouseMove");
+			"ForwardsMove",
+			"RightMove",
+			"BackwardsMove",
+			"LeftMove",
+			"LeftView",
+			"RightView",
+			"LeftMouse",
+			"RightMouse",
+			"MouseMove");
 	}
 
-	private Rotating viewRotating = Rotating.NONE;
 	private boolean viewLDown = false;
 	private boolean viewRDown = false;
-	private CharacterGraphics walking = null;
 	private boolean isAnimating = false;
 
+	/**
+	 * Notify the input system when animation begins.  It is not possible to
+	 * launch an attack etc. while an animation is playing.
+	 * */
 	public void notifyAnimationStart() {
 		isAnimating = true;
 	}
 
+	/**
+	 * Notify the input system when an animation ends.
+	 * */
 	public void notifyAnimationEnd() {
 		isAnimating = false;
 	}
@@ -93,62 +87,56 @@ public class GameActionListener implements ActionListener, AnalogListener {
 		return isAnimating;
 	}
 
-	/**
-	 * Determine if the view is currently rotating, and in which direction.
-	 * */
-	public Rotating getViewRotating() {
-		return viewRotating;
-	}
+	// Access to this object must be synchronized
+	GUIListener inputState = new GUIListener();
 
-	private TurnCharacter selectedTurnCharacter;
-	private CharacterGraphics selectedCharacter;
-
-	public CharacterGraphics getSelectedCharacter() {
-		return selectedCharacter;
+	public GUIListener getGUIListener() {
+		return inputState;
 	}
 
 	/**
-	 * Set the current turn object.
+	 * Use an inner class to restrict the GUI to invoking only the permitted
+	 * methods, and to enforce synchronization.
 	 * */
-	public synchronized void setTurn(Turn turn) {
-		this.turn = turn;
-	}
+	public class GUIListener {
+		private InputMode leftButtonMode = InputMode.SELECT;
+		private int repeats = 0;
+		private AbilityName attackWith;
 
-	/**
-	 * Notify input handler (this) that the user selected the move action.
-	 * */
-	public synchronized void notifyMove() {
-		leftButtonMode = InputMode.MOVE;
-	}
+		/**
+		 * Notify input handler (this) that the user selected the move action.
+		 * */
+		public synchronized void notifyMove() {
+			leftButtonMode = InputMode.MOVE;
+		}
 
-	/**
-	 * Notify input handler (this) that the user selected the attack action.
-	 * */
-	public synchronized void notifyTarget(AbilityName ability, int repeats) {
-		attackWith = ability;
-		leftButtonMode = InputMode.TARGET;
-		repeats = repeats - 1;
-	}
-
-	/**
-	 * End the current turn.  To be called by the GUI.
-	 * */
-	public synchronized void notifyEndTurn() {
-		turn.endTurn();
-	}
-
-	/**
-	 * Notify input handler (this) that an ability is repeating.
-	 * */
-	public synchronized void repeatTarget() {
-		if (repeats > 0) {
-      System.out.println("Ability repeats");
+		/**
+		 * Notify input handler (this) that the user selected the attack action.
+		 * */
+		public synchronized void notifyTarget(AbilityName ability, int repeats) {
+			attackWith = ability;
 			leftButtonMode = InputMode.TARGET;
-			repeats -= 1;
+			repeats = repeats - 1;
+		}
+
+		/**
+		 * Notify input handler that an ability is repeating.
+		 * */
+		public synchronized void notifyRepeat() {
+			if (repeats > 0) {
+				System.out.println("Ability repeats");
+				leftButtonMode = InputMode.TARGET;
+				repeats -= 1;
+			}
+		}
+
+		/**
+		 * End the current turn.  To be called by the GUI.
+		 * */
+		public synchronized void notifyEndTurn() {
+			driver.endTurn();
 		}
 	}
-
-	private int clickCount = 0;
 
 	/**
 	 * TODO: Think about action names and possible key mappings. Should be
@@ -160,18 +148,18 @@ public class GameActionListener implements ActionListener, AnalogListener {
 	 * @param tpf time per frame
 	 */
 	@Override
-	public synchronized void onAction(
+	public void onAction(
 		String name, boolean isPressed, float tpf
 	) {
 		if (isPressed) {
 			// actions that work at any time
 			// =============================
 			if (name.equals("LeftView")) {
-				viewRotating = Rotating.LEFT;
+				driver.setViewRotating(Rotating.LEFT);
 				viewLDown = true;
 			}
 			if (name.equals("RightView")) {
-				viewRotating = Rotating.RIGHT;
+				driver.setViewRotating(Rotating.RIGHT);
 				viewRDown = true;
 			}
 
@@ -189,22 +177,24 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			if (name.equals("LeftMove")) {
 			}
 			if (name.equals("LeftMouse")) {
-				switch (leftButtonMode) {
-					case SELECT:
-						selectCharacterAtMouse();
-						break;
-					case MOVE:
-						moveCharacterToMouse();
+				synchronized(inputState) {
+					switch (inputState.leftButtonMode) {
+						case SELECT:
+							selectCharacterAtMouse();
+							break;
+						case MOVE:
+							moveCharacterToMouse();
 
-						graphics.getBoardGraphics().clearHighlighting();
-						leftButtonMode = InputMode.SELECT;
-						break;
-					case TARGET:
-						targetMouse();
+							graphics.getBoardGraphics().clearHighlighting();
+							inputState.leftButtonMode = InputMode.SELECT;
+							break;
+						case TARGET:
+							targetMouse();
 
-						graphics.getBoardGraphics().clearHighlighting();
-						leftButtonMode = InputMode.SELECT;
-						break;
+							graphics.getBoardGraphics().clearHighlighting();
+							inputState.leftButtonMode = InputMode.SELECT;
+							break;
+					}
 				}
 			}
 			if (name.equals("RightMouse")) {
@@ -213,17 +203,17 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			if (name.equals("LeftView")) {
 				viewLDown = false;
 				if (viewRDown) {
-					viewRotating = Rotating.RIGHT;
+					driver.setViewRotating(Rotating.RIGHT);
 				} else {
-					viewRotating = Rotating.NONE;
+					driver.setViewRotating(Rotating.NONE);
 				}
 			}
 			if (name.equals("RightView")) {
 				viewRDown = false;
 				if (viewLDown) {
-					viewRotating = Rotating.LEFT;
+					driver.setViewRotating(Rotating.LEFT);
 				} else {
-					viewRotating = Rotating.NONE;
+					driver.setViewRotating(Rotating.NONE);
 				}
 			}
 		}
@@ -232,11 +222,17 @@ public class GameActionListener implements ActionListener, AnalogListener {
 	private Position lastMouse = new Position(0, 0);
 
 	@Override
-	public synchronized void onAnalog(String name, float value, float tpf) {
+	public void onAnalog(String name, float value, float tpf) {
 		if (name.equals("MouseMove")) {
 			Vector2f mouse = inputManager.getCursorPosition();
+			TurnCharacter selected = driver.getSelectedTurnCharacter();
+			onMouseMove(mouse, selected);
+		}
+	}
 
-			if (leftButtonMode == InputMode.MOVE) {
+	private void onMouseMove(Vector2f mouse, TurnCharacter selected) {
+		synchronized(inputState) {
+			if (inputState.leftButtonMode == InputMode.MOVE) {
 				Position p = graphics.getBoardByMouse(mouse);
 
 				if (p == null) {
@@ -245,12 +241,12 @@ public class GameActionListener implements ActionListener, AnalogListener {
 				} else if(!p.equals(lastMouse)) {
 					lastMouse = p;
 
-					List<Position> path = selectedTurnCharacter.getMove(null, p);
+					List<Position> path = selected.getMove(null, p);
 					graphics.getBoardGraphics().highlightTiles(
 						path, BoardGraphics.PATH_COLOR);
 				}
 
-			} else if (leftButtonMode == InputMode.TARGET) {
+			} else if (inputState.leftButtonMode == InputMode.TARGET) {
 				Position p = graphics.getTargetByMouse(mouse);
 				
 				if (p == null) {
@@ -259,94 +255,38 @@ public class GameActionListener implements ActionListener, AnalogListener {
 				} else if (!p.equals(lastMouse)) {
 					lastMouse = p;
 
-					if (!selectedTurnCharacter.canDoAbility(attackWith, p)) {
+					if (!selected.canDoAbility(inputState.attackWith, p)) {
 						graphics.getBoardGraphics().clearHighlighting();
 						
 					} else {
 						Collection<Position> aoe =
-							selectedTurnCharacter.getAffectedArea(attackWith, p);
+							selected.getAffectedArea(inputState.attackWith, p);
 						graphics.getBoardGraphics().highlightTiles(
 							aoe, BoardGraphics.TARGET_COLOR);
 					}
 				}
 			}
-
 		}
 	}
 
-	private void selectCharacterAtMouse() {
-		selectCharacter(graphics.getCharacterByMouse(
+	public void selectCharacterAtMouse() {
+		driver.selectCharacter(graphics.getCharacterByMouse(
 			inputManager.getCursorPosition()));
-
-		if (selectedCharacter == null) {
-			ui.deselectCharacter();
-			System.out.println("Deselected character");
-
-		} else {
-			CharacterInfo info = selectedTurnCharacter.getCharacterInfo();
-			ui.selectCharacter(info);
-
-			System.out.println("Selected character " +
-				selectedTurnCharacter.getName().toString() + " at " +
-				selectedCharacter.getPosition().toString());
-			System.out.println(
-				"mp: " + info.mp.toString() +
-				", ap: " + info.ap.toString() +
-				", hp: " + info.hp.toString());
-		}
 	}
 
-	private void moveCharacterToMouse() {
+	public void moveCharacterToMouse() {
 		Position destination =
 			graphics.getBoardByMouse(inputManager.getCursorPosition());
+		driver.moveCharacter(destination);
+	}
 
-		if (selectedTurnCharacter != null && destination != null) {
-			List<Position> path =
-				selectedTurnCharacter.getMove(null, destination);
-
-			if (path == null) {
-				System.out.println("Bad path or not enough MP");
-
-			} else {
-				selectedTurnCharacter.doMotion(path);
-				ui.updateMP(
-					selectedTurnCharacter.getName(),
-					selectedTurnCharacter.getMP());
-			}
+	public void targetMouse() {
+		synchronized(inputState) {
+			Position target =	
+				graphics.getTargetByMouse(inputManager.getCursorPosition());
+			driver.targetPosition(inputState.attackWith, target);
 		}
 	}
 
-	private void targetMouse() {
-		Position target =	
-			graphics.getTargetByMouse(inputManager.getCursorPosition());
-
-		if (selectedTurnCharacter != null && target != null) {
-			if (!selectedTurnCharacter.canDoAbility(attackWith, target)) {
-				System.out.println("Cannot target " + target.toString()
-					+ " with ability " + attackWith.toString());
-			} else {
-				selectedTurnCharacter.doAbility(attackWith, target);
-				ui.updateAP(
-					selectedTurnCharacter.getName(),
-					selectedTurnCharacter.getAP());
-				ui.updateMP(
-					selectedTurnCharacter.getName(),
-					selectedTurnCharacter.getMP());
-			}
-		}
-	}
-
-	private synchronized void selectCharacter(CharacterGraphics cg) {
-		selectedCharacter = cg;
-		if (cg == null) {
-			selectedTurnCharacter = null;
-		} else {
-			selectedTurnCharacter = turn.turnCharacterAt(cg.getPosition());
-			if (selectedTurnCharacter == null) {
-				System.out.println("cannot select enemy characters");
-				selectedCharacter = null;
-			}
-		}
-	}
 }
 

@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package nz.dcoder.inthezone;
+package nz.dcoder.inthezone.control;
 
 import com.jme3.scene.Node;
 import com.jme3x.jfx.JmeFxContainer;
@@ -22,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
@@ -36,10 +32,12 @@ import nz.dcoder.inthezone.Main;
  */
 public class UserInterface {
 	final GameActionListener input;
+	final GameDriver driver;
 	final MainHUDController controller;
 
-	public UserInterface(Main game, Graphics g) {
-		this.input = new GameActionListener(game.getInputManager(), g, this);
+	public UserInterface(Main game, GameState gameState, Graphics g) {
+		this.driver = new GameDriver(g, gameState, this);
+		this.input = new GameActionListener(game.getInputManager(), g, driver);
 
 		Node guiNode = game.getGuiNode();
 
@@ -59,6 +57,10 @@ public class UserInterface {
 				"Failed to create GUI because: " + e.getMessage(), e);
 		}
 
+	}
+
+	public GameDriver getGameDriver() {
+		return driver;
 	}
 
 	public GameActionListener getGameActionListener() {
@@ -129,7 +131,7 @@ class LaunchJavaFxGUI implements Runnable {
 			jmeFx.setScene(scene, root);
 
 			MainHUDController controller = fxmlLoader.getController();
-			controller.setGameInput(input);
+			controller.setGameInput(input.getGUIListener());
 			controller.setContainer(jmeFx);
 			hud.complete(controller);
 

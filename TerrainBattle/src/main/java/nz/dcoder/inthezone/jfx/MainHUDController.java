@@ -108,7 +108,8 @@ public class MainHUDController implements Initializable {
 	@FXML private Button noItems;
 
 	@FXML protected void onMoveButton(ActionEvent event) {
-		input.notifyMove();                 
+		input.notifyMove();
+                textPrompt.setText("Where would you like to move?");
 	}
         
 	AbilityName pushAbility = new AbilityName("push");
@@ -120,21 +121,25 @@ public class MainHUDController implements Initializable {
 	@FXML protected void onAttackButton(ActionEvent event) {
 		pushMenu(attackMenu);
 		jmeFx.loseFocus();
+                textPrompt.setText("Who would you like to attack?");
 	}
 
 	@FXML protected void onMagicButton(ActionEvent event) {
 		pushMenu(magicMenu);
 		jmeFx.loseFocus();
+                textPrompt.setText("Which ability would you like to use?");
 	}
 
 	@FXML protected void onItemButton(ActionEvent event) {
 		pushMenu(itemMenu);
 		jmeFx.loseFocus();
+                textPrompt.setText("Which item would you like to use?");
 	}
 
 	@FXML protected void onEndButton(ActionEvent event) {
 		input.notifyEndTurn();
 		jmeFx.loseFocus();
+                textPrompt.setText("Turn ended");
 	}
 
 	@FXML protected void onBackButton(ActionEvent event) {
@@ -152,7 +157,7 @@ public class MainHUDController implements Initializable {
 		Collection<CharacterInfo> npcs
 	) {
 		selectedCharacter.setVisible(false);
-		hideMenus();
+		hideMenus();      
 	}
 
 	CharacterName currentCharacter = null;
@@ -173,16 +178,22 @@ public class MainHUDController implements Initializable {
 
 		selectedCharacter.setVisible(true);
 		pushMenu(topMenu);
+                textPrompt.setText(currentCharacter + " Has been selected!!");      
 	}
 
 	public void deselectCharacter() {
 		selectedCharacter.setVisible(false);
 		hideMenus();
+                if (currentCharacter == null) {
+                    textPrompt.setText("No character selected!");
+                } else {
+                    textPrompt.setText(currentCharacter + " Has been deselected!"); 
+                }
 	}
 
 	public void updateMP(CharacterName name, Points points) {
 		if (name.equals(currentCharacter)) {
-			setPoints(mp, mpLabel, points);
+			setPoints(mp, mpLabel, points);                
 		}
 	}
 
@@ -230,17 +241,6 @@ public class MainHUDController implements Initializable {
 
 		attack.add(attackExit);
 		magic.add(magicExit);
-	}   
-        
-        public void textPrompt(CharacterName name, Points points) { 
-            //JLabel characterSelected = new JLabel(currentCharacter + "Has been selected!", JLabel.BOTTOM);
-            //JTextField characterSelected = new JTextField(currentCharacter + "Has been selected!");
-            //JTextField characterHP = new JTextField(currentCharacter + "Now has " + hp + " health left!");
-            //JTextField characterPush = new JTextField(currentCharacter + "Used " + pushAbility + "!");
-            
-            if (name.equals (currentCharacter) ) {
-                textPrompt.setText(currentCharacter + "Has been selected!");    
-            }            
-        }
+	}      
 }
 

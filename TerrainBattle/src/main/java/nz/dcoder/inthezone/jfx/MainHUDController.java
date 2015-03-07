@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import nz.dcoder.inthezone.control.GameActionListener;
 import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
@@ -33,7 +34,6 @@ import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
-import nz.dcoder.inthezone.input.GameActionListener;
 
 
 /**

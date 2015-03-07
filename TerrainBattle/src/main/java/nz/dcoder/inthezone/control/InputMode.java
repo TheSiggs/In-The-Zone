@@ -1,4 +1,4 @@
-package nz.dcoder.inthezone.input;
+package nz.dcoder.inthezone.control;
 
 public enum InputMode {
 	SELECT, MOVE, TARGET, ITEM_TARGET

@@ -24,7 +24,6 @@ import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.graphics.Graphics;
-import nz.dcoder.inthezone.input.GameActionListener;
 import nz.dcoder.inthezone.jfx.MainHUDController;
 import nz.dcoder.inthezone.Main;
 

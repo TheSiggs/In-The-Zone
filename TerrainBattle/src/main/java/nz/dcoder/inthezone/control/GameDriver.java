@@ -11,7 +11,6 @@ import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
-import nz.dcoder.inthezone.input.Rotating;
 
 /**
  * This is where every command to the game begins.  From here, we call into the

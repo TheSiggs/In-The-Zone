@@ -25,8 +25,6 @@ import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.graphics.ObjectGraphics;
-import nz.dcoder.inthezone.input.GameActionListener;
-import nz.dcoder.inthezone.input.Rotating;
 
 /**
  *

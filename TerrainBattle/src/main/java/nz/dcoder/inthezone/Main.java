@@ -11,6 +11,7 @@ import java.util.List;
 
 import nz.dcoder.inthezone.ai.AIPlayer;
 import nz.dcoder.inthezone.control.Control;
+import nz.dcoder.inthezone.control.GameActionListener;
 import nz.dcoder.inthezone.control.GameDriver;
 import nz.dcoder.inthezone.control.UserInterface;
 import nz.dcoder.inthezone.data_model.Character;
@@ -32,7 +33,6 @@ import nz.dcoder.inthezone.data_model.Terrain;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.ControllerChain;
 import nz.dcoder.inthezone.graphics.Graphics;
-import nz.dcoder.inthezone.input.GameActionListener;
 
 /**
  * Please change sparingly and only to attach new objects dependencies which are

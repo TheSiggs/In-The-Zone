@@ -1,4 +1,4 @@
-package nz.dcoder.inthezone.input;
+package nz.dcoder.inthezone.control;
 
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
@@ -12,7 +12,6 @@ import com.jme3.math.Vector2f;
 import java.util.List;
 import java.util.Collection;
 
-import nz.dcoder.inthezone.control.GameDriver;
 import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.Position;

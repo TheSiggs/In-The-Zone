@@ -29,7 +29,6 @@ public class PathController extends ChainableController {
 	private float t = 0;
 
 	public PathController (Graphics graphics, ModelGraphics mg) {
-		super(graphics.getControllerChain());
 		this.graphics = graphics;
 		this.mg = mg;
 		this.setEnabled(false);
@@ -40,31 +39,48 @@ public class PathController extends ChainableController {
 	private boolean rotate;
 	private float speed = 1f;
 
-	public void doWalk(List<Position> path, boolean rotate) {
+	public void doWalk(
+		List<Position> path,
+		boolean rotate,
+		ControllerChain.Token t
+	) {
 		animation = "walk";
 		restoreAnimation = mg.getAnimation();
 		this.rotate = rotate;
 		this.speed = Graphics.WALK_SPEED;
-		activate(path, true);
+		activate(path, true, t);
 	}
 
-	public void doRun(List<Position> path, boolean rotate) {
+	public void doRun(
+		List<Position> path,
+		boolean rotate,
+		ControllerChain.Token t
+	) {
 		animation = "run";
 		restoreAnimation = mg.getAnimation();
 		this.rotate = rotate;
 		this.speed = Graphics.RUN_SPEED;
-		activate(path, true);
+		activate(path, true, t);
 	}
 
-	public void doSlide(List<Position> path, float speed, boolean rotate) {
+	public void doSlide(
+		List<Position> path,
+		float speed,
+		boolean rotate,
+		ControllerChain.Token t
+	) {
 		animation = null;
 		restoreAnimation = null;
 		this.rotate = rotate;
 		this.speed = speed;
-		activate(path, false);
+		activate(path, false, t);
 	}
 
-	private void activate(List<Position> path, boolean walkAroundCharacters) {
+	private void activate(
+		List<Position> path,
+		boolean walkAroundCharacters,
+		ControllerChain.Token token
+	) {
 		Spline spline0 = new Spline();
 		nControlPoints = path.size();
 		for (Position p : path) {
@@ -83,6 +99,8 @@ public class PathController extends ChainableController {
 		t = 0;
 
 		finalPosition = path.get(path.size() - 1);
+
+		startControl(token);
 		this.setEnabled(true);
 	}
 

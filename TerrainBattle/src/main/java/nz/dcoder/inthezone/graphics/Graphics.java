@@ -271,7 +271,7 @@ public class Graphics {
 		List<Position> path,
 		Runnable continuation
 	) {
-		controllerChain.queueAnimation(() -> cg.getPathController().doRun(path, true));
+		controllerChain.queueAnimation(t -> cg.getPathController().doRun(path, true, t));
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 
@@ -287,7 +287,7 @@ public class Graphics {
 		boardNode.detachChild(cg.getSpatial());
 		characters.remove(cg);
 		ObjectGraphics r = addObject(p, body);
-		controllerChain.queueAnimation(() -> r.setAnimation("die", 1));
+		controllerChain.queueAnimation(t -> r.setAnimation("die", 1, t));
 		return r;
 	}
 
@@ -296,7 +296,7 @@ public class Graphics {
 	 * */
 	public void destroyObject(ObjectGraphics og) {
 		objects.remove(og);
-		controllerChain.queueAnimation(() -> og.setAnimation("destroy", 1));
+		controllerChain.queueAnimation(t -> og.setAnimation("destroy", 1, t));
 	}
 
 	/**
@@ -336,16 +336,16 @@ public class Graphics {
 		objectPath.add(og.getPosition());
 		objectPath.add(objectTarget);
 
-		controllerChain.queueAnimation(() -> {
-			cg.getPathController().doWalk(characterPath, true);
-			og.getPathController().doSlide(objectPath, WALK_SPEED, false);
+		controllerChain.queueAnimation(t -> {
+			cg.getPathController().doWalk(characterPath, true, t);
+			og.getPathController().doSlide(objectPath, WALK_SPEED, false, t);
 		});
 
 		// HACK: part of the workaround for no "die" animation in the goblin model
 		// This should be removed as soon as possible.
-		controllerChain.queueAnimation(() -> {
+		controllerChain.queueAnimation(t -> {
 			og.replaceAnim(goblinDieAnimation(objectTarget, false));
-			og.setAnimation("die", 1);
+			og.setAnimation("die", 1, t);
 		});
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
@@ -356,11 +356,7 @@ public class Graphics {
 	public void doTeleport(
 		CharacterGraphics cg, Position target, Runnable continuation
 	) {
-		controllerChain.queueAnimation(() -> {
-			cg.setPosition(target);
-			controllerChain.nextAnimation();  // this line is required when we don't
-			                                  // actually have an animation to queue
-		});
+		controllerChain.queueAnimation(t -> cg.setPosition(target));
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}
 

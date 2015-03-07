@@ -13,20 +13,20 @@ import nz.dcoder.inthezone.ai.AIPlayer;
 import nz.dcoder.inthezone.control.Control;
 import nz.dcoder.inthezone.control.GameDriver;
 import nz.dcoder.inthezone.control.UserInterface;
-import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
 import nz.dcoder.inthezone.data_model.Equipment;
 import nz.dcoder.inthezone.data_model.factories.AbilityFactory;
 import nz.dcoder.inthezone.data_model.factories.BattleObjectFactory;
 import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
 import nz.dcoder.inthezone.data_model.factories.DatabaseException;
-import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.factories.EquipmentFactory;
+import nz.dcoder.inthezone.data_model.factories.ItemFactory;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.Party;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentName;
+import nz.dcoder.inthezone.data_model.pure.ItemName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Terrain;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
@@ -52,6 +52,7 @@ public class Main extends SimpleApplication {
 	private BattleObjectFactory battleObjectFactory = null;
 	private CharacterFactory characterFactory = null;
 	private EquipmentFactory equipmentFactory = null;
+	private ItemFactory itemFactory = null;
 
 	public Main() {
 		super((AppState) null);
@@ -85,6 +86,7 @@ public class Main extends SimpleApplication {
 			characterFactory = new CharacterFactory(
 				abilityFactory, battleObjectFactory);
 			equipmentFactory = new EquipmentFactory(abilityFactory);
+			itemFactory = new ItemFactory(abilityFactory);
 
 			graphics = new Graphics(this, gameState.terrain);
 			userInterface = new UserInterface(this, gameState, graphics);
@@ -95,7 +97,7 @@ public class Main extends SimpleApplication {
 				input::notifyAnimationStart,
 				input::notifyAnimationEnd));
 
-			control = new Control(graphics, userInterface);
+			control = new Control(gameState, graphics, userInterface);
 
 			startSimpleBattle();
 		} catch (DatabaseException e) {
@@ -129,6 +131,18 @@ public class Main extends SimpleApplication {
 
 		for (int x = 0; x < 5; ++x) {
 			npcs.add(initGoblin(new Position(x * 2, 0), x + 6, headingS));
+		}
+
+		// create some items and add them to the party
+		ItemName potion = new ItemName("potion");
+		ItemName grenade = new ItemName("grenade");
+
+		for (int i = 0; i < 3; i++) {
+			gameState.party.gainItem(itemFactory.newItem(potion));
+		}
+
+		for (int i = 0; i < 2; i++) {
+			gameState.party.gainItem(itemFactory.newItem(grenade));
 		}
 
 		gameState.makeBattle(pcs, npcs,

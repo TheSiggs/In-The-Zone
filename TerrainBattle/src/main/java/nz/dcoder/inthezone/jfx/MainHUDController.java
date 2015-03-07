@@ -18,13 +18,15 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.Node;
+import javafx.scene.text.Text;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
-import javafx.scene.text.Text;
 
+import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
@@ -148,7 +150,8 @@ public class MainHUDController implements Initializable {
 	public void turnStart(
 		boolean isPlayerTurn,
 		Collection<CharacterInfo> players,
-		Collection<CharacterInfo> npcs
+		Collection<CharacterInfo> npcs,
+		Map<Item, Integer> items
 	) {
 		selectedCharacter.setVisible(false);
 		hideMenus();

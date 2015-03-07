@@ -2,10 +2,10 @@ package nz.dcoder.inthezone.control;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import nz.dcoder.inthezone.ai.AIPlayer;
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
 import nz.dcoder.inthezone.data_model.DoAbilityInfo;
@@ -35,12 +35,14 @@ import nz.dcoder.inthezone.input.Rotating;
 public final class Control {
 	private final GameActionListener input;
 	private final GameDriver driver;
+	private final GameState gameState;
 	private final Graphics graphics;
 	private final UserInterface ui;
 
 	private Turn turn;
 
-	public Control(Graphics graphics, UserInterface ui) {
+	public Control(GameState gameState, Graphics graphics, UserInterface ui) {
+		this.gameState = gameState;
 		this.graphics = graphics;
 		this.ui = ui;
 		this.input = ui.getGameActionListener();
@@ -89,7 +91,8 @@ public final class Control {
 
 		ui.turnStart(true,
 			turn.getPlayerInfo().stream().collect(Collectors.toList()),
-			turn.getNPCInfo().stream().collect(Collectors.toList()));
+			turn.getNPCInfo().stream().collect(Collectors.toList()),
+			gameState.party.getItemInfo());
 	}
 
 	private void aiPlayerTurnStart(Turn turn) {
@@ -102,7 +105,8 @@ public final class Control {
 
 		ui.turnStart(true,
 			turn.getPlayerInfo().stream().collect(Collectors.toList()),
-			turn.getNPCInfo().stream().collect(Collectors.toList()));
+			turn.getNPCInfo().stream().collect(Collectors.toList()),
+			new HashMap<>());
 	}
 
 	/**

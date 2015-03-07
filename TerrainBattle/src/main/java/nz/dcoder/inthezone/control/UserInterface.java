@@ -16,8 +16,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 import nz.dcoder.inthezone.data_model.GameState;
+import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
@@ -70,9 +72,11 @@ public class UserInterface {
 	public void turnStart(
 		boolean isPlayerTurn,
 		Collection<CharacterInfo> players,
-		Collection<CharacterInfo> npcs
+		Collection<CharacterInfo> npcs,
+		Map<Item, Integer> items
 	) {
-		Platform.runLater(() -> controller.turnStart(isPlayerTurn, players, npcs));
+		Platform.runLater(() ->
+			controller.turnStart(isPlayerTurn, players, npcs, items));
 	}
 
 	public void selectCharacter(CharacterInfo info) {

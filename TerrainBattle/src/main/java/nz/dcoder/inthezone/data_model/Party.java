@@ -11,51 +11,19 @@ import nz.dcoder.inthezone.data_model.pure.ItemName;
  * The player's party, and everything they're carrying.
  * */
 public class Party {
-	final Map<ItemName, List<Item>> items;
 	// equipment that isn't presently equipt to any character 
-	final Collection<Equipment> equipment; 
-	final Collection<Character> characters;
+	private final Collection<Equipment> equipment; 
+	private final Collection<Character> characters;
+	private final ItemBag items;
 
 	public Party() {
-		items = new HashMap<>();
 		equipment = new ArrayList<>();
 		characters = new ArrayList<>();
+		items = new ItemBag();
 	}
 
-	/**
-	 * Information about items for the GUI
-	 *
-	 * @return items
-	 */
-	public Map<Item, Integer> getItemInfo() {
-		Map<Item, Integer> m = new HashMap<>();
-		items.keySet().stream()
-			.forEach(i -> m.put(items.get(i).get(0), items.get(i).size()));
-		return m;
-	}
-
-	public boolean hasItem(ItemName name) {
-		return items.keySet().stream().anyMatch(i -> i.equals(name));
-	}
-
-	public void consumeItem(ItemName name) {
-		List<Item> l = items.get(name);
-		if (l != null) {
-			if (l.size() == 1) {
-				items.remove(name);
-			} else {
-				l.remove(0);
-			}
-		}
-	}
-
-	public void gainItem(Item item) {
-		List<Item> l = items.get(item.name);
-		if (l == null) {
-			l = new ArrayList<Item>();
-			items.put(item.name, l);
-		}
-		l.add(item);
+	public ItemBag getItemBag() {
+		return items;
 	}
 }
 

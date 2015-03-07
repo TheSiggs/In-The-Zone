@@ -113,11 +113,11 @@ public class GameDriver {
 					+ " with item " + item.name.toString());
 			} else {
 				selectedTurnCharacter.useItem(item, target);
-				gameState.party.consumeItem(item.name);
+				turn.getItems().consumeItem(item.name);
 				ui.updateAP(
 					selectedTurnCharacter.getName(),
 					selectedTurnCharacter.getAP());
-				ui.updateItems(gameState.party.getItemInfo());
+				ui.updateItems(turn.getItems().getItemInfo());
 			}
 		}
 	}

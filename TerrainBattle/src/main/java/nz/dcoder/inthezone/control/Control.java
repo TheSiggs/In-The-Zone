@@ -1,9 +1,5 @@
 package nz.dcoder.inthezone.control;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import nz.dcoder.inthezone.data_model.BattleController;
@@ -90,7 +86,7 @@ public final class Control {
 		ui.turnStart(true,
 			turn.getPlayerInfo().stream().collect(Collectors.toList()),
 			turn.getNPCInfo().stream().collect(Collectors.toList()),
-			gameState.party.getItemInfo());
+			turn.getItems().getItemInfo());
 	}
 
 	private void aiPlayerTurnStart(Turn turn) {
@@ -104,7 +100,7 @@ public final class Control {
 		ui.turnStart(true,
 			turn.getPlayerInfo().stream().collect(Collectors.toList()),
 			turn.getNPCInfo().stream().collect(Collectors.toList()),
-			new HashMap<>());
+			turn.getItems().getItemInfo());
 	}
 
 	/**

@@ -23,6 +23,7 @@ import nz.dcoder.inthezone.data_model.factories.DatabaseException;
 import nz.dcoder.inthezone.data_model.factories.EquipmentFactory;
 import nz.dcoder.inthezone.data_model.factories.ItemFactory;
 import nz.dcoder.inthezone.data_model.GameState;
+import nz.dcoder.inthezone.data_model.ItemBag;
 import nz.dcoder.inthezone.data_model.Party;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
@@ -137,15 +138,19 @@ public class Main extends SimpleApplication {
 		ItemName potion = new ItemName("potion");
 		ItemName grenade = new ItemName("grenade");
 
+		ItemBag playerItems = gameState.party.getItemBag();
+		ItemBag aiItems = new ItemBag();
+
 		for (int i = 0; i < 3; i++) {
-			gameState.party.gainItem(itemFactory.newItem(potion));
+			playerItems.gainItem(itemFactory.newItem(potion));
 		}
 
 		for (int i = 0; i < 2; i++) {
-			gameState.party.gainItem(itemFactory.newItem(grenade));
+			playerItems.gainItem(itemFactory.newItem(grenade));
 		}
 
 		gameState.makeBattle(pcs, npcs,
+			playerItems, aiItems,
 			control.getBattleController(), new AIPlayer());
 	}
 

@@ -13,17 +13,24 @@ public class Turn {
 	final private Collection<TurnCharacter> turnCharacters;
 	final private Battle battle;
 	final private int turnNumber;
+	final private ItemBag items;
 
 	public Turn (
 		boolean isPlayerTurn,
 		Collection<TurnCharacter> turnCharacters,
+		ItemBag items,
 		Battle battle,
 		int turnNumber
 	) {
 		this.isPlayerTurn = isPlayerTurn;
 		this.turnCharacters = turnCharacters;
+		this.items = items;
 		this.battle = battle;
 		this.turnNumber = turnNumber;
+	}
+
+	public ItemBag getItems() {
+		return items;
 	}
 
 	/**

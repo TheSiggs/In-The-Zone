@@ -25,6 +25,8 @@ public class GameState {
 	public void makeBattle(
 		Collection<Character> pcs,
 		Collection<Character> nps,
+		ItemBag pcItems,
+		ItemBag npcItems,
 		BattleController controller,
 		AIPlayer aiPlayer
 	) {
@@ -37,6 +39,8 @@ public class GameState {
 			controller,
 			pcs,
 			nps,
+			pcItems,
+			npcItems,
 			new ArrayList<BattleObject>(),   // no battle objects to start with
 			terrain,
 			true                             // human player goes first

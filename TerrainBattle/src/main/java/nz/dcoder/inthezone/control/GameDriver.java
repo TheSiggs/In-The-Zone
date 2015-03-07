@@ -3,6 +3,7 @@ package nz.dcoder.inthezone.control;
 import java.util.List;
 
 import nz.dcoder.inthezone.data_model.GameState;
+import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -102,6 +103,22 @@ public class GameDriver {
 				ui.updateMP(
 					selectedTurnCharacter.getName(),
 					selectedTurnCharacter.getMP());
+			}
+		}
+	}
+
+	public void targetItemPosition(Item item, Position target) {
+		if (selectedTurnCharacter != null && target != null) {
+			if (!selectedTurnCharacter.canUseItem(item, target)) {
+				System.out.println("Cannot target " + target.toString()
+					+ " with item " + item.name.toString());
+			} else {
+				selectedTurnCharacter.useItem(item, target);
+				gameState.party.consumeItem(item.name);
+				ui.updateAP(
+					selectedTurnCharacter.getName(),
+					selectedTurnCharacter.getAP());
+				ui.updateItems(gameState.party.getItemInfo());
 			}
 		}
 	}

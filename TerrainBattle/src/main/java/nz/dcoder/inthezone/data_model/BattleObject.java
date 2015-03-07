@@ -46,6 +46,19 @@ public class BattleObject {
 		}
 	}
 
+	private final static BattleObjectName terrainObstacle =
+		new BattleObjectName("terrainObstacle");
+
+	/**
+	 * Convenience method to create obstacles that mirror the terrain obstacles.
+	 * */
+	public static BattleObject newTerrainObstacle(Position p) {
+		BattleObject r = new BattleObject(terrainObstacle,
+			true, true, false, false, 1, null);
+		r.position = p;
+		return r;
+	}
+
 	/**
 	 * Used e.g. by exploding mines.  Called when a character moves to or through
 	 * the position parameter, determines whether or not the object's ability is

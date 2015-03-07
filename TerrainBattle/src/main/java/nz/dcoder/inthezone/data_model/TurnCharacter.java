@@ -64,15 +64,11 @@ public class TurnCharacter {
 		int width = battle.terrain.getWidth();
 		int height = battle.terrain.getHeight();
 
-		Set<Position> obstacles =
-			new HashSet<Position>(battle.terrain.getObstacles());
-
 		// ensure that the destination is valid
 		if (
 			destination.x >= width || destination.x < 0 ||
 			destination.y >= height || destination.y < 0 ||
-			battle.getOccupiedPositions().contains(destination) ||
-			obstacles.contains(destination)
+			battle.getOccupiedPositions().contains(destination)
 		) {
 			return null;
 		}
@@ -92,7 +88,8 @@ public class TurnCharacter {
 		if (startPos.equals(destination)) return soFar;
 
 		// start of pathfinding code
-		obstacles.addAll(battle.getObstacles(battle.turn.isPlayerTurn));
+		Set<Position> obstacles = new HashSet<Position>(
+			battle.getObstacles(battle.turn.isPlayerTurn));
 
 		Node<Position> start = new AStarPositionNode(null,
 			obstacles, width, height, startPos, destination);

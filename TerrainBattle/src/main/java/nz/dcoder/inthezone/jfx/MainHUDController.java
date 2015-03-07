@@ -154,6 +154,7 @@ public class MainHUDController implements Initializable {
 		Map<Item, Integer> items
 	) {
 		selectedCharacter.setVisible(false);
+		rebuildItemsMenu(items);
 		hideMenus();
 	}
 
@@ -198,6 +199,32 @@ public class MainHUDController implements Initializable {
 		if (name.equals(currentCharacter)) {
 			setPoints(hp, hpLabel, points);
 		}
+	}
+
+	public void updateItems(Map<Item, Integer> items) {
+		rebuildItemsMenu(items);
+	}
+
+	private void rebuildItemsMenu(Map<Item, Integer> items) {
+		ObservableList<Node> menu = itemMenu.getChildren();
+		menu.clear();
+
+		for (Item i : items.keySet()) {
+			Button b = new Button(i.name.toString() + " x" + items.get(i).toString());
+			b.setMnemonicParsing(false);
+			b.setOnAction(event -> {
+				input.notifyItem(i);
+				jmeFx.loseFocus();
+			});
+			b.setPrefWidth(menuWidth);
+
+			b.setTooltip(new Tooltip(i.description));
+
+			menu.add(b);
+		}
+
+		if (menu.size() == 0) menu.add(noItems);
+		menu.add(itemExit);
 	}
 
 	private void rebuildMenus(Collection<AbilityInfo> abilities) {

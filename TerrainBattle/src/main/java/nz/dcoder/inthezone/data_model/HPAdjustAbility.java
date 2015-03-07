@@ -40,8 +40,9 @@ public class HPAdjustAbility extends Ability {
 		// 4) apply the formula to each target.
 		for (Character c : characterTargets) {
 			c.hp += m;
-			if (c.hp > c.getMaxHP()) c.hp = c.getMaxHP();
-			else {
+			if (c.hp > c.getMaxHP()) {
+				c.hp = c.getMaxHP();
+			} else if (c.hp <= 0) {
 				c.hp = 0;
 				battle.kill(c);
 			}

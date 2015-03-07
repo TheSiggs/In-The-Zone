@@ -129,13 +129,15 @@ abstract public class Ability {
 
 				// there may be a character at the target position, but not anywhere
 				// along the LOS, hence we now ignore the last element of the LOS.
-				los1.remove(los1.size() - 1);
-				los2.remove(los2.size() - 1);
-				allClear &=
-					los1.stream().map(p -> battle.getCharacterAt(p))
-						.noneMatch(c -> c != null) ||
-					los2.stream().map(p -> battle.getCharacterAt(p))
-						.noneMatch(c -> c != null);
+				if (los1.size() > 0 && los2.size() > 0) {
+					los1.remove(los1.size() - 1);
+					los2.remove(los2.size() - 1);
+					allClear &=
+						los1.stream().map(p -> battle.getCharacterAt(p))
+							.noneMatch(c -> c != null) ||
+						los2.stream().map(p -> battle.getCharacterAt(p))
+							.noneMatch(c -> c != null);
+				}
 			}
 			return allClear;
 	}

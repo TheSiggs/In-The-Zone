@@ -98,6 +98,10 @@ public class UserInterface {
 	public void updateHP(CharacterName name, Points hp) {
 		Platform.runLater(() -> controller.updateHP(name, hp));
 	}
+
+	public void updateItems(Map<Item, Integer> items) {
+		Platform.runLater(() -> controller.updateItems(items));
+	}
 }
 
 /**

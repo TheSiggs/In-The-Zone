@@ -92,7 +92,7 @@ public class DamageAbility extends Ability {
 					"Error evaluating damage formula: " + e.getMessage(), e);
 			}
 
-			if (c.hp < 0) {
+			if (c.hp <= 0) {
 				c.hp = 0;
 				battle.kill(c);
 			}

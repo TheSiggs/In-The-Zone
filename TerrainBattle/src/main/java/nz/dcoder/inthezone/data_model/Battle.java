@@ -35,6 +35,10 @@ class Battle {
 		this.objects = objects;
 		this.terrain = terrain;
 
+		// import obstacles from the terrain
+		terrain.getObstacles().stream().forEach(p ->
+			objects.add(BattleObject.newTerrainObstacle(p)));
+
 		// create a dummy turn 0 to 'prime the pump'
 		turnNumber = 0;
 		turn = new Turn(

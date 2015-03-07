@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import nz.dcoder.inthezone.data_model.pure.ItemName;
 
 /**
@@ -29,7 +28,7 @@ public class Party {
 	 * @return items
 	 */
 	public Map<Item, Integer> getItemInfo() {
-		Map<Item, Integer> m = new TreeMap<>();
+		Map<Item, Integer> m = new HashMap<>();
 		items.keySet().stream()
 			.forEach(i -> m.put(items.get(i).get(0), items.get(i).size()));
 		return m;
@@ -54,6 +53,7 @@ public class Party {
 		List<Item> l = items.get(item.name);
 		if (l == null) {
 			l = new ArrayList<Item>();
+			items.put(item.name, l);
 		}
 		l.add(item);
 	}

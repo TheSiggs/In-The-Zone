@@ -110,7 +110,7 @@ public class BoardGraphics {
 		highlighted.addAll(highlight);
 		for (Position p : highlighted) {
 			Geometry g = tiles.get(p);
-			g.getMaterial().setColor("Color", h);
+			if (g != null) g.getMaterial().setColor("Color", h);
 		}
 	}
 
@@ -120,8 +120,10 @@ public class BoardGraphics {
 	public void clearHighlighting() {
 		for (Position p : highlighted) {
 			Geometry g = tiles.get(p);
-			g.getMaterial().setColor("Color",
-				(ColorRGBA) g.getUserData("defaultColor"));
+			if (g != null) {
+				g.getMaterial().setColor("Color",
+					(ColorRGBA) g.getUserData("defaultColor"));
+			}
 		}
 		highlighted.clear();
 	}

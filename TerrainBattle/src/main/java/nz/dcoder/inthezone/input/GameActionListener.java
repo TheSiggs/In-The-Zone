@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Collection;
 
 import nz.dcoder.inthezone.control.GameDriver;
+import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
@@ -102,12 +103,18 @@ public class GameActionListener implements ActionListener, AnalogListener {
 		private InputMode leftButtonMode = InputMode.SELECT;
 		private int repeats = 0;
 		private AbilityName attackWith;
+		private Item useItem;
 
 		/**
 		 * Notify input handler (this) that the user selected the move action.
 		 * */
 		public synchronized void notifyMove() {
 			leftButtonMode = InputMode.MOVE;
+		}
+
+		public synchronized void notifyItem(Item item) {
+			useItem = item;
+			leftButtonMode = InputMode.ITEM_TARGET;
 		}
 
 		/**
@@ -194,6 +201,12 @@ public class GameActionListener implements ActionListener, AnalogListener {
 							graphics.getBoardGraphics().clearHighlighting();
 							inputState.leftButtonMode = InputMode.SELECT;
 							break;
+						case ITEM_TARGET:
+							targetItemMouse();
+
+							graphics.getBoardGraphics().clearHighlighting();
+							inputState.leftButtonMode = InputMode.SELECT;
+							break;
 					}
 				}
 			}
@@ -232,6 +245,8 @@ public class GameActionListener implements ActionListener, AnalogListener {
 
 	private void onMouseMove(Vector2f mouse, TurnCharacter selected) {
 		synchronized(inputState) {
+			boolean isItem = inputState.leftButtonMode == InputMode.ITEM_TARGET;
+
 			if (inputState.leftButtonMode == InputMode.MOVE) {
 				Position p = graphics.getBoardByMouse(mouse);
 
@@ -246,7 +261,7 @@ public class GameActionListener implements ActionListener, AnalogListener {
 						path, BoardGraphics.PATH_COLOR);
 				}
 
-			} else if (inputState.leftButtonMode == InputMode.TARGET) {
+			} else if (inputState.leftButtonMode == InputMode.TARGET || isItem) {
 				Position p = graphics.getTargetByMouse(mouse);
 				
 				if (p == null) {
@@ -255,12 +270,21 @@ public class GameActionListener implements ActionListener, AnalogListener {
 				} else if (!p.equals(lastMouse)) {
 					lastMouse = p;
 
-					if (!selected.canDoAbility(inputState.attackWith, p)) {
+					if (
+						(isItem && !selected.canUseItem(inputState.useItem, p)) ||
+						(!isItem && !selected.canDoAbility(inputState.attackWith, p))
+					) {
 						graphics.getBoardGraphics().clearHighlighting();
 						
 					} else {
-						Collection<Position> aoe =
-							selected.getAffectedArea(inputState.attackWith, p);
+						Collection<Position> aoe;
+						
+						if (isItem) {
+							aoe = selected.getItemAffectedArea(inputState.useItem, p);
+						} else {
+							aoe = selected.getAffectedArea(inputState.attackWith, p);
+						}
+
 						graphics.getBoardGraphics().highlightTiles(
 							aoe, BoardGraphics.TARGET_COLOR);
 					}
@@ -285,6 +309,14 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			Position target =	
 				graphics.getTargetByMouse(inputManager.getCursorPosition());
 			driver.targetPosition(inputState.attackWith, target);
+		}
+	}
+
+	public void targetItemMouse() {
+		synchronized(inputState) {
+			Position target =	
+				graphics.getTargetByMouse(inputManager.getCursorPosition());
+			driver.targetItemPosition(inputState.useItem, target);
 		}
 	}
 

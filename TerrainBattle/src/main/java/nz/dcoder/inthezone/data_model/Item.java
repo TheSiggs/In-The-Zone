@@ -1,6 +1,7 @@
 package nz.dcoder.inthezone.data_model;
 
 import java.util.Collection;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.BaseStats;
 import nz.dcoder.inthezone.data_model.pure.ItemName;
 
@@ -17,6 +18,10 @@ public class Item {
 		this.name = name;
 		this.description = description;
 		this.ability = ability;
+	}
+
+	public AbilityInfo getAbility() {
+		return ability.info;
 	}
 
 	@Override public boolean equals(Object obj) {

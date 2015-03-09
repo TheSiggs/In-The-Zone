@@ -9,14 +9,11 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.math.Vector2f;
-import java.util.List;
-import java.util.Collection;
 
 import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
-import nz.dcoder.inthezone.graphics.BoardGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 
 /**
@@ -109,11 +106,13 @@ public class GameActionListener implements ActionListener, AnalogListener {
 		 * */
 		public synchronized void notifyMove() {
 			leftButtonMode = InputMode.MOVE;
+			driver.setMoveHighlight();
 		}
 
 		public synchronized void notifyItem(Item item) {
 			useItem = item;
 			leftButtonMode = InputMode.ITEM_TARGET;
+			driver.setItemRangeHighlight(item);
 		}
 
 		/**
@@ -123,6 +122,7 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			attackWith = ability;
 			leftButtonMode = InputMode.TARGET;
 			repeats = repeats - 1;
+			driver.setRangeHighlight(ability);
 		}
 
 		/**
@@ -133,6 +133,8 @@ public class GameActionListener implements ActionListener, AnalogListener {
 				System.out.println("Ability repeats");
 				leftButtonMode = InputMode.TARGET;
 				repeats -= 1;
+
+				driver.setRangeHighlight(attackWith);
 			}
 		}
 
@@ -190,20 +192,14 @@ public class GameActionListener implements ActionListener, AnalogListener {
 							break;
 						case MOVE:
 							moveCharacterToMouse();
-
-							graphics.getBoardGraphics().clearHighlighting();
 							inputState.leftButtonMode = InputMode.SELECT;
 							break;
 						case TARGET:
 							targetMouse();
-
-							graphics.getBoardGraphics().clearHighlighting();
 							inputState.leftButtonMode = InputMode.SELECT;
 							break;
 						case ITEM_TARGET:
 							targetItemMouse();
-
-							graphics.getBoardGraphics().clearHighlighting();
 							inputState.leftButtonMode = InputMode.SELECT;
 							break;
 					}
@@ -249,44 +245,18 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			if (inputState.leftButtonMode == InputMode.MOVE) {
 				Position p = graphics.getBoardByMouse(mouse);
 
-				if (p == null) {
-					graphics.getBoardGraphics().clearHighlighting();
-
-				} else if(!p.equals(lastMouse)) {
+				if (p == null || !p.equals(lastMouse)) {
 					lastMouse = p;
-
-					List<Position> path = selected.getMove(null, p);
-					graphics.getBoardGraphics().highlightTiles(
-						path, BoardGraphics.PATH_COLOR);
+					driver.setPathHighlight(p);
 				}
 
 			} else if (inputState.leftButtonMode == InputMode.TARGET || isItem) {
 				Position p = graphics.getTargetByMouse(mouse);
-				
-				if (p == null) {
-					graphics.getBoardGraphics().clearHighlighting();
 
-				} else if (!p.equals(lastMouse)) {
+				if (p == null || !p.equals(lastMouse)) {
 					lastMouse = p;
-
-					if (
-						(isItem && !selected.canUseItem(inputState.useItem, p)) ||
-						(!isItem && !selected.canDoAbility(inputState.attackWith, p))
-					) {
-						graphics.getBoardGraphics().clearHighlighting();
-						
-					} else {
-						Collection<Position> aoe;
-						
-						if (isItem) {
-							aoe = selected.getItemAffectedArea(inputState.useItem, p);
-						} else {
-							aoe = selected.getAffectedArea(inputState.attackWith, p);
-						}
-
-						graphics.getBoardGraphics().highlightTiles(
-							aoe, BoardGraphics.TARGET_COLOR);
-					}
+					driver.setAOEHighlight(p, inputState.attackWith,
+						inputState.useItem, isItem);
 				}
 			}
 		}

@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.Node;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
+import nz.dcoder.inthezone.data_model.pure.LineOfSight;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -40,6 +42,16 @@ public class TurnCharacter {
 		this.maxAP = character.getBaseStats().baseAP;
 		mp = maxMP;
 		ap = maxAP;
+	}
+
+	/**
+	 * Get all the positions this character could move to, which depends on the
+	 * current MP and configuration of the board.
+	 * */
+	public Collection<Position> getMoveRange() {
+		return LineOfSight.getDiamond(character.position, mp).stream()
+			.filter(p -> getMove(null, p) != null)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -177,6 +189,17 @@ public class TurnCharacter {
 	private final EffectName pushEffect = new EffectName("push");
 
 	/**
+	 * Get all the positions that could be targeted by an ability.
+	 * */
+	public Collection<Position> getAbilityRange(AbilityName name) {
+		AbilityInfo info = getAbility(name).info;
+
+		return LineOfSight.getDiamond(character.position, info.range).stream()
+			.filter(p -> canDoAbility(name, p))
+			.collect(Collectors.toList());
+	}
+
+	/**
 	 * Determine if this character can perform an ability with a given target
 	 * */
 	public boolean canDoAbility(AbilityName name, Position target) {
@@ -247,12 +270,23 @@ public class TurnCharacter {
 	}
 
 	/**
+	 * Get all the positions that could be targeted by an item.
+	 * */
+	public Collection<Position> getItemRange(Item item) {
+		AbilityInfo info = item.getAbility();
+
+		return LineOfSight.getDiamond(character.position, info.range).stream()
+			.filter(p -> canUseItem(item, p))
+			.collect(Collectors.toList());
+	}
+
+	/**
 	 * Determine if this character is able to use the specified item targeting
 	 * the specified square.  In the case of items that are used on oneself, the
 	 * target parameter will be set to the position of this character.
 	 * */
 	public boolean canUseItem(Item item, Position target) {
-		if (item.ability.info.cost > ap) return false;
+		if (item.getAbility().cost > ap) return false;
 		return item.ability.canApplyEffect(character, target, battle);
 	}
 

@@ -1,6 +1,7 @@
 package nz.dcoder.inthezone.control;
 
 import java.util.List;
+import java.util.Collection;
 
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.Item;
@@ -9,6 +10,7 @@ import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
+import nz.dcoder.inthezone.graphics.BoardGraphics;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 
@@ -72,7 +74,78 @@ public class GameDriver {
 		turn.endTurn();
 	}
 
+	/**
+	 * Set highlighting for move range.
+	 * */
+	public void setMoveHighlight() {
+		graphics.getBoardGraphics().setStaticHighlight(
+			selectedTurnCharacter.getMoveRange(), BoardGraphics.RANGE_COLOR);
+	}
+
+	/**
+	 * Set highlighting for ability range.
+	 * */
+	public void setRangeHighlight(AbilityName name) {
+		graphics.getBoardGraphics().setStaticHighlight(
+			selectedTurnCharacter.getAbilityRange(name), BoardGraphics.RANGE_COLOR);
+	}
+
+	/**
+	 * Set highlighting for item range.
+	 * */
+	public void setItemRangeHighlight(Item item) {
+		graphics.getBoardGraphics().setStaticHighlight(
+			selectedTurnCharacter.getItemRange(item), BoardGraphics.RANGE_COLOR);
+	}
+
+	/**
+	 * Set highlighting for current path.
+	 * */
+	public void setPathHighlight(Position p) {
+		if (p == null) {
+			graphics.getBoardGraphics().clearMovingHighlight();
+
+		} else {
+			List<Position> path = selectedTurnCharacter.getMove(null, p);
+			graphics.getBoardGraphics().setMovingHighlight(
+				path, BoardGraphics.PATH_COLOR);
+		}
+	}
+	
+	/**
+	 * Set area of effect highlighting.
+	 * */
+	public void setAOEHighlight(
+		Position p, AbilityName attackWith, Item useItem, boolean isItem
+	) {
+		if (p == null) {
+			graphics.getBoardGraphics().clearMovingHighlight();
+
+		} else {
+			if (
+				(isItem && !selectedTurnCharacter.canUseItem(useItem, p)) ||
+				(!isItem && !selectedTurnCharacter.canDoAbility(attackWith, p))
+			) {
+				graphics.getBoardGraphics().clearMovingHighlight();
+				
+			} else {
+				Collection<Position> aoe;
+				
+				if (isItem) {
+					aoe = selectedTurnCharacter.getItemAffectedArea(useItem, p);
+				} else {
+					aoe = selectedTurnCharacter.getAffectedArea(attackWith, p);
+				}
+
+				graphics.getBoardGraphics().setMovingHighlight(
+					aoe, BoardGraphics.TARGET_COLOR);
+			}
+		}
+	}
+
 	public void moveCharacter(Position destination) {
+		graphics.getBoardGraphics().clearAllHighlighting();
+
 		if (selectedTurnCharacter != null && destination != null) {
 			List<Position> path =
 				selectedTurnCharacter.getMove(null, destination);
@@ -90,6 +163,8 @@ public class GameDriver {
 	}
 
 	public void targetPosition(AbilityName attackWith, Position target) {
+		graphics.getBoardGraphics().clearAllHighlighting();
+
 		if (selectedTurnCharacter != null && target != null) {
 			if (!selectedTurnCharacter.canDoAbility(attackWith, target)) {
 				System.out.println("Cannot target " + target.toString()
@@ -107,6 +182,8 @@ public class GameDriver {
 	}
 
 	public void targetItemPosition(Item item, Position target) {
+		graphics.getBoardGraphics().clearAllHighlighting();
+
 		if (selectedTurnCharacter != null && target != null) {
 			if (!selectedTurnCharacter.canUseItem(item, target)) {
 				System.out.println("Cannot target " + target.toString()

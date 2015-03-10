@@ -31,7 +31,7 @@ public class CharacterGraphics extends ModelGraphics {
 	public CharacterGraphics(Graphics graphics, Spatial spatial, Position p) {
 		super(graphics, spatial, p, "character");
 		this.selectedIndicator = graphics.selectedIndicator;
-		this.healthBar = new HealthBarGraphics();
+		this.healthBar = new HealthBarGraphics(graphics);
 		setAnimation("idleA");
 	}
 
@@ -46,36 +46,41 @@ public class CharacterGraphics extends ModelGraphics {
 		selectedIndicator.getControl(SpinController.class).setEnabled(true);
 
 		selectedIndicator.setLocalScale(0.2f, 0.4f, 0.2f);
-		selectedIndicator.setLocalTranslation(new Vector3f(0.0f, 2.0f, 0.0f));
+		selectedIndicator.setLocalTranslation(
+			new Vector3f(0.0f, 2.0f, 0.0f));
 	}
 
 	/**
-	 * Update the health bar for this character (if it's visible).
+	 * Update the health bar for this character (if it's visible).  The health
+	 * bar appears to show the new HP, then disappears after a delay.
 	 * */
 	public void setHP(Points hp) {
+		showHP();
 		healthBar.setHP(hp);
 	}
+
+	private boolean healthVisible = false;
 
 	/**
 	 * Show the health bar for this character.
 	 * */
 	public void showHP() {
-		((Node) spatial).attachChild(healthBar.getSpatial());
+		if (!healthVisible) {
+			Spatial bar = healthBar.getSpatial();
+			((Node) spatial).attachChild(bar);
+			bar.setLocalTranslation(new Vector3f(0.5f, 1.8f, 0.0f));
+			healthVisible = true;
+		}
 	}
 
 	/**
-	 * Hide the health bar for this character.  Incorporates a delay so the
-	 * player has time to read the health bar before it vanishes.
+	 * Hide the health bar for this character.
 	 * */
 	public void hideHP() {
-		healthBar.hideHealthDelay();
-	}
-
-	/**
-	 * Hide the health bar immediately with no delay.
-	 * */
-	public void hideHPNow() {
-		healthBar.hideHealth();
+		if (healthVisible) {
+			healthBar.hideHealth();
+			healthVisible = false;
+		}
 	}
 
   public Quaternion getUprightRotation() {

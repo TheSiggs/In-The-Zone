@@ -85,9 +85,11 @@ public class Graphics {
 		rootNode.attachChild(sceneNode);
 		sceneNode.addControl(boardSpinner);
 
+		initMaterials();
+
 		initLight();
 
-		initSelectedIndicator(assetManager);
+		initSelectedIndicator(solidGreen);
 
 		boardGraphics = new BoardGraphics(terrain, assetManager);
 		boardNode = boardGraphics.getBoardNode();
@@ -115,9 +117,8 @@ public class Graphics {
 	}
 
 	Geometry selectedIndicator = null;
-	private void initSelectedIndicator(AssetManager assetManager) {
+	private void initSelectedIndicator(Material mat) {
 		Mesh m = new Mesh();
-		//m.setMode(Mesh.Mode.LineLoop);
 		Vector3f[] vertices = new Vector3f[5];
 		vertices[0] = new Vector3f( 0.0f, 0.0f,  0.0f);
 		vertices[1] = new Vector3f(-0.5f, 1.0f,  0.5f);
@@ -130,15 +131,26 @@ public class Graphics {
 		m.updateBound();
 
 		selectedIndicator = new Geometry("selected", m);
-		Material mat = new Material(assetManager, 
-			"Common/MatDefs/Misc/Unshaded.j3md");
-		mat.setColor("Color", ColorRGBA.Green);
 		selectedIndicator.setMaterial(mat);
 
 		SpinController spinner = new SpinController(3.0f, Vector3f.UNIT_Y, Rotating.LEFT);
 		spinner.setEnabled(false);
 		selectedIndicator.addControl(spinner);
 	}
+
+	public Material solidGreen = null;
+	public Material solidRed = null;
+
+	private void initMaterials() {
+		solidGreen = new Material(assetManager, 
+			"Common/MatDefs/Misc/Unshaded.j3md");
+		solidGreen.setColor("Color", ColorRGBA.Green);
+
+		solidRed = new Material(assetManager, 
+			"Common/MatDefs/Misc/Unshaded.j3md");
+		solidRed.setColor("Color", ColorRGBA.Red);
+	}
+
 
 	public void deselectAllCharacters() {
 		Node p = selectedIndicator.getParent();

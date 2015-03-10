@@ -1,7 +1,8 @@
 package nz.dcoder.inthezone.control;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.Item;
@@ -95,6 +96,24 @@ public class GameDriver {
 				path, BoardGraphics.PATH_COLOR);
 		}
 	}
+
+	private final Collection<CharacterGraphics> targets = new ArrayList<>();
+
+	private void clearTargetsHP() {
+		for (CharacterGraphics t : targets) {
+			t.hideHP();
+		}
+		targets.clear();
+	}
+
+	private void showTargetsHP(Collection<Position> ts) {
+		clearTargetsHP();
+		for (Position p : ts) {
+			CharacterGraphics cg = graphics.getCharacterByPosition(p);
+			cg.showHP();
+			targets.add(cg);
+		}
+	}
 	
 	/**
 	 * Set area of effect highlighting.
@@ -104,6 +123,7 @@ public class GameDriver {
 	) {
 		if (p == null) {
 			graphics.getBoardGraphics().clearMovingHighlight();
+			clearTargetsHP();
 
 		} else {
 			if (
@@ -111,14 +131,17 @@ public class GameDriver {
 				(!isItem && !selectedTurnCharacter.canDoAbility(attackWith, p))
 			) {
 				graphics.getBoardGraphics().clearMovingHighlight();
+			clearTargetsHP();
 				
 			} else {
 				Collection<Position> aoe;
 				
 				if (isItem) {
 					aoe = selectedTurnCharacter.getItemAffectedArea(useItem, p);
+					showTargetsHP(selectedTurnCharacter.getItemTargets(useItem, p));
 				} else {
 					aoe = selectedTurnCharacter.getAffectedArea(attackWith, p);
+					showTargetsHP(selectedTurnCharacter.getTargets(attackWith, p));
 				}
 
 				graphics.getBoardGraphics().setMovingHighlight(

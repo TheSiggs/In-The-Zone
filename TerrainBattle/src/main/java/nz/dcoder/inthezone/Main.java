@@ -108,15 +108,6 @@ public class Main extends SimpleApplication {
 		}
 	}
 
-	/**
-	 * Pass responsibility down to presentation.
-	 * @param tpf time per frame
-	 */
-	@Override
-	public void simpleUpdate(float tpf) {
-		control.simpleUpdate(tpf);
-	}
-
 	void startSimpleBattle() {
 		// create the characters for this battle (ignore the Party class for now)
 

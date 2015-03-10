@@ -15,11 +15,11 @@ import nz.dcoder.inthezone.data_model.pure.Position;
  * object.
  * */
 public abstract class ModelGraphics implements AnimEventListener {
-	protected final Spatial spatial;
 	protected final AnimChannel channel;
 	protected final AnimControl control;
 	protected final ControllerChain controllerChain;
 	protected final PathController pathController;
+	protected final Spatial spatial;
 
 	protected Position p;
 

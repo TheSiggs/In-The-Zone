@@ -35,22 +35,6 @@ public class GameDriver {
 		return gameState;
 	}
 
-	private Rotating viewRotating = Rotating.NONE;
-
-	/**
-	 * Determine if the view is currently rotating, and in which direction.
-	 * */
-	public Rotating getViewRotating() {
-		return viewRotating;
-	}
-
-	/**
-	 * Set the direction the view is rotating
-	 * */
-	public void setViewRotating(Rotating viewRotating) {
-		this.viewRotating = viewRotating;
-	}
-
 	private TurnCharacter selectedTurnCharacter;
 	private CharacterGraphics selectedCharacter;
 
@@ -217,11 +201,13 @@ public class GameDriver {
 
 		if (selectedCharacter == null) {
 			ui.deselectCharacter();
+			graphics.deselectAllCharacters();
 			System.out.println("Deselected character");
 
 		} else {
 			CharacterInfo info = selectedTurnCharacter.getCharacterInfo();
 			ui.selectCharacter(info);
+			selectedCharacter.indicateSelected();
 
 			System.out.println("Selected character " +
 				selectedTurnCharacter.getName().toString() + " at " +

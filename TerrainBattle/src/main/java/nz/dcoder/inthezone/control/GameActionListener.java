@@ -163,11 +163,11 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			// actions that work at any time
 			// =============================
 			if (name.equals("LeftView")) {
-				driver.setViewRotating(Rotating.LEFT);
+				graphics.boardSpinner.setDirection(Rotating.LEFT);
 				viewLDown = true;
 			}
 			if (name.equals("RightView")) {
-				driver.setViewRotating(Rotating.RIGHT);
+				graphics.boardSpinner.setDirection(Rotating.RIGHT);
 				viewRDown = true;
 			}
 
@@ -211,17 +211,17 @@ public class GameActionListener implements ActionListener, AnalogListener {
 			if (name.equals("LeftView")) {
 				viewLDown = false;
 				if (viewRDown) {
-					driver.setViewRotating(Rotating.RIGHT);
+					graphics.boardSpinner.setDirection(Rotating.RIGHT);
 				} else {
-					driver.setViewRotating(Rotating.NONE);
+					graphics.boardSpinner.setDirection(Rotating.NONE);
 				}
 			}
 			if (name.equals("RightView")) {
 				viewRDown = false;
 				if (viewLDown) {
-					driver.setViewRotating(Rotating.LEFT);
+					graphics.boardSpinner.setDirection(Rotating.LEFT);
 				} else {
-					driver.setViewRotating(Rotating.NONE);
+					graphics.boardSpinner.setDirection(Rotating.NONE);
 				}
 			}
 		}

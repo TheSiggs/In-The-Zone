@@ -45,19 +45,6 @@ public final class Control {
 		initBattleController();
 	}
 
-	/**
-	 * Main update loop for the game.  Try to avoid putting things in here, use
-	 * controllers instead.
-	 * */
-	public void simpleUpdate(float tpf) {
-		Rotating viewRotating = driver.getViewRotating();
-		if (viewRotating == Rotating.LEFT) {
-			graphics.rotateView(tpf * Graphics.rotationSpeed);
-		} else if (viewRotating == Rotating.RIGHT) {
-			graphics.rotateView(-tpf * Graphics.rotationSpeed);
-		}
-	}
-
 	private final BattleController controller = new BattleController();
 
 	private void initBattleController() {

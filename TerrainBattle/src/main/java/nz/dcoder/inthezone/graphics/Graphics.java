@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.graphics;
 
+import nz.dcoder.inthezone.control.Rotating;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
@@ -15,14 +16,19 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.VertexBuffer.Type;
+import com.jme3.util.BufferUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +57,8 @@ public class Graphics {
 	private final Node rootNode;
 	private final Node sceneNode = new Node();
 
+	public final SpinController boardSpinner = new SpinController(1.5f, Vector3f.UNIT_Z);
+
 	private final Collection<CharacterGraphics> characters =
 		new ArrayList<CharacterGraphics>();
 	
@@ -75,8 +83,11 @@ public class Graphics {
 		sceneNode.setLocalTranslation(trans);
 
 		rootNode.attachChild(sceneNode);
+		sceneNode.addControl(boardSpinner);
 
 		initLight();
+
+		initSelectedIndicator(assetManager);
 
 		boardGraphics = new BoardGraphics(terrain, assetManager);
 		boardNode = boardGraphics.getBoardNode();
@@ -103,6 +114,38 @@ public class Graphics {
 		rootNode.addLight(southLight);
 	}
 
+	Geometry selectedIndicator = null;
+	private void initSelectedIndicator(AssetManager assetManager) {
+		Mesh m = new Mesh();
+		//m.setMode(Mesh.Mode.LineLoop);
+		Vector3f[] vertices = new Vector3f[5];
+		vertices[0] = new Vector3f( 0.0f, 0.0f,  0.0f);
+		vertices[1] = new Vector3f(-0.5f, 1.0f,  0.5f);
+		vertices[2] = new Vector3f( 0.5f, 1.0f,  0.5f);
+		vertices[3] = new Vector3f( 0.5f, 1.0f, -0.5f);
+		vertices[4] = new Vector3f(-0.5f, 1.0f, -0.5f);
+		int[] indices = {0,1,2, 0,2,3, 0,3,4, 0,4,1, 1,4,3, 3,2,1};
+		m.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+		m.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(indices));
+		m.updateBound();
+
+		selectedIndicator = new Geometry("selected", m);
+		Material mat = new Material(assetManager, 
+			"Common/MatDefs/Misc/Unshaded.j3md");
+		mat.setColor("Color", ColorRGBA.Green);
+		selectedIndicator.setMaterial(mat);
+
+		SpinController spinner = new SpinController(3.0f, Vector3f.UNIT_Y, Rotating.LEFT);
+		spinner.setEnabled(false);
+		selectedIndicator.addControl(spinner);
+	}
+
+	public void deselectAllCharacters() {
+		Node p = selectedIndicator.getParent();
+		if (p != null) p.detachChild(selectedIndicator);
+		selectedIndicator.getControl(SpinController.class).setEnabled(false);
+	}
+
 	/**
 	 * Get the BoardGraphics, which manages highlighting etc.
 	 * */
@@ -121,16 +164,6 @@ public class Graphics {
 
 	public void setControllerChain(ControllerChain chain) {
 		this.controllerChain = chain;
-	}
-
-	Quaternion quat = new Quaternion();
-
-	/**
-	 * Rotate the view about the z-axis
-	 * */
-	public void rotateView(float angle) {
-		quat.fromAngleAxis(angle, Vector3f.UNIT_Z);
-		sceneNode.rotate(quat);
 	}
 
 	public static Vector3f positionToVector(Position p) {

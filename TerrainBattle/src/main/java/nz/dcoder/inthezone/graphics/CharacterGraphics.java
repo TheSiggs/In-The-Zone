@@ -7,6 +7,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 /**
@@ -25,22 +26,56 @@ public class CharacterGraphics extends ModelGraphics {
 	}
 
 	private final Geometry selectedIndicator;
+	private final HealthBarGraphics healthBar;
 
 	public CharacterGraphics(Graphics graphics, Spatial spatial, Position p) {
 		super(graphics, spatial, p, "character");
 		this.selectedIndicator = graphics.selectedIndicator;
+		this.healthBar = new HealthBarGraphics();
 		setAnimation("idleA");
 	}
 
+	/**
+	 * Indicate that this character is selected.
+	 * */
 	public void indicateSelected() {
 		Node p = selectedIndicator.getParent();
 		if (p != null) p.detachChild(selectedIndicator);
 
-		((Node) this.getSpatial()).attachChild(selectedIndicator);
+		((Node) spatial).attachChild(selectedIndicator);
 		selectedIndicator.getControl(SpinController.class).setEnabled(true);
 
 		selectedIndicator.setLocalScale(0.2f, 0.4f, 0.2f);
 		selectedIndicator.setLocalTranslation(new Vector3f(0.0f, 2.0f, 0.0f));
+	}
+
+	/**
+	 * Update the health bar for this character (if it's visible).
+	 * */
+	public void setHP(Points hp) {
+		healthBar.setHP(hp);
+	}
+
+	/**
+	 * Show the health bar for this character.
+	 * */
+	public void showHP() {
+		((Node) spatial).attachChild(healthBar.getSpatial());
+	}
+
+	/**
+	 * Hide the health bar for this character.  Incorporates a delay so the
+	 * player has time to read the health bar before it vanishes.
+	 * */
+	public void hideHP() {
+		healthBar.hideHealthDelay();
+	}
+
+	/**
+	 * Hide the health bar immediately with no delay.
+	 * */
+	public void hideHPNow() {
+		healthBar.hideHealth();
 	}
 
   public Quaternion getUprightRotation() {

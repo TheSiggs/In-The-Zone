@@ -1,6 +1,10 @@
 package nz.dcoder.inthezone.graphics;
 
+import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
@@ -23,14 +27,24 @@ public class HealthBarGraphics {
 
 	private static final float animDelay = 1f;
 	private static final float hideDelay = 1f;
+	private static final float fadeDelay = 0.5f;
+
+	private ColorRGBA hpColor = ColorRGBA.Green.clone();
+	private ColorRGBA nohpColor = ColorRGBA.Red.clone();
 
 	public HealthBarGraphics(Graphics graphics) {
 		healthBar = new Node("healthBar");
+		healthBar.setQueueBucket(Bucket.Translucent);
+
+		Material hpMat = graphics.solidGreen.clone();
+		Material nohpMat = graphics.solidRed.clone();
+		hpMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+		nohpMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 
 		hp = new Geometry("hp", new Quad(width, height));
 		nohp = new Geometry("nohp", new Quad(width, height));
-		hp.setMaterial(graphics.solidGreen);
-		nohp.setMaterial(graphics.solidRed);
+		hp.setMaterial(hpMat);
+		nohp.setMaterial(nohpMat);
 
 		healthBar.attachChild(nohp);
 		healthBar.attachChild(hp);
@@ -53,12 +67,14 @@ public class HealthBarGraphics {
 	private float oldHealth = 1f;      // previous target value
 	private float healthInter = 1f;    // 0 for oldHealth, 1 for health
 	private float untilFade = 0f;
+	private float untilVanish = 0f;
 
 	public void setHP(Points hp) {
 		oldHealth = health;
 		health = ((float) hp.total) / ((float) hp.max);
 		healthInter = 0f;
 		untilFade = 0f;
+		untilVanish = 0f;
 	}
 
 	/**
@@ -66,15 +82,26 @@ public class HealthBarGraphics {
 	 * */
 	public void showHealth() {
 		untilFade = 0;
+		untilVanish = 0;
+		interpolateFade(0.0f);
 	}
 
 	public void hideHealth() {
-		hideHealthGeom();
+		untilVanish = fadeDelay;
 	}
 
 	private void interpolateHealth(float i) {
 		float p = (health * i) + (oldHealth * (1 - i));
 		hp.setLocalScale(p, 1.0f, 1.0f);
+		nohp.setLocalScale(1 - p, 1.0f, 1.0f);
+		nohp.setLocalTranslation((p * width) - (width/2), 0.0f, 0.0f);
+	}
+
+	private void interpolateFade(float fade) {
+		hpColor.a = 1 - fade;
+		nohpColor.a = 1 - fade;
+		hp.getMaterial().setColor("Color", hpColor);
+		nohp.getMaterial().setColor("Color", nohpColor);
 	}
 
 	private void hideHealthGeom() {
@@ -97,11 +124,20 @@ public class HealthBarGraphics {
 					interpolateHealth(healthInter);
 				}
 				if (untilFade > 0.0f) {
-					untilFade -= tpf / hideDelay;
+					untilFade -= tpf;
 					if (untilFade <= 0.0f) {
 						untilFade = 0.0f;
+						untilVanish = fadeDelay;
+						hideHealth();
+					}
+				}
+				if (untilVanish > 0.0f) {
+					untilVanish -= tpf;
+					if (untilVanish <= 0.0f) {
+						untilVanish = 0.0f;
 						hideHealthGeom();
 					}
+					interpolateFade((fadeDelay - untilVanish) / fadeDelay);
 				}
 			}
 		}

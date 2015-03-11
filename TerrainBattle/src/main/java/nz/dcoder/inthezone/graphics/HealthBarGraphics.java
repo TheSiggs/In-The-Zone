@@ -29,14 +29,16 @@ public class HealthBarGraphics {
 	public HealthBarGraphics(Graphics graphics) {
 		healthBar = new Node("healthBar");
 
-		Vector3f[] vertices = new Vector3f[5];
+		Vector3f[] vertices = new Vector3f[6];
 		vertices[0] = new Vector3f( 0.0f,  0.0f,   0.0f);
 		vertices[1] = new Vector3f( width, 0.0f,   0.0f);
 		vertices[2] = new Vector3f( width, height, 0.0f);
 		vertices[3] = new Vector3f( 0.0f,  height, 0.0f);
+		vertices[4] = new Vector3f(-width, height, 0.0f);
+		vertices[5] = new Vector3f(-width, 0.0f,   0.0f);
 
-		int[] indicesHP = {0,1,2, 2,3,0, 0,3,2, 2,1,0};
-		int[] indicesNoHP = {1,2,3, 3,0,1, 1,0,3, 3,2,1};
+		int[] indicesHP = {0,1,2, 2,3,0}; //, 0,3,2, 2,1,0};
+		int[] indicesNoHP = {0,3,4, 4,5,0}; //, 0,5,4, 4,3,0};
 		
 		Mesh qhp = new Mesh();
 		qhp.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
@@ -44,14 +46,14 @@ public class HealthBarGraphics {
 		qhp.updateBound();
 
 		Mesh qnohp = new Mesh();
-		qnohp.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
-		qnohp.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(indicesNoHP));
+		qnohp.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices)); 
+		qnohp.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(indicesHP));
 		qnohp.updateBound();
 
 		hp = new Geometry("hp", qhp);
 		nohp = new Geometry("nohp", qnohp);
-		healthBar.attachChild(hp);
 		healthBar.attachChild(nohp);
+		healthBar.attachChild(hp);
 		healthBar.addControl(new Controller());
 
 		hp.setMaterial(graphics.solidGreen);
@@ -88,7 +90,9 @@ public class HealthBarGraphics {
 	private void interpolateHealth(float i) {
 		float p = (health * i) + (oldHealth * (i - 1));
 		hp.setLocalScale(p, 1.0f, 1.0f);
-		nohp.setLocalScale(1.0f - p, 1.0f, 1.0f);
+		//hp.setLocalScale(1.0f, 1.0f, 1.0f);
+		//nohp.setLocalScale(1.0f - p, 1.0f, 1.0f);
+		//nohp.setLocalScale(1.0f, 1.0f, 1.0f);
 	}
 
 	private void hideHealthGeom() {

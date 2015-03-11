@@ -147,9 +147,11 @@ public final class Control {
 			graphics.doAbility(cg, action.ability.name, continuation);
 
 			for (Position p : action.targets) {
+				CharacterGraphics cgTarget = graphics.getCharacterByPosition(p);
 				CharacterInfo target = turn.getCharacterAt(p);
 				if (target != null) {
 					ui.updateHP(target.name, target.hp);
+					cgTarget.setHP(target.hp);
 				}
 			}
 		}

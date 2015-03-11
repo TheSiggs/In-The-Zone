@@ -182,7 +182,7 @@ public class TurnCharacter {
 	}
 
 	private Ability getAbility(AbilityName name) {
-		return character.getAbilities().stream()
+		return character.getAbilities(isOnManaZone()).stream()
 			.filter(a -> a.info.name.equals(name)).findFirst().orElse(null);
 	}
 
@@ -361,7 +361,7 @@ public class TurnCharacter {
 	 * Get a copy of essential information about a character
 	 * */
 	public CharacterInfo getCharacterInfo() {
-		CharacterInfo info = character.getCharacterInfo();
+		CharacterInfo info = character.getCharacterInfo(isOnManaZone());
 		info.mp = getMP();
 		info.ap = getAP();
 		return info;
@@ -378,7 +378,7 @@ public class TurnCharacter {
 	public boolean hasOptions(Collection<Item> items) {
 		boolean canUseItem = items.stream()
 			.anyMatch(i -> i.ability.info.cost <= ap);
-		boolean canUseAbility = character.getAbilities().stream()
+		boolean canUseAbility = character.getAbilities(isOnManaZone()).stream()
 			.anyMatch(a -> a.info.cost <= ap);
 		return canUseItem || canUseAbility;
 	}

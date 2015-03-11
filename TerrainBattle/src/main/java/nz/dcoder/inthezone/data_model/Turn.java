@@ -48,13 +48,14 @@ public class Turn {
 
 	public Collection<CharacterInfo> getNPCInfo() {
 		return battle.aiPlayers.stream()
-			.map(c -> c.getCharacterInfo()).collect(Collectors.toList());
+			.map(c -> c.getCharacterInfo(battle.terrain.isManaZone(c.position)))
+			.collect(Collectors.toList());
 	}
 
 	public CharacterInfo getCharacterAt(Position pos) {
 		Character c = battle.getCharacterAt(pos);
 		if (c == null) return null;
-		return c.getCharacterInfo();
+		return c.getCharacterInfo(battle.terrain.isManaZone(c.position));
 	}
 
 	/**

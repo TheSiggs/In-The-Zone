@@ -186,7 +186,7 @@ public class FactoryTests {
 			assertEquals("Character level", 2, test.getLevel());
 
 			// check abilities
-			Collection<Ability> abilities = test.getAbilities();
+			Collection<Ability> abilities = test.getAbilities(true);
 			int count = 0;
 			for(Ability a : abilities) {
 				count += 1;

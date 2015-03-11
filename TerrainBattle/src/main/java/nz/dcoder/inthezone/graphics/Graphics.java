@@ -427,8 +427,10 @@ public class Graphics {
 
 	/**
 	 * Get the character under the mouse cursor
+	 * @param precise Set to true if the mouse must be directly over the
+	 * character, not just over the character's square.
 	 * */
-	public CharacterGraphics getCharacterByMouse(Vector2f cursor) {
+	public CharacterGraphics getCharacterByMouse(Vector2f cursor, boolean precise) {
 		CollisionResults rs = getMouseCollision(cursor);
 
 		CharacterGraphics cg = null;
@@ -450,8 +452,10 @@ public class Graphics {
 					spatial = parent;
 					op = spatial.getUserData("p");
 				}
+
+				String kind = spatial.getUserData("kind");
 				
-				if (op != null) {
+				if (op != null && (!precise || kind.equals("character"))) {
 					Position p = ((SaveablePosition) op).getPosition();
 					CharacterGraphics cg1 = getCharacterByPosition(p);
 					if (cg1 != null) {
@@ -498,7 +502,7 @@ public class Graphics {
 	 * */
 	public Position getTargetByMouse(Vector2f cursor) {
 		// TODO: rewrite this to be more efficient, and to handle object targets
-		CharacterGraphics character = getCharacterByMouse(cursor);
+		CharacterGraphics character = getCharacterByMouse(cursor, false);
 		if (character != null) {
 			return character.getPosition();
 		} else {

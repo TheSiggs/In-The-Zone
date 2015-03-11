@@ -110,6 +110,19 @@ public class GameDriver {
 		clearTargetsHP();
 		for (Position p : ts) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(p);
+			if (cg != null) {
+				cg.showHP();
+				targets.add(cg);
+			}
+		}
+	}
+
+	/**
+	 * Set highlighting etc. for mouse over a character.
+	 * */
+	public void setMouseOverCharacter(CharacterGraphics cg) {
+		clearTargetsHP();
+		if (cg != null) {
 			cg.showHP();
 			targets.add(cg);
 		}

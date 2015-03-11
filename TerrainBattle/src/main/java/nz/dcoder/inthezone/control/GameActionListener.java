@@ -14,6 +14,7 @@ import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.TurnCharacter;
+import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 
 /**
@@ -242,7 +243,17 @@ public class GameActionListener implements ActionListener, AnalogListener {
 		synchronized(inputState) {
 			boolean isItem = inputState.leftButtonMode == InputMode.ITEM_TARGET;
 
-			if (inputState.leftButtonMode == InputMode.MOVE) {
+			if (inputState.leftButtonMode == InputMode.SELECT) {
+				CharacterGraphics cg = graphics.getCharacterByMouse(mouse, true);
+				Position p = null;
+				if (cg != null) p = cg.getPosition();
+
+				if ((p == null && lastMouse != null) || (p != null && !p.equals(lastMouse))) {
+					lastMouse = p;
+					driver.setMouseOverCharacter(cg);
+				}
+
+			} else if (inputState.leftButtonMode == InputMode.MOVE) {
 				Position p = graphics.getBoardByMouse(mouse);
 
 				if (p == null || !p.equals(lastMouse)) {
@@ -264,7 +275,7 @@ public class GameActionListener implements ActionListener, AnalogListener {
 
 	public void selectCharacterAtMouse() {
 		driver.selectCharacter(graphics.getCharacterByMouse(
-			inputManager.getCursorPosition()));
+			inputManager.getCursorPosition(), false));
 	}
 
 	public void moveCharacterToMouse() {

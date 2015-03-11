@@ -55,6 +55,9 @@ abstract public class Ability {
 			List<Position> diamond =
 				LineOfSight.getDiamond(target, info.areaOfEffect);
 
+			// don't include the target position twice
+			diamond.remove(target);
+
 			if (!info.hasAOEShading) {
 				affected.addAll(diamond);
 			} else {

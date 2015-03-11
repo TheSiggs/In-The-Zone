@@ -66,6 +66,7 @@ public class CharacterGraphics extends ModelGraphics {
 	 * */
 	public void showHP() {
 		if (!healthVisible) {
+			healthBar.showHealth();
 			Spatial bar = healthBar.getSpatial();
 			((Node) spatial).attachChild(bar);
 			bar.setLocalTranslation(new Vector3f(0.5f, 1.8f, 0.0f));

@@ -7,11 +7,9 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.control.Control;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
+import com.jme3.scene.shape.Quad;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.VertexBuffer.Type;
-import com.jme3.util.BufferUtils;
 
 import nz.dcoder.inthezone.data_model.pure.Points;
 
@@ -29,43 +27,22 @@ public class HealthBarGraphics {
 	public HealthBarGraphics(Graphics graphics) {
 		healthBar = new Node("healthBar");
 
-		Vector3f[] vertices = new Vector3f[6];
-		vertices[0] = new Vector3f( 0.0f,  0.0f,   0.0f);
-		vertices[1] = new Vector3f( width, 0.0f,   0.0f);
-		vertices[2] = new Vector3f( width, height, 0.0f);
-		vertices[3] = new Vector3f( 0.0f,  height, 0.0f);
-		vertices[4] = new Vector3f(-width, height, 0.0f);
-		vertices[5] = new Vector3f(-width, 0.0f,   0.0f);
+		hp = new Geometry("hp", new Quad(width, height));
+		nohp = new Geometry("nohp", new Quad(width, height));
+		hp.setMaterial(graphics.solidGreen);
+		nohp.setMaterial(graphics.solidRed);
 
-		int[] indicesHP = {0,1,2, 2,3,0}; //, 0,3,2, 2,1,0};
-		int[] indicesNoHP = {0,3,4, 4,5,0}; //, 0,5,4, 4,3,0};
-		
-		Mesh qhp = new Mesh();
-		qhp.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
-		qhp.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(indicesHP));
-		qhp.updateBound();
-
-		Mesh qnohp = new Mesh();
-		qnohp.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices)); 
-		qnohp.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(indicesHP));
-		qnohp.updateBound();
-
-		hp = new Geometry("hp", qhp);
-		nohp = new Geometry("nohp", qnohp);
 		healthBar.attachChild(nohp);
 		healthBar.attachChild(hp);
 		healthBar.addControl(new Controller());
 
-		hp.setMaterial(graphics.solidGreen);
-		nohp.setMaterial(graphics.solidRed);
+		BillboardControl billboard = new BillboardControl();
+		healthBar.addControl(billboard);
 
 		hp.setLocalTranslation(-(width / 2), 0, 0);
 		nohp.setLocalTranslation(-(width / 2), 0, 0);
 
 		interpolateHealth(1.0f);
-
-		BillboardControl billboard = new BillboardControl();
-		healthBar.addControl(billboard);
 	}
 
 	public Spatial getSpatial() {
@@ -81,6 +58,14 @@ public class HealthBarGraphics {
 		oldHealth = health;
 		health = ((float) hp.total) / ((float) hp.max);
 		healthInter = 0f;
+		untilFade = 0f;
+	}
+
+	/**
+	 * Call before attaching the health bar spatial to the scene graph.
+	 * */
+	public void showHealth() {
+		untilFade = 0;
 	}
 
 	public void hideHealth() {
@@ -88,11 +73,8 @@ public class HealthBarGraphics {
 	}
 
 	private void interpolateHealth(float i) {
-		float p = (health * i) + (oldHealth * (i - 1));
+		float p = (health * i) + (oldHealth * (1 - i));
 		hp.setLocalScale(p, 1.0f, 1.0f);
-		//hp.setLocalScale(1.0f, 1.0f, 1.0f);
-		//nohp.setLocalScale(1.0f - p, 1.0f, 1.0f);
-		//nohp.setLocalScale(1.0f, 1.0f, 1.0f);
 	}
 
 	private void hideHealthGeom() {

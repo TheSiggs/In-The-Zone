@@ -46,8 +46,9 @@ abstract public class Ability {
 				// piercing attacks must go in cardinal directions
 				return affected;
 			} else {
-				affected.add(target);
-				affected.addAll(LineOfSight.getLOS(agentPosition, target, true));
+				List<Position> line = LineOfSight.getLOS(agentPosition, target, true);
+				line.remove(0);         // don't target ourselves
+				affected.addAll(line);
 			}
 		} 
 

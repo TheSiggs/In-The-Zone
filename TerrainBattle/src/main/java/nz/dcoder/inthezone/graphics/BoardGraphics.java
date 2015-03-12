@@ -61,7 +61,8 @@ public class BoardGraphics {
 
 	ColorRGBA colors[] = {
 		new ColorRGBA(0.3f, 0.3f, 0.3f, 1f),
-		new ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
+		new ColorRGBA(0.9f, 0.9f, 0.9f, 1f),
+		new ColorRGBA(0.5f, 0.0f, 0.8f, 1f)
 	};
 
 	public BoardGraphics(Terrain terrain, AssetManager assetManager) {
@@ -71,9 +72,13 @@ public class BoardGraphics {
 
 		for (int i = 0; i < width; ++i) {
 			for (int j = 0; j < height; ++j) {
-				addBox(new Position(i, j),
-					colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
-					terrain.getBoardState(i, j));
+				ColorRGBA color;
+				if (terrain.getBoardState(i, j) == 2) {
+					color = colors[2];
+				} else {
+					color = colors[j % 2 == 0 ? i % 2 : (i + 1) % 2];
+				}
+				addBox(new Position(i, j), color, terrain.getBoardState(i, j));
 			}
 		}
 	}
@@ -83,7 +88,7 @@ public class BoardGraphics {
 		ColorRGBA color,
 		int boardValue
 	) {
-		float offsetZ = boardValue * 0.5f;
+		float offsetZ = boardValue == 1 ? 0.5f : 0.0f;
 
 		float x = p.x * Graphics.scale;
 		float y = -p.y * Graphics.scale;

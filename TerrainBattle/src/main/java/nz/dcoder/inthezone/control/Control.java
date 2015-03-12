@@ -108,6 +108,8 @@ public final class Control {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
 			graphics.doRun(cg, move.path, null);
+			ui.selectCharacter(turn.turnCharacterAt(
+				move.path.get(move.path.size() - 1)).getCharacterInfo());
 
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");
@@ -155,6 +157,9 @@ public final class Control {
 				}
 			}
 		}
+
+		ui.selectCharacter(turn.turnCharacterAt(
+			action.agentTarget).getCharacterInfo());
 
 		System.err.println("Character at position " + action.agentPos.toString()
 			+ " uses " + action.ability.name.toString()

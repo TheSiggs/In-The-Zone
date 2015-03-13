@@ -1,10 +1,11 @@
 package nz.dcoder.inthezone.data_model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.TreeSet;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.LineOfSight;
@@ -37,7 +38,7 @@ abstract public class Ability {
 	public Collection<Position> getAffectedArea(
 		Position agentPosition, Position target, Battle battle
 	) {
-		final List<Position> affected = new ArrayList<Position>();
+		final Set<Position> affected = new TreeSet<Position>();
 
 		if (!info.isPiercing) {
 			affected.add(target);
@@ -55,9 +56,6 @@ abstract public class Ability {
 		if (info.areaOfEffect > 0) {
 			List<Position> diamond =
 				LineOfSight.getDiamond(target, info.areaOfEffect);
-
-			// don't include the target position twice
-			diamond.remove(target);
 
 			if (!info.hasAOEShading) {
 				affected.addAll(diamond);

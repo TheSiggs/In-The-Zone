@@ -214,7 +214,8 @@ public class MainHUDController implements Initializable {
 		menu.clear();
 
 		for (Item i : items.keySet()) {
-			Button b = new Button(i.name.toString() + " x" + items.get(i).toString());
+			Button b = new Button(i.name.toString() + " x" + items.get(i).toString() 
+              + " (AP " + i.getAbility().cost + ")");
 			b.setMnemonicParsing(false);
 			b.setOnAction(event -> {
 				input.notifyItem(i);

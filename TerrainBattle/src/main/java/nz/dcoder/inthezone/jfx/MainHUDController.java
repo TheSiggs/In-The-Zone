@@ -187,6 +187,15 @@ public class MainHUDController implements Initializable {
     textPrompt.setText(msg);
   }
   
+  public void enterLeaveManaZone(CharacterInfo info, boolean entered) {
+    rebuildMenus(info.abilities);
+    if (entered) {
+      textPrompt.setText(info.name.toString() + " has enterd the mana zone!");
+    } else {
+      textPrompt.setText(info.name.toString() + " has left the mana zone!");
+    }
+  }
+  
 	public void updateMP(CharacterName name, Points points) {
 		if (name.equals(currentCharacter)) {
 			setPoints(mp, mpLabel, points);                

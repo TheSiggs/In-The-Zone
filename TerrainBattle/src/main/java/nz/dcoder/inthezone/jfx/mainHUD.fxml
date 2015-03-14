@@ -48,7 +48,7 @@
             <Button fx:id="topAttack" mnemonicParsing="false" onAction="#onAttackButton" prefHeight="24" prefWidth="160" text="Attack" />
             <Button fx:id="topMagic" mnemonicParsing="false" onAction="#onMagicButton" prefHeight="24" prefWidth="160" text="Magic" />
             <Button fx:id="topItem" mnemonicParsing="false" onAction="#onItemButton" prefHeight="24" prefWidth="160" text="Use Item" />
-            <Button fx:id="topEndTurn" mnemonicParsing="false" onAction="#onEndButton" prefHeight="24" prefWidth="160" text="End Turn" />
+            <Button fx:id="topEndTurn2" mnemonicParsing="false" onAction="#onEndButton" prefHeight="24" prefWidth="160" text="End Turn" />
         </children>
         </TilePane>
 
@@ -72,11 +72,16 @@
             <Button fx:id="itemExit" mnemonicParsing="false" onAction="#onBackButton" prefHeight="24" prefWidth="160" text="Back" />
         </children>
         </TilePane>
-      <Text fx:id="textPrompt" layoutX="183.0" layoutY="562.0" strokeType="OUTSIDE" strokeWidth="0.0" text="..." textAlignment="CENTER" wrappingWidth="433.13671875">
-         <font>
-            <Font name="Comic Sans MS" size="16.0" />
-         </font>
+        
+        <HBox fx:id="textStore" alignment="BASELINE_CENTER" AnchorPane.bottomAnchor="20">
+        <children>
+            <Text fx:id="textPrompt" strokeType="OUTSIDE" strokeWidth="0.0" text="..." textAlignment="CENTER" wrappingWidth="433.13671875">
+            <font>
+                <Font name="Comic Sans MS" size="16.0" />
+            </font>
       </Text>
-
+        </children>
+        </HBox>
+        
     </children>
 </AnchorPane>

@@ -109,8 +109,7 @@ public class MainHUDController implements Initializable {
 	@FXML private Button noItems;
 
 	@FXML protected void onMoveButton(ActionEvent event) {
-		input.notifyMove();
-                textPrompt.setText("Where would you like to move?");
+		input.notifyMove();         
 	}
         
 	AbilityName pushAbility = new AbilityName("push");
@@ -122,25 +121,21 @@ public class MainHUDController implements Initializable {
 	@FXML protected void onAttackButton(ActionEvent event) {
 		pushMenu(attackMenu);
 		jmeFx.loseFocus();
-                textPrompt.setText("Who would you like to attack?");
 	}
 
 	@FXML protected void onMagicButton(ActionEvent event) {
 		pushMenu(magicMenu);
 		jmeFx.loseFocus();
-                textPrompt.setText("Which ability would you like to use?");
 	}
 
 	@FXML protected void onItemButton(ActionEvent event) {
 		pushMenu(itemMenu);
 		jmeFx.loseFocus();
-                textPrompt.setText("Which item would you like to use?");
 	}
 
 	@FXML protected void onEndButton(ActionEvent event) {
 		input.notifyEndTurn();
 		jmeFx.loseFocus();
-                textPrompt.setText("Turn ended");
 	}
 
 	@FXML protected void onBackButton(ActionEvent event) {
@@ -180,20 +175,18 @@ public class MainHUDController implements Initializable {
 		rebuildMenus(info.abilities);
 
 		selectedCharacter.setVisible(true);
-		pushMenu(topMenu);
-                textPrompt.setText(currentCharacter + " Has been selected!!");      
+		pushMenu(topMenu);      
 	}
 
 	public void deselectCharacter() {
 		selectedCharacter.setVisible(false);
 		hideMenus();
-                if (currentCharacter == null) {
-                    textPrompt.setText("No character selected!");
-                } else {
-                    textPrompt.setText(currentCharacter + " Has been deselected!"); 
-                }
 	}
-
+  
+  public void showMessage(String msg){
+    textPrompt.setText(msg);
+  }
+  
 	public void updateMP(CharacterName name, Points points) {
 		if (name.equals(currentCharacter)) {
 			setPoints(mp, mpLabel, points);                

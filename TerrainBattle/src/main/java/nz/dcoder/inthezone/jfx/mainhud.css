@@ -31,3 +31,6 @@
 	-fx-accent: Orange;
 }
 
+#textStore {
+    -fx-background-color: White;
+}

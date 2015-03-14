@@ -25,7 +25,7 @@ public class Terrain {
 
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				if (boardState.get(x, y) != 0) {
+				if (boardState.get(x, y) == 1) {
 					obstacles.add(new Position(x, y));
 				}
 			}
@@ -55,9 +55,11 @@ public class Terrain {
 		return boardState.getHeight();
 	}
 
+	/**
+	 * Determine if a square is a mana zone
+	 * */
 	public boolean isManaZone(Position pos) {
-		// TODO: implement this method
-		return false;
+		return boardState.get(pos.x, pos.y) == 2;
 	}
 }
 

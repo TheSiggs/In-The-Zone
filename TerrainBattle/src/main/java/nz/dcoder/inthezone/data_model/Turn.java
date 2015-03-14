@@ -13,17 +13,24 @@ public class Turn {
 	final private Collection<TurnCharacter> turnCharacters;
 	final private Battle battle;
 	final private int turnNumber;
+	final private ItemBag items;
 
 	public Turn (
 		boolean isPlayerTurn,
 		Collection<TurnCharacter> turnCharacters,
+		ItemBag items,
 		Battle battle,
 		int turnNumber
 	) {
 		this.isPlayerTurn = isPlayerTurn;
 		this.turnCharacters = turnCharacters;
+		this.items = items;
 		this.battle = battle;
 		this.turnNumber = turnNumber;
+	}
+
+	public ItemBag getItems() {
+		return items;
 	}
 
 	/**
@@ -41,13 +48,14 @@ public class Turn {
 
 	public Collection<CharacterInfo> getNPCInfo() {
 		return battle.aiPlayers.stream()
-			.map(c -> c.getCharacterInfo()).collect(Collectors.toList());
+			.map(c -> c.getCharacterInfo(battle.terrain.isManaZone(c.position)))
+			.collect(Collectors.toList());
 	}
 
 	public CharacterInfo getCharacterAt(Position pos) {
 		Character c = battle.getCharacterAt(pos);
 		if (c == null) return null;
-		return c.getCharacterInfo();
+		return c.getCharacterInfo(battle.terrain.isManaZone(c.position));
 	}
 
 	/**

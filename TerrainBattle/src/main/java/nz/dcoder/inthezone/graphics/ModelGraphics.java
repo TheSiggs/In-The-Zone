@@ -15,11 +15,11 @@ import nz.dcoder.inthezone.data_model.pure.Position;
  * object.
  * */
 public abstract class ModelGraphics implements AnimEventListener {
-	protected final Spatial spatial;
 	protected final AnimChannel channel;
 	protected final AnimControl control;
 	protected final ControllerChain controllerChain;
 	protected final PathController pathController;
+	protected final Spatial spatial;
 
 	protected Position p;
 
@@ -71,6 +71,8 @@ public abstract class ModelGraphics implements AnimEventListener {
 		return pathController;
 	}
 
+	private ControllerChain.Token token = null;
+
 	@Override
 	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
 		if (limitedAnimation) {
@@ -78,7 +80,7 @@ public abstract class ModelGraphics implements AnimEventListener {
 			if (animRepeats < 1) {
 				channel.setLoopMode(LoopMode.DontLoop);
 				limitedAnimation = false;
-				controllerChain.nextAnimation();
+				token.endAnimation();
 			}
 		}
 	}
@@ -92,9 +94,13 @@ public abstract class ModelGraphics implements AnimEventListener {
 	 * a controller chain to restore the idle animation.
 	 * */
 	public void setAnimation(String name) {
+		if (limitedAnimation) {
+			throw new RuntimeException(
+				"You can only run one animation at a time per object");
+		}
+
 		limitedAnimation = false;
 		channel.setAnim(name);
-		controllerChain.nextAnimation();
 	}
 
 	private boolean limitedAnimation = false;
@@ -103,10 +109,20 @@ public abstract class ModelGraphics implements AnimEventListener {
 	/**
 	 * Set an animation to run n times, and notify when done
 	 * */
-	public void setAnimation(String name, int n) {
+	public void setAnimation(String name, int n, ControllerChain.Token token) {
+		if (limitedAnimation) {
+			throw new RuntimeException(
+				"You can only run one animation at a time per object");
+		}
 		limitedAnimation = true;
+		this.token = token;
 		animRepeats = n;
+		token.startAnimation();
 		channel.setAnim(name);
+
+		// special case single frame animations (since they don't trigger
+		// onAnimCycleDone)
+		if (channel.getAnimMaxTime() == 0) token.endAnimation();
 	}
 
 	public String getAnimation() {

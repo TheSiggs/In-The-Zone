@@ -16,6 +16,7 @@ import com.jme3.texture.Texture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -33,14 +34,35 @@ public class BoardGraphics {
 	private final AssetManager assetManager;
 
 	private Map<Position, Geometry> tiles = new HashMap<>();
-	private Collection<Position> highlighted = new ArrayList<>();
+	private Collection<Position> movingHighlight = new ArrayList<>();
+	private Collection<Position> staticHighlight = new HashSet<>();
+	private ColorRGBA staticHighlightColor = null;
 
-	public static final ColorRGBA PATH_COLOR = new ColorRGBA(0.0f, 1.0f, 0.0f, 0.0f);
-	public static final ColorRGBA TARGET_COLOR = new ColorRGBA(1.0f, 0.0f, 0.0f, 0.0f);
+	public static final ColorRGBA PATH_COLOR = new ColorRGBA(0.0f, 1.0f, 0.0f, 0.8f);
+	public static final ColorRGBA TARGET_COLOR = new ColorRGBA(1.0f, 0.0f, 0.0f, 0.8f);
+	public static final ColorRGBA RANGE_COLOR = new ColorRGBA(1.0f, 1.0f, 0.0f, 0.8f);
+
+	/**
+	 * Utility function to alpha blend two colors.  I'm surprised this doesn't
+	 * come with JME.
+	 * */
+	private static ColorRGBA alphaBlend(ColorRGBA src, ColorRGBA dst) {
+		ColorRGBA msrc = src.mult(src.a);
+		ColorRGBA mdst = dst.mult(dst.a);
+		float outA = src.a + (dst.a * (1 - src.a));
+		if (outA == 0) {
+			return ColorRGBA.Black;
+		} else {
+			msrc.addLocal(mdst.multLocal(1 - src.a)).multLocal(1 / outA);
+			msrc.a = outA;
+			return msrc;
+		}
+	}
 
 	ColorRGBA colors[] = {
-		new ColorRGBA(0.3f, 0.3f, 0.3f, 0f),
-		new ColorRGBA(0.9f, 0.9f, 0.9f, 0f)
+		new ColorRGBA(0.3f, 0.3f, 0.3f, 1f),
+		new ColorRGBA(0.9f, 0.9f, 0.9f, 1f),
+		new ColorRGBA(0.5f, 0.0f, 0.8f, 1f)
 	};
 
 	public BoardGraphics(Terrain terrain, AssetManager assetManager) {
@@ -50,9 +72,13 @@ public class BoardGraphics {
 
 		for (int i = 0; i < width; ++i) {
 			for (int j = 0; j < height; ++j) {
-				addBox(new Position(i, j),
-					colors[j % 2 == 0 ? i % 2 : (i + 1) % 2],
-					terrain.getBoardState(i, j));
+				ColorRGBA color;
+				if (terrain.getBoardState(i, j) == 2) {
+					color = colors[2];
+				} else {
+					color = colors[j % 2 == 0 ? i % 2 : (i + 1) % 2];
+				}
+				addBox(new Position(i, j), color, terrain.getBoardState(i, j));
 			}
 		}
 	}
@@ -62,7 +88,7 @@ public class BoardGraphics {
 		ColorRGBA color,
 		int boardValue
 	) {
-		float offsetZ = boardValue * 0.5f;
+		float offsetZ = boardValue == 1 ? 0.5f : 0.0f;
 
 		float x = p.x * Graphics.scale;
 		float y = -p.y * Graphics.scale;
@@ -101,29 +127,76 @@ public class BoardGraphics {
 	}
 
 	/**
-	 * Highlight tiles for pathfinding, targeting etc.
+	 * Set the moving highlight (which indicates the path for movement, or the
+	 * area of effect for abilities).
 	 * */
-	public void highlightTiles(Collection<Position> highlight, ColorRGBA h) {
-		clearHighlighting();
+	public void setMovingHighlight(Collection<Position> highlight, ColorRGBA h) {
+		clearMovingHighlight();
+
 		if (highlight == null) return;
 
-		highlighted.addAll(highlight);
-		for (Position p : highlighted) {
+		movingHighlight.addAll(highlight);
+		for (Position p : movingHighlight) {
 			Geometry g = tiles.get(p);
-			g.getMaterial().setColor("Color", h);
+			if (g != null) {
+				ColorRGBA c = alphaBlend(h, (ColorRGBA) g.getUserData("defaultColor"));
+				g.getMaterial().setColor("Color", c);
+			}
 		}
 	}
 
 	/**
-	 * Remove highlighting
+	 * Clear the moving highlight.
 	 * */
-	public void clearHighlighting() {
-		for (Position p : highlighted) {
+	public void clearMovingHighlight() {
+		for (Position p : movingHighlight) {
 			Geometry g = tiles.get(p);
-			g.getMaterial().setColor("Color",
-				(ColorRGBA) g.getUserData("defaultColor"));
+			if (g != null) {
+				ColorRGBA restoreColor = (ColorRGBA) g.getUserData("defaultColor");
+
+				if (staticHighlight.contains(p)) {
+					restoreColor = alphaBlend(staticHighlightColor, restoreColor);
+				}
+
+				g.getMaterial().setColor("Color", restoreColor);
+			}
 		}
-		highlighted.clear();
+		movingHighlight.clear();
+	}
+
+	/**
+	 * Set the static highlight, which generally indicates range of motion or
+	 * range of abilities.
+	 * */
+	public void setStaticHighlight(Collection<Position> highlight, ColorRGBA h) {
+		staticHighlightColor = h;
+		clearAllHighlighting();
+
+		staticHighlight.addAll(highlight);
+		for (Position p : staticHighlight) {
+			Geometry g = tiles.get(p);
+			if (g != null) {
+				ColorRGBA c = alphaBlend(staticHighlightColor,
+					(ColorRGBA) g.getUserData("defaultColor"));
+				g.getMaterial().setColor("Color", c);
+			}
+		}
+	}
+
+	/**
+	 * remove all highlighting.
+	 * */
+	public void clearAllHighlighting() {
+		clearMovingHighlight();
+		for (Position p : staticHighlight) {
+			Geometry g = tiles.get(p);
+			if (g != null) {
+				g.getMaterial().setColor("Color",
+					(ColorRGBA) g.getUserData("defaultColor"));
+			}
+		}
+
+		staticHighlight.clear();
 	}
 }
 

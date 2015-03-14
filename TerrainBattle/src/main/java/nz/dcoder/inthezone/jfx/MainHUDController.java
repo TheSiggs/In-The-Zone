@@ -18,21 +18,22 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.Node;
+import javafx.scene.text.Text;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
-import javafx.scene.text.Text;
 
+import nz.dcoder.inthezone.control.GameActionListener;
+import nz.dcoder.inthezone.data_model.Item;
 import nz.dcoder.inthezone.data_model.pure.AbilityClass;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Points;
-import nz.dcoder.inthezone.graphics.Graphics;
-import nz.dcoder.inthezone.input.GameActionListener;
 
 
 /**
@@ -51,8 +52,8 @@ public class MainHUDController implements Initializable {
 	Pane currentMenu = null;
 	private List<Pane> subMenus = new LinkedList<>();
 
-	private GameActionListener input;
-	public void setGameInput(GameActionListener input) {
+	private GameActionListener.GUIListener input;
+	public void setGameInput(GameActionListener.GUIListener input) {
 		this.input = input;
 	}
 
@@ -154,10 +155,12 @@ public class MainHUDController implements Initializable {
 	public void turnStart(
 		boolean isPlayerTurn,
 		Collection<CharacterInfo> players,
-		Collection<CharacterInfo> npcs
+		Collection<CharacterInfo> npcs,
+		Map<Item, Integer> items
 	) {
 		selectedCharacter.setVisible(false);
-		hideMenus();      
+		rebuildItemsMenu(items);
+		hideMenus();
 	}
 
 	CharacterName currentCharacter = null;
@@ -207,6 +210,32 @@ public class MainHUDController implements Initializable {
 		if (name.equals(currentCharacter)) {
 			setPoints(hp, hpLabel, points);
 		}
+	}
+
+	public void updateItems(Map<Item, Integer> items) {
+		rebuildItemsMenu(items);
+	}
+
+	private void rebuildItemsMenu(Map<Item, Integer> items) {
+		ObservableList<Node> menu = itemMenu.getChildren();
+		menu.clear();
+
+		for (Item i : items.keySet()) {
+			Button b = new Button(i.name.toString() + " x" + items.get(i).toString());
+			b.setMnemonicParsing(false);
+			b.setOnAction(event -> {
+				input.notifyItem(i);
+				jmeFx.loseFocus();
+			});
+			b.setPrefWidth(menuWidth);
+
+			b.setTooltip(new Tooltip(i.description));
+
+			menu.add(b);
+		}
+
+		if (menu.size() == 0) menu.add(noItems);
+		menu.add(itemExit);
 	}
 
 	private void rebuildMenus(Collection<AbilityInfo> abilities) {

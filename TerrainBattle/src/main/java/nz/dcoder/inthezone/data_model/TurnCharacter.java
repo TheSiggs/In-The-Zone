@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.dcoder.ai.astar.AStarSearch;
 import nz.dcoder.ai.astar.Node;
+import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
+import nz.dcoder.inthezone.data_model.pure.LineOfSight;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -43,6 +45,16 @@ public class TurnCharacter {
 	}
 
 	/**
+	 * Get all the positions this character could move to, which depends on the
+	 * current MP and configuration of the board.
+	 * */
+	public Collection<Position> getMoveRange() {
+		return LineOfSight.getDiamond(character.position, mp).stream()
+			.filter(p -> getMove(null, p) != null)
+			.collect(Collectors.toList());
+	}
+
+	/**
 	 * Get a path on behalf of the presentation layer.  This method is designed
 	 * to permit waypoints.  The soFar parameter contains the path up until now.
 	 *
@@ -64,15 +76,11 @@ public class TurnCharacter {
 		int width = battle.terrain.getWidth();
 		int height = battle.terrain.getHeight();
 
-		Set<Position> obstacles =
-			new HashSet<Position>(battle.terrain.getObstacles());
-
 		// ensure that the destination is valid
 		if (
 			destination.x >= width || destination.x < 0 ||
 			destination.y >= height || destination.y < 0 ||
-			battle.getOccupiedPositions().contains(destination) ||
-			obstacles.contains(destination)
+			battle.getOccupiedPositions().contains(destination)
 		) {
 			return null;
 		}
@@ -92,7 +100,8 @@ public class TurnCharacter {
 		if (startPos.equals(destination)) return soFar;
 
 		// start of pathfinding code
-		obstacles.addAll(battle.getObstacles(battle.turn.isPlayerTurn));
+		Set<Position> obstacles = new HashSet<Position>(
+			battle.getObstacles(battle.turn.isPlayerTurn));
 
 		Node<Position> start = new AStarPositionNode(null,
 			obstacles, width, height, startPos, destination);
@@ -173,11 +182,22 @@ public class TurnCharacter {
 	}
 
 	private Ability getAbility(AbilityName name) {
-		return character.getAbilities().stream()
+		return character.getAbilities(isOnManaZone()).stream()
 			.filter(a -> a.info.name.equals(name)).findFirst().orElse(null);
 	}
 
 	private final EffectName pushEffect = new EffectName("push");
+
+	/**
+	 * Get all the positions that could be targeted by an ability.
+	 * */
+	public Collection<Position> getAbilityRange(AbilityName name) {
+		AbilityInfo info = getAbility(name).info;
+
+		return LineOfSight.getDiamond(character.position, info.range).stream()
+			.filter(p -> canDoAbility(name, p))
+			.collect(Collectors.toList());
+	}
 
 	/**
 	 * Determine if this character can perform an ability with a given target
@@ -250,12 +270,23 @@ public class TurnCharacter {
 	}
 
 	/**
+	 * Get all the positions that could be targeted by an item.
+	 * */
+	public Collection<Position> getItemRange(Item item) {
+		AbilityInfo info = item.getAbility();
+
+		return LineOfSight.getDiamond(character.position, info.range).stream()
+			.filter(p -> canUseItem(item, p))
+			.collect(Collectors.toList());
+	}
+
+	/**
 	 * Determine if this character is able to use the specified item targeting
 	 * the specified square.  In the case of items that are used on oneself, the
 	 * target parameter will be set to the position of this character.
 	 * */
 	public boolean canUseItem(Item item, Position target) {
-		if (item.ability.info.cost > ap) return false;
+		if (item.getAbility().cost > ap) return false;
 		return item.ability.canApplyEffect(character, target, battle);
 	}
 
@@ -330,7 +361,7 @@ public class TurnCharacter {
 	 * Get a copy of essential information about a character
 	 * */
 	public CharacterInfo getCharacterInfo() {
-		CharacterInfo info = character.getCharacterInfo();
+		CharacterInfo info = character.getCharacterInfo(isOnManaZone());
 		info.mp = getMP();
 		info.ap = getAP();
 		return info;
@@ -347,7 +378,7 @@ public class TurnCharacter {
 	public boolean hasOptions(Collection<Item> items) {
 		boolean canUseItem = items.stream()
 			.anyMatch(i -> i.ability.info.cost <= ap);
-		boolean canUseAbility = character.getAbilities().stream()
+		boolean canUseAbility = character.getAbilities(isOnManaZone()).stream()
 			.anyMatch(a -> a.info.cost <= ap);
 		return canUseItem || canUseAbility;
 	}

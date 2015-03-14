@@ -1,11 +1,7 @@
-package nz.dcoder.inthezone;
+package nz.dcoder.inthezone.control;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
-import nz.dcoder.inthezone.ai.AIPlayer;
 import nz.dcoder.inthezone.data_model.BattleController;
 import nz.dcoder.inthezone.data_model.Character;
 import nz.dcoder.inthezone.data_model.DoAbilityInfo;
@@ -14,11 +10,6 @@ import nz.dcoder.inthezone.data_model.DoCharacterDeath;
 import nz.dcoder.inthezone.data_model.DoMoveInfo;
 import nz.dcoder.inthezone.data_model.DoObjectDestruction;
 import nz.dcoder.inthezone.data_model.Equipment;
-import nz.dcoder.inthezone.data_model.factories.AbilityFactory;
-import nz.dcoder.inthezone.data_model.factories.BattleObjectFactory;
-import nz.dcoder.inthezone.data_model.factories.CharacterFactory;
-import nz.dcoder.inthezone.data_model.factories.DatabaseException;
-import nz.dcoder.inthezone.data_model.factories.EquipmentFactory;
 import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.pure.CharacterInfo;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
@@ -30,99 +21,28 @@ import nz.dcoder.inthezone.data_model.Turn;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.graphics.ObjectGraphics;
-import nz.dcoder.inthezone.input.GameActionListener;
-import nz.dcoder.inthezone.input.Rotating;
 
 /**
  *
  * @author denz
  */
-public final class Presentation {
-	private final GameState gameState;
+public final class Control {
 	private final GameActionListener input;
+	private final GameDriver driver;
+	private final GameState gameState;
 	private final Graphics graphics;
 	private final UserInterface ui;
 
-	private final AbilityFactory abilityFactory;
-	private final BattleObjectFactory battleObjectFactory;
-	private final CharacterFactory characterFactory;
-	private final EquipmentFactory equipmentFactory;
-
 	private Turn turn;
 
-	Presentation(
-		GameState gameState, Graphics graphics, UserInterface ui
-	) throws DatabaseException {
+	public Control(GameState gameState, Graphics graphics, UserInterface ui) {
 		this.gameState = gameState;
 		this.graphics = graphics;
 		this.ui = ui;
 		this.input = ui.getGameActionListener();
-
-		abilityFactory = new AbilityFactory();
-		battleObjectFactory = new BattleObjectFactory(abilityFactory);
-		characterFactory = new CharacterFactory(
-			abilityFactory, battleObjectFactory);
-		equipmentFactory = new EquipmentFactory(abilityFactory);
+		this.driver = ui.getGameDriver();
 
 		initBattleController();
-		startBattle();
-	}
-
-	void startBattle() {
-		// create the characters for this battle (ignore the Party class for now)
-
-		List<Character> pcs = new ArrayList<Character>();
-		List<Character> npcs = new ArrayList<Character>();
-
-		Position headingN = new Position(0, -1);
-		Position headingS = new Position(0, 1);
-
-		for (int x = 0; x < 5; ++x) {
-			pcs.add(initGoblin(new Position(x * 2, 9), x + 1, headingN));
-		}
-
-		for (int x = 0; x < 5; ++x) {
-			npcs.add(initGoblin(new Position(x * 2, 0), x + 6, headingS));
-		}
-
-		gameState.makeBattle(pcs, npcs, controller, new AIPlayer());
-	}
-
-	/**
-	 * When we get more sophisticated, we will add another method to init actual
-	 * players rather than just goblins.
-	 * */
-	Character initGoblin(Position p, int i, Position dp) {
-		CharacterGraphics cg = graphics.addGoblin(p, i);
-		cg.setHeading(dp);
-
-		CharacterName name = new CharacterName("goblin " + i);
-		Character r = characterFactory.newCharacter(name, 1);
-		Equipment weapon = equipmentFactory.newEquipment(
-			new EquipmentName("simple weapon"));
-		r.equipWeapon(weapon);
-
-		if (r == null) {
-			throw new RuntimeException(
-				"Could not create character " + name.toString());
-		}
-
-		r.position = p;
-
-		return r;
-	}
-
-	/**
-	 * Main update loop for the game.  Try to avoid putting things in here, use
-	 * controllers instead.
-	 * */
-	void simpleUpdate(float tpf) {
-		Rotating viewRotating = input.getViewRotating();
-		if (viewRotating == Rotating.LEFT) {
-			graphics.rotateView(tpf * Graphics.rotationSpeed);
-		} else if (viewRotating == Rotating.RIGHT) {
-			graphics.rotateView(-tpf * Graphics.rotationSpeed);
-		}
 	}
 
 	private final BattleController controller = new BattleController();
@@ -137,18 +57,23 @@ public final class Presentation {
 		controller.onDestruction = this::destruction;
 	}
 
+	public BattleController getBattleController() {
+		return controller;
+	}
+
 	/**
 	 * Handle the start of the player's turn.
 	 * */
 	private void playerTurnStart(Turn turn) {
-		input.setTurn(turn);
+		driver.startTurn(turn);
 		this.turn = turn;
 
 		System.out.println("Player turn starts");
 
 		ui.turnStart(true,
 			turn.getPlayerInfo().stream().collect(Collectors.toList()),
-			turn.getNPCInfo().stream().collect(Collectors.toList()));
+			turn.getNPCInfo().stream().collect(Collectors.toList()),
+			turn.getItems().getItemInfo());
 	}
 
 	private void aiPlayerTurnStart(Turn turn) {
@@ -156,12 +81,13 @@ public final class Presentation {
 		// we'll make let the human player take this turn for now.
 		
 		System.out.println("AI turn starts");
-		input.setTurn(turn);
+		driver.startTurn(turn);
 		this.turn = turn;
 
 		ui.turnStart(true,
 			turn.getPlayerInfo().stream().collect(Collectors.toList()),
-			turn.getNPCInfo().stream().collect(Collectors.toList()));
+			turn.getNPCInfo().stream().collect(Collectors.toList()),
+			turn.getItems().getItemInfo());
 	}
 
 	/**
@@ -182,6 +108,8 @@ public final class Presentation {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
 			graphics.doRun(cg, move.path, null);
+			ui.selectCharacter(turn.turnCharacterAt(
+				move.path.get(move.path.size() - 1)).getCharacterInfo());
 
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");
@@ -198,6 +126,7 @@ public final class Presentation {
 	private void ability(DoAbilityInfo action) {
 		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
 
+		// TODO: revist
 		Runnable continuation = null;
 
 		if (action.ability.effect.equals(pushEffect)) {
@@ -214,18 +143,23 @@ public final class Presentation {
 			// all other effects
 
 			if (action.ability.repeats > 1) {
-				continuation = () -> input.repeatTarget();
+				continuation = () -> input.getGUIListener().notifyRepeat();
 			}
 
 			graphics.doAbility(cg, action.ability.name, continuation);
 
 			for (Position p : action.targets) {
+				CharacterGraphics cgTarget = graphics.getCharacterByPosition(p);
 				CharacterInfo target = turn.getCharacterAt(p);
 				if (target != null) {
 					ui.updateHP(target.name, target.hp);
+					cgTarget.setHP(target.hp);
 				}
 			}
 		}
+
+		ui.selectCharacter(turn.turnCharacterAt(
+			action.agentTarget).getCharacterInfo());
 
 		System.err.println("Character at position " + action.agentPos.toString()
 			+ " uses " + action.ability.name.toString()

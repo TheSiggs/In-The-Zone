@@ -56,13 +56,13 @@ public class Character implements CanDoAbility {
 		this.position = new Position(0, 0);
 	}
 
-	public CharacterInfo getCharacterInfo() {
+	public CharacterInfo getCharacterInfo(boolean isOnManaZone) {
 		return new CharacterInfo(
 			name,
 			description,
 			getLevel(),
 			new Points(getMaxHP(), hp),
-			getAbilities().stream()
+			getAbilities(isOnManaZone).stream()
 				.map(a -> a.info).collect(Collectors.toList()));
 	}
 
@@ -91,11 +91,12 @@ public class Character implements CanDoAbility {
 		return level.maxHP;
 	}
 
-	public Collection<Ability> getAbilities() {
+	public Collection<Ability> getAbilities(boolean isOnManaZone) {
 		return Stream.concat(
 			equipment.stream().flatMap(e -> e.abilities.stream()),
 			level.abilities.stream()
-		).collect(Collectors.toList());
+		).filter(a -> isOnManaZone || !a.info.requiresMana)
+			.collect(Collectors.toList());
 	}
 
 	public Collection<Equipment> getArmour() {

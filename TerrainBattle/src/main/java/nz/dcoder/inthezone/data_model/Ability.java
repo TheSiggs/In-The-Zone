@@ -1,10 +1,11 @@
 package nz.dcoder.inthezone.data_model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.TreeSet;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.LineOfSight;
@@ -37,7 +38,7 @@ abstract public class Ability {
 	public Collection<Position> getAffectedArea(
 		Position agentPosition, Position target, Battle battle
 	) {
-		final List<Position> affected = new ArrayList<Position>();
+		final Set<Position> affected = new TreeSet<Position>();
 
 		if (!info.isPiercing) {
 			affected.add(target);
@@ -46,8 +47,9 @@ abstract public class Ability {
 				// piercing attacks must go in cardinal directions
 				return affected;
 			} else {
-				affected.add(target);
-				affected.addAll(LineOfSight.getLOS(agentPosition, target, true));
+				List<Position> line = LineOfSight.getLOS(agentPosition, target, true);
+				line.remove(0);         // don't target ourselves
+				affected.addAll(line);
 			}
 		} 
 
@@ -129,13 +131,15 @@ abstract public class Ability {
 
 				// there may be a character at the target position, but not anywhere
 				// along the LOS, hence we now ignore the last element of the LOS.
-				los1.remove(los1.size() - 1);
-				los2.remove(los2.size() - 1);
-				allClear &=
-					los1.stream().map(p -> battle.getCharacterAt(p))
-						.noneMatch(c -> c != null) ||
-					los2.stream().map(p -> battle.getCharacterAt(p))
-						.noneMatch(c -> c != null);
+				if (los1.size() > 0 && los2.size() > 0) {
+					los1.remove(los1.size() - 1);
+					los2.remove(los2.size() - 1);
+					allClear &=
+						los1.stream().map(p -> battle.getCharacterAt(p))
+							.noneMatch(c -> c != null) ||
+						los2.stream().map(p -> battle.getCharacterAt(p))
+							.noneMatch(c -> c != null);
+				}
 			}
 			return allClear;
 	}

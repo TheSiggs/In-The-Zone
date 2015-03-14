@@ -3,7 +3,7 @@ package nz.dcoder.inthezone.data_model.pure;
 /**
  * The grid square at which something is located
  * */
-public class Position {
+public class Position implements Comparable<Position> {
 	public final int x;
 	public final int y;
 
@@ -39,6 +39,14 @@ public class Position {
 		r = m * r + x;
 		r = m * r + y;
 		return r;
+	}
+
+	@Override public int compareTo(Position p) {
+		if (x == p.x) {
+			return y < p.y ? -1 : (y == p.y ? 0 : 1);
+		} else {
+			return x < p.y ? -1 : 1;
+		}
 	}
 }
 

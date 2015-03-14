@@ -3,15 +3,16 @@ package nz.dcoder.inthezone.graphics;
 import com.jme3.scene.control.AbstractControl;
 
 public abstract class ChainableController extends AbstractControl {
-	private final ControllerChain chain;
+	private ControllerChain.Token token;
 
-	public ChainableController(ControllerChain chain) {
-		this.chain = chain;
+	protected void startControl(ControllerChain.Token token) {
+		this.token = token;
+		token.startAnimation();
 	}
 
 	protected void endControl() {
 		this.setEnabled(false);
-		chain.nextAnimation();
+		token.endAnimation();
 	}
 }
 

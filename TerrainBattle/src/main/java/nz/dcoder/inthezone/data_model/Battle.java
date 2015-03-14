@@ -16,6 +16,9 @@ class Battle {
 	Collection<Character> aiPlayers;
 	Collection<BattleObject> objects;
 
+	private final ItemBag playerItems;
+	private final ItemBag aiItems;
+
 	Terrain terrain;
 	Turn turn;
 
@@ -25,6 +28,8 @@ class Battle {
 		BattleController controller,
 		Collection<Character> players,
 		Collection<Character> aiPlayers,
+		ItemBag playerItems,
+		ItemBag aiItems,
 		Collection<BattleObject> objects,
 		Terrain terrain,
 		boolean playerGoesFirst  // true if the human player goes first
@@ -32,14 +37,21 @@ class Battle {
 		this.controller = controller;
 		this.players = players;
 		this.aiPlayers = aiPlayers;
+		this.playerItems = playerItems;
+		this.aiItems = aiItems;
 		this.objects = objects;
 		this.terrain = terrain;
+
+		// import obstacles from the terrain
+		terrain.getObstacles().stream().forEach(p ->
+			objects.add(BattleObject.newTerrainObstacle(p)));
 
 		// create a dummy turn 0 to 'prime the pump'
 		turnNumber = 0;
 		turn = new Turn(
 			!playerGoesFirst,
 			new ArrayList<TurnCharacter>(),
+			turnItems(!playerGoesFirst),
 			this,
 			turnNumber);
 
@@ -149,6 +161,7 @@ class Battle {
 			turn = new Turn(
 				isPlayerTurn,
 				turnCharacters(isPlayerTurn, turnNumber),
+				turnItems(isPlayerTurn),
 				this, turnNumber);
 
 			// notify the presentation layer that a new turn has started
@@ -173,6 +186,14 @@ class Battle {
 		return s
 			.map(c -> new TurnCharacter(c, turnNumber, this))
 			.collect(Collectors.toList());
+	}
+
+	private ItemBag turnItems(boolean isPlayerTurn) {
+		if (isPlayerTurn) {
+			return playerItems;
+		} else {
+			return aiItems;
+		}
 	}
 }
 

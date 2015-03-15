@@ -30,8 +30,13 @@ public class BattleController {
 		if (onBattleEnd != null) onBattleEnd.accept(new DoBattleEnd(playerWins));
 	}
 
-	void callOnMove(Position start, List<Position> path) {
-		if (onMove != null) onMove.accept(new DoMoveInfo(start, path));
+	void callOnMove(
+		Position start,
+		List<Position> path,
+		boolean enterLeaveManaZone
+	) {
+		if (onMove != null) onMove.accept(new DoMoveInfo(
+			start, path, enterLeaveManaZone));
 	}
 
 	void callOnAbility(

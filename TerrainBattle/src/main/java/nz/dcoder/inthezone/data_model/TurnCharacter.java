@@ -178,7 +178,12 @@ public class TurnCharacter {
 		mp -= path.size() - 1;
 		Position p0 = character.position;
 		character.position = path.get(path.size() - 1);
-		battle.controller.callOnMove(p0, path);
+
+		boolean enterLeaveManaZone =
+			battle.terrain.isManaZone(p0) !=
+			battle.terrain.isManaZone(character.position);
+
+		battle.controller.callOnMove(p0, path, enterLeaveManaZone);
 	}
 
 	private Ability getAbility(AbilityName name) {

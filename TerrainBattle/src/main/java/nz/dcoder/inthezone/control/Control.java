@@ -18,6 +18,7 @@ import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 import nz.dcoder.inthezone.data_model.pure.Points;
 import nz.dcoder.inthezone.data_model.pure.Position;
 import nz.dcoder.inthezone.data_model.Turn;
+import nz.dcoder.inthezone.data_model.TurnCharacter;
 import nz.dcoder.inthezone.graphics.CharacterGraphics;
 import nz.dcoder.inthezone.graphics.Graphics;
 import nz.dcoder.inthezone.graphics.ObjectGraphics;
@@ -108,8 +109,12 @@ public final class Control {
 		if (move.path.size() >= 2) {
 			CharacterGraphics cg = graphics.getCharacterByPosition(move.start);
 			graphics.doRun(cg, move.path, null);
-			ui.selectCharacter(turn.turnCharacterAt(
-				move.path.get(move.path.size() - 1)).getCharacterInfo());
+
+			if (move.enterLeaveManaZone) {
+				TurnCharacter tc = turn.turnCharacterAt(
+					move.path.get(move.path.size() - 1));
+				ui.enterLeaveManaZone(tc.getCharacterInfo(), tc.isOnManaZone());
+			}
 
 		} else {
 			System.out.println("Short path (length less than 2).  This shouldn't happen");

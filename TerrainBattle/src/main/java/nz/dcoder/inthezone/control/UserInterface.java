@@ -86,6 +86,10 @@ public class UserInterface {
 		Platform.runLater(() -> controller.deselectCharacter());
 	}
 
+  public void enterLeaveManaZone(CharacterInfo info, boolean entered) {
+		Platform.runLater(() -> controller.enterLeaveManaZone(info, entered));
+	}
+
 	public void updateMP(CharacterName name, Points mp) {
 		Platform.runLater(() -> controller.updateMP(name, mp));
 	}

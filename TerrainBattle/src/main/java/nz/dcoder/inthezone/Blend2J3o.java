@@ -27,8 +27,9 @@ public class Blend2J3o extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         String filename = "file:///var/projects/dcoder.nz/in-the-zone/TerrainBattle/assets/Models/zan/zan_texturing.blend";
+        String assetFilename = "Models/zan/zan_texturing.blend";
         BlenderModelLoader loader = new BlenderModelLoader();
-        ModelKey assetKey = new ModelKey("hello");
+        ModelKey assetKey = new ModelKey("");
         URL url = null;
         try {
             url = new URL(filename);
@@ -44,11 +45,12 @@ public class Blend2J3o extends SimpleApplication {
         Spatial spatial = null;
         try {
             spatial = loader.load(info);
+            spatial = assetManager.loadModel(assetFilename);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        File file = new File("output.j3o");
+        rootNode.attachChild(spatial);
+        File file = new File("zan_texturing.j3o");
         try {
             getBinaryExporter().save(spatial, file);
         } catch (IOException e) {

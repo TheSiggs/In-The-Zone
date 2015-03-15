@@ -42,6 +42,7 @@ public class BlenderRender extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		assetManager.registerLocator("assets", FileLocator.class);
+        assetManager.registerLocator("", FileLocator.class);
 		viewPort.setBackgroundColor(ColorRGBA.DarkGray);
         try {
             loadCsv(csvName);

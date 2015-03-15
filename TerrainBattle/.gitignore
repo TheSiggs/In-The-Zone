@@ -12,3 +12,5 @@ zans-story.iml
 gitignore/
 *.ipr
 *.iws
+.gradle/
+.gradle/**

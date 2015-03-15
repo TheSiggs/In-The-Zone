@@ -32,5 +32,14 @@
 }
 
 #textStore {
-    -fx-background-color: White;
+	-fx-padding: 0 0 20 0;
 }
+
+#textPromptFrame {
+	-fx-background-color: rgba(255, 255, 255, 0.6);
+}
+
+.mainFxmlClass {
+	-fx-background-color: rgba(255, 255, 255, 0);
+}
+

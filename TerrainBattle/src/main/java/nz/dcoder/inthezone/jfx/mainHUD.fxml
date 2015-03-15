@@ -10,11 +10,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: rgba(255,255,255,0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.dcoder.inthezone.jfx.MainHUDController">
+<BorderPane id="borderPane" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.dcoder.inthezone.jfx.MainHUDController" fx:id="rootPane">
+
     <stylesheets>
         <URL value="@mainhud.css" />
     </stylesheets>
 
+    <center>
+    <AnchorPane>
     <children>
         <Pane fx:id="selectedCharacter" visible="false" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20">
         <children>
@@ -72,16 +75,25 @@
             <Button fx:id="itemExit" mnemonicParsing="false" onAction="#onBackButton" prefHeight="24" prefWidth="160" text="Back" />
         </children>
         </TilePane>
-        
-        <HBox fx:id="textStore" alignment="BASELINE_CENTER" AnchorPane.bottomAnchor="20">
+    </children>
+    </AnchorPane>
+    </center>
+
+    <bottom>
+    <HBox fx:id="textStore" prefHeight="50" alignment="TOP_CENTER">
+    <children>
+        <Pane fx:id="textPromptFrame"> 
         <children>
-            <Text fx:id="textPrompt" strokeType="OUTSIDE" strokeWidth="0.0" text="..." textAlignment="CENTER" wrappingWidth="433.13671875">
+            <Text fx:id="textPrompt" layoutX="0" layoutY="20" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="433.13671875">
             <font>
                 <Font name="Comic Sans MS" size="16.0" />
             </font>
-      </Text>
+            </Text>
         </children>
-        </HBox>
-        
+        </Pane>
     </children>
-</AnchorPane>
+    </HBox>
+    </bottom>
+
+</BorderPane>
+

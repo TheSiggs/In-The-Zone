@@ -190,9 +190,9 @@ public class MainHUDController implements Initializable {
   public void enterLeaveManaZone(CharacterInfo info, boolean entered) {
     rebuildMenus(info.abilities);
     if (entered) {
-      textPrompt.setText(info.name.toString() + " has enterd the mana zone!");
+      textPrompt.setText(info.name.toString() + " enters the mana zone!");
     } else {
-      textPrompt.setText(info.name.toString() + " has left the mana zone!");
+      textPrompt.setText(info.name.toString() + " leaves the mana zone!");
     }
   }
   

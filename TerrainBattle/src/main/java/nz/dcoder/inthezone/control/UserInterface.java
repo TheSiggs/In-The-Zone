@@ -90,6 +90,10 @@ public class UserInterface {
 		Platform.runLater(() -> controller.enterLeaveManaZone(info, entered));
 	}
 
+  public void showMessage(String msg) {
+		Platform.runLater(() -> controller.showMessage(msg));
+	}
+
 	public void updateMP(CharacterName name, Points mp) {
 		Platform.runLater(() -> controller.updateMP(name, mp));
 	}

@@ -59,7 +59,7 @@ public class Blend2J3o extends SimpleApplication {
         if (args.length == 2) {
             main.convert(args[0], args[1]);
         }
-        if (sourceCsvFilename != null) {
+        if (false && sourceCsvFilename != null) {
             // csv file load
             try {
                 main.loadCsv(sourceCsvFilename);
@@ -76,7 +76,7 @@ public class Blend2J3o extends SimpleApplication {
         for (CSVRecord record : records) {
             String filename = record.get(0);
             String toJ3o = filename.replace(".blend", ".j3o");
-            this.
+            //this.
             //convert(filename, toJ3o);
         }
     }

@@ -5,10 +5,10 @@ import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
 public class DoAbilityInfo {
-	public final Position agentPos;
-	public final Position agentTarget;
-	public final Collection<Position> targets;
-	public final AbilityInfo ability;
+	public final Position agentPos;      // position of the character before the ability happens
+	public final Position agentTarget;   // position of the character after the ability happens
+	public final Collection<Position> targets;   // positions with targeted characters/objects
+	public final AbilityInfo ability;            // the ability that was applied
 
 	public DoAbilityInfo(
 		Position agentPos,

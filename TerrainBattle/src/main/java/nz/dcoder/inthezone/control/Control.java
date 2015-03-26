@@ -129,12 +129,19 @@ public final class Control {
 	 * Handle ability effects
 	 * */
 	private void ability(DoAbilityInfo action) {
+		// Note: agentPos is the current position of the character according to the
+		// graphics layer.  agentTarget is the current position of the character
+		// according to the model layer.
+
 		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
-		TurnCharacter turnCharacter = turn.turnCharacterAt(action.agentPos);
-		String characterName = "Character";
-		if(turnCharacter!=null){
-			characterName = turnCharacter.getCharacterInfo().name.toString();
+		TurnCharacter turnCharacter = turn.turnCharacterAt(action.agentTarget);
+
+		if (turnCharacter == null) {
+			throw new RuntimeException("Expected to find character at " +
+				action.agentTarget.toString() + " but there was no one there.");
 		}
+
+		CharacterInfo info = turnCharacter.getCharacterInfo();
 		
 		// TODO: revist
 		Runnable continuation = null;
@@ -148,7 +155,7 @@ public final class Control {
 		} else if (action.ability.effect.equals(teleportEffect)) {
 			// basic teleporting
 			graphics.doTeleport(cg, action.agentTarget, continuation);
-			ui.showMessage(characterName + " uses " +
+			ui.showMessage(info.name.toString() + " uses " +
 				action.ability.name.toString() + "!");
 
 		} else {
@@ -158,7 +165,7 @@ public final class Control {
 				continuation = () -> input.getGUIListener().notifyRepeat();
 			}
 
-			ui.showMessage(characterName + " uses " +
+			ui.showMessage(info.name.toString() + " uses " +
 				action.ability.name.toString() + "!");
 
 			graphics.doAbility(cg, action.ability.name, continuation);

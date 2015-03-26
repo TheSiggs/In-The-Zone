@@ -130,9 +130,12 @@ public final class Control {
 	 * */
 	private void ability(DoAbilityInfo action) {
 		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
-		CharacterInfo info = turn.turnCharacterAt(
-			action.agentPos).getCharacterInfo();
-
+		TurnCharacter turnCharacter = turn.turnCharacterAt(action.agentPos);
+		String characterName = "Character";
+		if(turnCharacter!=null){
+			characterName = turnCharacter.getCharacterInfo().name.toString();
+		}
+		
 		// TODO: revist
 		Runnable continuation = null;
 
@@ -145,7 +148,7 @@ public final class Control {
 		} else if (action.ability.effect.equals(teleportEffect)) {
 			// basic teleporting
 			graphics.doTeleport(cg, action.agentTarget, continuation);
-			ui.showMessage(info.name.toString() + " uses " +
+			ui.showMessage(characterName + " uses " +
 				action.ability.name.toString() + "!");
 
 		} else {
@@ -155,7 +158,7 @@ public final class Control {
 				continuation = () -> input.getGUIListener().notifyRepeat();
 			}
 
-			ui.showMessage(info.name.toString() + " uses " +
+			ui.showMessage(characterName + " uses " +
 				action.ability.name.toString() + "!");
 
 			graphics.doAbility(cg, action.ability.name, continuation);
@@ -171,7 +174,7 @@ public final class Control {
 		}
 
 		ui.selectCharacter(turn.turnCharacterAt(
-			action.agentTarget).getCharacterInfo());
+				action.agentTarget).getCharacterInfo());
 
 		System.err.println("Character at position " + action.agentPos.toString()
 			+ " uses " + action.ability.name.toString()

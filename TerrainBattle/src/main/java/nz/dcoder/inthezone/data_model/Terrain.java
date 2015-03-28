@@ -23,9 +23,9 @@ public class Terrain {
 		int width = boardState.getWidth();
 		int height = boardState.getHeight();
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (boardState.get(x, y) == 1) {
+		for (int x = -1; x < width+1; x++) {
+			for (int y = -1; y < height+1; y++) {
+				if (x==-1 || x==width || y==-1 || y==height || boardState.get(x, y) == 1) {
 					obstacles.add(new Position(x, y));
 				}
 			}

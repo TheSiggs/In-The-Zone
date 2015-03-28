@@ -54,7 +54,6 @@ public class Blend2J3o extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		init();
-		//loadAndSave();
 		processAll();
 		this.stop();
 	}
@@ -76,16 +75,6 @@ public class Blend2J3o extends SimpleApplication {
 		main.setSettings(settings);
 		main.setShowSettings(false);
 		main.start();
-		/*else if (args.length != 2) {
-		 args = new String[]{"Models/zan/zan_texturing.blend", "zan.j3o"};
-		 }
-		 if (args.length == 2) {
-		 main.convert(args[0], args[1]);
-		 } else {
-		 // csv file load
-
-		 }
-		 */
 	}
 
 	public void convert(String blend, String toJ3o) {

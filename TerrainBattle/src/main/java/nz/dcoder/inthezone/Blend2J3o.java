@@ -4,6 +4,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Spatial;
+import com.jme3.system.AppSettings;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -71,6 +72,9 @@ public class Blend2J3o extends SimpleApplication {
 				Logger.getLogger(Blend2J3o.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
+		AppSettings settings = new AppSettings(true);
+		main.setSettings(settings);
+		main.setShowSettings(false);
 		main.start();
 		/*else if (args.length != 2) {
 		 args = new String[]{"Models/zan/zan_texturing.blend", "zan.j3o"};

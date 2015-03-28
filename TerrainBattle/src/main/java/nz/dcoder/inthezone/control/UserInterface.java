@@ -86,11 +86,11 @@ public class UserInterface {
 		Platform.runLater(() -> controller.deselectCharacter());
 	}
 
-  public void enterLeaveManaZone(CharacterInfo info, boolean entered) {
+	public void enterLeaveManaZone(CharacterInfo info, boolean entered) {
 		Platform.runLater(() -> controller.enterLeaveManaZone(info, entered));
 	}
 
-  public void showMessage(String msg) {
+	public void showMessage(String msg) {
 		Platform.runLater(() -> controller.showMessage(msg));
 	}
 

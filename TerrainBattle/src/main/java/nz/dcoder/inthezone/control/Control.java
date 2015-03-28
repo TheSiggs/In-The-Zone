@@ -129,10 +129,20 @@ public final class Control {
 	 * Handle ability effects
 	 * */
 	private void ability(DoAbilityInfo action) {
-		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
-		CharacterInfo info = turn.turnCharacterAt(
-			action.agentPos).getCharacterInfo();
+		// Note: agentPos is the current position of the character according to the
+		// graphics layer.  agentTarget is the current position of the character
+		// according to the model layer.
 
+		CharacterGraphics cg = graphics.getCharacterByPosition(action.agentPos);
+		TurnCharacter turnCharacter = turn.turnCharacterAt(action.agentTarget);
+
+		if (turnCharacter == null) {
+			throw new RuntimeException("Expected to find character at " +
+				action.agentTarget.toString() + " but there was no one there.");
+		}
+
+		CharacterInfo info = turnCharacter.getCharacterInfo();
+		
 		// TODO: revist
 		Runnable continuation = null;
 
@@ -171,7 +181,7 @@ public final class Control {
 		}
 
 		ui.selectCharacter(turn.turnCharacterAt(
-			action.agentTarget).getCharacterInfo());
+				action.agentTarget).getCharacterInfo());
 
 		System.err.println("Character at position " + action.agentPos.toString()
 			+ " uses " + action.ability.name.toString()

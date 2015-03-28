@@ -323,3 +323,9 @@ task distDmg(type: Exec) {
 	args 'create', "${buildDir}/${project.name}.dmg", \
 		'-volname', 'ZansStory', '-srcfolder', "${buildDir}/zans-story"
 }
+
+task convert(type: JavaExec, dependsOn: classes) {
+	main "nz.dcoder.inthezone.Blend2J3o"
+	classpath sourceSets.main.runtimeClasspath 
+}
+

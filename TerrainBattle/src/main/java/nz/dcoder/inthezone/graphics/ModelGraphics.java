@@ -122,7 +122,11 @@ public abstract class ModelGraphics implements AnimEventListener {
 
 		// special case single frame animations (since they don't trigger
 		// onAnimCycleDone)
-		if (channel.getAnimMaxTime() == 0) token.endAnimation();
+		if (channel.getAnimMaxTime() == 0) {
+			limitedAnimation = false;
+			animRepeats = 0;
+			token.endAnimation();
+		}
 	}
 
 	public String getAnimation() {

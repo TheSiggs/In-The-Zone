@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.control;
 
+import com.jme3.app.Application;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,11 +26,18 @@ public class GameDriver {
 	private final Graphics graphics;
 	private final UserInterface ui;
 	private final GameState gameState;
+	private final Application app;
 
-	public GameDriver(Graphics graphics, GameState gameState, UserInterface ui) {
+	public GameDriver(
+		Graphics graphics,
+		GameState gameState,
+		UserInterface ui,
+		Application app
+	) {
 		this.graphics = graphics;
 		this.gameState = gameState;
 		this.ui = ui;
+		this.app = app;
 	}
 
 	public GameState getGameState() {
@@ -57,6 +65,11 @@ public class GameDriver {
 	 * */
 	public void endTurn() {
 		turn.endTurn();
+		app.enqueue(() -> {
+			selectCharacter((CharacterGraphics) null);
+			graphics.getBoardGraphics().clearAllHighlighting();
+			return null;
+		});
 	}
 
 	/**

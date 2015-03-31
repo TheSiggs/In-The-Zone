@@ -143,6 +143,7 @@ public class GameActionListener implements ActionListener, AnalogListener {
 		 * End the current turn.  To be called by the GUI.
 		 * */
 		public synchronized void notifyEndTurn() {
+			leftButtonMode = InputMode.SELECT;
 			driver.endTurn();
 		}
 	}

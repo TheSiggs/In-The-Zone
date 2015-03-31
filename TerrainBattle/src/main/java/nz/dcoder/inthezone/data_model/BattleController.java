@@ -52,9 +52,8 @@ public class BattleController {
 
 	void callOnDeath(List<BattleObject> bodies) {
 		if (onDeath != null) onDeath.accept(
-			new DoCharacterDeath(
-				bodies.stream().map(b -> b.position).collect(Collectors.toList()),
-				bodies.stream().map(b -> b.name).collect(Collectors.toList())));
+			new DoCharacterDeath(bodies.stream()
+				.map(b -> b.getInfo()).collect(Collectors.toList())));
 	}
 
 	void callOnDestruction(List<BattleObject> objects) {

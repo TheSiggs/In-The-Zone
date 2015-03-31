@@ -192,7 +192,7 @@ public final class Control {
 	 * Handle a character death event
 	 * */
 	private void death(DoCharacterDeath d) {
-		graphics.killCharacters(d.positions, d.bodies);
+		graphics.killCharacters(d.bodies);
 	}
 
 	/**

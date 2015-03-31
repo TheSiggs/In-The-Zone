@@ -2,6 +2,7 @@ package nz.dcoder.inthezone.graphics;
 
 import nz.dcoder.inthezone.control.Rotating;
 import nz.dcoder.inthezone.data_model.pure.AbilityName;
+import nz.dcoder.inthezone.data_model.pure.BattleObjectInfo;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -325,21 +326,15 @@ public class Graphics {
 	 * with a body.  Also invokes the death animation (so characters go out with
 	 * a bang).
 	 * */
-	public List<ObjectGraphics> killCharacters(
-		List<Position> positions, List<BattleObjectName> bodies
-	) {
-		for (Position p : positions) {
-			CharacterGraphics cg = getCharacterByPosition(p);
+	public List<ObjectGraphics> killCharacters(List<BattleObjectInfo> bodies) {
+		List<ObjectGraphics> rs = new ArrayList<>();
+
+		for (BattleObjectInfo i: bodies) {
+			rs.add(addObject(i.p, i.name));
+
+			CharacterGraphics cg = getCharacterByPosition(i.p);
 			boardNode.detachChild(cg.getSpatial());
 			characters.remove(cg);
-		}
-
-		// I'd like to use "aggregate operations" here, but Java 8 is lacking
-		// zipWith.  Too bad.
-		List<ObjectGraphics> rs = new ArrayList<>();
-		int n = positions.size();
-		for (int i = 0; i < n; i++) {
-			rs.add(addObject(positions.get(i), bodies.get(i)));
 		}
 
 		controllerChain.queueAnimation(t -> {

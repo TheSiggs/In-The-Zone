@@ -3,6 +3,7 @@ package nz.dcoder.inthezone.data_model;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.List;
+import java.util.stream.Collectors;
 import nz.dcoder.inthezone.data_model.pure.AbilityInfo;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -49,14 +50,17 @@ public class BattleController {
 			new DoAbilityInfo(agentPos, agentTarget, targets, ability));
 	}
 
-	void callOnDeath(BattleObject body) {
+	void callOnDeath(List<BattleObject> bodies) {
 		if (onDeath != null) onDeath.accept(
-			new DoCharacterDeath(body.position, body.name));
+			new DoCharacterDeath(
+				bodies.stream().map(b -> b.position).collect(Collectors.toList()),
+				bodies.stream().map(b -> b.name).collect(Collectors.toList())));
 	}
 
-	void callOnDestruction(BattleObject object) {
+	void callOnDestruction(List<BattleObject> objects) {
 		if (onDestruction != null) onDestruction.accept(
-			new DoObjectDestruction(object.position));
+			new DoObjectDestruction(objects.stream()
+				.map(o -> o.position).collect(Collectors.toList())));
 	}
 }
 

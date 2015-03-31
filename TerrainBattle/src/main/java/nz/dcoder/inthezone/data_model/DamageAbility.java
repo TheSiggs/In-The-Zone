@@ -92,10 +92,14 @@ public class DamageAbility extends Ability {
 					"Error evaluating damage formula: " + e.getMessage(), e);
 			}
 
-			if (c.hp <= 0) {
-				c.hp = 0;
-				battle.kill(c);
-			}
+		}
+
+		List<Character> kills = characterTargets.stream()
+			.filter(c -> c.hp <= 0)
+			.map(c -> {c.hp = 0; return c;})
+			.collect(Collectors.toList());
+		if (kills.size() > 0) {
+			battle.kill(kills);
 		}
 
 		for (BattleObject o : objectTargets) {

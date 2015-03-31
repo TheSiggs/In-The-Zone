@@ -192,15 +192,14 @@ public final class Control {
 	 * Handle a character death event
 	 * */
 	private void death(DoCharacterDeath d) {
-		CharacterGraphics cg = graphics.getCharacterByPosition(d.position);
-		graphics.killCharacter(cg, d.body);
+		graphics.killCharacters(d.positions, d.bodies);
 	}
 
 	/**
 	 * Handle the destruction of an object
 	 * */
 	private void destruction(DoObjectDestruction d) {
-		graphics.destroyObject(graphics.getObjectByPosition(d.position));
+		graphics.destroyObjects(d.positions);
 	}
 }
 

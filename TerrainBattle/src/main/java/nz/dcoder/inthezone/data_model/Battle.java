@@ -2,6 +2,7 @@ package nz.dcoder.inthezone.data_model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -139,12 +140,15 @@ class Battle {
 	/**
 	 * Kill a character and remove from the board.
 	 * */
-	public void kill(Character c) {
-		BattleObject body = c.die();
-		objects.add(body);
-		players.remove(c);
-		aiPlayers.remove(c);
-		controller.callOnDeath(body);
+	public void kill(List<Character> cs) {
+		List<BattleObject> bodies = cs.stream().map(c -> {
+			BattleObject body = c.die();
+			objects.add(body);
+			players.remove(c);
+			aiPlayers.remove(c);
+			return body;
+		}).collect(Collectors.toList());
+		controller.callOnDeath(bodies);
 	}
 
 	public void changeTurn() {

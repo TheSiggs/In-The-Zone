@@ -325,30 +325,50 @@ public class Graphics {
 	 * with a body.  Also invokes the death animation (so characters go out with
 	 * a bang).
 	 * */
-	public ObjectGraphics killCharacter(
-		CharacterGraphics cg, BattleObjectName body
+	public List<ObjectGraphics> killCharacters(
+		List<Position> positions, List<BattleObjectName> bodies
 	) {
-		Position p = cg.getPosition();
-		boardNode.detachChild(cg.getSpatial());
-		characters.remove(cg);
-		ObjectGraphics r = addObject(p, body);
-
-		if (cg.getSpatial().getName().equals("goblin-ogremesh")) {
-			// special case required for globlins
-			// TODO: remove this at first opportunity
-			controllerChain.queueAnimation(t -> r.setAnimation("die" + p.toString(), 1, t));
-		} else {
-			controllerChain.queueAnimation(t -> r.setAnimation("die", 1, t));
+		for (Position p : positions) {
+			CharacterGraphics cg = getCharacterByPosition(p);
+			boardNode.detachChild(cg.getSpatial());
+			characters.remove(cg);
 		}
-		return r;
+
+		// I'd like to use "aggregate operations" here, but Java 8 is lacking
+		// zipWith.  Too bad.
+		List<ObjectGraphics> rs = new ArrayList<>();
+		int n = positions.size();
+		for (int i = 0; i < n; i++) {
+			rs.add(addObject(positions.get(i), bodies.get(i)));
+		}
+
+		controllerChain.queueAnimation(t -> {
+			rs.stream().forEach(r -> {
+				if (r.getSpatial().getName().equals("goblin-ogremesh")) {
+					r.setAnimation("die" + r.getPosition().toString(), 1, t);
+				} else {
+					r.setAnimation("die", 1, t);
+				}
+			});
+		});
+
+		return rs;
 	}
 
 	/**
 	 * Remove an object from the battle (in dramatic fashion).
 	 * */
-	public void destroyObject(ObjectGraphics og) {
-		objects.remove(og);
-		controllerChain.queueAnimation(t -> og.setAnimation("destroy", 1, t));
+	public void destroyObjects(List<Position> positions) {
+		List<ObjectGraphics> ogs = new ArrayList<>();
+
+		for (Position p : positions) {
+			ObjectGraphics og = getObjectByPosition(p);
+			ogs.add(og);
+			objects.remove(og);
+		}
+
+		controllerChain.queueAnimation(t ->
+			ogs.stream().forEach(og -> og.setAnimation("destroy", 1, t)));
 	}
 
 	/**

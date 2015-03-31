@@ -185,7 +185,7 @@ public class Graphics {
 		return new Vector3f(bx, by, bz);
 	}
 
-	private Spatial addGoblinSpatial(Position p, int i) {
+	private Spatial addGoblinSpatial(int i) {
 		String texture;
 		if (i <= 5) {
 			texture = "belt/D.png";
@@ -216,7 +216,7 @@ public class Graphics {
 	 * and 6 - 10 are the enemy goblins)
 	 * */
 	public CharacterGraphics addGoblin(Position p, int i) {
-		Spatial spatial = addGoblinSpatial(p, i);
+		Spatial spatial = addGoblinSpatial(i);
 
 		CharacterGraphics cg = new CharacterGraphics(this, spatial, p);
 		characters.add(cg);
@@ -228,7 +228,7 @@ public class Graphics {
 	 * Add a dead goblin object.  For testing purposes only.
 	 * */
 	public ObjectGraphics addDeadGoblin(Position p, int i) {
-		Spatial spatial = addGoblinSpatial(p, i);
+		Spatial spatial = addGoblinSpatial(i);
 
 		ObjectGraphics og = new ObjectGraphics(this, spatial, p);
 		og.addAnim(goblinDieAnimation(p, true));
@@ -248,7 +248,7 @@ public class Graphics {
 	 * transformation
 	 * */
 	private Animation goblinDieAnimation(Position p, boolean animate) {
-		Animation die = new Animation("die", animate? 1f : 0f);
+		Animation die = new Animation("die" + p.toString(), animate? 1f : 0f);
 
 		int frames = animate? 2 : 1;
 		float[] times = new float[frames];
@@ -332,7 +332,14 @@ public class Graphics {
 		boardNode.detachChild(cg.getSpatial());
 		characters.remove(cg);
 		ObjectGraphics r = addObject(p, body);
-		controllerChain.queueAnimation(t -> r.setAnimation("die", 1, t));
+
+		if (cg.getSpatial().getName().equals("goblin-ogremesh")) {
+			// special case required for globlins
+			// TODO: remove this at first opportunity
+			controllerChain.queueAnimation(t -> r.setAnimation("die" + p.toString(), 1, t));
+		} else {
+			controllerChain.queueAnimation(t -> r.setAnimation("die", 1, t));
+		}
 		return r;
 	}
 
@@ -370,7 +377,8 @@ public class Graphics {
 		Runnable continuation
 	) {
 		Position dp = target.sub(cg.getPosition());
-		Position objectTarget = og.getPosition().add(dp);
+		Position oldObjectPos = og.getPosition();
+		Position objectTarget = oldObjectPos.add(dp);
 
 		List<Position> characterPath = new ArrayList<>();
 		List<Position> objectPath = new ArrayList<>();
@@ -389,8 +397,9 @@ public class Graphics {
 		// HACK: part of the workaround for no "die" animation in the goblin model
 		// This should be removed as soon as possible.
 		controllerChain.queueAnimation(t -> {
-			og.replaceAnim(goblinDieAnimation(objectTarget, false));
-			og.setAnimation("die", 1, t);
+			og.replaceAnim("die" + oldObjectPos.toString(),
+				goblinDieAnimation(objectTarget, false));
+			og.setAnimation("die" + objectTarget.toString(), 1, t);
 		});
 		if (continuation != null) controllerChain.queueContinuation(continuation);
 	}

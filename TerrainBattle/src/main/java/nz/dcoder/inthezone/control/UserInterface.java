@@ -37,7 +37,7 @@ public class UserInterface {
 	final MainHUDController controller;
 
 	public UserInterface(Main game, GameState gameState, Graphics g) {
-		this.driver = new GameDriver(g, gameState, this);
+		this.driver = new GameDriver(g, gameState, this, game);
 		this.input = new GameActionListener(game.getInputManager(), g, driver);
 
 		Node guiNode = game.getGuiNode();

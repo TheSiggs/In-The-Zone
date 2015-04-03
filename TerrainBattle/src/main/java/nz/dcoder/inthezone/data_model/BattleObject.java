@@ -1,5 +1,6 @@
 package nz.dcoder.inthezone.data_model;
 
+import nz.dcoder.inthezone.data_model.pure.BattleObjectInfo;
 import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
 import nz.dcoder.inthezone.data_model.pure.Position;
 
@@ -44,6 +45,10 @@ public class BattleObject {
 		} else {
 			this.ability = new ObjectAbility(ability, this);
 		}
+	}
+
+	public BattleObjectInfo getInfo() {
+		return new BattleObjectInfo(this.name, this.position);
 	}
 
 	private final static BattleObjectName terrainObstacle =

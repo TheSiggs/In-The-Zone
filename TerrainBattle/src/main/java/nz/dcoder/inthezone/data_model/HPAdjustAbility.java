@@ -42,10 +42,15 @@ public class HPAdjustAbility extends Ability {
 			c.hp += m;
 			if (c.hp > c.getMaxHP()) {
 				c.hp = c.getMaxHP();
-			} else if (c.hp <= 0) {
-				c.hp = 0;
-				battle.kill(c);
 			}
+		}
+
+		List<Character> kills = characterTargets.stream()
+			.filter(c -> c.hp <= 0)
+			.map(c -> {c.hp = 0; return c;})
+			.collect(Collectors.toList());
+		if (kills.size() > 0) {
+			battle.kill(kills);
 		}
 
 		// for abilities that do damage, hit target objects also

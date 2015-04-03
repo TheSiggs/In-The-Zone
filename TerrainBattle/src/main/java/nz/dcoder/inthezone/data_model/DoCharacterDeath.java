@@ -1,15 +1,13 @@
 package nz.dcoder.inthezone.data_model;
 
-import nz.dcoder.inthezone.data_model.pure.BattleObjectName;
-import nz.dcoder.inthezone.data_model.pure.Position;
+import java.util.List;
+import nz.dcoder.inthezone.data_model.pure.BattleObjectInfo;
 
 public class DoCharacterDeath {
-	public final BattleObjectName body;
-	public final Position position;
+	public final List<BattleObjectInfo> bodies;
 
-	public DoCharacterDeath(Position position, BattleObjectName body) {
-		this.position = position;
-		this.body = body;
+	public DoCharacterDeath(List<BattleObjectInfo> bodies) {
+		this.bodies = bodies;
 	}
 }
 

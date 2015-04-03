@@ -87,7 +87,9 @@ public class HealthBarGraphics {
 	}
 
 	public void hideHealth() {
-		untilVanish = fadeDelay;
+		if (!(healthInter < 1f || untilVanish > 0f || untilFade > 0f)) {
+			untilVanish = fadeDelay;
+		}
 	}
 
 	private void interpolateHealth(float i) {

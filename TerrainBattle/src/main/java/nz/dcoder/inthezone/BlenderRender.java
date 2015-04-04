@@ -9,6 +9,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import org.apache.commons.csv.CSVFormat;
@@ -42,6 +43,7 @@ public class BlenderRender extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		assetManager.registerLocator("assets", FileLocator.class);
+        assetManager.registerLocator("", FileLocator.class);
 		viewPort.setBackgroundColor(ColorRGBA.DarkGray);
         try {
             loadCsv(csvName);
@@ -79,19 +81,38 @@ public class BlenderRender extends SimpleApplication {
         Reader in = new FileReader(name);
         Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
         for (CSVRecord record : records) {
-            String filename = record.get(0);
-            String xs = record.get(1);
-            String ys = record.get(2);
-            String zs = record.get(3);
+            int size = record.size();
+            String xs = null,
+                    ys = null,
+                    zs = null,
+                    rxs = "0",
+                    rys = "0",
+                    rzs = "0",
+                    filename = null;
+            if (size >= 4) {
+                filename = record.get(0);
+                xs = record.get(1);
+                ys = record.get(2);
+                zs = record.get(3);
+            }
+            if (size == 7) {
+                rxs  = record.get(4);
+                rys  = record.get(5);
+                rzs  = record.get(6);
+            }
             //String  = record.get("X");
             System.out.println(filename +" | "+ xs +" | "+ ys +" | "+ zs);
-            addAndAttachModel(filename, Float.parseFloat(xs), Float.parseFloat(ys), Float.parseFloat(zs));
+            float xrot = Float.parseFloat(rxs);
+            float yrot = Float.parseFloat(rys);
+            float zrot = Float.parseFloat(rzs);
+            addAndAttachModel(filename, Float.parseFloat(xs), Float.parseFloat(ys), Float.parseFloat(zs), xrot, yrot, zrot);
         }
     }
 
-    private void addAndAttachModel(String path, float x, float y, float z) {
+    private void addAndAttachModel(String path, float x, float y, float z, float xrot, float yrot, float zrot) {
         Spatial spatial = assetManager.loadModel(path);
         rootNode.attachChild(spatial);
         spatial.setLocalTranslation(x, y, z);
+        spatial.rotate(xrot * 180 / FastMath.PI, yrot * 180 / FastMath.PI, zrot * 180 / FastMath.PI);
     }
 }

@@ -20,9 +20,9 @@ buildscript {
 apply plugin: 'eu.appsatori.fatjar'
 
 def mainClass = 'nz.dcoder.inthezone.Main'
-def oldMainClass = 'nz.dcoder.inthezone.OldMain'
 def sceneClass = 'nz.dcoder.inthezone.MyScene'
 def blenderClass = 'nz.dcoder.inthezone.BlenderRender'
+def blend2J3oClass = 'nz.dcoder.inthezone.BlenderRender'
 def jmonkeyengine_version = '3.0'
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -175,14 +175,15 @@ task scene(type: JavaExec, dependsOn: classes) {
 	classpath sourceSets.main.runtimeClasspath 
 }
 
+task blend2j3o(type: JavaExec, dependsOn: classes) {
+    main blend2J3oClass
+    args = ['zan_texturing.blend', 'zan_texturing.j3o']
+    classpath sourceSets.main.runtimeClasspath
+}
+
 task blender(type: JavaExec, dependsOn: classes) {
 	main blenderClass
     args = ['scene.csv']
-	classpath sourceSets.main.runtimeClasspath 
-}
-
-task oldMain(type: JavaExec, dependsOn: classes) {
-	main oldMainClass
 	classpath sourceSets.main.runtimeClasspath 
 }
 
@@ -206,8 +207,14 @@ task createBlenderScripts {
         batch.text = '''bin/scene-loader.bat'''
     }
 }
+
+task convert(type: JavaExec, dependsOn: classes) {
+	main "nz.dcoder.inthezone.Blend2J3o"
+	classpath sourceSets.main.runtimeClasspath 
+}
+
 distZip {
-    //dependsOn fatJar
+    dependsOn convert
     into(project.name) {
     	from '.'
     	include 'assets/**', '*.dylib', '*.so', '*.map', 'scene.csv'
@@ -266,6 +273,10 @@ task distBlender(type: Zip) {
             fileMode = 0755
         }
     }
+}
+
+task generateChangeLog(type: Exec) {
+	commandLine './make_changelog.bash'
 }
 
 task packageApp(type: Exec) {

@@ -20,7 +20,6 @@ buildscript {
 apply plugin: 'eu.appsatori.fatjar'
 
 def mainClass = 'nz.dcoder.inthezone.Main'
-def oldMainClass = 'nz.dcoder.inthezone.OldMain'
 def sceneClass = 'nz.dcoder.inthezone.MyScene'
 def blenderClass = 'nz.dcoder.inthezone.BlenderRender'
 def blend2J3oClass = 'nz.dcoder.inthezone.BlenderRender'
@@ -185,11 +184,6 @@ task blend2j3o(type: JavaExec, dependsOn: classes) {
 task blender(type: JavaExec, dependsOn: classes) {
 	main blenderClass
     args = ['scene.csv']
-	classpath sourceSets.main.runtimeClasspath 
-}
-
-task oldMain(type: JavaExec, dependsOn: classes) {
-	main oldMainClass
 	classpath sourceSets.main.runtimeClasspath 
 }
 

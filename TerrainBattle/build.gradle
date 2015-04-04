@@ -265,7 +265,7 @@ task distBlender(type: Zip) {
     }
     into(name) {
         from '.'
-        include 'assets/**', '*.dylib', '*.so', '*.map'
+        include 'assets/**.j3o', '*.dylib', '*.so', '*.map'
     }
     into(name) {
         from('.') {

@@ -109,7 +109,8 @@ public class Blend2J3o extends SimpleApplication {
 		Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
 		for (CSVRecord record : records) {
 			String source = record.get(0);
-			String target = source.replace(".blend", ".j3o");
+			String target = "assets/"+ source.replace(".blend", ".j3o");
+			System.out.println("Source: "+ source +", Target: "+ target);
 			this.add(source, target);
 		}
 	}

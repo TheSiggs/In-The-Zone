@@ -275,6 +275,15 @@ task distBlender(type: Zip) {
     }
 }
 
+task generateChangeLog(type: Exec) {
+	commandLine 'git', 'log'
+	args '--pretty=format:%s'
+	doFirst {
+        standardOutput = new FileOutputStream('changelog.txt')
+    }
+	//standardOutput new org.apache.tools.ant.util.TeeOutputStream(new FileOutputStream("someFolder/someFile.out"), System.out);
+}
+
 task packageApp(type: Exec) {
     dependsOn fatJar
     commandLine 'java', '-jar', 'tools/packr.jar'

@@ -26,7 +26,6 @@ import nz.dcoder.inthezone.data_model.GameState;
 import nz.dcoder.inthezone.data_model.ItemBag;
 import nz.dcoder.inthezone.data_model.Party;
 import nz.dcoder.inthezone.data_model.pure.CharacterName;
-import nz.dcoder.inthezone.data_model.pure.EffectName;
 import nz.dcoder.inthezone.data_model.pure.EquipmentName;
 import nz.dcoder.inthezone.data_model.pure.ItemName;
 import nz.dcoder.inthezone.data_model.pure.Position;
@@ -64,12 +63,17 @@ public class Main extends SimpleApplication {
 	 * @param args 
 	 */
 	public static void main(String args[]) {
+		/*
 		if (args.length > 1) {
 			BlenderRender.main(args);
 		} else {
 			Main app = new Main();
 			app.start();
 		}
+		*/
+		TwoDeeExperiment app = new TwoDeeExperiment();
+		app.simpleInitApp();
+		app.start();
 	}
 
 	/**
@@ -111,8 +115,8 @@ public class Main extends SimpleApplication {
 	void startSimpleBattle() {
 		// create the characters for this battle (ignore the Party class for now)
 
-		List<Character> pcs = new ArrayList<Character>();
-		List<Character> npcs = new ArrayList<Character>();
+		List<Character> pcs = new ArrayList<>();
+		List<Character> npcs = new ArrayList<>();
 
 		Position headingN = new Position(0, -1);
 		Position headingS = new Position(0, 1);

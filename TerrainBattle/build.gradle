@@ -19,7 +19,7 @@ buildscript {
 
 apply plugin: 'eu.appsatori.fatjar'
 
-def mainClass = 'nz.dcoder.inthezone.Main'
+def mainClass = 'nz.dcoder.inthezone.JfxGame'
 def sceneClass = 'nz.dcoder.inthezone.MyScene'
 def blenderClass = 'nz.dcoder.inthezone.BlenderRender'
 def blend2J3oClass = 'nz.dcoder.inthezone.BlenderRender'

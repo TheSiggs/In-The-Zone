@@ -55,7 +55,7 @@ public class Main extends SimpleApplication {
 	private ItemFactory itemFactory = null;
 
 	public Main() {
-		super((AppState) null);
+		//super((AppState) null);
 	}
 
 	/**
@@ -71,15 +71,14 @@ public class Main extends SimpleApplication {
 			app.start();
 		}
 		*/
-		TwoDeeExperiment app = new TwoDeeExperiment();
-		app.simpleInitApp();
-		app.start();
+		//TwoDeeExperiment app = new TwoDeeExperiment();
+		//app.start();
 	}
 
 	/**
 	 * Initialise the game states.
 	 */
-	@Override
+	//@Override
 	public void simpleInitApp() {
 		Party party = new Party();
 		Terrain terrain = new Terrain();

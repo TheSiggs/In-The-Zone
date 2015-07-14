@@ -2,35 +2,44 @@ package nz.dcoder.inthezone;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.geometry.Point2D;
+import javafx.event.EventHandler;
+//import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+//import javafx.scene.image.Image;
+//import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
+//import javafx.scene.transform.Scale;
+//import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class JfxGame extends Application {
 
+	static double viewX = 0;
+	static double viewY = 0;
+	static double viewDX = 0;
+	static double viewDY = 0;
+
 	@Override
 	public void start(Stage primaryStage) {
 		//board size
 		int nx = 10;
 		int ny = 10;
+		int dimondsPerPage = 6;
 		// root
 		Group root = new Group();
 		Rectangle2D screenRect = Screen.getPrimary().getBounds();
 		double screenWidth = screenRect.getWidth();
 		double screenHeight = screenRect.getHeight();
-		double tileSize = (screenWidth / nx) / Math.sqrt(2.0);
+		double tileSize = (screenWidth / dimondsPerPage) / Math.sqrt(2.0);
 		Scene scene = new Scene(root, screenWidth, screenHeight, Color.BLACK);
 		primaryStage.setFullScreen(true);
 		primaryStage.setScene(scene);
@@ -64,13 +73,38 @@ public class JfxGame extends Application {
 		boardNode.getTransforms().add(tilesAffine); // apply transform
 
 		primaryStage.show();
+		primaryStage.show();
 		
-		boardNode.setTranslateX(x);
-		boardNode.setTranslateY(y);
-		
+		viewX = -x;
+		viewY = -y;
+    
+		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+			  //System.out.println(event.getCode());
+			  if(event.getCode()==KeyCode.W){accellY(16);}
+			  if(event.getCode()==KeyCode.S){accellY(-16);}
+			  if(event.getCode()==KeyCode.A){accellX(16);}
+			  if(event.getCode()==KeyCode.D){accellX(-16);}
+			  
+				boardNode.setTranslateX(x+viewX);
+		    boardNode.setTranslateY(y+viewY);
+			}
+		});
 	}
+
+  public static void accellX(double delta){
+    viewDX = delta;
+    viewX+=viewDX;
+  }
+  public static void accellY(double delta){
+    viewDY = delta;
+    viewY+=viewDY;
+  }
+
 
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
 }

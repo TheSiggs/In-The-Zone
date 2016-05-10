@@ -3,6 +3,8 @@ package inthezone.battle.data;
 import isogame.engine.CorruptDataException;
 import isogame.engine.Library;
 import isogame.engine.Stage;
+import isogame.resource.DevelopmentResourceLocator;
+import isogame.resource.ResourceLocator;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +17,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.function.Function;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +29,7 @@ import org.json.simple.parser.ParseException;
 
 public class GameDataFactory {
 	private final Library globalLibrary;
-	private final Function<String, String> urlConverter;
+	private final ResourceLocator loc;
 	public static final String globalLibraryName = "global_library.json";
 	public static final String gameDataName = "game_data.json";
 	public static final File gameDataCacheDir =
@@ -40,45 +41,23 @@ public class GameDataFactory {
 		InputStream gameData;
 		File gameDataFile;
 
-		// developer mode
 		if (baseDir.isPresent()) {
-			File base = baseDir.get();
-			String uri = (new File(base, globalLibraryName)).toString();
-			this.urlConverter = u -> (new File(base, "gfx/" + u)).toURI().toString();
-			this.globalLibrary = Library.fromFile(
-				new FileInputStream(uri), uri, urlConverter, null);
-			gameDataFile = new File(base, gameDataName);
-			gameData = new FileInputStream(gameDataFile);
-
-		// normal mode
+			this.loc = new DevelopmentResourceLocator(baseDir.get());
 		} else {
-			this.urlConverter = u -> "/gamedata/gfx/" + u;
-			this.globalLibrary = Library.fromFile(
-				GameDataFactory.class.getResourceAsStream("/" + globalLibraryName),
-				"/" + globalLibraryName, urlConverter, null);
-
-			gameDataFile = new File(gameDataCacheDir, gameDataName);
-
-			if (!gameDataFile.exists()) {
-				// copy the compiled-in version to make a new cached version
-				if (!gameDataCacheDir.exists()) gameDataCacheDir.mkdir();
-				OutputStream fout = new FileOutputStream(gameDataFile);
-				InputStream fin = GameDataFactory.class.getResourceAsStream(
-					"/" + gameDataFile.toString());
-				int b;
-				while ((b = fin.read()) != -1) fout.write(b);
-				fout.close();
-				fin.close();
-			}
-			gameData = new FileInputStream(gameDataFile);
+			this.loc = new CompiledResourceLocator(gameDataCacheDir);
 		}
+
+		this.globalLibrary = Library.fromFile(
+			loc.globalLibrary(), loc.globalLibraryFilename(), loc, null);
+
+		gameData = loc.gameData();
 
 		// load the game data
 		try (BufferedReader in =
 			new BufferedReader(new InputStreamReader(gameData, "UTF-8"))
 		) {
 			if (in == null) throw new FileNotFoundException(
-				"File not found " + gameDataFile.toString());
+				"File not found " + loc.gameDataFilename().toString());
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(in);
 			loadGameData(json);
@@ -117,7 +96,7 @@ public class GameDataFactory {
 
 			for (Object x : aStages) {
 				Stage i = Stage.fromJSON(
-					(JSONObject) x, urlConverter, globalLibrary);
+					(JSONObject) x, loc, globalLibrary);
 				stages.put(i.name, i);
 			}
 

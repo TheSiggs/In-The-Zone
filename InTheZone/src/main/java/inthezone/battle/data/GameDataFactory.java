@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import org.json.simple.parser.ParseException;
 
 public class GameDataFactory {
 	private final Library globalLibrary;
+	private final Function<String, String> urlConverter;
 	public static final String globalLibraryName = "global_library.json";
 	public static final String gameDataName = "game_data.json";
 	public static final File gameDataCacheDir =
@@ -42,15 +44,18 @@ public class GameDataFactory {
 		if (baseDir.isPresent()) {
 			File base = baseDir.get();
 			String uri = (new File(base, globalLibraryName)).toString();
-			this.globalLibrary = Library.fromFile(new FileInputStream(uri), uri, null);
+			this.urlConverter = u -> (new File(base, "gfx/" + u)).toURI().toString();
+			this.globalLibrary = Library.fromFile(
+				new FileInputStream(uri), uri, urlConverter, null);
 			gameDataFile = new File(base, gameDataName);
 			gameData = new FileInputStream(gameDataFile);
 
 		// normal mode
 		} else {
+			this.urlConverter = u -> "/gamedata/gfx/" + u;
 			this.globalLibrary = Library.fromFile(
 				GameDataFactory.class.getResourceAsStream("/" + globalLibraryName),
-				"/" + globalLibraryName, null);
+				"/" + globalLibraryName, urlConverter, null);
 
 			gameDataFile = new File(gameDataCacheDir, gameDataName);
 
@@ -111,7 +116,8 @@ public class GameDataFactory {
 			JSONArray aCharacters = (JSONArray) oCharacters;
 
 			for (Object x : aStages) {
-				Stage i = Stage.fromJSON((JSONObject) x, globalLibrary);
+				Stage i = Stage.fromJSON(
+					(JSONObject) x, urlConverter, globalLibrary);
 				stages.put(i.name, i);
 			}
 

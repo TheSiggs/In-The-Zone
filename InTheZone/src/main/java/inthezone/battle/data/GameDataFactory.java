@@ -61,6 +61,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 		) {
 			if (in == null) throw new FileNotFoundException(
 				"File not found " + loc.gameDataFilename().toString());
+			System.err.println(loc.gameDataFilename().toString());
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(in);
 			loadGameData(json);

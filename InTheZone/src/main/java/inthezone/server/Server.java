@@ -23,8 +23,11 @@ public class Server {
 			parsedArgs.put(p[0], p[1]);
 		}
 
+		System.err.println(parsedArgs.toString());
+
 		final Optional<File> baseDir = 
-			Optional.ofNullable(parsedArgs.get("basedir")).map(x -> new File(x));
+			Optional.ofNullable(parsedArgs.get("basedir"))
+			.map(x -> (new File(x)).getAbsoluteFile());
 
 		try {
 			final int port = Optional.ofNullable(parsedArgs.get("port"))
@@ -33,19 +36,16 @@ public class Server {
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_BACKLOG);
 
 			GameDataFactory dataFactory = new GameDataFactory(baseDir);
-			Multiplexer multiplexer = new Multiplexer(dataFactory);
-			Connector connector = new Connector(port, backlog, multiplexer);
+			Multiplexer multiplexer = new Multiplexer(port, backlog, dataFactory);
 
 			Thread mplexerThread = new Thread(multiplexer);
-			Thread connectorThread = new Thread(connector);
 			mplexerThread.start();
-			connectorThread.start();
 
 			boolean again = true;
 			while (again) {
 				try {
 					again = false;
-					connectorThread.join();
+					mplexerThread.join();
 				} catch (InterruptedException e) {
 					again = true;
 				}

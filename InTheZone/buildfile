@@ -24,7 +24,7 @@ define 'server' do
 	# even though the server doesn't depend on all these things
 	compile.using(:lint => 'all').with('lib/json-simple-1.1.1.jar', 'lib/engine.jar', 'lib/durian-3.4.0.jar')
 	project.version = '0.0.1'
-	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.server.Server'})
+	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.server.Server', 'Class-Path'=>'lib/json-simple-1.1.1.jar lib/engine.jar lib/durian-3.4.0.jar'})
 	run.using(:main => 'inthezone.server.Server')
 end
 

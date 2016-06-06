@@ -8,8 +8,8 @@ import inthezone.protocol.MessageKind;
 import inthezone.protocol.Protocol;
 import inthezone.protocol.ProtocolException;
 import java.io.IOException;
-import java.net.Socket;
 import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +23,7 @@ public class Client {
 	public static final long DISCONNECTION_TIMEOUT_MILLIS = 5 * 60 * 1000;
 
 	private ClientState state = ClientState.HANDSHAKE;
-	private Socket connection;
+	private SocketChannel connection;
 	private MessageChannel channel;
 	private final GameDataFactory dataFactory;
 
@@ -46,7 +46,7 @@ public class Client {
 	private final UUID sessionKey = UUID.randomUUID();
 	
 	public Client(
-		Socket connection,
+		SocketChannel connection,
 		Selector sel,
 		Map<String, Client> namedClients,
 		Collection<Client> pendingClients,
@@ -58,7 +58,7 @@ public class Client {
 		this.sessions = sessions;
 		this.dataFactory = dataFactory;
 		this.connection = connection;
-		this.channel = new MessageChannel(connection.getChannel(), sel, this);
+		this.channel = new MessageChannel(connection, sel, this);
 
 		sessions.put(sessionKey, this);
 
@@ -75,7 +75,7 @@ public class Client {
 	 * Data from the client ready to read
 	 * */
 	public void receive() {
-		if (connection.isClosed()) return;
+		if (!connection.isOpen()) return;
 		try {
 			List<Message> msgs = channel.doRead();
 			for (Message msg : msgs) doNextMessage(msg);
@@ -90,7 +90,7 @@ public class Client {
 	 * Client ready to be sent data.
 	 * */
 	public void send() {
-		if (connection.isClosed()) return;
+		if (!connection.isOpen()) return;
 		try {
 			channel.doWrite();
 		} catch (IOException e) {
@@ -137,7 +137,7 @@ public class Client {
 	}
 
 	public boolean isConnected() {
-		return !connection.isClosed();
+		return connection.isOpen();
 	}
 
 	public boolean isDisconnected() {
@@ -240,10 +240,10 @@ public class Client {
 
 	/**
 	 * */
-	public void reconnect(Socket connection, MessageChannel channel)
+	public void reconnect(SocketChannel connection, MessageChannel channel)
 		throws ProtocolException
 	{
-		if (!connection.isClosed()) throw new ProtocolException(
+		if (connection.isOpen()) throw new ProtocolException(
 			"Attempted to reconnect client, but the client wasn't disconnected"); 
 		this.channel = channel;
 		channel.affiliate(this);

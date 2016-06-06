@@ -2,9 +2,11 @@ package inthezone.server;
 
 import inthezone.battle.data.GameDataFactory;
 import java.io.IOException;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,9 +24,19 @@ public class Multiplexer implements Runnable {
 	private final GameDataFactory dataFactory;
 	private Selector selector;
 
-	public Multiplexer(GameDataFactory dataFactory) throws IOException {
+	private final ServerSocketChannel serverSocket;
+	private final SelectionKey serverKey;
+
+	public Multiplexer(int port, int backlog, GameDataFactory dataFactory)
+		throws IOException
+	{
 		this.dataFactory = dataFactory;
 		this.selector = Selector.open();
+
+		this.serverSocket = ServerSocketChannel.open();
+		serverSocket.bind(new InetSocketAddress(port), backlog);
+		serverSocket.configureBlocking(false);
+		serverKey = serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 	}
 
 	private boolean killThread = false;
@@ -32,6 +44,7 @@ public class Multiplexer implements Runnable {
 	@Override
 	public void run() {
 		while (!killThread) {
+			System.out.println("In multiplexer");
 			try {
 				doSelect();
 			} catch (Exception e) {
@@ -42,35 +55,42 @@ public class Multiplexer implements Runnable {
 	}
 
 	private void restoreSelector() {
-		synchronized (pendingClients) {
-			try {
-				selector = Selector.open();
-				for (Client c : pendingClients) {
+		try {
+			selector = Selector.open();
+			for (Client c : pendingClients) {
+				c.closeConnection(false);
+			}
+			Collection<Client> cannotReset = new LinkedList<>();
+			for (Client c : namedClients.values()) {
+				try {
+					c.resetSelector(selector);
+				} catch (IOException e) {
+					cannotReset.add(c);
+				}
+			}
+			for (Client c : cannotReset) {
+				if (!c.isDisconnected()) {
 					c.closeConnection(false);
 				}
-				Collection<Client> cannotReset = new LinkedList<>();
-				for (Client c : namedClients.values()) {
-					try {
-						c.resetSelector(selector);
-					} catch (IOException e) {
-						cannotReset.add(c);
-					}
-				}
-				for (Client c : cannotReset) {
-					if (!c.isDisconnected()) {
-						c.closeConnection(false);
-					}
-				}
-			} catch (IOException e) {
-				System.err.println("Cannot get selector, quitting");
-				killThread = true;
 			}
+		} catch (IOException e) {
+			System.err.println("Cannot get selector, quitting");
+			killThread = true;
 		}
 	}
 
 	private void doSelect() throws IOException {
+		System.out.println("blocking");
 		selector.select();
+		System.out.println("unblocked");
+
 		for (SelectionKey k : selector.keys()) {
+			if (k == serverKey) {
+				SocketChannel connection = serverSocket.accept();
+				if (connection != null) newClient(connection);
+				break;
+			}
+
 			Client c = (Client) k.attachment();
 			if (k.isValid()) {
 				if (k.isReadable()) c.receive();
@@ -93,26 +113,22 @@ public class Multiplexer implements Runnable {
 		}
 	}
 
-	private synchronized void removeClient(Client c) {
-		synchronized (pendingClients) {
-			sessions.remove(c);
-			namedClients.remove(c);
-			pendingClients.remove(c);
-		}
+	private void removeClient(Client c) {
+		sessions.remove(c);
+		namedClients.remove(c);
+		pendingClients.remove(c);
 	}
 
-	public synchronized void newClient(Socket connection) {
-		synchronized (pendingClients) {
+	private void newClient(SocketChannel connection) {
+		try {
+			pendingClients.add(new Client(
+				connection, selector, namedClients,
+				pendingClients, sessions, dataFactory));
+		} catch (IOException e) {
 			try {
-				pendingClients.add(new Client(
-					connection, selector, namedClients,
-					pendingClients, sessions, dataFactory));
-			} catch (IOException e) {
-				try {
-					connection.close();
-				} catch (IOException e2) {
-					/* Doesn't matter */
-				}
+				connection.close();
+			} catch (IOException e2) {
+				/* Doesn't matter */
 			}
 		}
 	}

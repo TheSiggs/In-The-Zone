@@ -19,3 +19,12 @@ define 'game' do
 	run.using(:main => 'inthezone.game.Game')
 end
 
+define 'server' do
+	# buildr always compiles everything, so we need to add all the dependencies
+	# even though the server doesn't depend on all these things
+	compile.using(:lint => 'all').with('lib/json-simple-1.1.1.jar', 'lib/engine.jar', 'lib/durian-3.4.0.jar')
+	project.version = '0.0.1'
+	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.server.Server'})
+	run.using(:main => 'inthezone.server.Server')
+end
+

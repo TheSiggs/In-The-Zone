@@ -1,0 +1,409 @@
+package inthezone.server;
+
+import inthezone.battle.data.GameDataFactory;
+import inthezone.protocol.ClientState;
+import inthezone.protocol.Message;
+import inthezone.protocol.MessageChannel;
+import inthezone.protocol.MessageKind;
+import inthezone.protocol.Protocol;
+import inthezone.protocol.ProtocolException;
+import java.io.IOException;
+import java.net.Socket;
+import java.nio.channels.Selector;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+public class Client {
+	public static final int MAX_CHALLENGES = 5;
+	public static final long DISCONNECTION_TIMEOUT_MILLIS = 5 * 60 * 1000;
+
+	private ClientState state = ClientState.HANDSHAKE;
+	private Socket connection;
+	private MessageChannel channel;
+	private final GameDataFactory dataFactory;
+
+	private final Map<String, Client> namedClients;
+	private final Map<UUID, Client> sessions;
+	// pendingClients can be accessed from other threads, so it needs to be
+	// synchronized.
+	private final Collection<Client> pendingClients;
+
+	public Optional<String> name = Optional.empty();
+
+	private Set<Client> challenges = new HashSet<>();
+	private Set<Client> challenged = new HashSet<>();
+	private Optional<Client> inGameWith = Optional.empty();
+
+	// If we are in the disconnected state, then this tells us when the
+	// disconnection happened
+	private long disconnectedAt = 0;
+
+	private final UUID sessionKey = UUID.randomUUID();
+	
+	public Client(
+		Socket connection,
+		Selector sel,
+		Map<String, Client> namedClients,
+		Collection<Client> pendingClients,
+		Map<UUID, Client> sessions,
+		GameDataFactory dataFactory
+	) throws IOException {
+		this.namedClients = namedClients;
+		this.pendingClients = pendingClients;
+		this.sessions = sessions;
+		this.dataFactory = dataFactory;
+		this.connection = connection;
+		this.channel = new MessageChannel(connection.getChannel(), sel, this);
+
+		sessions.put(sessionKey, this);
+
+		// Send the server version to get the ball rolling
+		channel.requestSend(Message.SV(
+			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey));
+	}
+
+	public void resetSelector(Selector sel) throws IOException {
+		channel.resetSelector(sel, this);
+	}
+
+	/**
+	 * Data from the client ready to read
+	 * */
+	public void receive() {
+		if (connection.isClosed()) return;
+		try {
+			List<Message> msgs = channel.doRead();
+			for (Message msg : msgs) doNextMessage(msg);
+		} catch (IOException e) {
+			closeConnection(false);
+		} catch (ProtocolException e) {
+			closeConnection(false);
+		}
+	}
+
+	/**
+	 * Client ready to be sent data.
+	 * */
+	public void send() {
+		if (connection.isClosed()) return;
+		try {
+			channel.doWrite();
+		} catch (IOException e) {
+			closeConnection(false);
+		}
+	}
+
+	/**
+	 * Close the connection used by this client.  All other clients are notified
+	 * that this client has left the lobby.
+	 * @param intentional true if this is an intentional logoff, false if it is
+	 * caused by an IO error.
+	 * */
+	public void closeConnection(boolean intentional) {
+		synchronized (pendingClients) {
+			pendingClients.remove(this);
+		}
+		if (inGameWith.isPresent()) {
+			if (intentional) {
+				inGameWith.get().otherGuyLoggedOff();
+				sessions.remove(sessionKey);
+				if (name.isPresent()) {
+					namedClients.remove(name.get());
+					for (Client c : namedClients.values()) {
+						try {
+							if (c != this) c.leftLobby(this);
+						} catch (ProtocolException e) {
+							/* If there was an error, then that client can't have had a
+							 * reference to us anyway, so we can ignore the exception */
+						}
+					}
+				}
+			} else {
+				inGameWith.get().waitForReconnect();
+				state = ClientState.DISCONNECTED;
+				disconnectedAt = System.currentTimeMillis();
+			}
+		}
+		try {
+			connection.close();
+		} catch (IOException e) {
+			/* We tried, it failed, too bad. */
+		}
+	}
+
+	public boolean isConnected() {
+		return !connection.isClosed();
+	}
+
+	public boolean isDisconnected() {
+		return state == ClientState.DISCONNECTED;
+	}
+
+	public boolean isDisconnectedTimeout() {
+		return state == ClientState.DISCONNECTED &&
+			(System.currentTimeMillis() - disconnectedAt) > DISCONNECTION_TIMEOUT_MILLIS;
+	}
+
+	/**
+	 * Some other player leaves the lobby, i.e. disconnects from the server.
+	 * */
+	public void leftLobby(Client client) throws ProtocolException {
+		channel.requestSend(Message.PLAYER_LEAVES(client.name.orElseThrow(() ->
+			new ProtocolException("Unnamed client attempted to enter lobby"))));
+		challenges.remove(client);
+		challenged.remove(client);
+	}
+
+	/**
+	 * Some other player enters the lobby.
+	 * */
+	public void enteredLobby(Client client) throws ProtocolException {
+		channel.requestSend(Message.PLAYER_JOINS(client.name.orElseThrow(() ->
+			new ProtocolException("Unnamed client attempted to leave lobby"))));
+	}
+
+	/**
+	 * Some other client has entered a game (and so isn't available for
+	 * challenges).
+	 * */
+	public void enteredGame(Client client) throws ProtocolException {
+		channel.requestSend(Message.PLAYER_STARTS_GAME(client.name.orElseThrow(() ->
+			new ProtocolException("Unnamed client attempted to start game"))));
+	}
+
+	/**
+	 * Begin a game with another client.
+	 * */
+	public void startGameWith(Client client) {
+		state = ClientState.GAME;
+		inGameWith = Optional.of(client);
+	}
+
+	/**
+	 * A challenge that this client made is rejected.
+	 * */
+	public void challengeRejected(Client client) {
+		challenged.remove(client);
+	}
+
+	/**
+	 * Forward a message on to this client.
+	 * */
+	public void forwardMessage(Message msg) {
+		channel.requestSend(msg);
+	}
+
+	/**
+	 * Determine if this player is available to enter a game.
+	 * */
+	public boolean isReadyToPlay() {
+		return state == ClientState.LOBBY;
+	}
+
+	/**
+	 * The game that this client was playing is now over.
+	 * */
+	public void gameOver() {
+		state = ClientState.LOBBY;
+		inGameWith = Optional.empty();
+	}
+
+	/**
+	 * The other player logged off
+	 * */
+	public void otherGuyLoggedOff() {
+		inGameWith = Optional.empty();
+		channel.requestSend(Message.LOGOFF());
+		if (state == ClientState.GAME) {
+			state = ClientState.LOBBY;
+		}
+	}
+
+	/**
+	 * Wait for the other player to reconnect
+	 * */
+	public void waitForReconnect() {
+		channel.requestSend(Message.WAIT_FOR_RECONNECT());
+	}
+
+	/**
+	 * The other player has reconnected
+	 * */
+	public void otherGuyReconnected() {
+		channel.requestSend(Message.RECONNECT());
+	}
+
+	/**
+	 * */
+	public void reconnect(Socket connection, MessageChannel channel)
+		throws ProtocolException
+	{
+		if (!connection.isClosed()) throw new ProtocolException(
+			"Attempted to reconnect client, but the client wasn't disconnected"); 
+		this.channel = channel;
+		channel.affiliate(this);
+		this.connection = connection;
+
+		if (inGameWith.isPresent()) {
+			this.state = ClientState.GAME;
+			inGameWith.get().otherGuyReconnected();
+		} else {
+			this.state = ClientState.LOBBY;
+		}
+	}
+
+	/**
+	 * Process the next message, which may result in a state change.
+	 * */
+	private void doNextMessage(Message msg) throws ProtocolException {
+		if (msg.kind == MessageKind.LOGOFF) {
+			closeConnection(true);
+			return;
+		}
+
+		switch (state) {
+			case HANDSHAKE:
+				if (msg.kind != MessageKind.C_VERSION)
+					throw new ProtocolException("Expected client version");
+				int v = msg.parseVersion();
+				UUID gv = msg.parseGameDataVersion();
+				if (v != Protocol.PROTOCOL_VERSION)
+					throw new ProtocolException("Wrong protocol version");
+				if (gv.equals(dataFactory.getVersion())) {
+					channel.requestSend(Message.OK());
+				} else {
+					channel.requestSend(Message.DATA(dataFactory.getJSON()));
+				}
+				state = ClientState.NAMING;
+				break;
+
+			case NAMING:
+				String name = msg.parseName();
+				if (msg.kind == MessageKind.RECONNECT) {
+					UUID connectTo = msg.parseSessionKey();
+					Client old = sessions.get(connectTo);
+					if (old == null) {
+						channel.requestSend(Message.NOK());
+					} else {
+						old.reconnect(connection, channel);
+						channel.requestSend(Message.OK());
+
+						// remove this client
+						synchronized (pendingClients) {
+							pendingClients.remove(this);
+							sessions.remove(sessionKey);
+						}
+					}
+				} else if (msg.kind == MessageKind.REQUEST_NAME) {
+					if (namedClients.containsKey(name)) {
+						channel.requestSend(Message.NOK());
+					} else {
+						for (Client c : namedClients.values()) {
+							if (c != this) c.enteredLobby(this);
+						}
+						synchronized (pendingClients) {
+							namedClients.put(name, this);
+							pendingClients.remove(this);
+						}
+						channel.requestSend(Message.OK());
+						state = ClientState.LOBBY;
+					}
+				} else {
+					throw new ProtocolException("Expected name request");
+				}
+				break;
+
+			case LOBBY:
+				Client client = namedClients.get(msg.parseName());
+				if (client == null) {
+					channel.requestSend(Message.NOK());
+				} else {
+					if (msg.kind == MessageKind.CHALLENGE_PLAYER) {
+						doChallenge(client);
+					} else if (msg.kind == MessageKind.REJECT_CHALLENGE) {
+						doRejectChallenge(msg, client);
+					} else if (msg.kind == MessageKind.ACCEPT_CHALLENGE) {
+						doAcceptChallenge(msg, client);
+					} else {
+						throw new ProtocolException("Wrong message for lobby mode");
+					}
+				}
+				break;
+
+			case GAME:
+				Client otherPlayer = inGameWith.orElseThrow(() ->
+					new ProtocolException("In game state without a partner"));
+				if (msg.kind == MessageKind.COMMAND) {
+					otherPlayer.forwardMessage(msg);
+				} else if (msg.kind == MessageKind.GAME_OVER) {
+					otherPlayer.gameOver();
+					this.gameOver();
+					for (Client c : namedClients.values()) {
+						if (c != otherPlayer) c.enteredLobby(otherPlayer);
+						if (c != this) c.enteredLobby(this);
+					}
+				} else if (msg.kind == MessageKind.REJECT_CHALLENGE) {
+					doRejectChallenge(msg, namedClients.get(msg.parseName()));
+				} else {
+					throw new ProtocolException("Wrong message for game mode");
+				}
+
+				break;
+
+			case DISCONNECTED:
+				throw new ProtocolException(
+					"Cannot receive messages while disconnected, unless it's ghosts.  Must be ghosts.");
+
+			default:
+				throw new RuntimeException("This cannot happen");
+		}
+	}
+
+	private void doChallenge(Client client) {
+		if (challenged.size() < MAX_CHALLENGES) {
+			challenged.add(client);
+			channel.requestSend(Message.OK());
+		} else {
+			channel.requestSend(Message.NOK());
+		}
+	}
+
+	private void doRejectChallenge(Message msg, Client client) {
+		if (challenges.contains(client)) {
+			challenges.remove(client);
+			client.challengeRejected(this);
+			client.forwardMessage(msg);
+			channel.requestSend(Message.OK());
+		} else {
+			channel.requestSend(Message.NOK());
+		}
+	}
+
+	private void doAcceptChallenge(Message msg, Client client)
+		throws ProtocolException
+	{
+		if (challenges.contains(client) && client.isReadyToPlay()) {
+			challenges.remove(client);
+			startGameWith(client);
+			client.startGameWith(this);
+
+			for (Client c : namedClients.values()) {
+				if (c != this && c != client) {
+					c.enteredGame(this);
+					c.enteredGame(client);
+				}
+			}
+
+			client.forwardMessage(msg);
+			channel.requestSend(Message.OK());
+		} else {
+			channel.requestSend(Message.NOK());
+		}
+	}
+}
+

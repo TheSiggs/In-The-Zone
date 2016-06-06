@@ -1,6 +1,7 @@
 package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
+import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
 import isogame.engine.Stage;
 import isogame.resource.DevelopmentResourceLocator;
@@ -27,13 +28,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class GameDataFactory {
+public class GameDataFactory implements HasJSONRepresentation {
 	private final Library globalLibrary;
 	private final ResourceLocator loc;
 	public static final String globalLibraryName = "global_library.json";
 	public static final String gameDataName = "game_data.json";
 	public static final File gameDataCacheDir =
 		new File(System.getProperty("user.home"), ".inthezone");
+
+	private JSONObject json = null;
 
 	public GameDataFactory(Optional<File> baseDir)
 		throws IOException, CorruptDataException
@@ -66,6 +69,12 @@ public class GameDataFactory {
 		}
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public JSONObject getJSON() {
+		return json;
+	}
+
 	public void updateGameData(JSONObject json) throws CorruptDataException {
 		stages.clear();
 		weapons.clear();
@@ -74,6 +83,7 @@ public class GameDataFactory {
 	}
 
 	private void loadGameData(JSONObject json) throws CorruptDataException {
+		this.json = json;
 		Object oVersion = json.get("version");
 		Object oVersionNumber = json.get("versionNumber");
 		Object oStages = json.get("stages");

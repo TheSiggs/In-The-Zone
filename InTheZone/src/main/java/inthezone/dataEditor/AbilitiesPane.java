@@ -382,7 +382,9 @@ public class AbilitiesPane extends VBox {
 		hookOnEditCommit(instantAfter, changed);
 		hookOnEditCommit(statusEffect, changed);
 
-		table.getColumns().setAll(
+
+		@SuppressWarnings("unchecked")
+		boolean v = table.getColumns().setAll(
 			name, type, ap, mp, pp, eff, chance, heal, range, radius,
 			piercing, ribbon, targetMode, nTargets, los, useWeaponRange,
 			recursion, instantBefore, instantAfter, statusEffect);

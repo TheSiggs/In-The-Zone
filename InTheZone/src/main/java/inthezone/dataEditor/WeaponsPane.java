@@ -142,7 +142,8 @@ public class WeaponsPane extends VBox {
 				changed.setValue(true);
 		});
 
-		table.getColumns().setAll(name, range, attack);
+		@SuppressWarnings("unchecked")
+		boolean v = table.getColumns().setAll(name, range, attack);
 	}
 
 	private static <S, T> void hookOnEditCommit(

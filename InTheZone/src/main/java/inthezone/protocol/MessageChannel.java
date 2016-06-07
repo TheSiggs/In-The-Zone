@@ -60,7 +60,18 @@ public class MessageChannel {
 	 * IOExceptions are not recoverable, so the connection should be terminated.
 	 * */
 	public List<Message> doRead() throws IOException, ProtocolException {
-		channel.read(recBuffer);
+		int n = channel.read(recBuffer);
+		if (n == -1) {
+			channel.close();
+			recBuffer.clear();
+			msgBuffer.clear();
+			sndBuffer.clear();
+			sendQueue.clear();
+			decoder.reset();
+			encoder.reset();
+			return new LinkedList<Message>();
+		}
+
 		recBuffer.flip();
 		msgBuffer.mark();
 		CoderResult r = decoder.decode(recBuffer, msgBuffer, false);

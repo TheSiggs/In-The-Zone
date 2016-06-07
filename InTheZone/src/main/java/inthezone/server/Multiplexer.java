@@ -9,6 +9,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
@@ -84,32 +85,38 @@ public class Multiplexer implements Runnable {
 		selector.select();
 		System.out.println("unblocked");
 
-		for (SelectionKey k : selector.keys()) {
+		// do IO operations
+		for (
+			Iterator<SelectionKey> skeys = selector.selectedKeys().iterator();
+			skeys.hasNext();
+		) {
+			SelectionKey k = skeys.next();
+
 			if (k == serverKey) {
-				SocketChannel connection = serverSocket.accept();
-				if (connection != null) newClient(connection);
-				break;
+				if (k.isAcceptable()) {
+					SocketChannel connection = serverSocket.accept();
+					if (connection != null) newClient(connection);
+					skeys.remove();
+				}
+				continue;
 			}
 
 			Client c = (Client) k.attachment();
-			if (k.isValid()) {
-				if (k.isReadable()) c.receive();
-				if (k.isWritable()) c.send();
-			} else {
-				// clean up this client if necessary.
-				k.cancel();
-				if (c.isDisconnected()) {
-					if (c.isDisconnectedTimeout()) removeClient(c);
-				} else {
-					c.closeConnection(false);
-				}
-			}
+			if (k.isValid() && k.isWritable()) c.send();
+			if (k.isValid() && k.isReadable()) c.receive();
+			skeys.remove();
 		}
+
+		// cancel keys for closed connections.
+		for (SelectionKey k : selector.keys()) if (!k.isValid()) k.cancel();
 
 		// clean up any clients which have quietly dropped their connections.
 		for (Client c : sessions.values()) {
-			if (!c.isConnected()) c.closeConnection(false);
-			if (c.isDisconnectedTimeout()) removeClient(c);
+			if (c.isDisconnected()) {
+				if (c.isDisconnectedTimeout()) removeClient(c);
+			} else if (!c.isConnected()) {
+				c.closeConnection(false);
+			}
 		}
 	}
 

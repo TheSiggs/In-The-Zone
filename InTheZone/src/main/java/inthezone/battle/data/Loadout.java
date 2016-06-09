@@ -1,11 +1,14 @@
 package inthezone.battle.data;
 
-import java.util.Collection;
-
 import inthezone.battle.Character;
 import inthezone.battle.InventoryItem;
+import inthezone.protocol.ProtocolException;
+import isogame.engine.CorruptDataException;
+import isogame.engine.HasJSONRepresentation;
+import java.util.Collection;
+import org.json.simple.JSONObject;
 
-public class Loadout {
+public class Loadout implements HasJSONRepresentation {
 	public final Character c1;
 	public final Character c2;
 	public final Character c3;
@@ -21,6 +24,17 @@ public class Loadout {
 		this.c3 = c3;
 		this.c4 = c4;
 		this.items = items;
+	}
+
+	@Override
+	public JSONObject getJSON() {
+		// TODO: implement this
+		return new JSONObject();
+	}
+
+	public static Loadout fromJSON(JSONObject json) throws CorruptDataException {
+		// TODO: implement this
+		return new Loadout(null, null, null, null, null);
 	}
 }
 

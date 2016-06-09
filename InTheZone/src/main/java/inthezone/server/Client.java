@@ -29,8 +29,6 @@ public class Client {
 
 	private final Map<String, Client> namedClients;
 	private final Map<UUID, Client> sessions;
-	// pendingClients can be accessed from other threads, so it needs to be
-	// synchronized.
 	private final Collection<Client> pendingClients;
 
 	public Optional<String> name = Optional.empty();
@@ -105,9 +103,7 @@ public class Client {
 	 * caused by an IO error.
 	 * */
 	public void closeConnection(boolean intentional) {
-		synchronized (pendingClients) {
-			pendingClients.remove(this);
-		}
+		pendingClients.remove(this);
 		if (inGameWith.isPresent()) {
 			if (intentional) {
 				inGameWith.get().otherGuyLoggedOff();
@@ -292,12 +288,11 @@ public class Client {
 					} else {
 						old.reconnect(connection, channel);
 						channel.requestSend(Message.OK());
+						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
 
 						// remove this client
-						synchronized (pendingClients) {
-							pendingClients.remove(this);
-							sessions.remove(sessionKey);
-						}
+						pendingClients.remove(this);
+						sessions.remove(sessionKey);
 					}
 				} else if (msg.kind == MessageKind.REQUEST_NAME) {
 					if (namedClients.containsKey(name)) {
@@ -306,11 +301,10 @@ public class Client {
 						for (Client c : namedClients.values()) {
 							if (c != this) c.enteredLobby(this);
 						}
-						synchronized (pendingClients) {
-							namedClients.put(name, this);
-							pendingClients.remove(this);
-						}
+						namedClients.put(name, this);
+						pendingClients.remove(this);
 						channel.requestSend(Message.OK());
+						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
 						state = ClientState.LOBBY;
 					}
 				} else {

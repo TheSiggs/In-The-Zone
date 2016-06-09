@@ -76,11 +76,18 @@ public class GameDataFactory implements HasJSONRepresentation {
 		return json;
 	}
 
-	public void updateGameData(JSONObject json) throws CorruptDataException {
+	public void update(JSONObject json) throws CorruptDataException {
 		stages.clear();
 		weapons.clear();
 		characters.clear();
 		loadGameData(json);
+	}
+
+	/**
+	 * Update the cached game data to this version of the game data.
+	 * */
+	public void update() {
+		// TODO: implement this
 	}
 
 	private void loadGameData(JSONObject json) throws CorruptDataException {

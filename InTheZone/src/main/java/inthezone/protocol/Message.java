@@ -1,5 +1,8 @@
 package inthezone.protocol;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -52,6 +55,17 @@ public class Message {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static Message PLAYERS_JOIN(Collection<String> players) {
+		JSONObject o = new JSONObject();
+		JSONArray a = new JSONArray();
+		a.addAll(players);
+		o.put("add", a);
+		o.put("leave", new JSONArray());
+		o.put("game", new JSONArray());
+		return new Message(MessageKind.PLAYERS_JOIN, o);
+	}
+
+	@SuppressWarnings("unchecked")
 	public static Message PLAYER_JOINS(String name) {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
@@ -82,6 +96,21 @@ public class Message {
 		o.put("leave", new JSONArray());
 		o.put("game", a);
 		return new Message(MessageKind.PLAYERS_JOIN, o);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Message CHALLENGE_PLAYER(String name, JSONObject cmd) {
+		JSONObject o = new JSONObject();
+		o.put("name", name);
+		o.put("cmd", cmd);
+		return new Message(MessageKind.CHALLENGE_PLAYER, o);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Message REJECT_CHALLENGE(String name) {
+		JSONObject o = new JSONObject();
+		o.put("name", name);
+		return new Message(MessageKind.REJECT_CHALLENGE, o);
 	}
 
 	public static Message LOGOFF() {
@@ -151,6 +180,42 @@ public class Message {
 		}
 	}
 
+	public Collection<String> parseJoinedLobby() throws ProtocolException {
+		if (kind != MessageKind.PLAYERS_JOIN)
+			throw new ProtocolException("Expected lobby players message");
+		try {
+			Object a = payload.get("add");
+			if (a == null) throw new ProtocolException("Malformed message");
+			return jsonArrayToList((JSONArray) a, String.class);
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
+	public Collection<String> parseLeftLobby() throws ProtocolException {
+		if (kind != MessageKind.PLAYERS_JOIN)
+			throw new ProtocolException("Expected lobby players message");
+		try {
+			Object a = payload.get("leave");
+			if (a == null) throw new ProtocolException("Malformed message");
+			return jsonArrayToList((JSONArray) a, String.class);
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
+	public Collection<String> parseJoinedGame() throws ProtocolException {
+		if (kind != MessageKind.PLAYERS_JOIN)
+			throw new ProtocolException("Expected lobby players message");
+		try {
+			Object a = payload.get("game");
+			if (a == null) throw new ProtocolException("Malformed message");
+			return jsonArrayToList((JSONArray) a, String.class);
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
 	public static Message fromString(String message) throws ProtocolException {
 		String id = message.substring(0, 2);
 		String data = message.substring(2);
@@ -166,6 +231,17 @@ public class Message {
 
 	public String toString() {
 		return kind.toString() + payload.toString();
+	}
+
+	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
+		throws ClassCastException
+	{
+		List<T> r = new ArrayList<>();
+		int limit = a.size();
+		for (int i = 0; i < limit; i++) {
+			r.add(clazz.cast(a.get(i)));
+		}
+		return r;
 	}
 }
 

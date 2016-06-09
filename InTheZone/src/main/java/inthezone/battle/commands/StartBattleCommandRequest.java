@@ -1,11 +1,14 @@
 package inthezone.battle.commands;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
+import inthezone.protocol.ProtocolException;
+import isogame.engine.CorruptDataException;
+import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+import java.util.concurrent.ThreadLocalRandom;
+import org.json.simple.JSONObject;
 
 /**
  * This one works a bit different.  Player 1 generates a
@@ -14,7 +17,7 @@ import isogame.engine.Stage;
  * which he executes then sends to player 1, who executes it.  Then, the battle
  * begins.
  * */
-public class StartBattleCommandRequest {
+public class StartBattleCommandRequest implements HasJSONRepresentation {
 	private final String stage;
 	private final Loadout me;
 
@@ -23,6 +26,41 @@ public class StartBattleCommandRequest {
 	public StartBattleCommandRequest(String stage, Loadout me) {
 		this.stage = stage;
 		this.me = me;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public JSONObject getJSON() {
+		JSONObject r = new JSONObject();
+		r.put("name", "startBattleReq");
+		r.put("stage", stage);
+		r.put("loadout", me.getJSON());
+		return r;
+	}
+
+	public static StartBattleCommandRequest fromJSON(JSONObject json)
+		throws ProtocolException
+	{
+		Object oname = json.get("name");
+		Object ostage = json.get("stage");
+		Object oloadout = json.get("loadout");
+		if (oname == null) throw new ProtocolException("Missing name in start battle request");
+		if (ostage == null) throw new ProtocolException("Missing stage in start battle request");
+		if (oloadout == null) throw new ProtocolException("Missing loadout in start battle request");
+
+		try {
+			String name = (String) oname;
+			String stage = (String) ostage;
+			Loadout loadout = Loadout.fromJSON((JSONObject) oloadout);
+			if (!name.equals("startBattleReq"))
+				throw new ProtocolException("Expected start battle request");
+			return new StartBattleCommandRequest(stage, loadout);
+
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Type error in start battle request");
+		} catch (CorruptDataException e) {
+			throw new ProtocolException("Parse error in start battle request", e);
+		}
 	}
 
 	public StartBattleCommand makeCommand(

@@ -26,6 +26,7 @@ public class DisconnectedView extends FlowPane {
 			} else {
 				while (playerName.equals("")) {
 					TextInputDialog ti = new TextInputDialog("<player name>");
+					ti.setHeaderText("Enter player name");
 					playerName = ti.showAndWait().orElse("");
 					if (playerName.equals("")) {
 						Alert a = new Alert(Alert.AlertType.ERROR,

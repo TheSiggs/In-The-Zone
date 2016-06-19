@@ -26,6 +26,7 @@ public class Game extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		Map<String, String> args = getParameters().getNamed();
+		System.err.println("args: " + args.toString());
 
 		Optional<String> basedir;
 		String server;

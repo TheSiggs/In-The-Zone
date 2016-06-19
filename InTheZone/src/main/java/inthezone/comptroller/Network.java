@@ -121,14 +121,18 @@ public class Network implements Runnable {
 			gameData.getVersion()).toString());
 		toServer.flush();
 
-		Message r = Message.fromString(fromServer.readLine());
-		if (r.kind != MessageKind.C_VERSION) {
+		String raw = fromServer.readLine();
+		if (raw == null) throw new IOException("Unexpected disconnection");
+		Message r = Message.fromString(raw);
+		if (r.kind != MessageKind.S_VERSION) {
 			throw new ProtocolException("Server error: protocol violation #1");
 		} else {
 			this.session = r.parseSessionKey();
 		}
 
-		r = Message.fromString(fromServer.readLine());
+		raw = fromServer.readLine();
+		if (raw == null) throw new IOException("Unexpected disconnection");
+		r = Message.fromString(raw);
 		if (r.kind == MessageKind.GAME_DATA) {
 			try {
 				gameData.update(r.payload);
@@ -144,7 +148,9 @@ public class Network implements Runnable {
 		while (!named) {
 			toServer.write(Message.NAME(playerName).toString());
 			toServer.flush();
-			r = Message.fromString(fromServer.readLine());
+			raw = fromServer.readLine();
+			if (raw == null) throw new IOException("Unexpected disconnection");
+			r = Message.fromString(raw);
 			if (r.kind == MessageKind.OK) {
 				named = true;
 			} else {
@@ -159,7 +165,9 @@ public class Network implements Runnable {
 		}
 
 		// server sends a list of players in the lobby
-		r = Message.fromString(fromServer.readLine());
+		raw = fromServer.readLine();
+		if (raw == null) throw new IOException("Unexpected disconnection");
+		r = Message.fromString(raw);
 		if (r.kind != MessageKind.PLAYERS_JOIN) {
 			throw new ProtocolException("Server error: protocol violation #4");
 		} else {

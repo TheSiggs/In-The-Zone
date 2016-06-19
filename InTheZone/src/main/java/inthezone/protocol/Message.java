@@ -167,7 +167,7 @@ public class Message {
 	}
 
 	public UUID parseSessionKey() throws ProtocolException {
-		if (kind != MessageKind.C_VERSION && kind != MessageKind.RECONNECT)
+		if (kind != MessageKind.S_VERSION && kind != MessageKind.RECONNECT)
 			throw new ProtocolException("Expected session key");
 		try {
 			Object v = payload.get("session");
@@ -229,8 +229,9 @@ public class Message {
 		}
 	}
 
+	@Override
 	public String toString() {
-		return kind.toString() + payload.toString();
+		return kind.toString() + payload.toString() + "\n";
 	}
 
 	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)

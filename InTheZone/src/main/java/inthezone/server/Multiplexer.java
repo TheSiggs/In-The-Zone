@@ -49,7 +49,7 @@ public class Multiplexer implements Runnable {
 			try {
 				doSelect();
 			} catch (Exception e) {
-				System.err.println(e.getMessage());
+				e.printStackTrace(System.err);
 				if (!selector.isOpen()) restoreSelector();
 			}
 		}

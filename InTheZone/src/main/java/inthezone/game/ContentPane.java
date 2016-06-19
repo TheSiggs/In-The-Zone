@@ -6,6 +6,8 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.LobbyListener;
 import inthezone.comptroller.Network;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import java.util.Collection;
@@ -55,12 +57,22 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	@Override
 	public void errorConnectingToServer(Exception e) {
-		disconnected.endConnecting();
+		Platform.runLater(() -> {
+			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			a.setHeaderText("Error connecting to server");
+			a.showAndWait();
+			disconnected.endConnecting();
+		});
 	}
 
 	@Override
 	public void serverError(Exception e) {
-		disconnected.endConnecting();
+		Platform.runLater(() -> {
+			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			a.setHeaderText("Server error");
+			a.showAndWait();
+			disconnected.endConnecting();
+		});
 	}
 
 	@Override

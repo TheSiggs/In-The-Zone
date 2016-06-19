@@ -116,6 +116,7 @@ public class MessageChannel {
 				msg = msgBuffer.toString();
 				msgBuffer.position(msgBuffer.limit()).limit(max);
 				msgBuffer.compact();
+				break;
 			}
 		}
 

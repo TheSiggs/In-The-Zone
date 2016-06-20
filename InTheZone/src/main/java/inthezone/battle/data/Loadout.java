@@ -5,36 +5,57 @@ import inthezone.battle.InventoryItem;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Loadout implements HasJSONRepresentation {
-	public final Character c1;
-	public final Character c2;
-	public final Character c3;
-	public final Character c4;
-	public final Collection<InventoryItem> items;
+	public final List<CharacterProfile> characters;
 
 	public Loadout(
-		Character c1, Character c2, Character c3, Character c4,
-		Collection<InventoryItem> items
+		List<CharacterProfile> characters
 	) {
-		this.c1 = c1;
-		this.c2 = c2;
-		this.c3 = c3;
-		this.c4 = c4;
-		this.items = items;
+		this.characters = characters;
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		// TODO: implement this
-		return new JSONObject();
+		JSONObject o = new JSONObject();
+		JSONArray cs = new JSONArray();
+		for (CharacterProfile p : characters) cs.add(p.getJSON());
+		o.put("characters", cs);
+		return o;
 	}
 
-	public static Loadout fromJSON(JSONObject json) throws CorruptDataException {
-		// TODO: implement this
-		return new Loadout(null, null, null, null, null);
+	public static Loadout fromJSON(
+		JSONObject json, GameDataFactory gameData
+	) throws CorruptDataException {
+		Object ocs = json.get("characters");
+		if (ocs == null) throw new CorruptDataException("Missing characters in loadout");
+
+		try {
+			final List<JSONObject> cs =
+				jsonArrayToList((JSONArray) ocs, JSONObject.class);
+			final List<CharacterProfile> r = new ArrayList<>();
+			for (JSONObject c : cs) r.add(CharacterProfile.fromJSON(c, gameData));
+
+			return new Loadout(r);
+		} catch (ClassCastException e) {
+			throw new CorruptDataException("Type error in loadout", e);
+		}
+	}
+
+	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
+		throws ClassCastException
+	{
+		List<T> r = new ArrayList<>();
+		int limit = a.size();
+		for (int i = 0; i < limit; i++) {
+			r.add(clazz.cast(a.get(i)));
+		}
+		return r;
 	}
 }
 

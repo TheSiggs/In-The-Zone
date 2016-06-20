@@ -18,8 +18,6 @@ public class Game extends Application {
 	private final static String DEFAULT_SERVER = "127.0.0.1"; // TODO: update with the ip of the real sever
 	private final static int DEFAULT_PORT = 8000; // TODO: update this with the real default port
 
-	private final ClientConfig config = new ClientConfig();
-
 	public static void main(final String[] arguments) {
 		Application.launch(arguments);
 	}
@@ -57,8 +55,9 @@ public class Game extends Application {
 		try {
 			final GameDataFactory gameData =
 				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()));
+			final ClientConfig config = new ClientConfig(gameData);
 			final ContentPane contentPane = new ContentPane(
-				gameData, server, port, config.getDefaultPlayerName());
+				gameData, server, port, config.defaultPlayerName);
 			root.getChildren().add(contentPane);
 
 			this.network = contentPane.network;

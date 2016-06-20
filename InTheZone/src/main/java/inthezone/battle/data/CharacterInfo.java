@@ -3,7 +3,9 @@ package inthezone.battle.data;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -12,6 +14,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public final Stats stats;
 	public final Collection<AbilityInfo> abilities;
 
+	private final Map<String, AbilityInfo> abilitiesIndex = new HashMap<>();
+
 
 	public CharacterInfo(
 		String name, Stats stats, Collection<AbilityInfo> abilities
@@ -19,6 +23,15 @@ public class CharacterInfo implements HasJSONRepresentation {
 		this.name = name;
 		this.stats = stats;
 		this.abilities = abilities;
+
+		for (AbilityInfo a : abilities) abilitiesIndex.put(a.name, a);
+	}
+
+	/**
+	 * Get an ability by name.  May return null.
+	 * */
+	public AbilityInfo lookupAbility(String name) {
+		return abilitiesIndex.get(name);
 	}
 
 	@Override

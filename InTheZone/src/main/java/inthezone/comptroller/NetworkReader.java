@@ -1,6 +1,7 @@
 package inthezone.comptroller;
 
 import inthezone.battle.commands.StartBattleCommandRequest;
+import inthezone.battle.data.GameDataFactory;
 import inthezone.protocol.Message;
 import inthezone.protocol.ProtocolException;
 import java.io.BufferedReader;
@@ -11,12 +12,17 @@ public class NetworkReader implements Runnable {
 	private final BufferedReader in;
 	private final LobbyListener lobbyListener;
 	private final Thread parent;
+	private final GameDataFactory gameData;
 
 	public NetworkReader(
-		BufferedReader in, LobbyListener lobbyListener, Thread parent
+		BufferedReader in,
+		LobbyListener lobbyListener,
+		GameDataFactory gameData,
+		Thread parent
 	) {
 		this.in = in;
 		this.lobbyListener = lobbyListener;
+		this.gameData = gameData;
 		this.parent = parent;
 	}
 
@@ -39,7 +45,7 @@ public class NetworkReader implements Runnable {
 						try {
 						lobbyListener.challengeFrom(msg.parseName(),
 							StartBattleCommandRequest.fromJSON(
-								(JSONObject) msg.payload.get("cmd")));
+								(JSONObject) msg.payload.get("cmd"), gameData));
 						} catch (ClassCastException e) {
 							throw new ProtocolException("Malformed command", e);
 						}

@@ -25,10 +25,14 @@ public class LobbyView extends VBox {
 	public LobbyView(Network network) {
 		final FlowPane toolbar = new FlowPane();
 		final Button logout = new Button("Logout");
+		final Button challenge = new Button("Challenge");
 		toolbar.getChildren().add(logout);
 
 		logout.setOnAction(event -> {
 			network.logout();
+		});
+
+		challenge.setOnAction(event -> {
 		});
 
 		final VBox leftPane = new VBox();

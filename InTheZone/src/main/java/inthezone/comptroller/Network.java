@@ -68,7 +68,8 @@ public class Network implements Runnable {
 				try {
 					doConnect();
 					(new Thread(new NetworkReader(
-						fromServer, lobbyListener, Thread.currentThread()))).start();
+						fromServer, lobbyListener, gameData,
+							Thread.currentThread()))).start();
 				} catch (IOException e) {
 					cleanUpConnection();
 					lobbyListener.errorConnectingToServer(e);

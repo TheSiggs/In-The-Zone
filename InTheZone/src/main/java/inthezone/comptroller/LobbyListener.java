@@ -11,6 +11,7 @@ public interface LobbyListener {
 	public void errorConnectingToServer(Exception e);
 	public void serverError(Exception e);
 	public void connectionDropped();
+	public void loggedOff();
 	public void playerHasLoggedIn(String player);
 	public void playerHasLoggedOff(String player);
 	public void playerHasEnteredBattle(String player);

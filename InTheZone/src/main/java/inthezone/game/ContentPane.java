@@ -18,7 +18,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	private final LoadoutView loadout;
 	private final LobbyView lobbyView;
 
-	private final Network network;
+	public final Network network;
 	private Thread networkThread;
 
 	private Pane currentPane;
@@ -31,7 +31,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 		network = new Network(gameData, this);
 		disconnected = new DisconnectedView(network, server, port, playername);
 		loadout = new LoadoutView();
-		lobbyView = new LobbyView();
+		lobbyView = new LobbyView(network);
 		networkThread = new Thread(network);
 		networkThread.start();
 		currentPane = disconnected;
@@ -40,13 +40,18 @@ public class ContentPane extends StackPane implements LobbyListener {
 		this.getChildren().addAll(disconnected, loadout, lobbyView);
 	}
 
+	private void switchPane(Pane target) {
+		currentPane.setVisible(false);
+		target.setVisible(true);
+		currentPane = target;
+	}
+
 	@Override
 	public void connectedToServer(Collection<String> players) {
 		Platform.runLater(() -> {
 			disconnected.endConnecting();
-			currentPane.setVisible(false);
 			lobbyView.setPlayers(players);
-			lobbyView.setVisible(true);
+			switchPane(lobbyView);
 		});
 	}
 
@@ -62,6 +67,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			a.setHeaderText("Error connecting to server");
 			a.showAndWait();
 			disconnected.endConnecting();
+			switchPane(disconnected);
 		});
 	}
 
@@ -72,6 +78,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			a.setHeaderText("Server error");
 			a.showAndWait();
 			disconnected.endConnecting();
+			switchPane(disconnected);
 		});
 	}
 
@@ -80,15 +87,32 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 	@Override
+	public void loggedOff() {
+		Platform.runLater(() -> {
+			disconnected.endConnecting();
+			switchPane(disconnected);
+		});
+	}
+
+	@Override
 	public void playerHasLoggedIn(String player) {
+		Platform.runLater(() -> {
+			lobbyView.playerJoins(player);
+		});
 	}
 
 	@Override
 	public void playerHasLoggedOff(String player) {
+		Platform.runLater(() -> {
+			lobbyView.playerLeaves(player);
+		});
 	}
 
 	@Override
 	public void playerHasEnteredBattle(String player) {
+		Platform.runLater(() -> {
+			lobbyView.playerEntersGame(player);
+		});
 	}
 
 	@Override

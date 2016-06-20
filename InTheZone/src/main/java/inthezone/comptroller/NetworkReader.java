@@ -25,7 +25,7 @@ public class NetworkReader implements Runnable {
 		try {
 			for (
 				String inline = in.readLine();
-				inline != null; in.readLine()
+				inline != null; inline = in.readLine()
 			) {
 				Message msg = Message.fromString(inline);
 				switch (msg.kind) {

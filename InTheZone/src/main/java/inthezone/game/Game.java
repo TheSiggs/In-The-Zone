@@ -1,6 +1,7 @@
 package inthezone.game;
 
 import inthezone.battle.data.GameDataFactory;
+import inthezone.comptroller.Network;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -22,6 +23,8 @@ public class Game extends Application {
 	public static void main(final String[] arguments) {
 		Application.launch(arguments);
 	}
+
+	private Network network = null;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -58,6 +61,8 @@ public class Game extends Application {
 				gameData, server, port, config.getDefaultPlayerName());
 			root.getChildren().add(contentPane);
 
+			this.network = contentPane.network;
+
 			primaryStage.setTitle("In the Zone!");
 			primaryStage.setScene(scene);
 			primaryStage.show();
@@ -65,6 +70,13 @@ public class Game extends Application {
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Error starting game client");
 			a.showAndWait();
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (network != null) {
+			//network.shutdown();
 		}
 	}
 }

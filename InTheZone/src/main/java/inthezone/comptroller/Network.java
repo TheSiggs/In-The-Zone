@@ -85,6 +85,12 @@ public class Network implements Runnable {
 					Message msg = sendQueue.take();
 					toServer.write(msg.toString());
 					toServer.flush();
+
+					if (msg.kind == MessageKind.LOGOFF) {
+						cleanUpConnection();
+						lobbyListener.loggedOff();
+						break;
+					}
 				} catch (InterruptedException e) {
 					if (socket.isClosed()) {
 						cleanUpConnection();
@@ -101,6 +107,7 @@ public class Network implements Runnable {
 	}
 
 	private void cleanUpConnection() {
+		sendQueue.clear();
 		if (socket != null) try {
 			socket.close();
 		} catch (IOException e) {
@@ -157,7 +164,7 @@ public class Network implements Runnable {
 				Optional<String> nextPlayerName =
 					lobbyListener.tryDifferentPlayerName(playerName);
 				if (!nextPlayerName.isPresent()) {
-					throw new ProtocolException("Server error: protocol violation #3");
+					throw new ProtocolException("Cannot get name on server");
 				} else {
 					playerName = nextPlayerName.get();
 				}
@@ -203,9 +210,17 @@ public class Network implements Runnable {
 		// wait for a 'ready' response
 	}
 
-	public synchronized void refuseChallenge(String player) {
+	public void refuseChallenge(String player) {
 		try {
 			sendQueue.put(Message.REJECT_CHALLENGE(player));
+		} catch (InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		}
+	}
+
+	public void logout() {
+		try {
+			sendQueue.put(Message.LOGOFF());
 		} catch (InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}

@@ -80,8 +80,10 @@ public class Multiplexer implements Runnable {
 		}
 	}
 
+	int debugCounter = 0;
+
 	private void doSelect() throws IOException {
-		System.out.println("blocking");
+		System.out.println("blocking " + (debugCounter++));
 		selector.select();
 		System.out.println("unblocked");
 
@@ -115,6 +117,7 @@ public class Multiplexer implements Runnable {
 			if (c.isDisconnected()) {
 				if (c.isDisconnectedTimeout()) removeClient(c);
 			} else if (!c.isConnected()) {
+				System.err.println("Dropped connection");
 				c.closeConnection(false);
 			}
 		}

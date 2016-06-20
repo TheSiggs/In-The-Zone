@@ -78,8 +78,10 @@ public class Client {
 			List<Message> msgs = channel.doRead();
 			for (Message msg : msgs) doNextMessage(msg);
 		} catch (IOException e) {
+			e.printStackTrace(System.err);
 			closeConnection(false);
 		} catch (ProtocolException e) {
+			e.printStackTrace(System.err);
 			closeConnection(false);
 		}
 	}
@@ -92,6 +94,7 @@ public class Client {
 		try {
 			channel.doWrite();
 		} catch (IOException e) {
+			e.printStackTrace(System.err);
 			closeConnection(false);
 		}
 	}
@@ -104,26 +107,24 @@ public class Client {
 	 * */
 	public void closeConnection(boolean intentional) {
 		pendingClients.remove(this);
-		if (inGameWith.isPresent()) {
-			if (intentional) {
-				inGameWith.get().otherGuyLoggedOff();
-				sessions.remove(sessionKey);
-				if (name.isPresent()) {
-					namedClients.remove(name.get());
-					for (Client c : namedClients.values()) {
-						try {
-							if (c != this) c.leftLobby(this);
-						} catch (ProtocolException e) {
-							/* If there was an error, then that client can't have had a
-							 * reference to us anyway, so we can ignore the exception */
-						}
+		if (intentional) {
+			inGameWith.ifPresent(x -> x.otherGuyLoggedOff());
+			sessions.remove(sessionKey);
+			if (name.isPresent()) {
+				namedClients.remove(name.get());
+				for (Client c : namedClients.values()) {
+					try {
+						c.leftLobby(this);
+					} catch (ProtocolException e) {
+						/* If there was an error, then that client can't have had a
+						 * reference to us anyway, so we can ignore the exception */
 					}
 				}
-			} else {
-				inGameWith.get().waitForReconnect();
-				state = ClientState.DISCONNECTED;
-				disconnectedAt = System.currentTimeMillis();
 			}
+		} else {
+			inGameWith.ifPresent(x -> x.waitForReconnect());
+			state = ClientState.DISCONNECTED;
+			disconnectedAt = System.currentTimeMillis();
 		}
 		try {
 			connection.close();
@@ -150,7 +151,7 @@ public class Client {
 	 * */
 	public void leftLobby(Client client) throws ProtocolException {
 		channel.requestSend(Message.PLAYER_LEAVES(client.name.orElseThrow(() ->
-			new ProtocolException("Unnamed client attempted to enter lobby"))));
+			new ProtocolException("Unnamed client attempted to leave lobby"))));
 		challenges.remove(client);
 		challenged.remove(client);
 	}
@@ -160,7 +161,7 @@ public class Client {
 	 * */
 	public void enteredLobby(Client client) throws ProtocolException {
 		channel.requestSend(Message.PLAYER_JOINS(client.name.orElseThrow(() ->
-			new ProtocolException("Unnamed client attempted to leave lobby"))));
+			new ProtocolException("Unnamed client attempted to enter lobby"))));
 	}
 
 	/**
@@ -298,6 +299,7 @@ public class Client {
 					if (namedClients.containsKey(name)) {
 						channel.requestSend(Message.NOK());
 					} else {
+						this.name = Optional.of(name);
 						for (Client c : namedClients.values()) {
 							if (c != this) c.enteredLobby(this);
 						}

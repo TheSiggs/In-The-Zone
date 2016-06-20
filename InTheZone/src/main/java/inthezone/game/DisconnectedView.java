@@ -26,14 +26,17 @@ public class DisconnectedView extends FlowPane {
 			} else {
 				while (playerName.equals("")) {
 					TextInputDialog ti = new TextInputDialog("<player name>");
+					ti.setTitle("Enter player name");
 					ti.setHeaderText("Enter player name");
-					playerName = ti.showAndWait().orElse("");
+					Optional<String> oPlayerName = ti.showAndWait();
+					if (!oPlayerName.isPresent()) return;
+					playerName = oPlayerName.orElse("");
 					if (playerName.equals("")) {
-						Alert a = new Alert(Alert.AlertType.ERROR,
+						Alert a = new Alert(Alert.AlertType.INFORMATION,
 							"You must enter a player name", ButtonType.OK, ButtonType.CANCEL);
-						a.showAndWait().ifPresent(x -> {
-							if (x == ButtonType.CANCEL) return;
-						});
+						a.setHeaderText("");
+						Optional<ButtonType> r = a.showAndWait();
+						if (r.isPresent() && r.get() == ButtonType.CANCEL) return;
 					}
 				}
 			}

@@ -32,8 +32,6 @@ public class ClientConfig implements HasJSONRepresentation {
 		new File(GameDataFactory.gameDataCacheDir, "client.json");
 
 	public ClientConfig(GameDataFactory gameData) {
-		boolean doResetFile = false;
-
 		try (
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 				new FileInputStream(configFile), "UTF-8"))
@@ -45,10 +43,8 @@ public class ClientConfig implements HasJSONRepresentation {
 			loadConfig(json, gameData);
 		} catch (Exception e) {
 			System.err.println("Error reading config file: " + e.getMessage());
-			doResetFile = true;
+			resetConfigFile();
 		}
-
-		if (doResetFile) resetConfigFile();
 	}
 
 	public Optional<String> defaultPlayerName = Optional.empty();

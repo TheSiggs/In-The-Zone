@@ -48,7 +48,7 @@ public class ClientConfig implements HasJSONRepresentation {
 	}
 
 	public Optional<String> defaultPlayerName = Optional.empty();
-	public final Collection<Loadout> loadouts = new ArrayList<>();
+	public Collection<Loadout> loadouts = new ArrayList<>();
 
 	public void loadConfig(JSONObject json, GameDataFactory gameData)
 		throws CorruptDataException

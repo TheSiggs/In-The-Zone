@@ -1,4 +1,4 @@
-package inthezone.game;
+package inthezone.game.lobby;
 
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;

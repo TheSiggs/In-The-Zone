@@ -19,10 +19,6 @@ public class Character implements Targetable {
 	private int hp;
 	private final int maxHP;
 
-	private int getMaxHP(Stats stats) {
-		return (stats.vitality * 750) / 150;
-	}
-
 	public Character(
 		Player player, MapPoint pos, Stats baseStats,
 		Collection<Ability> abilities, Weapon weapon
@@ -31,7 +27,7 @@ public class Character implements Targetable {
 		this.baseStats = baseStats;
 		this.pos = pos;
 		this.weapon = weapon;
-		this.maxHP = getMaxHP(baseStats);
+		this.maxHP = baseStats.hp;
 		this.hp = maxHP;
 		this.abilities = abilities;
 	}

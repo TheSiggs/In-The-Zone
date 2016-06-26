@@ -5,6 +5,8 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.LobbyListener;
 import inthezone.comptroller.Network;
+import inthezone.game.loadoutEditor.LoadoutView;
+import inthezone.game.lobby.LobbyView;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -23,14 +25,23 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	private Pane currentPane;
 
+	private boolean isConnected = false;
+
+
 	public ContentPane(
-		GameDataFactory gameData, String server, int port, Optional<String> playername
+		ClientConfig config,
+		GameDataFactory gameData,
+		String server,
+		int port,
+		Optional<String> playername
 	) {
 		super();
 
 		network = new Network(gameData, this);
-		disconnected = new DisconnectedView(network, server, port, playername);
-		loadout = new LoadoutView();
+		loadout = new LoadoutView(config, gameData, this::fallbackPane);
+		disconnected = new DisconnectedView(
+			() -> switchPane(loadout),
+			network, server, port, playername);
 		lobbyView = new LobbyView(network);
 		networkThread = new Thread(network);
 		networkThread.start();
@@ -44,6 +55,14 @@ public class ContentPane extends StackPane implements LobbyListener {
 		currentPane.setVisible(false);
 		target.setVisible(true);
 		currentPane = target;
+	}
+
+	/**
+	 * Fall back to the most appropriate pane.
+	 * */
+	private void fallbackPane() {
+		if (!isConnected) switchPane(disconnected);
+		else switchPane(lobbyView);
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class WeaponInfo implements HasJSONRepresentation {
 
 	public static final AbilityInfo defaultAbility = new AbilityInfo(
 		"none",
-		AbilityType.WEAPON,
+		AbilityType.BASIC,
 		0, 0, 0,
 		1.0, 1.0,
 		false,

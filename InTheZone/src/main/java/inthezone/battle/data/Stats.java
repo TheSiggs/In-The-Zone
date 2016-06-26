@@ -8,7 +8,7 @@ public class Stats implements HasJSONRepresentation {
 	public final int ap;
 	public final int mp;
 	public final int power;
-	public final int vitality;
+	public final int hp;
 	public final int attack;
 	public final int defence;
 
@@ -16,20 +16,20 @@ public class Stats implements HasJSONRepresentation {
 		this.ap = 0;
 		this.mp = 0;
 		this.power = 0;
-		this.vitality = 0;
+		this.hp = 0;
 		this.attack = 0;
 		this.defence = 0;
 	}
 
 	public Stats(
 		int ap, int mp,
-		int power, int vitality,
+		int power, int hp,
 		int attack, int defence
 	) {
 		this.ap = ap;
 		this.mp = mp;
 		this.power = power;
-		this.vitality = vitality;
+		this.hp = hp;
 		this.attack = attack;
 		this.defence = defence;
 	}
@@ -39,7 +39,7 @@ public class Stats implements HasJSONRepresentation {
 			ap + stats.ap,
 			mp + stats.mp,
 			power + stats.power,
-			vitality + stats.vitality,
+			hp + stats.hp,
 			attack + stats.attack,
 			defence + stats.defence);
 	}
@@ -51,7 +51,7 @@ public class Stats implements HasJSONRepresentation {
 		r.put("ap", ap);
 		r.put("mp", mp);
 		r.put("power", power);
-		r.put("vitality", vitality);
+		r.put("hp", hp);
 		r.put("attack", attack);
 		r.put("defence", defence);
 		return r;
@@ -63,14 +63,14 @@ public class Stats implements HasJSONRepresentation {
 		Object rap       = json.get("ap");
 		Object rmp       = json.get("mp");
 		Object rpower    = json.get("power");
-		Object rvitality = json.get("vitality");
+		Object rhp = json.get("hp");
 		Object rattack   = json.get("attack");
 		Object rdefence  = json.get("defence");
 
 		if (rap       == null) throw new CorruptDataException("Missing ap");
 		if (rmp       == null) throw new CorruptDataException("Missing mp");
 		if (rpower    == null) throw new CorruptDataException("Missing power");
-		if (rvitality == null) throw new CorruptDataException("Missing vitality");
+		if (rhp == null) throw new CorruptDataException("Missing hp");
 		if (rattack   == null) throw new CorruptDataException("Missing attack");
 		if (rdefence  == null) throw new CorruptDataException("Missing defence");
 
@@ -78,7 +78,7 @@ public class Stats implements HasJSONRepresentation {
 			Number ap = (Number) rap;
 			Number mp = (Number) rmp;
 			Number power = (Number) rpower;
-			Number vitality = (Number) rvitality;
+			Number hp = (Number) rhp;
 			Number attack = (Number) rattack;
 			Number defence = (Number) rdefence;
 
@@ -86,7 +86,7 @@ public class Stats implements HasJSONRepresentation {
 				ap.intValue(),
 				mp.intValue(),
 				power.intValue(),
-				vitality.intValue(),
+				hp.intValue(),
 				attack.intValue(),
 				defence.intValue());
 		} catch (ClassCastException e) {

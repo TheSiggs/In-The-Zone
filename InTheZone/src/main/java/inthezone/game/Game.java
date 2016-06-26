@@ -57,7 +57,7 @@ public class Game extends Application {
 				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()));
 			final ClientConfig config = new ClientConfig(gameData);
 			final ContentPane contentPane = new ContentPane(
-				gameData, server, port, config.defaultPlayerName);
+				config, gameData, server, port, config.defaultPlayerName);
 			root.getChildren().add(contentPane);
 
 			this.network = contentPane.network;

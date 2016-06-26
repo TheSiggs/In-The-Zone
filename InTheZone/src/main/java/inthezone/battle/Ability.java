@@ -20,7 +20,7 @@ public class Ability {
 	public double damageFormula(
 		double attackBuff, double defenceBuff, Stats a, Stats t
 	) {
-		double q = info.type == AbilityType.WEAPON? 1 : info.eff;
+		double q = info.type == AbilityType.BASIC? 1 : info.eff;
 		return
 			q * (1 + attackBuff - defenceBuff) *
 			(0.9 + (0.2 * Math.random())) *
@@ -33,7 +33,7 @@ public class Ability {
 	) {
 		return (info.eff * const_h *
 			(0.9 + (0.2 * Math.random())) *
-			(double) t.vitality) / const_i;
+			(double) t.hp) / const_i;
 	}
 
 	public DamageToTarget computeDamageToTarget(

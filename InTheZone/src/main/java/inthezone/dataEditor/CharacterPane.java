@@ -30,7 +30,7 @@ public class CharacterPane extends TitledPane {
 	private final PositiveIntegerField ap;
 	private final PositiveIntegerField mp;
 	private final PositiveIntegerField power;
-	private final PositiveIntegerField vitality;
+	private final PositiveIntegerField hp;
 	private final PositiveIntegerField attack;
 	private final PositiveIntegerField defence;
 	private final TreeItem<AbilityInfoModel> abilitiesRoot;
@@ -134,7 +134,7 @@ public class CharacterPane extends TitledPane {
 			name.getText(),
 			new Stats(
 				ap.getValue(), mp.getValue(),
-				power.getValue(), vitality.getValue(),
+				power.getValue(), hp.getValue(),
 				attack.getValue(), defence.getValue()),
 			getAbilities());
 	}
@@ -206,7 +206,7 @@ public class CharacterPane extends TitledPane {
 		ap = new PositiveIntegerField(character.stats.ap);
 		mp = new PositiveIntegerField(character.stats.mp);
 		power = new PositiveIntegerField(character.stats.power);
-		vitality = new PositiveIntegerField(character.stats.vitality);
+		hp = new PositiveIntegerField(character.stats.hp);
 		attack = new PositiveIntegerField(character.stats.attack);
 		defence = new PositiveIntegerField(character.stats.defence);
 
@@ -216,7 +216,7 @@ public class CharacterPane extends TitledPane {
 		grid.addRow(1, new Label("Base AP"), ap);
 		grid.addRow(2, new Label("Base MP"), mp);
 		grid.addRow(3, new Label("Base Power"), power);
-		grid.addRow(4, new Label("Base Vitality"), vitality);
+		grid.addRow(4, new Label("Base HP"), hp);
 		grid.addRow(5, new Label("Base Attack"), attack);
 		grid.addRow(6, new Label("Base Defence"), defence);
 		grid.add(weaponsButton, 1, 7);
@@ -225,7 +225,7 @@ public class CharacterPane extends TitledPane {
 		ap.textProperty().addListener(c -> changed.setValue(true));
 		mp.textProperty().addListener(c -> changed.setValue(true));
 		power.textProperty().addListener(c -> changed.setValue(true));
-		vitality.textProperty().addListener(c -> changed.setValue(true));
+		hp.textProperty().addListener(c -> changed.setValue(true));
 		attack.textProperty().addListener(c -> changed.setValue(true));
 		defence.textProperty().addListener(c -> changed.setValue(true));
 

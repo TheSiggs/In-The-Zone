@@ -1,4 +1,4 @@
-package inthezone.game;
+package inthezone.game.lobby;
 
 import inthezone.comptroller.Network;
 import javafx.collections.FXCollections;

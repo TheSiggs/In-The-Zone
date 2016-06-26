@@ -15,7 +15,11 @@ public class DisconnectedView extends FlowPane {
 	private final Button loadout = new Button("Edit loadouts offline");
 
 	public DisconnectedView(
-		Network network, String server, int port, Optional<String> cachedName
+		Runnable showLoadoutEditor,
+		Network network,
+		String server,
+		int port,
+		Optional<String> cachedName
 	) {
 		this.network = network;
 
@@ -42,6 +46,10 @@ public class DisconnectedView extends FlowPane {
 			}
 			startConnecting();
 			network.connectToServer(server, port, playerName);
+		});
+
+		loadout.setOnAction(event -> {
+			showLoadoutEditor.run();
 		});
 
 		this.getChildren().addAll(login, loadout);

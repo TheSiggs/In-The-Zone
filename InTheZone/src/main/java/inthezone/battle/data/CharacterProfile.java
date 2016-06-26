@@ -15,7 +15,21 @@ public class CharacterProfile implements HasJSONRepresentation {
 	public final AbilityInfo basicAbility;
 	public final int extraAttack;
 	public final int extraDefence;
-	public final int extraVitality;
+	public final int extraHP;
+
+	public CharacterProfile(CharacterInfo rootCharacter)
+		throws CorruptDataException
+	{
+		this.rootCharacter = rootCharacter;
+		this.abilities = new ArrayList<>();
+		basicAbility = rootCharacter.abilities.stream()
+			.filter(a -> a.type == AbilityType.BASIC)
+			.findFirst().orElseThrow(() ->
+				new CorruptDataException("No basic ability for " + rootCharacter.name));
+		extraAttack = 0;
+		extraDefence = 0;
+		extraHP = 0;
+	}
 
 	public CharacterProfile(
 		CharacterInfo rootCharacter,
@@ -23,14 +37,19 @@ public class CharacterProfile implements HasJSONRepresentation {
 		AbilityInfo basicAbility,
 		int extraAttack,
 		int extraDefence,
-		int extraVitality
+		int extraHP
 	) {
 		this.rootCharacter = rootCharacter;
 		this.abilities = abilities;
 		this.basicAbility = basicAbility;
 		this.extraAttack = extraAttack;
 		this.extraDefence = extraDefence;
-		this.extraVitality = extraVitality;
+		this.extraHP = extraHP;
+	}
+
+	public Stats getBaseStats() {
+		return rootCharacter.stats.add(new Stats(
+			0, 0, 0, extraHP, extraAttack, extraDefence));
 	}
 
 	@Override
@@ -44,7 +63,7 @@ public class CharacterProfile implements HasJSONRepresentation {
 		r.put("basicAbility", basicAbility.name);
 		r.put("attack", extraAttack);
 		r.put("defence", extraDefence);
-		r.put("vitality", extraVitality);
+		r.put("HP", extraHP);
 		return r;
 	}
 
@@ -56,14 +75,14 @@ public class CharacterProfile implements HasJSONRepresentation {
 		Object obasicAbility = json.get("basicAbility");
 		Object oattack = json.get("attack");
 		Object odefence = json.get("defence");
-		Object ovitality = json.get("vitality");
+		Object ohp = json.get("HP");
 
 		if (oroot == null) throw new CorruptDataException("Missing root in character profile");
 		if (oabilities == null) throw new CorruptDataException("Missing abilities in character profile");
 		if (obasicAbility == null) throw new CorruptDataException("Missing basicAbility in character profile");
 		if (oattack == null) throw new CorruptDataException("Missing attack in character profile");
 		if (odefence == null) throw new CorruptDataException("Missing defence in character profile");
-		if (ovitality == null) throw new CorruptDataException("Missing vitality in character profile");
+		if (ohp == null) throw new CorruptDataException("Missing HP in character profile");
 
 		try {
 			final CharacterInfo root = gameData.getCharacter((String) oroot);
@@ -83,7 +102,7 @@ public class CharacterProfile implements HasJSONRepresentation {
 			return new CharacterProfile(root, abilities, basicAbility,
 				((Number) oattack).intValue(),
 				((Number) odefence).intValue(),
-				((Number) ovitality).intValue());
+				((Number) ohp).intValue());
 		} catch (ClassCastException e) {
 			throw new CorruptDataException("Type error in character profile", e);
 		}

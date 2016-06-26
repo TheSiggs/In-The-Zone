@@ -88,6 +88,10 @@ public class ClientConfig implements HasJSONRepresentation {
 	}
 
 	public void writeConfig() {
+		if (!GameDataFactory.gameDataCacheDir.exists()) {
+			GameDataFactory.gameDataCacheDir.mkdir();
+		}
+
 		try (
 			PrintWriter out = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(configFile), "UTF-8"))

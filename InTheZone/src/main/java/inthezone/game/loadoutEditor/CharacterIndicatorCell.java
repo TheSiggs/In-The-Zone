@@ -21,6 +21,7 @@ public class CharacterIndicatorCell extends ListCell<CharacterProfile> {
 		if (!empty) {
 			if (cell == null) { 
 				cell = new CharacterIndicatorPane(profile);
+				setGraphic(cell);
 			} else {
 				cell.updateProfile(profile);
 			}

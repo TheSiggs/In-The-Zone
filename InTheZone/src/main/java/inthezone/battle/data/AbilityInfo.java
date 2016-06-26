@@ -23,6 +23,11 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final Optional<InstantEffectInfo> instantAfter;
 	public final Optional<StatusEffectInfo> statusEffect;
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 	public AbilityInfo(
 		String name,
 		AbilityType type,

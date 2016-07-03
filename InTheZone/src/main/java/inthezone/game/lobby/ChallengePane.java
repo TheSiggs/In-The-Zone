@@ -3,12 +3,14 @@ package inthezone.game.lobby;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
 import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -17,20 +19,19 @@ import java.util.Optional;
 public class ChallengePane extends VBox {
 	private final ObservableList<String> stages =
 		FXCollections.observableArrayList();
-	private final ObservableList<String> players =
-		FXCollections.observableArrayList("Player 1", "Player 2");
 	private final ObservableList<String> loadouts =
 		FXCollections.observableArrayList();
+
+	private Collection<MapPoint> startTiles = null;
 
 	public ChallengePane(GameDataFactory gameData, Optional<String> useStage)
 		throws CorruptDataException
 	{
 		final FlowPane toolbar = new FlowPane();
 		final ComboBox<String> stage = new ComboBox<>(stages);
-		final ComboBox<String> player = new ComboBox<>(players);
 		final ComboBox<String> loadout = new ComboBox<>(loadouts);
 		toolbar.getChildren().addAll(
-			new Label("Stage"), stage, player,
+			new Label("Stage"), stage,
 			new Label("Loadout"), loadout);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));

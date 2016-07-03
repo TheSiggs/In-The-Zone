@@ -5,6 +5,7 @@ import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.game.ClientConfig;
+import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -21,11 +22,12 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoadoutView extends HBox {
+public class LoadoutView extends DialogScreen<Void> {
 	private final ObservableList<LoadoutModel> loadoutsModel =
 		FXCollections.observableArrayList();
 
 	private final CharacterProfilePane cp = new CharacterProfilePane();
+	private final HBox content = new HBox();
 	private final VBox rightPane = new VBox();
 
 	private final ComboBox<LoadoutModel> loadout = new ComboBox<>(loadoutsModel);
@@ -34,9 +36,7 @@ public class LoadoutView extends HBox {
 	private final ListView<CharacterProfile> profiles = new ListView<>();
 	private final Button done = new Button("Done");
 
-	public LoadoutView(
-		ClientConfig config, GameDataFactory gameData, Runnable onDone
-	) {
+	public LoadoutView(ClientConfig config, GameDataFactory gameData) {
 		super();
 
 		loadout.setCellFactory(LoadoutCell.forListView());
@@ -102,10 +102,11 @@ public class LoadoutView extends HBox {
 			for (LoadoutModel m : loadoutsModel)
 				config.loadouts.add(m.encodeLoadout());
 			config.writeConfig();
-			onDone.run();
+			onDone.accept(null);
 		});
 
-		this.getChildren().addAll(cp, rightPane);
+		content.getChildren().addAll(cp, rightPane);
+		this.getChildren().add(content);
 	}
 
 	private static LoadoutModel emptyLoadout(

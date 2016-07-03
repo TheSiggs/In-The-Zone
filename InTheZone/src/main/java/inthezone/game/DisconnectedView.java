@@ -1,6 +1,7 @@
 package inthezone.game;
 
 import inthezone.comptroller.Network;
+import inthezone.game.loadoutEditor.LoadoutView;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -15,13 +16,12 @@ public class DisconnectedView extends FlowPane {
 	private final Button loadout = new Button("Edit loadouts offline");
 
 	public DisconnectedView(
-		Runnable showLoadoutEditor,
-		Network network,
+		ContentPane parent,
 		String server,
 		int port,
 		Optional<String> cachedName
 	) {
-		this.network = network;
+		this.network = parent.network;
 
 		login.setOnAction(event -> {
 			String playerName = "";
@@ -49,7 +49,9 @@ public class DisconnectedView extends FlowPane {
 		});
 
 		loadout.setOnAction(event -> {
-			showLoadoutEditor.run();
+			parent.showScreen(
+				new LoadoutView(parent.config, parent.gameData),
+				v -> {});
 		});
 
 		this.getChildren().addAll(login, loadout);

@@ -5,7 +5,6 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.LobbyListener;
 import inthezone.comptroller.Network;
-import inthezone.game.loadoutEditor.LoadoutView;
 import inthezone.game.lobby.LobbyView;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -13,20 +12,26 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.Optional;
+import java.util.Stack;
 
 public class ContentPane extends StackPane implements LobbyListener {
 	private final DisconnectedView disconnected;
-	private final LoadoutView loadout;
 	private final LobbyView lobbyView;
 
+	@SuppressWarnings("unchecked")
+	private final Stack<DialogScreen> screens = new Stack();
+
 	public final Network network;
+	public final ClientConfig config;
+	public final GameDataFactory gameData;
+
 	private Thread networkThread;
 
 	private Pane currentPane;
 
 	private boolean isConnected = false;
-
 
 	public ContentPane(
 		ClientConfig config,
@@ -37,18 +42,42 @@ public class ContentPane extends StackPane implements LobbyListener {
 	) {
 		super();
 
+		this.config = config;
+		this.gameData = gameData;
+
 		network = new Network(gameData, this);
-		loadout = new LoadoutView(config, gameData, this::fallbackPane);
 		disconnected = new DisconnectedView(
-			() -> switchPane(loadout),
-			network, server, port, playername);
+			this, server, port, playername);
 		lobbyView = new LobbyView(network);
 		networkThread = new Thread(network);
 		networkThread.start();
 		currentPane = disconnected;
-		loadout.setVisible(false);
 		lobbyView.setVisible(false);
-		this.getChildren().addAll(disconnected, loadout, lobbyView);
+		this.getChildren().addAll(disconnected, lobbyView);
+	}
+
+	/**
+	 * Show a dialog screen.
+	 * @param screen The screen to show
+	 * @param k The continuation to execute when the screen finishes
+	 * */
+	public <T> void showScreen(DialogScreen<T> screen, Consumer<Optional<T>> k) {
+		screens.push(screen);
+		switchPane(screen);
+		screen.doOnDone(v -> {
+			closeScreen();
+			k.accept(v);
+		});
+	}
+
+	private void closeScreen() {
+		screens.pop();
+		if (screens.isEmpty()) {
+			if (isConnected) switchPane(lobbyView);
+			else switchPane(disconnected);
+		} else {
+			switchPane(screens.peek());
+		}
 	}
 
 	private void switchPane(Pane target) {
@@ -57,20 +86,12 @@ public class ContentPane extends StackPane implements LobbyListener {
 		currentPane = target;
 	}
 
-	/**
-	 * Fall back to the most appropriate pane.
-	 * */
-	private void fallbackPane() {
-		if (!isConnected) switchPane(disconnected);
-		else switchPane(lobbyView);
-	}
-
 	@Override
 	public void connectedToServer(Collection<String> players) {
 		Platform.runLater(() -> {
 			disconnected.endConnecting();
 			lobbyView.setPlayers(players);
-			switchPane(lobbyView);
+			if (screens.isEmpty()) switchPane(lobbyView);
 		});
 	}
 
@@ -86,7 +107,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			a.setHeaderText("Error connecting to server");
 			a.showAndWait();
 			disconnected.endConnecting();
-			switchPane(disconnected);
+			if (screens.isEmpty()) switchPane(disconnected);
 		});
 	}
 
@@ -97,7 +118,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			a.setHeaderText("Server error");
 			a.showAndWait();
 			disconnected.endConnecting();
-			switchPane(disconnected);
+			if (screens.isEmpty()) switchPane(disconnected);
 		});
 	}
 
@@ -109,7 +130,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	public void loggedOff() {
 		Platform.runLater(() -> {
 			disconnected.endConnecting();
-			switchPane(disconnected);
+			if (screens.isEmpty()) switchPane(disconnected);
 		});
 	}
 

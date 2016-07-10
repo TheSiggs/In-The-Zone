@@ -1,9 +1,14 @@
 package inthezone.game.lobby;
 
+import inthezone.battle.data.GameDataFactory;
 import inthezone.comptroller.Network;
+import inthezone.game.ContentPane;
+import isogame.engine.CorruptDataException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.FlowPane;
@@ -12,51 +17,69 @@ import javafx.scene.layout.VBox;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class LobbyView extends VBox {
 	private final ObservableList<Player> players =
 		FXCollections.observableArrayList();
 
-	private final ObservableList<Challenge> challenges =
-		FXCollections.observableArrayList();
-
 	private final Map<String, Player>	playerNames = new HashMap<>();
 
-	public LobbyView(Network network) {
+	public LobbyView(Network network, GameDataFactory gameData, ContentPane parent) {
 		final FlowPane toolbar = new FlowPane();
 		final Button logout = new Button("Logout");
 		final Button challenge = new Button("Challenge");
-		toolbar.getChildren().add(logout);
+		toolbar.getChildren().addAll(challenge, logout);
+
+		final VBox mainPane = new VBox();
+
+		final ListView<Player> playerList = new ListView<>(players);
+		mainPane.getChildren().addAll(new Label("Players on server"), playerList);
+
+		challenge.disableProperty().bind(
+			playerList.getSelectionModel().selectedItemProperty().isNull());
+
+		this.getChildren().addAll(toolbar, mainPane);
 
 		logout.setOnAction(event -> {
 			network.logout();
 		});
 
 		challenge.setOnAction(event -> {
+			Player s = playerList.getSelectionModel().getSelectedItem();
+			if (s != null) {
+				int pn = (int) Math.floor(Math.random() * 2);
+				try {
+					parent.showScreen(
+						new ChallengePane(gameData, Optional.empty(), pn), oCmdReq ->
+							oCmdReq.ifPresent(cmdReq -> {
+								network.challengePlayer(cmdReq, s.name);
+							}));
+				} catch (CorruptDataException e) {
+					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+					a.setHeaderText("Error initialising challenge panel");
+					a.showAndWait();
+				}
+			}
 		});
-
-		final VBox leftPane = new VBox();
-		final VBox rightPane = new VBox(); 
-
-		final ListView<Player> playerList = new ListView<>(players);
-		final ListView<Challenge> challengeList = new ListView<>(challenges);
-		leftPane.getChildren().addAll(new Label("Players on server"), playerList);
-		rightPane.getChildren().addAll(new Label("Challenges"), challengeList);
-
-		final HBox mainPane = new HBox();
-		mainPane.getChildren().addAll(leftPane, rightPane);
-
-		this.getChildren().addAll(toolbar, mainPane);
 	}
 
-	public void setPlayers(Collection<String> players) {
+	private String playerName = null;
+
+	public void joinLobby(String playerName, Collection<String> players) {
+		this.playerName = playerName;
+
 		this.players.clear();
+
 		players.stream()
+			.filter(x -> !x.equals(playerName))
 			.map(x -> new Player(x, false))
 			.forEach(x -> this.players.add(x));
 	}
 
 	public void playerJoins(String player) {
+		if (player == playerName) return;
+
 		Player p = playerNames.get(player);
 		if (p != null) {
 			p.reset();
@@ -99,19 +122,6 @@ class Player {
 	@Override
 	public String toString() {
 		return name + (inGame? " (unavailable)" : "");
-	}
-}
-
-class Challenge {
-	public final String name;
-
-	public Challenge(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return name;
 	}
 }
 

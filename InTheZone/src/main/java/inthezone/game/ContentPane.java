@@ -48,7 +48,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 		network = new Network(gameData, this);
 		disconnected = new DisconnectedView(
 			this, server, port, playername);
-		lobbyView = new LobbyView(network);
+		lobbyView = new LobbyView(network, gameData, this);
 		networkThread = new Thread(network);
 		networkThread.start();
 		currentPane = disconnected;
@@ -87,10 +87,10 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 	@Override
-	public void connectedToServer(Collection<String> players) {
+	public void connectedToServer(String playerName, Collection<String> players) {
 		Platform.runLater(() -> {
 			disconnected.endConnecting();
-			lobbyView.setPlayers(players);
+			lobbyView.joinLobby(playerName, players);
 			if (screens.isEmpty()) switchPane(lobbyView);
 		});
 	}

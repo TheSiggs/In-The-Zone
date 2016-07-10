@@ -179,7 +179,7 @@ public class Network implements Runnable {
 		if (r.kind != MessageKind.PLAYERS_JOIN) {
 			throw new ProtocolException("Server error: protocol violation #4");
 		} else {
-			lobbyListener.connectedToServer(r.parseJoinedLobby());
+			lobbyListener.connectedToServer(playerName, r.parseJoinedLobby());
 		}
 	}
 

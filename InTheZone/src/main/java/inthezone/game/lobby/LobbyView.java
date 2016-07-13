@@ -2,6 +2,7 @@ package inthezone.game.lobby;
 
 import inthezone.battle.data.GameDataFactory;
 import inthezone.comptroller.Network;
+import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
 import isogame.engine.CorruptDataException;
 import javafx.collections.FXCollections;
@@ -25,7 +26,13 @@ public class LobbyView extends VBox {
 
 	private final Map<String, Player>	playerNames = new HashMap<>();
 
-	public LobbyView(Network network, GameDataFactory gameData, ContentPane parent) {
+	public LobbyView(
+		ContentPane parent,
+		GameDataFactory gameData,
+		ClientConfig config
+	) {
+		super();
+
 		final FlowPane toolbar = new FlowPane();
 		final Button logout = new Button("Logout");
 		final Button challenge = new Button("Challenge");
@@ -42,7 +49,7 @@ public class LobbyView extends VBox {
 		this.getChildren().addAll(toolbar, mainPane);
 
 		logout.setOnAction(event -> {
-			network.logout();
+			parent.network.logout();
 		});
 
 		challenge.setOnAction(event -> {
@@ -51,9 +58,9 @@ public class LobbyView extends VBox {
 				int pn = (int) Math.floor(Math.random() * 2);
 				try {
 					parent.showScreen(
-						new ChallengePane(gameData, Optional.empty(), pn), oCmdReq ->
+						new ChallengePane(gameData, config, Optional.empty(), pn), oCmdReq ->
 							oCmdReq.ifPresent(cmdReq -> {
-								network.challengePlayer(cmdReq, s.name);
+								parent.network.challengePlayer(cmdReq, s.name);
 							}));
 				} catch (CorruptDataException e) {
 					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);

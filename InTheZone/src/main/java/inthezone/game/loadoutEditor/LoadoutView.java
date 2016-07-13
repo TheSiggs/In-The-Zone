@@ -37,8 +37,6 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final Button done = new Button("Done");
 
 	public LoadoutView(ClientConfig config, GameDataFactory gameData) {
-		super();
-
 		loadout.setCellFactory(LoadoutCell.forListView());
 		loadout.setButtonCell(new LoadoutCell());
 

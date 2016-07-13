@@ -49,18 +49,16 @@ public class Game extends Application {
 			port = DEFAULT_PORT;
 		}
 
-		FlowPane root = new FlowPane();
-		Scene scene = new Scene(root, 960, 540);
-
 		try {
 			final GameDataFactory gameData =
 				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()));
 			final ClientConfig config = new ClientConfig(gameData);
 			final ContentPane contentPane = new ContentPane(
 				config, gameData, server, port, config.defaultPlayerName);
-			root.getChildren().add(contentPane);
 
 			this.network = contentPane.network;
+
+			Scene scene = new Scene(contentPane, 960, 540);
 
 			primaryStage.setTitle("In the Zone!");
 			primaryStage.setScene(scene);

@@ -47,8 +47,8 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 		network = new Network(gameData, this);
 		disconnected = new DisconnectedView(
-			this, server, port, playername);
-		lobbyView = new LobbyView(network, gameData, this);
+			this, gameData, config, server, port, playername);
+		lobbyView = new LobbyView(this, gameData, config);
 		networkThread = new Thread(network);
 		networkThread.start();
 		currentPane = disconnected;
@@ -62,9 +62,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 	 * @param k The continuation to execute when the screen finishes
 	 * */
 	public <T> void showScreen(DialogScreen<T> screen, Consumer<Optional<T>> k) {
+		this.getChildren().add(screen);
 		screens.push(screen);
 		switchPane(screen);
 		screen.doOnDone(v -> {
+			this.getChildren().remove(screen);
 			closeScreen();
 			k.accept(v);
 		});

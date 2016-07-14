@@ -84,10 +84,18 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		this.startPosChooser = new MapView(this,
 			useStage.map(s -> gameData.getStage(s)).orElse(null),
 			true, highlights);
-		startPosChooser.setFocusTraversable(true);
 		startPosChooser.widthProperty().bind(this.widthProperty());
 		startPosChooser.heightProperty().bind(this.heightProperty());
 		startPosChooser.startAnimating();
+
+		startPosChooser.setFocusTraversable(true);
+		// make sure other controls can't take focus
+		stage.focusedProperty().addListener(x -> {
+			if (stage.isFocused()) startPosChooser.requestFocus();
+		});
+		loadout.focusedProperty().addListener(x -> {
+			if (loadout.isFocused()) startPosChooser.requestFocus();
+		});
 
 		this.getChildren().addAll(startPosChooser, guiRoot);
 

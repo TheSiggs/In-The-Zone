@@ -3,6 +3,7 @@ package inthezone.battle.data;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
+import isogame.engine.SpriteInfo;
 import isogame.engine.Stage;
 import isogame.resource.DevelopmentResourceLocator;
 import isogame.resource.ResourceLocator;
@@ -158,6 +159,13 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 	public Collection<Stage> getStages() {
 		return stages.values();
+	}
+
+	/**
+	 * Get all the sprites in the global library.
+	 * */
+	public Collection<SpriteInfo> getGlobalSprites() {
+		return globalLibrary.allSprites();
 	}
 
 	/**

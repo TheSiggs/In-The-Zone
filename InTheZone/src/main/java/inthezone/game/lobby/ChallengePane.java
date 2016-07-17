@@ -8,6 +8,7 @@ import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
+import isogame.engine.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -101,9 +102,16 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		stage.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
 			if (s != null) {
-				startPosChooser.setStage(gameData.getStage(s));
+				Stage stage = gameData.getStage(s);
+				startPosChooser.setStage(stage);
+				Collection<MapPoint> tiles = player == 0?
+					stage.terrain.getPlayerStartTiles() : stage.terrain.getAIStartTiles();
+				startPosChooser.setSelectable(tiles);
+				startPosChooser.setHighlight(tiles, 0);
 			}
 		});
+
+		startPosChooser.doOnSelection(p -> System.err.println(p));
 	}
 }
 

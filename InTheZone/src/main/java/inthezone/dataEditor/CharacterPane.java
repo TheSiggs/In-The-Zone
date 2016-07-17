@@ -4,6 +4,7 @@ import com.diffplug.common.base.Errors;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterInfo;
+import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.Range;
 import inthezone.battle.data.Stats;
@@ -11,9 +12,13 @@ import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.TargetMode;
 import inthezone.battle.data.WeaponInfo;
 import isogame.engine.CorruptDataException;
+import isogame.engine.SpriteInfo;
 import isogame.gui.PositiveIntegerField;
 import javafx.beans.value.WritableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -27,6 +32,9 @@ import java.util.stream.Collectors;
 public class CharacterPane extends TitledPane {
 	private final GridPane grid = new GridPane();
 	private final TextField name;
+	private final ComboBox<String> sprite;
+	private final ObservableList<String> spriteList =
+		FXCollections.observableArrayList();
 	private final PositiveIntegerField ap;
 	private final PositiveIntegerField mp;
 	private final PositiveIntegerField power;
@@ -132,6 +140,7 @@ public class CharacterPane extends TitledPane {
 	{
 		return new CharacterInfo(
 			name.getText(),
+			sprite.getValue(),
 			new Stats(
 				ap.getValue(), mp.getValue(),
 				power.getValue(), hp.getValue(),
@@ -183,6 +192,7 @@ public class CharacterPane extends TitledPane {
 
 	public CharacterPane(
 		CharacterInfo character,
+		GameDataFactory gameData,
 		WritableValue<Boolean> changed,
 		AbilitiesPane abilities,
 		Collection<WeaponInfo> characterWeapons,
@@ -203,6 +213,7 @@ public class CharacterPane extends TitledPane {
 		}
 
 		name = new TextField(character.name);
+		sprite = new ComboBox<>(spriteList);
 		ap = new PositiveIntegerField(character.stats.ap);
 		mp = new PositiveIntegerField(character.stats.mp);
 		power = new PositiveIntegerField(character.stats.power);
@@ -213,15 +224,17 @@ public class CharacterPane extends TitledPane {
 		Button weaponsButton = new Button("Weapons ...");
 
 		grid.addRow(0, new Label("Name"), name);
-		grid.addRow(1, new Label("Base AP"), ap);
-		grid.addRow(2, new Label("Base MP"), mp);
-		grid.addRow(3, new Label("Base Power"), power);
-		grid.addRow(4, new Label("Base HP"), hp);
-		grid.addRow(5, new Label("Base Attack"), attack);
-		grid.addRow(6, new Label("Base Defence"), defence);
-		grid.add(weaponsButton, 1, 7);
+		grid.addRow(1, new Label("Sprite"), sprite);
+		grid.addRow(2, new Label("Base AP"), ap);
+		grid.addRow(3, new Label("Base MP"), mp);
+		grid.addRow(4, new Label("Base Power"), power);
+		grid.addRow(5, new Label("Base HP"), hp);
+		grid.addRow(6, new Label("Base Attack"), attack);
+		grid.addRow(7, new Label("Base Defence"), defence);
+		grid.add(weaponsButton, 1, 8);
 
 		name.textProperty().addListener(c -> changed.setValue(true));
+		sprite.valueProperty().addListener(c -> changed.setValue(true));
 		ap.textProperty().addListener(c -> changed.setValue(true));
 		mp.textProperty().addListener(c -> changed.setValue(true));
 		power.textProperty().addListener(c -> changed.setValue(true));
@@ -232,6 +245,9 @@ public class CharacterPane extends TitledPane {
 		this.setText(character.name);
 		this.setContent(grid);
 		this.textProperty().bind(name.textProperty());
+
+		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i.id);
+		sprite.getSelectionModel().select(character.sprite);
 
 		this.expandedProperty().addListener((v, oldv, newv) -> {
 			if (newv) {

@@ -41,7 +41,7 @@ public class CharactersPane extends VBox {
 	}
 
 	public CharactersPane(
-		GameDataFactory data,
+		GameDataFactory gameData,
 		File dataDir,
 		BooleanProperty changed,
 		AbilitiesPane abilities,
@@ -56,9 +56,9 @@ public class CharactersPane extends VBox {
 			Bindings.when(changed).then("").otherwise("d")));
 
 		this.characters = new Accordion(
-			data.getCharacters().stream()
-				.map(c -> new CharacterPane(c, changed, abilities,
-					data.characterWeapons(c), weapons))
+			gameData.getCharacters().stream()
+				.map(c -> new CharacterPane(c, gameData, changed, abilities,
+					gameData.characterWeapons(c), weapons))
 				.collect(Collectors.toList()).toArray(new CharacterPane[0]));
 
 		this.getChildren().addAll(tools, characters);
@@ -75,7 +75,7 @@ public class CharactersPane extends VBox {
 						c -> ((CharacterPane) c).getWeapons().stream()))
 					.collect(Collectors.toList());
 
-				data.writeToStream(
+				gameData.writeToStream(
 					new FileOutputStream(new File(dataDir, GameDataFactory.gameDataName)),
 					stages, cdata, wdata
 				);
@@ -97,9 +97,9 @@ public class CharactersPane extends VBox {
 
 		add.setOnAction(event -> {
 			Stats s = new Stats(3, 3, 1, 1, 1, 1);
-			CharacterInfo c = new CharacterInfo("New character", s, new LinkedList<>());
+			CharacterInfo c = new CharacterInfo("New character", null, s, new LinkedList<>());
 			CharacterPane pane =
-				new CharacterPane(c, changed, abilities, new LinkedList<>(), weapons);
+				new CharacterPane(c, gameData, changed, abilities, new LinkedList<>(), weapons);
 			characters.getPanes().add(pane);
 			characters.setExpandedPane(pane);
 			changed.setValue(true);

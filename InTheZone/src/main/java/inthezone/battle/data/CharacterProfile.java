@@ -118,5 +118,10 @@ public class CharacterProfile implements HasJSONRepresentation {
 		}
 		return r;
 	}
+
+	@Override
+	public String toString() {
+		return rootCharacter.name;
+	}
 }
 

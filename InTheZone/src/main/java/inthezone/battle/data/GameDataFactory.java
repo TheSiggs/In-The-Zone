@@ -125,7 +125,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 			}
 
 			for (Object x : aCharacters) {
-				CharacterInfo i = CharacterInfo.fromJSON((JSONObject) x);
+				CharacterInfo i = CharacterInfo.fromJSON((JSONObject) x, globalLibrary);
 				characters.put(i.name, i);
 			}
 
@@ -151,7 +151,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 	}
 
 	/**
-	 * May return null
+	 * May return null.
 	 * */
 	public Stage getStage(String name) {
 		return stages.get(name);

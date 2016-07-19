@@ -1,19 +1,24 @@
 package inthezone.game.lobby;
 
 import inthezone.battle.commands.StartBattleCommandRequest;
+import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
+import isogame.engine.FacingDirection;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
+import isogame.engine.Sprite;
 import isogame.engine.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
@@ -29,14 +34,18 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		FXCollections.observableArrayList();
 	private final ObservableList<Loadout> loadouts =
 		FXCollections.observableArrayList();
+	private final ObservableList<CharacterProfile> charactersModel =
+		FXCollections.observableArrayList();
 	
 	private final BorderPane guiRoot = new BorderPane();
 	private final FlowPane toolbar = new FlowPane();
 	private final ComboBox<String> stage = new ComboBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
+	private final ListView<CharacterProfile> characters = new ListView<>(charactersModel);
 	private final Button doneButton = new Button("Done");
 
 	private final int player;
+	private Stage currentStage = null;
 
 	private final MapView startPosChooser;
 
@@ -59,6 +68,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.setFocusTraversable(false);
 		stage.setFocusTraversable(false);
 		loadout.setFocusTraversable(false);
+		characters.setFocusTraversable(false);
 		doneButton.setFocusTraversable(false);
 
 		toolbar.getChildren().addAll(
@@ -68,16 +78,15 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.setStyle("-fx-background-color:#FFFFFF");
 		guiRoot.setTop(toolbar);
 
+		characters.setPrefHeight(4 * 30);
+		AnchorPane charactersAnchor = new AnchorPane();
+		AnchorPane.setLeftAnchor(characters, 0.0);
+		AnchorPane.setBottomAnchor(characters, 0.0);
+		charactersAnchor.getChildren().add(characters);
+		guiRoot.setLeft(charactersAnchor);
+
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
-
-		if (useStage.isPresent()) {
-			String s = useStage.get();
-			if (!stages.contains(s))
-				throw new CorruptDataException("Unknown stage " + s);
-			stage.getSelectionModel().select(s);
-			stage.setDisable(true);
-		}
 
 		final Paint[] highlights =
 			new Paint[] {Color.rgb(0x00, 0x00, 0xFF, 0.2)};
@@ -97,21 +106,48 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		loadout.focusedProperty().addListener(x -> {
 			if (loadout.isFocused()) startPosChooser.requestFocus();
 		});
+		characters.focusedProperty().addListener(x -> {
+			if (characters.isFocused()) startPosChooser.requestFocus();
+		});
 
 		this.getChildren().addAll(startPosChooser, guiRoot);
 
 		stage.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
 			if (s != null) {
-				Stage stage = gameData.getStage(s);
-				startPosChooser.setStage(stage);
+				currentStage = gameData.getStage(s);
+				startPosChooser.setStage(currentStage);
 				Collection<MapPoint> tiles = player == 0?
-					stage.terrain.getPlayerStartTiles() : stage.terrain.getAIStartTiles();
+					currentStage.terrain.getPlayerStartTiles() :
+					currentStage.terrain.getAIStartTiles();
 				startPosChooser.setSelectable(tiles);
 				startPosChooser.setHighlight(tiles, 0);
 			}
 		});
 
-		startPosChooser.doOnSelection(p -> System.err.println(p));
+		if (useStage.isPresent()) {
+			String s = useStage.get();
+			if (!stages.contains(s))
+				throw new CorruptDataException("Unknown stage " + s);
+			stage.getSelectionModel().select(s);
+			stage.setDisable(true);
+		}
+
+		loadout.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
+			if (s != null) {
+				charactersModel.clear();
+				charactersModel.addAll(s.characters);
+			}
+		});
+
+		startPosChooser.doOnSelection(p -> {
+			CharacterProfile c = characters.getSelectionModel().getSelectedItem();
+			if (c != null && currentStage != null) {
+				Sprite s = new Sprite(c.rootCharacter.sprite);
+				s.pos = p;
+				s.direction = FacingDirection.UP;
+				currentStage.addSprite(s);
+			}
+		});
 	}
 }
 

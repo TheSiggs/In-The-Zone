@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 public class CharacterPane extends TitledPane {
 	private final GridPane grid = new GridPane();
 	private final TextField name;
-	private final ComboBox<String> sprite;
-	private final ObservableList<String> spriteList =
+	private final ComboBox<SpriteInfo> sprite;
+	private final ObservableList<SpriteInfo> spriteList =
 		FXCollections.observableArrayList();
 	private final PositiveIntegerField ap;
 	private final PositiveIntegerField mp;
@@ -246,7 +246,7 @@ public class CharacterPane extends TitledPane {
 		this.setContent(grid);
 		this.textProperty().bind(name.textProperty());
 
-		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i.id);
+		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i);
 		sprite.getSelectionModel().select(character.sprite);
 
 		this.expandedProperty().addListener((v, oldv, newv) -> {

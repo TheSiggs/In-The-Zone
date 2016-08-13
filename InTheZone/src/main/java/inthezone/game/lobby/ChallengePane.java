@@ -24,6 +24,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -49,7 +51,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 	private final MapView startPosChooser;
 
-	private final Map<String, MapPos> characterPositions = new HashMap<>();
+	private final Map<String, MapPoint> characterPositions = new HashMap<>();
 
 	/**
 	 * @param gameData The game data
@@ -156,9 +158,9 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 				currentStage.addSprite(s);
 				characterPositions.put(c.rootCharacter.name, p);
 
-				Loadout l = loadout.getSelectionModel().getSelectedItem;
+				Loadout l = loadout.getSelectionModel().getSelectedItem();
 				doneButton.setDisable(
-					l == null || characterPositions.size != l.characters.size);
+					l == null || characterPositions.size() != l.characters.size());
 			}
 		});
 

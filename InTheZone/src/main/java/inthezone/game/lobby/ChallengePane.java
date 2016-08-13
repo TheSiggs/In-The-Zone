@@ -49,6 +49,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 	private final MapView startPosChooser;
 
+	private final Map<String, MapPos> characterPositions = new HashMap<>();
+
 	/**
 	 * @param gameData The game data
 	 * @param useStage Force the player to use the indicated stage.  Used when
@@ -70,6 +72,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		loadout.setFocusTraversable(false);
 		characters.setFocusTraversable(false);
 		doneButton.setFocusTraversable(false);
+
+		doneButton.setDisable(true);
 
 		toolbar.getChildren().addAll(
 			new Label("Stage"), stage,
@@ -141,12 +145,24 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		startPosChooser.doOnSelection(p -> {
 			CharacterProfile c = characters.getSelectionModel().getSelectedItem();
-			if (c != null && currentStage != null) {
+			if (c != null && currentStage != null && !characterPositions.containsValue(p)) {
 				Sprite s = new Sprite(c.rootCharacter.sprite);
 				s.pos = p;
 				s.direction = FacingDirection.UP;
+
+				if (characterPositions.containsKey(c.rootCharacter.name)) {
+					currentStage.removeSprite(characterPositions.get(c.rootCharacter.name));
+				}
 				currentStage.addSprite(s);
+				characterPositions.put(c.rootCharacter.name, p);
+
+				Loadout l = loadout.getSelectionModel().getSelectedItem;
+				doneButton.setDisable(
+					l == null || characterPositions.size != l.characters.size);
 			}
+		});
+
+		doneButton.setOnAction(event -> {
 		});
 	}
 }

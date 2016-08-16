@@ -144,6 +144,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			o.ifPresent(c -> {
 				if (currentStage != null) {
 					Sprite s = new Sprite(c.rootCharacter.sprite);
+					s.setAnimation("walk");
 					s.pos = p;
 					s.direction = FacingDirection.UP;
 

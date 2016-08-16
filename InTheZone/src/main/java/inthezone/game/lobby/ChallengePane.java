@@ -14,13 +14,14 @@ import isogame.engine.Sprite;
 import isogame.engine.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
@@ -51,6 +52,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	private final MapView startPosChooser;
 
 	private final Map<String, MapPoint> characterPositions = new HashMap<>();
+	private final Map<MapPoint, CharacterProfile> characterByPosition = new HashMap<>();
 
 	/**
 	 * @param gameData The game data
@@ -82,7 +84,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.setStyle("-fx-background-color:#FFFFFF");
 		guiRoot.setTop(toolbar);
 
-		guiRoot.setBottom(characterSelector);
+		final HBox ccentre = new HBox();
+		ccentre.setAlignment(Pos.CENTER);
+		ccentre.getChildren().addAll(characterSelector);
+		guiRoot.setBottom(ccentre);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
@@ -137,16 +142,28 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		startPosChooser.doOnSelection(p -> {
 			Optional<CharacterProfile> o = characterSelector.getSelectedCharacter();
 			o.ifPresent(c -> {
-				if (currentStage != null && !characterPositions.containsValue(p)) {
+				if (currentStage != null) {
 					Sprite s = new Sprite(c.rootCharacter.sprite);
 					s.pos = p;
 					s.direction = FacingDirection.UP;
 
+					characterSelector.setSelectedCharacter(Optional.empty());
+
+					if (characterByPosition.containsKey(p)) {
+						currentStage.removeSprite(p);
+						characterSelector.setSelectedCharacter(
+							Optional.ofNullable(characterByPosition.get(p)));
+						characterPositions.remove(characterByPosition.get(p).rootCharacter.name);
+					}
+
 					if (characterPositions.containsKey(c.rootCharacter.name)) {
-						currentStage.removeSprite(characterPositions.get(c.rootCharacter.name));
+						MapPoint oldP = characterPositions.get(c.rootCharacter.name);
+						currentStage.removeSprite(oldP);
+						characterByPosition.remove(oldP);
 					}
 					currentStage.addSprite(s);
 					characterPositions.put(c.rootCharacter.name, p);
+					characterByPosition.put(p, c);
 
 					Loadout l = loadout.getSelectionModel().getSelectedItem();
 					doneButton.setDisable(

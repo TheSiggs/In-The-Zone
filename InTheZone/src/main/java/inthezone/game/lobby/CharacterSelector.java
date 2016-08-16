@@ -98,7 +98,17 @@ public class CharacterSelector extends Canvas {
 		return selected;
 	}
 
+	public void setSelectedCharacter(Optional<CharacterProfile> c) {
+		selected = c;
+		render();
+	}
+
 	public void setCharacterEnabled(CharacterProfile character, boolean enabled) {
+		int i = characters.indexOf(character);
+		if (i >= 0 && i < this.enabled.size()) this.enabled.set(i, enabled);
+		if (selected.map(c -> c.rootCharacter.name.equals(character.rootCharacter.name))
+			.orElse(false)) selected = Optional.empty();
+		render();
 	}
 
 }

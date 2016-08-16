@@ -36,15 +36,14 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		FXCollections.observableArrayList();
 	private final ObservableList<Loadout> loadouts =
 		FXCollections.observableArrayList();
-	private final ObservableList<CharacterProfile> charactersModel =
-		FXCollections.observableArrayList();
 	
 	private final BorderPane guiRoot = new BorderPane();
 	private final FlowPane toolbar = new FlowPane();
 	private final ComboBox<String> stage = new ComboBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
-	private final ListView<CharacterProfile> characters = new ListView<>(charactersModel);
 	private final Button doneButton = new Button("Done");
+
+	private final CharacterSelector characterSelector = new CharacterSelector();
 
 	private final int player;
 	private Stage currentStage = null;
@@ -72,7 +71,6 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.setFocusTraversable(false);
 		stage.setFocusTraversable(false);
 		loadout.setFocusTraversable(false);
-		characters.setFocusTraversable(false);
 		doneButton.setFocusTraversable(false);
 
 		doneButton.setDisable(true);
@@ -84,12 +82,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.setStyle("-fx-background-color:#FFFFFF");
 		guiRoot.setTop(toolbar);
 
-		characters.setPrefHeight(4 * 30);
-		AnchorPane charactersAnchor = new AnchorPane();
-		AnchorPane.setLeftAnchor(characters, 0.0);
-		AnchorPane.setBottomAnchor(characters, 0.0);
-		charactersAnchor.getChildren().add(characters);
-		guiRoot.setLeft(charactersAnchor);
+		guiRoot.setBottom(characterSelector);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
@@ -111,9 +104,6 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		});
 		loadout.focusedProperty().addListener(x -> {
 			if (loadout.isFocused()) startPosChooser.requestFocus();
-		});
-		characters.focusedProperty().addListener(x -> {
-			if (characters.isFocused()) startPosChooser.requestFocus();
 		});
 
 		this.getChildren().addAll(startPosChooser, guiRoot);
@@ -140,28 +130,29 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		loadout.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
 			if (s != null) {
-				charactersModel.clear();
-				charactersModel.addAll(s.characters);
+				characterSelector.setCharacters(s.characters);
 			}
 		});
 
 		startPosChooser.doOnSelection(p -> {
-			CharacterProfile c = characters.getSelectionModel().getSelectedItem();
-			if (c != null && currentStage != null && !characterPositions.containsValue(p)) {
-				Sprite s = new Sprite(c.rootCharacter.sprite);
-				s.pos = p;
-				s.direction = FacingDirection.UP;
+			Optional<CharacterProfile> o = characterSelector.getSelectedCharacter();
+			o.ifPresent(c -> {
+				if (currentStage != null && !characterPositions.containsValue(p)) {
+					Sprite s = new Sprite(c.rootCharacter.sprite);
+					s.pos = p;
+					s.direction = FacingDirection.UP;
 
-				if (characterPositions.containsKey(c.rootCharacter.name)) {
-					currentStage.removeSprite(characterPositions.get(c.rootCharacter.name));
+					if (characterPositions.containsKey(c.rootCharacter.name)) {
+						currentStage.removeSprite(characterPositions.get(c.rootCharacter.name));
+					}
+					currentStage.addSprite(s);
+					characterPositions.put(c.rootCharacter.name, p);
+
+					Loadout l = loadout.getSelectionModel().getSelectedItem();
+					doneButton.setDisable(
+						l == null || characterPositions.size() != l.characters.size());
 				}
-				currentStage.addSprite(s);
-				characterPositions.put(c.rootCharacter.name, p);
-
-				Loadout l = loadout.getSelectionModel().getSelectedItem();
-				doneButton.setDisable(
-					l == null || characterPositions.size() != l.characters.size());
-			}
+			});
 		});
 
 		doneButton.setOnAction(event -> {

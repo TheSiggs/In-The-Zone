@@ -9,7 +9,6 @@ public class Character implements Targetable {
 	private final Player player;
 	private final Stats baseStats;
 
-	private final Weapon weapon;
 	private final Collection<Ability> abilities;
 
 	private Optional<StatusEffect> statusBuff;
@@ -21,12 +20,11 @@ public class Character implements Targetable {
 
 	public Character(
 		Player player, MapPoint pos, Stats baseStats,
-		Collection<Ability> abilities, Weapon weapon
+		Collection<Ability> abilities
 	) {
 		this.player = player;
 		this.baseStats = baseStats;
 		this.pos = pos;
-		this.weapon = weapon;
 		this.maxHP = baseStats.hp;
 		this.hp = maxHP;
 		this.abilities = abilities;
@@ -36,11 +34,7 @@ public class Character implements Targetable {
 	 * The clone is reset to default stats.
 	 * */
 	public Character cloneTo(MapPoint pos, Player newPlayer) {
-		return new Character (newPlayer, pos, baseStats, abilities, weapon);
-	}
-
-	public Weapon getWeapon() {
-		return weapon;
+		return new Character (newPlayer, pos, baseStats, abilities);
 	}
 
 	@Override public Stats getStats() {

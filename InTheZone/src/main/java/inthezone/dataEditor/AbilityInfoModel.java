@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 public class AbilityInfoModel {
 	private final SimpleStringProperty name;
 	private final SimpleStringProperty type;
+	private final SimpleBooleanProperty trap;
 	private final SimpleIntegerProperty ap;
 	private final SimpleIntegerProperty mp;
 	private final SimpleIntegerProperty pp;
@@ -36,6 +37,7 @@ public class AbilityInfoModel {
 	public AbilityInfoModel(boolean isMana, boolean isSubsequent) {
 		this.name = new SimpleStringProperty("New ability");
 		this.type = new SimpleStringProperty("skill");
+		this.trap = new SimpleBooleanProperty(false);
 		this.ap = new SimpleIntegerProperty(2);
 		this.mp = new SimpleIntegerProperty(0);
 		this.pp = new SimpleIntegerProperty(1);
@@ -61,6 +63,7 @@ public class AbilityInfoModel {
 	public void init(AbilityInfo i) {
 		this.name.setValue(i.name);
 		this.type.setValue(i.type.toString().toLowerCase());
+		this.trap.setValue(i.trap);
 		this.ap.setValue(i.ap);
 		this.mp.setValue(i.mp);
 		this.pp.setValue(i.pp);
@@ -104,6 +107,7 @@ public class AbilityInfoModel {
 		AbilityInfoModel r = new AbilityInfoModel(isMana, isSubsequent);
 		r.name.setValue(name.getValue());
 		r.type.setValue(type.getValue());
+		r.trap.setValue(trap.getValue());
 		r.ap.setValue(ap.getValue());
 		r.mp.setValue(mp.getValue());
 		r.pp.setValue(pp.getValue());
@@ -129,6 +133,9 @@ public class AbilityInfoModel {
 
 	public SimpleStringProperty typeProperty() { return type; }
 	public String getType() { return type.getValue(); }
+
+	public SimpleBooleanProperty trapProperty() { return trap; }
+	public boolean getTrap() { return trap.getValue(); }
 
 	public SimpleIntegerProperty apProperty() { return ap; }
 	public int getAP() { return ap.getValue(); }

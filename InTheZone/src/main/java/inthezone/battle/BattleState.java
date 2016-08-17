@@ -47,10 +47,6 @@ public class BattleState {
 		return true;
 	}
 
-	public boolean canChangeWeapon(MapPoint agent, Weapon weapon) {
-		return true;
-	}
-
 	public boolean canUseItem(MapPoint agent, Item item) {
 		return true;
 	}

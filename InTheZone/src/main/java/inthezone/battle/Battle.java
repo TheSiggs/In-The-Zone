@@ -23,9 +23,6 @@ public class Battle {
 	) {
 	}
 
-	public void doChangeWeapon(MapPoint agent, Weapon weapon) {
-	}
-
 	public void doUseItem(MapPoint agent, Item item) {
 	}
 

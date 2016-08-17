@@ -79,7 +79,6 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 	public void update(JSONObject json) throws CorruptDataException {
 		stages.clear();
-		weapons.clear();
 		characters.clear();
 		loadGameData(json);
 	}
@@ -96,12 +95,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 		Object oVersion = json.get("version");
 		Object oVersionNumber = json.get("versionNumber");
 		Object oStages = json.get("stages");
-		Object oWeapons = json.get("weapons");
 		Object oCharacters = json.get("characters");
 
 		if (oVersion == null) throw new CorruptDataException("No version in game data");
 		if (oStages == null) throw new CorruptDataException("No stages in game data");
-		if (oWeapons == null) throw new CorruptDataException("No weapons in game data");
 		if (oCharacters == null) throw new CorruptDataException("No characters in game data");
 
 		try {
@@ -110,18 +107,12 @@ public class GameDataFactory implements HasJSONRepresentation {
 				0 : ((Number) oVersionNumber).intValue();
 
 			JSONArray aStages = (JSONArray) oStages;
-			JSONArray aWeapons = (JSONArray) oWeapons;
 			JSONArray aCharacters = (JSONArray) oCharacters;
 
 			for (Object x : aStages) {
 				Stage i = Stage.fromJSON(
 					(JSONObject) x, loc, globalLibrary);
 				stages.put(i.name, i);
-			}
-
-			for (Object x : aWeapons) {
-				WeaponInfo i = WeaponInfo.fromJSON((JSONObject) x);
-				weapons.put(i.name, i);
 			}
 
 			for (Object x : aCharacters) {
@@ -139,7 +130,6 @@ public class GameDataFactory implements HasJSONRepresentation {
 	private UUID version;
 	private int versionNumber;
 	private Map<String, Stage> stages = new HashMap<>();
-	private Map<String, WeaponInfo> weapons = new HashMap<>();
 	private Map<String, CharacterInfo> characters = new HashMap<>();
 
 	public UUID getVersion() {
@@ -171,23 +161,6 @@ public class GameDataFactory implements HasJSONRepresentation {
 	/**
 	 * May return null
 	 * */
-	public WeaponInfo getWeapon(String name) {
-		return weapons.get(name);
-	}
-
-	public Collection<WeaponInfo> weapons() {
-		return weapons.values();
-	}
-
-	public Collection<WeaponInfo> characterWeapons(CharacterInfo c) {
-		return weapons.values().stream()
-			.filter(w -> w.character.equals(c.name))
-			.collect(Collectors.toList());
-	}
-
-	/**
-	 * May return null
-	 * */
 	public CharacterInfo getCharacter(String name) {
 		return characters.get(name);
 	}
@@ -203,8 +176,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 	public void writeToStream(
 		OutputStream outStream,
 		Collection<File> stages,
-		Collection<CharacterInfo> characters,
-		Collection<WeaponInfo> weapons
+		Collection<CharacterInfo> characters
 	) throws IOException {
 		try (PrintWriter out =
 			new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
@@ -219,14 +191,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 			for (CharacterInfo character : characters) {
 				c.add(character.getJSON());
 			}
-			for (WeaponInfo weapon : weapons) {
-				w.add(weapon.getJSON());
-			}
 			o.put("version", UUID.randomUUID().toString());
 			o.put("versionNumber", ++versionNumber);
 			o.put("stages", s);
 			o.put("characters", c);
-			o.put("weapons", w);
 			out.print(o);
 		}
 	}

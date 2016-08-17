@@ -10,7 +10,6 @@ import inthezone.battle.data.Range;
 import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.TargetMode;
-import inthezone.battle.data.WeaponInfo;
 import isogame.engine.CorruptDataException;
 import isogame.engine.SpriteInfo;
 import isogame.gui.PositiveIntegerField;
@@ -44,7 +43,6 @@ public class CharacterPane extends TitledPane {
 	private final PositiveIntegerField attack;
 	private final PositiveIntegerField defence;
 	private final TreeItem<AbilityInfoModel> abilitiesRoot;
-	private final TreeItem<WeaponInfoModel> weaponsRoot;
 
 	public String getName() {
 		return name.getText() == null? "" : name.getText();
@@ -101,6 +99,7 @@ public class CharacterPane extends TitledPane {
 		return new AbilityInfo(
 			a.getName(),
 			AbilityType.parse(a.getType()),
+			a.getTrap(),
 			a.getAP(),
 			a.getMP(),
 			a.getPP(),
@@ -121,20 +120,6 @@ public class CharacterPane extends TitledPane {
 			subsequent,
 			a.getRecursion(),
 			ib, ia, se);
-	}
-
-	private WeaponInfo encodeWeapon(
-		TreeItem<WeaponInfoModel> item, Collection<AbilityInfo> abilities
-	) {
-		WeaponInfoModel w = item.getValue();
-		String abilityName = w.getAttack();
-		return new WeaponInfo(
-			w.getName(),
-			w.getRange(),
-			name.getText(),
-			abilities.stream()
-				.filter(a -> a.name.equals(abilityName))
-				.findAny().orElse(WeaponInfo.defaultAbility));
 	}
 
 	public CharacterInfo getCharacter()
@@ -163,13 +148,6 @@ public class CharacterPane extends TitledPane {
 		}
 	}
 
-	public Collection<WeaponInfo> getWeapons() throws CorruptDataException {
-		Collection<AbilityInfo> abilities = getAbilities();
-		return weaponsRoot.getChildren().stream()
-			.map(i -> encodeWeapon(i, abilities))
-			.collect(Collectors.toList());
-	}
-
 	private static void decodeAbility(
 		AbilityInfo a, boolean isMana, boolean isSubsequent,
 		TreeItem<AbilityInfoModel> parent
@@ -187,32 +165,19 @@ public class CharacterPane extends TitledPane {
 			decodeAbility(a.mana.get(), true, false, baseItem);
 	}
 
-	private static TreeItem<WeaponInfoModel> decodeWeapon(WeaponInfo w) {
-		WeaponInfoModel base = new WeaponInfoModel();
-		base.init(w);
-		return new TreeItem<>(base);
-	}
-
 	public CharacterPane(
 		CharacterInfo character,
 		GameDataFactory gameData,
 		WritableValue<Boolean> changed,
-		AbilitiesPane abilities,
-		Collection<WeaponInfo> characterWeapons,
-		WeaponsDialog weapons
+		AbilitiesPane abilities
 	) {
 		super();
 
 		abilitiesRoot = new TreeItem<>(new AbilityInfoModel(false, false));
-		weaponsRoot = new TreeItem<>(new WeaponInfoModel());
 		abilitiesRoot.setExpanded(true);
-		weaponsRoot.setExpanded(true);
 
 		for (AbilityInfo i : character.abilities) {
 			decodeAbility(i, false, false, abilitiesRoot);
-		}
-		for (WeaponInfo i : characterWeapons) {
-			weaponsRoot.getChildren().add(decodeWeapon(i));
 		}
 
 		name = new TextField(character.name);
@@ -226,8 +191,6 @@ public class CharacterPane extends TitledPane {
 		attack = new PositiveIntegerField(character.stats.attack);
 		defence = new PositiveIntegerField(character.stats.defence);
 
-		Button weaponsButton = new Button("Weapons ...");
-
 		grid.addRow(0, new Label("Name"), name);
 		grid.add(playable, 1, 1);
 		grid.addRow(2, new Label("Sprite"), sprite);
@@ -237,7 +200,6 @@ public class CharacterPane extends TitledPane {
 		grid.addRow(6, new Label("Base HP"), hp);
 		grid.addRow(7, new Label("Base Attack"), attack);
 		grid.addRow(8, new Label("Base Defence"), defence);
-		grid.add(weaponsButton, 1, 9);
 
 		name.textProperty().addListener(c -> changed.setValue(true));
 		sprite.valueProperty().addListener(c -> changed.setValue(true));
@@ -258,13 +220,6 @@ public class CharacterPane extends TitledPane {
 		this.expandedProperty().addListener((v, oldv, newv) -> {
 			if (newv) {
 				abilities.setAbilities(name.textProperty(), abilitiesRoot);
-				weapons.setCharacter(name.textProperty(), weaponsRoot, abilitiesRoot);
-			}
-		});
-
-		weaponsButton.setOnAction(event -> {
-			if (!weapons.isShowing()) {
-				weapons.show();
 			}
 		});
 	}

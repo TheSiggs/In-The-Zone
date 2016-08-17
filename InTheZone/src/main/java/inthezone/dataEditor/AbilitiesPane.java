@@ -52,6 +52,7 @@ public class AbilitiesPane extends VBox {
 	
 	private final TreeTableColumn<AbilityInfoModel, String> name = new TreeTableColumn<>("Name");
 	private final TreeTableColumn<AbilityInfoModel, String> type = new TreeTableColumn<>("Type");
+	private final TreeTableColumn<AbilityInfoModel, Boolean> trap = new TreeTableColumn<>("Trap");
 	private final TreeTableColumn<AbilityInfoModel, Integer> ap = new TreeTableColumn<>("AP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> mp = new TreeTableColumn<>("MP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> pp = new TreeTableColumn<>("PP cost");
@@ -273,6 +274,7 @@ public class AbilitiesPane extends VBox {
 
 		name.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("name"));
 		type.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("type"));
+		trap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("trap"));
 		ap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("ap"));
 		mp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("mp"));
 		pp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("pp"));
@@ -295,6 +297,7 @@ public class AbilitiesPane extends VBox {
 		name.setSortable(false);
 		name.setPrefWidth(240);
 		type.setSortable(false);
+		trap.setSortable(false);
 		ap.setSortable(false);
 		mp.setSortable(false);
 		pp.setSortable(false);
@@ -324,6 +327,8 @@ public class AbilitiesPane extends VBox {
 			forTreeTableColumn(StringField::new, selection));
 		type.setCellFactory(ChoiceBoxTreeTableCell.<AbilityInfoModel, String>
 			forTreeTableColumn(types));
+		trap.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
+			forTreeTableColumn(trap));
 		ap.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		mp.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
@@ -363,6 +368,7 @@ public class AbilitiesPane extends VBox {
 
 		hookOnEditCommit(name, changed);
 		hookOnEditCommit(type, changed);
+		hookOnEditCommit(trap, changed);
 		hookOnEditCommit(ap, changed);
 		hookOnEditCommit(mp, changed);
 		hookOnEditCommit(pp, changed);
@@ -385,7 +391,7 @@ public class AbilitiesPane extends VBox {
 
 		@SuppressWarnings("unchecked")
 		boolean v = table.getColumns().setAll(
-			name, type, ap, mp, pp, eff, chance, heal, range, radius,
+			name, type, trap, ap, mp, pp, eff, chance, heal, range, radius,
 			piercing, ribbon, targetMode, nTargets, los, useWeaponRange,
 			recursion, instantBefore, instantAfter, statusEffect);
 	}

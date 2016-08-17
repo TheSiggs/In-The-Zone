@@ -4,7 +4,6 @@ import com.diffplug.common.base.Errors;
 import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Stats;
-import inthezone.battle.data.WeaponInfo;
 import isogame.engine.CorruptDataException;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -44,8 +43,7 @@ public class CharactersPane extends VBox {
 		GameDataFactory gameData,
 		File dataDir,
 		BooleanProperty changed,
-		AbilitiesPane abilities,
-		WeaponsDialog weapons
+		AbilitiesPane abilities
 	) {
 		super();
 
@@ -57,8 +55,7 @@ public class CharactersPane extends VBox {
 
 		this.characters = new Accordion(
 			gameData.getCharacters().stream()
-				.map(c -> new CharacterPane(c, gameData, changed, abilities,
-					gameData.characterWeapons(c), weapons))
+				.map(c -> new CharacterPane(c, gameData, changed, abilities))
 				.collect(Collectors.toList()).toArray(new CharacterPane[0]));
 
 		this.getChildren().addAll(tools, characters);
@@ -70,14 +67,10 @@ public class CharactersPane extends VBox {
 					.map(Errors.rethrow().wrapFunction(
 						c -> ((CharacterPane) c).getCharacter()))
 					.collect(Collectors.toList());
-				List<WeaponInfo> wdata = characters.getPanes().stream()
-					.flatMap(Errors.rethrow().wrapFunction(
-						c -> ((CharacterPane) c).getWeapons().stream()))
-					.collect(Collectors.toList());
 
 				gameData.writeToStream(
 					new FileOutputStream(new File(dataDir, GameDataFactory.gameDataName)),
-					stages, cdata, wdata
+					stages, cdata
 				);
 				changed.setValue(false);
 			} catch (IOException e) {
@@ -100,7 +93,7 @@ public class CharactersPane extends VBox {
 			CharacterInfo c = new CharacterInfo("New character", null,
 				s, new LinkedList<>(), true);
 			CharacterPane pane =
-				new CharacterPane(c, gameData, changed, abilities, new LinkedList<>(), weapons);
+				new CharacterPane(c, gameData, changed, abilities);
 			characters.getPanes().add(pane);
 			characters.setExpandedPane(pane);
 			changed.setValue(true);

@@ -129,7 +129,7 @@ public class DisconnectedView extends FlowPane {
 	) throws CorruptDataException {
 		List<CharacterProfile> characters = new ArrayList<>();
 		for (int i = 0; i < startTiles.size(); i++)
-			characters.add(new CharacterProfile(gameData.getCharacter("robot")));
+			characters.add(new CharacterProfile(gameData.getCharacter("Robot")));
 
 		return new Loadout("Sandpit", characters);
 	}

@@ -33,10 +33,13 @@ public class BattleView
 		canvas.widthProperty().bind(this.widthProperty());
 		canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
+		canvas.setFocusTraversable(true);
 
 		BattleInProgress battle =
 			new BattleInProgress(startBattle, player, gameData, this);
 		(new Thread(battle)).start();
+
+		this.getChildren().addAll(canvas);
 	}
 
 	public void startTurn() {

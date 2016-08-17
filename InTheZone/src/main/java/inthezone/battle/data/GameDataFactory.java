@@ -144,7 +144,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 	 * May return null.
 	 * */
 	public Stage getStage(String name) {
-		return stages.get(name);
+		Stage r = stages.get(name);
+		return r == null? null : r.clone();
 	}
 
 	public Collection<Stage> getStages() {

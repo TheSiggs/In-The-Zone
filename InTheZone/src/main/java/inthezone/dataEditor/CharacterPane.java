@@ -110,12 +110,10 @@ public class CharacterPane extends TitledPane {
 				a.getRange(),
 				a.getRadius(),
 				a.getPiercing(),
-				a.getRibbon(),
 				new TargetMode(a.getTargetMode()),
 				a.getnTargets(),
 				a.getLOS()
 			),
-			a.getUseWeaponRange(),
 			mana,
 			subsequent,
 			a.getRecursion(),

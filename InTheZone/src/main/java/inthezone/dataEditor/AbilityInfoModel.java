@@ -20,12 +20,10 @@ public class AbilityInfoModel {
 	private final SimpleIntegerProperty range;
 	private final SimpleIntegerProperty radius;
 	private final SimpleBooleanProperty piercing;
-	private final SimpleIntegerProperty ribbon;
 	private final SimpleStringProperty targetMode;
 	private final SimpleIntegerProperty nTargets;
 	private final SimpleBooleanProperty los;
 
-	private final SimpleBooleanProperty useWeaponRange;
 	private final SimpleBooleanProperty isMana;
 	private final SimpleBooleanProperty isSubsequent;
 	private final SimpleIntegerProperty recursion;
@@ -47,11 +45,9 @@ public class AbilityInfoModel {
 		this.range = new SimpleIntegerProperty(1);
 		this.radius = new SimpleIntegerProperty(1);
 		this.piercing = new SimpleBooleanProperty(false);
-		this.ribbon = new SimpleIntegerProperty(0);
 		this.targetMode = new SimpleStringProperty("E");
 		this.nTargets = new SimpleIntegerProperty(1);
 		this.los = new SimpleBooleanProperty(true);
-		this.useWeaponRange = new SimpleBooleanProperty(false);
 		this.isMana = new SimpleBooleanProperty(isMana);
 		this.isSubsequent = new SimpleBooleanProperty(isSubsequent);
 		this.recursion = new SimpleIntegerProperty(0);
@@ -73,11 +69,9 @@ public class AbilityInfoModel {
 		this.range.setValue(i.range.range);
 		this.radius.setValue(i.range.radius);
 		this.piercing.setValue(i.range.piercing);
-		this.ribbon.setValue(i.range.ribbon);
 		this.targetMode.setValue(i.range.targetMode.toString());
 		this.nTargets.setValue(i.range.nTargets);
 		this.los.setValue(i.range.los);
-		this.useWeaponRange.setValue(i.useWeaponRange);
 		this.recursion.setValue(i.recursion);
 		this.instantBefore.setValue(i.instantBefore.map(x -> x.toString().toLowerCase()).orElse("none"));
 		this.instantAfter.setValue(i.instantAfter.map(x -> x.toString().toLowerCase()).orElse("none"));
@@ -116,11 +110,9 @@ public class AbilityInfoModel {
 		r.heal.setValue(heal.getValue());
 		r.radius.setValue(radius.getValue());
 		r.piercing.setValue(piercing.getValue());
-		r.ribbon.setValue(ribbon.getValue());
 		r.targetMode.setValue(targetMode.getValue());
 		r.nTargets.setValue(nTargets.getValue());
 		r.los.setValue(los.getValue());
-		r.useWeaponRange.setValue(useWeaponRange.getValue());
 		r.recursion.setValue(recursion.getValue());
 		r.instantBefore.setValue(instantBefore.getValue());
 		r.instantAfter.setValue(instantAfter.getValue());
@@ -164,9 +156,6 @@ public class AbilityInfoModel {
 	public SimpleBooleanProperty piercingProperty() { return piercing; }
 	public boolean getPiercing() { return piercing.getValue(); }
 
-	public SimpleIntegerProperty ribbonProperty() { return ribbon; }
-	public int getRibbon() { return ribbon.getValue(); }
-
 	public SimpleStringProperty targetModeProperty() { return targetMode; }
 	public String getTargetMode() { return targetMode.getValue(); }
 
@@ -175,9 +164,6 @@ public class AbilityInfoModel {
 
 	public SimpleBooleanProperty losProperty() { return los; }
 	public boolean getLOS() { return los.getValue(); }
-
-	public SimpleBooleanProperty useWeaponRangeProperty() { return useWeaponRange; }
-	public boolean getUseWeaponRange() { return useWeaponRange.getValue(); }
 
 	public SimpleBooleanProperty isManaProperty() { return isMana; }
 	public boolean getIsMana() { return isMana.getValue(); }

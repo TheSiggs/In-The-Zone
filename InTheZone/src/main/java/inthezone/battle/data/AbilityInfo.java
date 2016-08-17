@@ -16,7 +16,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final double chance;
 	public final boolean heal;
 	public final Range range;
-	public final boolean useWeaponRange; // ignore for now
 	public final Optional<AbilityInfo> mana;
 	public final Optional<AbilityInfo> subsequent;
 	public final int recursion;
@@ -40,7 +39,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 		double chance,
 		boolean heal,
 		Range range,
-		boolean useWeaponRange,
 		Optional<AbilityInfo> mana,
 		Optional<AbilityInfo> subsequent,
 		int recursion,
@@ -58,7 +56,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.chance = chance;
 		this.heal = heal;
 		this.range = range;
-		this.useWeaponRange = useWeaponRange;
 		this.mana = mana;
 		this.subsequent = subsequent;
 		this.recursion = recursion;
@@ -81,7 +78,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 		r.put("chance", chance);
 		r.put("heal", heal);
 		r.put("range", range.getJSON());
-		r.put("useWeaponRange", useWeaponRange);
 		mana.ifPresent(m -> r.put("mana", m.getJSON()));
 		subsequent.ifPresent(s -> r.put("subsequent", s.getJSON()));
 		r.put("recursion", recursion);
@@ -104,7 +100,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 		Object rchance = json.get("chance");
 		Object rheal = json.get("heal");
 		Object rrange = json.get("range");
-		Object ruseWeaponRange = json.get("useWeaponRange");
 		Object rmana = json.get("mana");
 		Object rsubsequent = json.get("subsequent");
 		Object rrecursion = json.get("recursion");
@@ -124,8 +119,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 			if (rchance == null) throw new CorruptDataException("Missing chance in ability " + name);
 			if (rheal == null) throw new CorruptDataException("Missing heal in ability " + name);
 			if (rrange == null) throw new CorruptDataException("Missing range in ability " + name);
-			if (ruseWeaponRange == null) throw new CorruptDataException(
-				"Missing useWeaponRange in ability " + name);
 			if (rrecursion == null) throw new CorruptDataException("Missing recursion in ability " + name);
 
 			AbilityType type = AbilityType.parse((String) rtype);
@@ -137,7 +130,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 			Number chance = (Number) rchance;
 			boolean heal = (Boolean) rheal;
 			Range range = Range.fromJSON((JSONObject) rrange);
-			boolean useWeaponRange = (Boolean) ruseWeaponRange;
 			Number recursion = (Number) rrecursion;
 			Optional<AbilityInfo> mana;
 			Optional<AbilityInfo> subsequent;
@@ -166,7 +158,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 				ap.intValue(), mp.intValue(),
 				pp.intValue(), eff.doubleValue(),
 				chance.doubleValue(), heal, range,
-				useWeaponRange, mana, subsequent, recursion.intValue(),
+				mana, subsequent, recursion.intValue(),
 				instantBefore, instantAfter, statusEffect);
 
 		} catch (ClassCastException e) {

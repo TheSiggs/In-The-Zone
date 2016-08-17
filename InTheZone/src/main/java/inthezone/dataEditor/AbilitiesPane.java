@@ -63,12 +63,10 @@ public class AbilitiesPane extends VBox {
 	private final TreeTableColumn<AbilityInfoModel, Integer> range = new TreeTableColumn<>("Range");
 	private final TreeTableColumn<AbilityInfoModel, Integer> radius = new TreeTableColumn<>("Radius");
 	private final TreeTableColumn<AbilityInfoModel, Boolean> piercing = new TreeTableColumn<>("Piercing");
-	private final TreeTableColumn<AbilityInfoModel, Integer> ribbon = new TreeTableColumn<>("Ribbon");
 	private final TreeTableColumn<AbilityInfoModel, String> targetMode = new TreeTableColumn<>("Target");
 	private final TreeTableColumn<AbilityInfoModel, Integer> nTargets = new TreeTableColumn<>("Max targets");
 	private final TreeTableColumn<AbilityInfoModel, Boolean> los = new TreeTableColumn<>("LOS required");
 
-	private final TreeTableColumn<AbilityInfoModel, Boolean> useWeaponRange = new TreeTableColumn<>("Weapon range");
 	private final TreeTableColumn<AbilityInfoModel, Integer> recursion = new TreeTableColumn<>("Recursion");
 
 	private final TreeTableColumn<AbilityInfoModel, String> instantBefore = new TreeTableColumn<>("Instant before damage");
@@ -284,11 +282,9 @@ public class AbilitiesPane extends VBox {
 		range.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("range"));
 		radius.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("radius"));
 		piercing.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("piercing"));
-		ribbon.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("ribbon"));
 		targetMode.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("targetMode"));
 		nTargets.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("nTargets"));
 		los.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("los"));
-		useWeaponRange.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("useWeaponRange"));
 		recursion.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("recursion"));
 		instantBefore.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("instantBefore"));
 		instantAfter.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("instantAfter"));
@@ -307,14 +303,11 @@ public class AbilitiesPane extends VBox {
 		range.setSortable(false);
 		radius.setSortable(false);
 		piercing.setSortable(false);
-		ribbon.setSortable(false);
 		targetMode.setSortable(false);
 		nTargets.setSortable(false);
 		nTargets.setPrefWidth(120);
 		los.setSortable(false);
 		los.setPrefWidth(120);
-		useWeaponRange.setSortable(false);
-		useWeaponRange.setPrefWidth(120);
 		recursion.setSortable(false);
 		instantBefore.setSortable(false);
 		instantBefore.setPrefWidth(180);
@@ -347,16 +340,12 @@ public class AbilitiesPane extends VBox {
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		piercing.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
 			forTreeTableColumn(piercing));
-		ribbon.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
-			forTreeTableColumn(PositiveIntegerField::new, selection));
 		targetMode.setCellFactory(ChoiceBoxTreeTableCell.<AbilityInfoModel, String>
 			forTreeTableColumn(targetModes));
 		nTargets.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		los.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
 			forTreeTableColumn(los));
-		useWeaponRange.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
-			forTreeTableColumn(useWeaponRange));
 		recursion.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		instantBefore.setCellFactory(EffectField.<AbilityInfoModel>
@@ -378,11 +367,9 @@ public class AbilitiesPane extends VBox {
 		hookOnEditCommit(range, changed);
 		hookOnEditCommit(radius, changed);
 		hookOnEditCommit(piercing, changed);
-		hookOnEditCommit(ribbon, changed);
 		hookOnEditCommit(targetMode, changed);
 		hookOnEditCommit(nTargets, changed);
 		hookOnEditCommit(los, changed);
-		hookOnEditCommit(useWeaponRange, changed);
 		hookOnEditCommit(recursion, changed);
 		hookOnEditCommit(instantBefore, changed);
 		hookOnEditCommit(instantAfter, changed);
@@ -392,7 +379,7 @@ public class AbilitiesPane extends VBox {
 		@SuppressWarnings("unchecked")
 		boolean v = table.getColumns().setAll(
 			name, type, trap, ap, mp, pp, eff, chance, heal, range, radius,
-			piercing, ribbon, targetMode, nTargets, los, useWeaponRange,
+			piercing, targetMode, nTargets, los,
 			recursion, instantBefore, instantAfter, statusEffect);
 	}
 

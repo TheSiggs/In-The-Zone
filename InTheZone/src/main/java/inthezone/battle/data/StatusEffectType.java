@@ -4,7 +4,7 @@ import isogame.engine.CorruptDataException;
 
 public enum StatusEffectType {
 	ACCELERATED, DAZED, DEBILITATED, ENERGIZED, FEARED,
-	IMPRISONED, PRECISE, RESISTANT, REVERBERATING, VULNERABLE,
+	IMPRISONED, PRECISE, RESISTANT, VULNERABLE,
 	ONGOING, PANICKED, REGENERATION, SILENCED, SLOWED, STRENGTHENED,
 	STUNNED, VAMPIRISM, WEAKENED;
 
@@ -18,7 +18,6 @@ public enum StatusEffectType {
 			case IMPRISONED: return StatusEffectKind.DEBUFF;
 			case PRECISE: return StatusEffectKind.BUFF;
 			case RESISTANT: return StatusEffectKind.BUFF;
-			case REVERBERATING: return StatusEffectKind.BUFF;
 			case VULNERABLE: return StatusEffectKind.DEBUFF;
 			case ONGOING: return StatusEffectKind.DEBUFF;
 			case PANICKED: return StatusEffectKind.DEBUFF;
@@ -46,7 +45,6 @@ public enum StatusEffectType {
 			case "imprisoned": return IMPRISONED;
 			case "precise": return PRECISE;
 			case "resistant": return RESISTANT;
-			case "reverberating": return REVERBERATING;
 			case "vulnerable": return VULNERABLE;
 			case "ongoing": return ONGOING;
 			case "panicked": return PANICKED;

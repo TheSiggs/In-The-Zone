@@ -8,20 +8,18 @@ public class Range implements HasJSONRepresentation {
 	public final int range;
 	public final int radius;
 	public final boolean piercing; // ignore for now
-	public final int ribbon;       // ignore for now
 	public final TargetMode targetMode;
 	public final int nTargets;
 	public final boolean los;
 
 	public Range(
 		int range, int radius,
-		boolean piercing, int ribbon,
+		boolean piercing,
 		TargetMode targetMode,
 		int nTargets, boolean los
 	) {
 		this.range = range;
 		this.piercing = piercing;
-		this.ribbon = ribbon;
 		this.radius = radius;
 		this.targetMode = targetMode;
 		this.nTargets = nTargets;
@@ -34,7 +32,6 @@ public class Range implements HasJSONRepresentation {
 		JSONObject r = new JSONObject();
 		r.put("range", range);
 		r.put("piercing", piercing);
-		r.put("ribbon", ribbon);
 		r.put("radius", radius);
 		r.put("targetMode", targetMode.toString());
 		r.put("nTargets", nTargets);
@@ -47,7 +44,6 @@ public class Range implements HasJSONRepresentation {
 	{
 		Object rrange = json.get("range");
 		Object rpiercing = json.get("piercing");
-		Object rribbon = json.get("ribbon");
 		Object rradius = json.get("radius");
 		Object rtargetMode = json.get("targetMode");
 		Object rnTargets = json.get("nTargets");
@@ -55,7 +51,6 @@ public class Range implements HasJSONRepresentation {
 
 		if (rrange == null) throw new CorruptDataException("Missing range range");
 		if (rpiercing == null) throw new CorruptDataException("Missing piercing");
-		if (rribbon == null) throw new CorruptDataException("Missing ribbon");
 		if (rtargetMode == null) throw new CorruptDataException("Missing targetMode");
 		if (rnTargets == null) throw new CorruptDataException("Missing nTargets");
 		if (rlos == null) throw new CorruptDataException("Missing los");
@@ -63,15 +58,13 @@ public class Range implements HasJSONRepresentation {
 		try {
 			Number range = (Number) rrange;
 			Boolean piercing = (Boolean) rpiercing;
-			Number ribbon = (Number) rribbon;
 			Number radius = (Number) rradius;
 			String targetMode = (String) rtargetMode;
 			Number nTargets = (Number) rnTargets;
 			Boolean los = (Boolean) rlos;
 
 			return new Range(
-				range.intValue(), radius.intValue(),
-				piercing, ribbon.intValue(),
+				range.intValue(), radius.intValue(), piercing,
 				new TargetMode(targetMode),
 				nTargets.intValue(), los);
 		} catch (ClassCastException e) {

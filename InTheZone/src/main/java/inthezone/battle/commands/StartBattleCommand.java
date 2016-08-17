@@ -54,19 +54,16 @@ public class StartBattleCommand {
 		return sprites;
 	}
 
-	public Battle doCmd(GameDataFactory factory) {
-		/*ArrayList<Character> cs = new ArrayList<>();
-		cs.add(p1.c1.cloneTo(p1Start1, Player.PLAYER_A));
-		cs.add(p1.c2.cloneTo(p1Start2, Player.PLAYER_A));
-		cs.add(p1.c3.cloneTo(p1Start3, Player.PLAYER_A));
-		cs.add(p1.c4.cloneTo(p1Start4, Player.PLAYER_A));
-		cs.add(p2.c1.cloneTo(p2Start1, Player.PLAYER_B));
-		cs.add(p2.c2.cloneTo(p2Start2, Player.PLAYER_B));
-		cs.add(p2.c3.cloneTo(p2Start3, Player.PLAYER_B));
-		cs.add(p2.c4.cloneTo(p2Start4, Player.PLAYER_B));
-
-		return new Battle(new BattleState(factory.getStage(stage), cs));*/
-		return null;
+	public Battle doCmd(GameDataFactory gameData) {
+		Collection<Character> cs = new ArrayList<>();
+		for (int i = 0; i < p1start.size(); i++) {
+			cs.add(new Character(p1.characters.get(i), Player.PLAYER_A, p1start.get(i)));
+		}
+		for (int i = 0; i < p2start.size(); i++) {
+			cs.add(new Character(p2.characters.get(i), Player.PLAYER_B, p2start.get(i)));
+		}
+		
+		return new Battle(new BattleState(gameData.getStage(stage), cs));
 	}
 }
 

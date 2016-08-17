@@ -18,13 +18,16 @@ public class CharacterIndicatorCell extends ListCell<CharacterProfile> {
 	public void updateItem(CharacterProfile profile, boolean empty) {
 		super.updateItem(profile, empty);
 
-		if (!empty) {
+		if (empty) {
+			setText(null);
+			setGraphic(null);
+		} else {
 			if (cell == null) { 
 				cell = new CharacterIndicatorPane(profile);
-				setGraphic(cell);
 			} else {
 				cell.updateProfile(profile);
 			}
+			setGraphic(cell);
 		}
 	}
 }

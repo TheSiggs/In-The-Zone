@@ -8,6 +8,7 @@ import javafx.scene.layout.GridPane;
 public class CharacterIndicatorPane extends GridPane {
 	private CharacterProfile profile;
 
+	private final Label name = new Label("");
 	private final Label hp = new Label("0");
 	private final Label power = new Label("0");
 	private final Label attack = new Label("0");
@@ -18,7 +19,8 @@ public class CharacterIndicatorPane extends GridPane {
 
 		this.profile = profile;
 
-		this.add(new Label(profile.rootCharacter.name), 0, 0, 2, 1);
+		name.setText(profile.rootCharacter.name);
+		this.add(name, 0, 0, 2, 1);
 		this.add(new Label("HP:"),      0, 1);
 		this.add(new Label("Power:"),   0, 2);
 		this.add(new Label("Attack:"),  0, 3);
@@ -33,6 +35,7 @@ public class CharacterIndicatorPane extends GridPane {
 	public void updateProfile(CharacterProfile profile) {
 		this.profile = profile;
 		Stats baseStats = profile.getBaseStats();
+		this.name.setText(profile.rootCharacter.name);
 		this.hp.setText("" + baseStats.hp);
 		this.power.setText("" + baseStats.power);
 		this.attack.setText("" + baseStats.attack);

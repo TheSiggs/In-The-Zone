@@ -112,8 +112,9 @@ public class LoadoutView extends DialogScreen<Void> {
 	) {
 		try {
 			List<CharacterProfile> profiles = new ArrayList<>();
-			for (CharacterInfo c : gameData.getCharacters())
-				profiles.add(new CharacterProfile(c));
+			for (CharacterInfo c : gameData.getCharacters()) {
+				if (c.playable) profiles.add(new CharacterProfile(c));
+			}
 			return new LoadoutModel(new Loadout("<new loadout>", profiles));
 		} catch (CorruptDataException e) {
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);

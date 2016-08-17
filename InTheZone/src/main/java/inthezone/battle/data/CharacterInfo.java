@@ -49,6 +49,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 		JSONObject r = new JSONObject();
 		r.put("name", name);
 		r.put("sprite", sprite.id);
+		r.put("playable", playable);
 		r.put("stats", stats.getJSON());
 		JSONArray as = new JSONArray();
 		for (AbilityInfo a : abilities) {

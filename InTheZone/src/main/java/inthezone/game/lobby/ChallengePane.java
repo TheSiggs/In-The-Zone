@@ -15,7 +15,9 @@ import isogame.engine.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -26,8 +28,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Gather all the information required to issue / respond to a challenge.
@@ -174,6 +178,20 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		});
 
 		doneButton.setOnAction(event -> {
+			String s = stage.getSelectionModel().getSelectedItem();
+			Loadout l = loadout.getSelectionModel().getSelectedItem();
+			if (s == null || l == null ||
+				characterPositions.size() != l.characters.size())
+			{
+				Alert a = new Alert(Alert.AlertType.ERROR,
+					"Stage, loadout, or placement not complete", ButtonType.OK);
+				a.showAndWait();
+			} else {
+				List<MapPoint> startTiles = l.characters.stream()
+					.map(c -> characterPositions.get(c.rootCharacter.name))
+					.collect(Collectors.toList());
+				onDone.accept(Optional.of(new StartBattleCommandRequest(s, l, startTiles)));
+			}
 		});
 	}
 }

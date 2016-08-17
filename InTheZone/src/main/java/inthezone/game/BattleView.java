@@ -35,6 +35,9 @@ public class BattleView
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 
+		startBattle.makeSprites().stream()
+			.forEach(s -> canvas.getStage().addSprite(s));
+
 		BattleInProgress battle =
 			new BattleInProgress(startBattle, player, gameData, this);
 		(new Thread(battle)).start();

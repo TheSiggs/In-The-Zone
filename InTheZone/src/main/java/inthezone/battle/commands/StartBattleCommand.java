@@ -6,7 +6,11 @@ import inthezone.battle.Character;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
+import isogame.engine.FacingDirection;
 import isogame.engine.MapPoint;
+import isogame.engine.Sprite;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,6 +35,23 @@ public class StartBattleCommand {
 		this.p2 = p2;
 		this.p1start = p1start;
 		this.p2start = p2start;
+	}
+
+	public Collection<Sprite> makeSprites() {
+		Collection<Sprite> sprites = new ArrayList<>();
+		for (int i = 0; i < p1start.size(); i++) {
+			Sprite s = new Sprite(p1.characters.get(i).rootCharacter.sprite);
+			s.pos = p1start.get(i);
+			s.direction = FacingDirection.DOWN;
+			sprites.add(s);
+		}
+		for (int i = 0; i < p2start.size(); i++) {
+			Sprite s = new Sprite(p2.characters.get(i).rootCharacter.sprite);
+			s.pos = p2start.get(i);
+			s.direction = FacingDirection.DOWN;
+			sprites.add(s);
+		}
+		return sprites;
 	}
 
 	public Battle doCmd(GameDataFactory factory) {

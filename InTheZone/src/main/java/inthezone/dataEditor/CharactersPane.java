@@ -97,7 +97,8 @@ public class CharactersPane extends VBox {
 
 		add.setOnAction(event -> {
 			Stats s = new Stats(3, 3, 1, 1, 1, 1);
-			CharacterInfo c = new CharacterInfo("New character", null, s, new LinkedList<>());
+			CharacterInfo c = new CharacterInfo("New character", null,
+				s, new LinkedList<>(), true);
 			CharacterPane pane =
 				new CharacterPane(c, gameData, changed, abilities, new LinkedList<>(), weapons);
 			characters.getPanes().add(pane);

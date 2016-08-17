@@ -18,6 +18,7 @@ import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class CharacterPane extends TitledPane {
 	private final GridPane grid = new GridPane();
 	private final TextField name;
+	private final CheckBox playable;
 	private final ComboBox<SpriteInfo> sprite;
 	private final ObservableList<SpriteInfo> spriteList =
 		FXCollections.observableArrayList();
@@ -145,7 +147,8 @@ public class CharacterPane extends TitledPane {
 				ap.getValue(), mp.getValue(),
 				power.getValue(), hp.getValue(),
 				attack.getValue(), defence.getValue()),
-			getAbilities());
+			getAbilities(),
+			playable.isSelected());
 	}
 
 	public Collection<AbilityInfo> getAbilities() throws CorruptDataException {
@@ -213,6 +216,8 @@ public class CharacterPane extends TitledPane {
 		}
 
 		name = new TextField(character.name);
+		playable = new CheckBox("Playable");
+		playable.setSelected(character.playable);
 		sprite = new ComboBox<>(spriteList);
 		ap = new PositiveIntegerField(character.stats.ap);
 		mp = new PositiveIntegerField(character.stats.mp);
@@ -224,14 +229,15 @@ public class CharacterPane extends TitledPane {
 		Button weaponsButton = new Button("Weapons ...");
 
 		grid.addRow(0, new Label("Name"), name);
-		grid.addRow(1, new Label("Sprite"), sprite);
-		grid.addRow(2, new Label("Base AP"), ap);
-		grid.addRow(3, new Label("Base MP"), mp);
-		grid.addRow(4, new Label("Base Power"), power);
-		grid.addRow(5, new Label("Base HP"), hp);
-		grid.addRow(6, new Label("Base Attack"), attack);
-		grid.addRow(7, new Label("Base Defence"), defence);
-		grid.add(weaponsButton, 1, 8);
+		grid.add(playable, 1, 1);
+		grid.addRow(2, new Label("Sprite"), sprite);
+		grid.addRow(3, new Label("Base AP"), ap);
+		grid.addRow(4, new Label("Base MP"), mp);
+		grid.addRow(5, new Label("Base Power"), power);
+		grid.addRow(6, new Label("Base HP"), hp);
+		grid.addRow(7, new Label("Base Attack"), attack);
+		grid.addRow(8, new Label("Base Defence"), defence);
+		grid.add(weaponsButton, 1, 9);
 
 		name.textProperty().addListener(c -> changed.setValue(true));
 		sprite.valueProperty().addListener(c -> changed.setValue(true));

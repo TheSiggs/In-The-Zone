@@ -16,16 +16,22 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public final SpriteInfo sprite;
 	public final Stats stats;
 	public final Collection<AbilityInfo> abilities;
+	public final boolean playable;
 
 	private final Map<String, AbilityInfo> abilitiesIndex = new HashMap<>();
 
 	public CharacterInfo(
-		String name, SpriteInfo sprite, Stats stats, Collection<AbilityInfo> abilities
+		String name,
+		SpriteInfo sprite,
+		Stats stats,
+		Collection<AbilityInfo> abilities,
+		boolean playable
 	) {
 		this.name = name;
 		this.stats = stats;
 		this.sprite = sprite;
 		this.abilities = abilities;
+		this.playable = playable;
 
 		for (AbilityInfo a : abilities) abilitiesIndex.put(a.name, a);
 	}
@@ -58,6 +64,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 		Object rname = json.get("name");
 		Object rstats = json.get("stats");
 		Object rsprite = json.get("sprite");
+		Object rplayable = json.get("playable");
 		Object rabilities = json.get("abilities");
 
 		try {
@@ -75,6 +82,9 @@ public class CharacterInfo implements HasJSONRepresentation {
 			if (rsprite == null)
 				throw new CorruptDataException("Missing character sprite");
 
+			boolean playable;
+			if (rplayable == null) playable = true; else playable = (Boolean) rplayable;
+
 			SpriteInfo sprite = lib.getSprite((String) rsprite);
 
 			if (rabilities == null)
@@ -86,7 +96,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a));
 			}
 
-			return new CharacterInfo(name, sprite, stats, allAbilities);
+			return new CharacterInfo(name, sprite, stats, allAbilities, playable);
 		} catch(ClassCastException e) {
 			throw new CorruptDataException("Type error in character", e);
 		}

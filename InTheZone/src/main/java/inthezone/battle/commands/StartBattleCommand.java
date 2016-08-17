@@ -5,6 +5,7 @@ import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
+import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import java.util.List;
 
@@ -13,8 +14,8 @@ import java.util.List;
  * command initializes a new battle.
  * */
 public class StartBattleCommand {
-	private final String stage;
-	private final boolean p1GoesFirst;
+	public final String stage;
+	public final boolean p1GoesFirst;
 	private final Loadout p1;
 	private final Loadout p2;
 	private final List<MapPoint> p1start;

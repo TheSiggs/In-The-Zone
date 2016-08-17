@@ -6,6 +6,10 @@ import java.util.List;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 
+/**
+ * This class keeps track of the state of the battle.  It does not know how to
+ * perform high level battle operations.
+ * */
 public class BattleState {
 	public final Stage terrain;
 	public final Collection<Character> characters;

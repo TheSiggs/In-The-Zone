@@ -1,25 +1,57 @@
 package inthezone.game;
 
+import inthezone.battle.BattleOutcome;
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
-import isogame.engine.Stage;
-import isogame.engine.View;
-import javafx.scene.canvas.Canvas;
+import inthezone.comptroller.BattleListener;
+import isogame.engine.MapView;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
-public class BattleView extends Canvas {
-	private final View view;
-	private final Stage stage;
+public class BattleView
+	extends DialogScreen<BattleOutcome> implements BattleListener
+{
+	private final MapView canvas;
 
-	public BattleView(Stage stage, BattleInProgress battle) {
-		view = new View(960, 540);
-		this.stage = stage;
+	public BattleView(
+		StartBattleCommand startBattle, Player player, GameDataFactory gameData
+	) {
+		super();
 
-		// Listen for window resize events
-		this.widthProperty().addListener((obs, w0, w) -> {
-			view.setViewport(w.intValue(), (int) this.getHeight());
-		});
-		this.heightProperty().addListener((obs, h0, h) -> {
-			view.setViewport((int) this.getWidth(), h.intValue());
-		});
+		final Paint[] highlights =
+			new Paint[] {
+				Color.rgb(0x00, 0xFF, 0x00, 0.2),
+				Color.rgb(0xFF, 0x00, 0x00, 0.2),
+				Color.rgb(0x00, 0x00, 0xFF, 0.2)};
+
+		this.canvas = new MapView(this,
+			gameData.getStage(startBattle.stage), true, highlights);
+		canvas.widthProperty().bind(this.widthProperty());
+		canvas.heightProperty().bind(this.heightProperty());
+		canvas.startAnimating();
+
+		BattleInProgress battle =
+			new BattleInProgress(startBattle, player, gameData, this);
+		(new Thread(battle)).start();
+	}
+
+	public void startTurn() {
+	}
+
+	public void endTurn() {
+	}
+
+	public void endBattle(boolean playerWins) {
+	}
+
+	public void badCommand(CommandException e) {
+	}
+
+	public void command(Command cmd) {
 	}
 }
 

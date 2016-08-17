@@ -4,6 +4,7 @@ import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
+import inthezone.battle.data.Player;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
@@ -50,7 +51,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 	private final CharacterSelector characterSelector = new CharacterSelector();
 
-	private final int player;
+	private final Player player;
 	private Stage currentStage = null;
 
 	private final MapView startPosChooser;
@@ -62,12 +63,12 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	 * @param gameData The game data
 	 * @param useStage Force the player to use the indicated stage.  Used when
 	 * accepting a challenge.
-	 * @param player The player (0 or 1) to play.  For the challenger, chosen
-	 * randomly.  For the challenged, the opposite of the challenger.
+	 * @param player The player to play.  For the challenger, chosen randomly.
+	 * For the challenged, the opposite of the challenger.
 	 * */
 	public ChallengePane(
 		GameDataFactory gameData, ClientConfig config,
-		Optional<String> useStage, int player
+		Optional<String> useStage, Player player
 	)
 		throws CorruptDataException
 	{
@@ -121,7 +122,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			if (s != null) {
 				currentStage = gameData.getStage(s);
 				startPosChooser.setStage(currentStage);
-				Collection<MapPoint> tiles = player == 0?
+				Collection<MapPoint> tiles = player == Player.PLAYER_A?
 					currentStage.terrain.getPlayerStartTiles() :
 					currentStage.terrain.getAIStartTiles();
 				startPosChooser.setSelectable(tiles);
@@ -190,7 +191,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 				List<MapPoint> startTiles = l.characters.stream()
 					.map(c -> characterPositions.get(c.rootCharacter.name))
 					.collect(Collectors.toList());
-				onDone.accept(Optional.of(new StartBattleCommandRequest(s, l, startTiles)));
+				onDone.accept(Optional.of(new StartBattleCommandRequest(
+					s, player, l, startTiles)));
 			}
 		});
 	}

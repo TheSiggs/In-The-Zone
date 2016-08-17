@@ -1,5 +1,6 @@
 package inthezone.battle;
 
+import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import isogame.engine.MapPoint;
 import java.util.Collection;

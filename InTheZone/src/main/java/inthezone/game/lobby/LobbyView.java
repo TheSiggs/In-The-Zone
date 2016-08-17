@@ -1,6 +1,7 @@
 package inthezone.game.lobby;
 
 import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
@@ -21,10 +22,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public class LobbyView extends VBox {
-	private final ObservableList<Player> players =
+	private final ObservableList<ServerPlayer> players =
 		FXCollections.observableArrayList();
 
-	private final Map<String, Player>	playerNames = new HashMap<>();
+	private final Map<String, ServerPlayer>	playerNames = new HashMap<>();
 
 	public LobbyView(
 		ContentPane parent,
@@ -40,7 +41,7 @@ public class LobbyView extends VBox {
 
 		final VBox mainPane = new VBox();
 
-		final ListView<Player> playerList = new ListView<>(players);
+		final ListView<ServerPlayer> playerList = new ListView<>(players);
 		mainPane.getChildren().addAll(new Label("Players on server"), playerList);
 
 		challenge.disableProperty().bind(
@@ -53,15 +54,15 @@ public class LobbyView extends VBox {
 		});
 
 		challenge.setOnAction(event -> {
-			Player s = playerList.getSelectionModel().getSelectedItem();
+			ServerPlayer s = playerList.getSelectionModel().getSelectedItem();
 			if (s != null) {
-				int pn = (int) Math.floor(Math.random() * 2);
 				try {
 					parent.showScreen(
-						new ChallengePane(gameData, config, Optional.empty(), pn), oCmdReq ->
-							oCmdReq.ifPresent(cmdReq -> {
-								parent.network.challengePlayer(cmdReq, s.name);
-							}));
+						new ChallengePane(gameData, config,
+							Optional.empty(), Player.randomPlayer()), oCmdReq ->
+								oCmdReq.ifPresent(cmdReq -> {
+									parent.network.challengePlayer(cmdReq, s.name);
+								}));
 				} catch (CorruptDataException e) {
 					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 					a.setHeaderText("Error initialising challenge panel");
@@ -80,40 +81,40 @@ public class LobbyView extends VBox {
 
 		players.stream()
 			.filter(x -> !x.equals(playerName))
-			.map(x -> new Player(x, false))
+			.map(x -> new ServerPlayer(x, false))
 			.forEach(x -> this.players.add(x));
 	}
 
 	public void playerJoins(String player) {
 		if (player == playerName) return;
 
-		Player p = playerNames.get(player);
+		ServerPlayer p = playerNames.get(player);
 		if (p != null) {
 			p.reset();
 		} else {
-			p = new Player(player, false);
+			p = new ServerPlayer(player, false);
 			playerNames.put(player, p);
 			players.add(p);
 		}
 	}
 
 	public void playerLeaves(String player) {
-		Player p = playerNames.get(player);
+		ServerPlayer p = playerNames.get(player);
 		if (p != null) players.remove(p);
 	}
 
 	public void playerEntersGame(String player) {
-		Player p = playerNames.get(player);
+		ServerPlayer p = playerNames.get(player);
 		if (p != null) p.setInGame();
 	}
 }
 
-class Player {
+class ServerPlayer {
 	public final String name;
 
 	private boolean inGame;
 
-	public Player(String name, boolean inGame) {
+	public ServerPlayer(String name, boolean inGame) {
 		this.name = name;
 		this.inGame = inGame;
 	}

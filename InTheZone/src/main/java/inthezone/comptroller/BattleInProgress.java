@@ -7,7 +7,9 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
-import inthezone.battle.Player;
+import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import javafx.application.Platform;
 import java.util.Collection;
@@ -23,6 +25,17 @@ public class BattleInProgress implements Runnable {
 
 	private final BlockingQueue<CommandRequest> commandRequests =
 		new LinkedBlockingQueue<>();
+	
+	public BattleInProgress(
+		StartBattleCommand cmd, Player thisPlayer,
+		GameDataFactory gameData, BattleListener listener
+	) {
+		this(
+			cmd.doCmd(gameData),
+			thisPlayer,
+			cmd.p1GoesFirst == (thisPlayer == Player.PLAYER_A),
+			listener);
+	}
 
 	public BattleInProgress(
 		Battle battle, Player thisPlayer,

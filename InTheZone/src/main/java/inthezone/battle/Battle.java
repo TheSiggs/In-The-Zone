@@ -5,6 +5,9 @@ import java.util.List;
 
 import isogame.engine.MapPoint;
 
+/**
+ * This class processes battle commands.
+ * */
 public class Battle {
 	public BattleState battleState;
 

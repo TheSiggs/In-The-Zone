@@ -1,16 +1,28 @@
 package inthezone.game;
 
+import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.commands.StartBattleCommandRequest;
+import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Loadout;
+import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.loadoutEditor.LoadoutView;
 import inthezone.game.lobby.ChallengePane;
 import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+import isogame.engine.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DisconnectedView extends FlowPane {
 	private final Network network;
@@ -18,6 +30,9 @@ public class DisconnectedView extends FlowPane {
 	private final Button login = new Button("Connect to server");
 	private final Button loadout = new Button("Edit loadouts offline");
 	private final Button sandpit = new Button("Sandpit mode");
+
+	private final GameDataFactory gameData;
+	private final ContentPane parent;
 
 	public DisconnectedView(
 		ContentPane parent,
@@ -28,6 +43,8 @@ public class DisconnectedView extends FlowPane {
 		Optional<String> cachedName
 	) {
 		this.network = parent.network;
+		this.gameData = gameData;
+		this.parent = parent;
 
 		login.setOnAction(event -> {
 			String playerName = "";
@@ -63,15 +80,58 @@ public class DisconnectedView extends FlowPane {
 		sandpit.setOnAction(event -> {
 			try {
 				parent.showScreen(
-					new ChallengePane(gameData, config, Optional.empty(), 0), oCmdReq -> {});
+					new ChallengePane(gameData, config, Optional.empty(),
+						Player.PLAYER_A), getStartSandpitCont());
 			} catch (CorruptDataException e) {
-				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
 				a.setHeaderText("Error initialising challenge panel");
 				a.showAndWait();
 			}
 		});
 
 		this.getChildren().addAll(login, loadout, sandpit);
+	}
+
+	private Consumer<Optional<StartBattleCommandRequest>> getStartSandpitCont() {
+		return ostart -> {
+			ostart.ifPresent(start -> {
+				try {
+					// prepare the AI position
+					Player op = start.getOtherPlayer();
+					Stage si = gameData.getStage(start.stage);
+					Collection<MapPoint> startTiles = op == Player.PLAYER_A ?
+						si.terrain.getPlayerStartTiles() :
+						si.terrain.getAIStartTiles();
+					Loadout l = makeSandpitLoadout(start, startTiles, gameData);
+
+					// prepare the battle
+					StartBattleCommand ready =
+						(new StartBattleCommandRequest(start.stage, op, l,
+							startTiles.stream().collect(Collectors.toList())))
+							.makeCommand(start, gameData);
+
+					// start the battle
+					parent.showScreen(new BattleView(ready, Player.PLAYER_A, gameData),
+						winCond -> {});
+				} catch (CorruptDataException e) {
+					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+					a.setHeaderText("Error starting game");
+					a.showAndWait();
+				}
+			});
+		};
+	}
+	
+	private static Loadout makeSandpitLoadout(
+		StartBattleCommandRequest start,
+		Collection<MapPoint> startTiles,
+		GameDataFactory gameData
+	) throws CorruptDataException {
+		List<CharacterProfile> characters = new ArrayList<>();
+		for (int i = 0; i < startTiles.size(); i++)
+			characters.add(new CharacterProfile(gameData.getCharacter("robot")));
+
+		return new Loadout("Sandpit", characters);
 	}
 
 	public void startConnecting() {

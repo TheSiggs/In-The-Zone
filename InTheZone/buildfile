@@ -1,30 +1,38 @@
 repositories.remote << 'http://repo1.maven.org/maven2'
 
+allJars = [
+	'lib/json-simple-1.1.1.jar',
+	'lib/engine.jar',
+	'lib/dcoder-ai.jar',
+	'lib/vecmath.jar',
+	'lib/durian-3.4.0.jar']
+classpath = allJars.join ' '
+
 define 'dataeditor' do
-	compile.using(:lint => 'all').with('lib/json-simple-1.1.1.jar', 'lib/durian-3.4.0.jar', 'lib/engine.jar')
+	compile.using(:lint => 'all').with(allJars)
 	project.version = '0.0.1'
 	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.dataEditor.DataEditor'})
 	run.using(:main => 'inthezone.dataEditor.DataEditor')
 end
 
 define 'uuid-please' do
-	compile.using(:lint => 'all').with('lib/json-simple-1.1.1.jar', 'lib/durian-3.4.0.jar', 'lib/engine.jar')
+	compile.using(:lint => 'all').with(allJars)
 	run.using(:main => 'inthezone.MakeUUID')
 end
 
 define 'game' do
-	compile.using(:lint => 'all').with('lib/json-simple-1.1.1.jar', 'lib/durian-3.4.0.jar', 'lib/engine.jar')
+	compile.using(:lint => 'all').with(allJars)
 	project.version = '0.0.1'
-	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.game.Game', 'Class-Path'=>'lib/json-simple-1.1.1.jar lib/engine.jar lib/durian-3.4.0.jar'})
+	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.game.Game', 'Class-Path'=>classpath})
 	run.using(:main => 'inthezone.game.Game')
 end
 
 define 'server' do
 	# buildr always compiles everything, so we need to add all the dependencies
 	# even though the server doesn't depend on all these things
-	compile.using(:lint => 'all').with('lib/json-simple-1.1.1.jar', 'lib/engine.jar', 'lib/durian-3.4.0.jar')
+	compile.using(:lint => 'all').with(allJars)
 	project.version = '0.0.1'
-	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.server.Server', 'Class-Path'=>'lib/json-simple-1.1.1.jar lib/engine.jar lib/durian-3.4.0.jar'})
+	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.server.Server', 'Class-Path'=>classpath})
 	run.using(:main => 'inthezone.server.Server')
 end
 

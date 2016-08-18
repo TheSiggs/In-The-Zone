@@ -162,9 +162,7 @@ public class BattleInProgress implements Runnable {
 				MapPoint p = new MapPoint(x, y);
 				if (r.contains(p)) continue;
 				List<MapPoint> path = battle.battleState.findPath(c.getPos(), p, c.player);
-				if (battle.battleState.canMove(path)) {
-					r.addAll(path);
-				}
+				if (battle.battleState.canMove(path)) r.add(p);
 			}
 		}
 

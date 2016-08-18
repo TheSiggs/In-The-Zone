@@ -19,10 +19,10 @@ public class Character implements Targetable, Obstacle {
 	private Optional<StatusEffect> statusBuff;
 	private Optional<StatusEffect> statusDebuff;
 
-	private MapPoint pos;
-	private int ap;
-	private int mp;
-	private int hp;
+	private MapPoint pos = new MapPoint(0, 0);
+	private int ap = 0;
+	private int mp = 0;
+	private int hp = 0;
 
 	public Character(
 		String name,
@@ -83,6 +83,8 @@ public class Character implements Targetable, Obstacle {
 		this.basicAbility = new Ability(profile.basicAbility);
 		this.pos = pos;
 		this.maxHP = baseStats.hp;
+		this.ap = baseStats.ap;
+		this.mp = baseStats.mp;
 		this.hp = maxHP;
 	}
 

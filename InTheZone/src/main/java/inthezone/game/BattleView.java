@@ -94,11 +94,10 @@ public class BattleView
 	public void selectCharacter(Optional<Character> c) {
 		selectedCharacter = c;
 
+		canvas.getStage().clearHighlighting(0);
 		if (c.isPresent()) {
 			getFutureWithRetry(battle.getMoveRange(c.get())).ifPresent(mr ->
 				mr.stream().forEach(p -> canvas.getStage().setHighlight(p, 0)));
-		} else {
-			canvas.getStage().clearHighlighting(0);
 		}
 	}
 

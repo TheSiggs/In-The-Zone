@@ -60,13 +60,13 @@ public class PathFinderNode extends Node<MapPoint> {
 			if (n.y >= 0 && !obstacles.contains(n) && canTraverseBoundary(pos, n, SlopeType.N)) {
 				nodes.add(nextNode(n));
 			}
-			if (s.y < height && !obstacles.contains(s) && canTraverseBoundary(pos, n, SlopeType.S)) {
+			if (s.y < height && !obstacles.contains(s) && canTraverseBoundary(pos, s, SlopeType.S)) {
 				nodes.add(nextNode(s));
 			}
-			if (e.x < width && !obstacles.contains(e) && canTraverseBoundary(pos, n, SlopeType.E)) {
+			if (e.x < width && !obstacles.contains(e) && canTraverseBoundary(pos, e, SlopeType.E)) {
 				nodes.add(nextNode(e));
 			}
-			if (w.x >= 0 && !obstacles.contains(w) && canTraverseBoundary(pos, n, SlopeType.W)) {
+			if (w.x >= 0 && !obstacles.contains(w) && canTraverseBoundary(pos, w, SlopeType.W)) {
 				nodes.add(nextNode(w));
 			}
 		}

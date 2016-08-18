@@ -20,13 +20,12 @@ public class AttackCommandRequest extends CommandRequest {
 
 	@Override
 	public Command makeCommand(BattleState battleState) throws CommandException {
-		Character a = battleState.getCharacterAt(agent);
-		// TODO: fix this
-		Ability ability = null; //a.getWeapon().info.attack;
 		Collection<DamageToTarget> targets =
-			battleState.getAbilityTargets(agent, ability, target).stream()
-			.map(t -> ability.computeDamageToTarget(a, t))
-			.collect(Collectors.toList());
+			battleState.getCharacterAt(agent).map(a ->
+				battleState.getAbilityTargets(agent, a.basicAbility, target).stream()
+					.map(t -> a.basicAbility.computeDamageToTarget(a, t))
+					.collect(Collectors.toList())
+			).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
 		if (battleState.canAttack(agent, targets)) {
 			return new AttackCommand(agent, targets);

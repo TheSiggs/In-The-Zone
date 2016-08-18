@@ -3,9 +3,11 @@ package inthezone.battle;
 import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import nz.dcoder.ai.astar.AStarSearch;
@@ -27,21 +29,48 @@ public class BattleState {
 		return null;
 	}
 
-	public Character getCharacterAt(MapPoint x) {
-		return null;
+	/**
+	 * Get the character at a particular point.
+	 * */
+	public Optional<Character> getCharacterAt(MapPoint x) {
+		return characters.stream().filter(c -> c.getPos().equals(x)).findFirst();
 	}
 
 	public Collection<Character> cloneCharacters() {
 		return characters.stream().map(c -> c.clone()).collect(Collectors.toList());
 	}
 
+	/**
+	 * Determine if a path is valid.  A path is valid if it takes a character to
+	 * an unoccupied square and isn't longer than the character's mp.
+	 * */
 	public boolean canMove(List<MapPoint> path) {
-		return true;
+		if (path.size() < 2) return false;
+		return getCharacterAt(path.get(0)).map(c -> {
+			MapPoint target = path.get(path.size() - 1);
+
+			return !spaceObstacles(c.player).contains(target) &&
+				path.size() - 1 <= c.getMP();
+		}).orElse(false);
 	}
 
+	private Set<MapPoint> spaceObstacles(Player player) {
+		return new HashSet<>(characters.stream()
+			.filter(c -> c.blocksSpace(player))
+			.map(c -> c.getPos()).collect(Collectors.toList()));
+	}
+
+	/**
+	 * Find a path between two points.
+	 * @param player The player that has to traverse this path
+	 * @return A short path from start to target, or an empty list if there is no
+	 * path.
+	 * */
 	public List<MapPoint> findPath(
 		MapPoint start, MapPoint target, Player player
 	) {
+		if (start.equals(target)) return new ArrayList<>();
+
 		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
 			.filter(c -> c.blocksPath(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
@@ -51,8 +80,10 @@ public class BattleState {
 			terrain.terrain.w, terrain.terrain.h,
 			start, target));
 
-		return search.search().stream()
+		List<MapPoint> r = search.search().stream()
 			.map(n -> n.getPosition()).collect(Collectors.toList());
+		if (r.size() >= 1 && !r.get(r.size() - 1).equals(target))
+			return new ArrayList<>(); else return r;
 	}
 
 	public Collection<Targetable> getAbilityTargets(

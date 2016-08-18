@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class Character implements Targetable, Obstacle {
 	public final String name;
  	public final Player player;
-	private final Collection<Ability> abilities;
-	private final Ability basicAbility;
+	public final Collection<Ability> abilities;
+	public final Ability basicAbility;
 	private final Stats baseStats;
 	private final int maxHP;
 
@@ -20,6 +20,8 @@ public class Character implements Targetable, Obstacle {
 	private Optional<StatusEffect> statusDebuff;
 
 	private MapPoint pos;
+	private int ap;
+	private int mp;
 	private int hp;
 
 	public Character(
@@ -32,6 +34,8 @@ public class Character implements Targetable, Obstacle {
 		Optional<StatusEffect> statusBuff,
 		Optional<StatusEffect> statusDebuff,
 		MapPoint pos,
+		int ap,
+		int mp,
 		int hp
 	) {
 		this.name = name;
@@ -43,6 +47,8 @@ public class Character implements Targetable, Obstacle {
 		this.statusBuff = statusBuff;
 		this.statusDebuff = statusDebuff;
 		this.pos = pos;
+		this.ap = ap;
+		this.mp = mp;
 		this.hp = hp;
 	}
 
@@ -60,6 +66,8 @@ public class Character implements Targetable, Obstacle {
 			statusBuff,
 			statusDebuff,
 			pos,
+			ap,
+			mp,
 			hp
 		);
 	}
@@ -78,6 +86,13 @@ public class Character implements Targetable, Obstacle {
 		this.hp = maxHP;
 	}
 
+	public int getAP() {
+		return ap;
+	}
+
+	public int getMP() {
+		return mp;
+	}
 
 	@Override public Stats getStats() {
 		return baseStats;

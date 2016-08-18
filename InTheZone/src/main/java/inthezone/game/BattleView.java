@@ -17,6 +17,8 @@ import isogame.GlobalConstants;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.Optional;
 
@@ -77,8 +79,27 @@ public class BattleView
 		this.getChildren().addAll(canvas);
 	}
 
+	private static <T> Optional<T> getFutureWithRetry(Future<T> f) {
+		while (true) {
+			try {
+				return Optional.of(f.get());
+			} catch (InterruptedException e) {
+				/* ignore */
+			} catch (ExecutionException e) {
+				return Optional.empty();
+			}
+		}
+	}
+
 	public void selectCharacter(Optional<Character> c) {
 		selectedCharacter = c;
+
+		if (c.isPresent()) {
+			getFutureWithRetry(battle.getMoveRange(c.get())).ifPresent(mr ->
+				mr.stream().forEach(p -> canvas.getStage().setHighlight(p, 0)));
+		} else {
+			canvas.getStage().clearHighlighting(0);
+		}
 	}
 
 	private Consumer<MapPoint> handleSelection() {

@@ -2,6 +2,7 @@ package inthezone.battle;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
@@ -25,6 +26,10 @@ public class BattleState {
 
 	public Character getCharacterAt(MapPoint x) {
 		return null;
+	}
+
+	public Collection<Character> cloneCharacters() {
+		return characters.stream().map(c -> c.clone()).collect(Collectors.toList());
 	}
 
 	public boolean canMove(List<MapPoint> path) {

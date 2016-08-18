@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Character implements Targetable {
-	private final Player player;
+	public final String name;
+ 	public final Player player;
 	private final Collection<Ability> abilities;
 	private final Ability basicAbility;
 	private final Stats baseStats;
@@ -22,8 +23,51 @@ public class Character implements Targetable {
 	private int hp;
 
 	public Character(
+		String name,
+		Player player,
+		Collection<Ability> abilities,
+		Ability basicAbility,
+		Stats baseStats,
+		int maxHP,
+		Optional<StatusEffect> statusBuff,
+		Optional<StatusEffect> statusDebuff,
+		MapPoint pos,
+		int hp
+	) {
+		this.name = name;
+		this.player = player;
+		this.abilities = abilities;
+		this.basicAbility = basicAbility;
+		this.baseStats = baseStats;
+		this.maxHP = maxHP;
+		this.statusBuff = statusBuff;
+		this.statusDebuff = statusDebuff;
+		this.pos = pos;
+		this.hp = hp;
+	}
+
+	/**
+	 * Create a copy of this character.
+	 * */
+	public Character clone() {
+		return new Character(
+			name,
+			player,
+			abilities,
+			basicAbility,
+			baseStats,
+			maxHP,
+			statusBuff,
+			statusDebuff,
+			pos,
+			hp
+		);
+	}
+
+	public Character(
 		CharacterProfile profile, Player player, MapPoint pos
 	) {
+		this.name = profile.rootCharacter.name;
 		this.player = player;
 		this.baseStats = profile.getBaseStats();
 		this.abilities = profile.abilities.stream()
@@ -33,6 +77,7 @@ public class Character implements Targetable {
 		this.maxHP = baseStats.hp;
 		this.hp = maxHP;
 	}
+
 
 	@Override public Stats getStats() {
 		return baseStats;

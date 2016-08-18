@@ -51,6 +51,9 @@ public class BattleInProgress implements Runnable {
 	@Override
 	public void run() {
 		boolean gameOver = false;
+		Platform.runLater(() -> listener.updateCharacters(
+			battle.battleState.cloneCharacters()));
+
 		if (!thisPlayerGoesFirst) {
 			otherTurn();
 		}

@@ -11,10 +11,14 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
+import isogame.engine.Sprite;
+import isogame.engine.SpriteDecalRenderer;
+import isogame.GlobalConstants;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.Optional;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -27,6 +31,19 @@ public class BattleView
 	// ready to accept command requests from the user
 	private boolean ready = true;
 	private Collection<Character> characters = null;
+
+	// the selected character
+	private Optional<Character> selectedCharacter = Optional.empty();
+
+	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
+	private final double[] sarrowx = new double[] {
+		GlobalConstants.TILEW * 3.0/8.0,
+		GlobalConstants.TILEW * 5.0/8.0,
+		GlobalConstants.TILEW / 2.0};
+	private final double[] sarrowy = new double[] {
+		GlobalConstants.TILEW * (-1.0)/8.0,
+		GlobalConstants.TILEW * (-1.0)/8.0,
+		0};
 
 	public BattleView(
 		StartBattleCommand startBattle, Player player, GameDataFactory gameData
@@ -48,9 +65,11 @@ public class BattleView
 		canvas.setFocusTraversable(true);
 		canvas.doOnSpriteSelection(handleSelection());
 
-		startBattle.makeSprites().stream()
-			.forEach(s -> canvas.getStage().addSprite(s));
-
+		for (Sprite s : startBattle.makeSprites()) {
+			s.setDecalRenderer(renderDecals);
+			canvas.getStage().addSprite(s);
+		}
+		
 		battle = new BattleInProgress(
 			startBattle, player, gameData, this);
 		(new Thread(battle)).start();
@@ -58,14 +77,37 @@ public class BattleView
 		this.getChildren().addAll(canvas);
 	}
 
-	public Consumer<MapPoint> handleSelection() {
+	public void selectCharacter(Optional<Character> c) {
+		selectedCharacter = c;
+	}
+
+	private Consumer<MapPoint> handleSelection() {
 		return p -> {
 			if (!ready && characters != null) return;
-			characters.stream().filter(c -> c.getPos() == p).findFirst().ifPresent(c -> {
-				System.err.println("Selected " + c.name);
-			});
+			if (p == null) {
+				selectCharacter(Optional.empty()); return;
+			}
+
+			Optional<Character> oc =
+				characters.stream().filter(c -> c.getPos() == p).findFirst();
+
+			if (oc.isPresent() && oc.get().player == player) {
+				selectCharacter(Optional.of(oc.get()));
+			} else {
+				selectCharacter(Optional.empty());
+			}
 		};
 	}
+
+	private SpriteDecalRenderer renderDecals = (cx, s, t, angle) -> {
+		// selection arrow
+		selectedCharacter.ifPresent(c -> {
+			if (s.pos.equals(c.getPos())) {
+				cx.setFill(sarrowColor);
+				cx.fillPolygon(sarrowx, sarrowy, 3);
+			}
+		});
+	};
 
 	@Override
 	public void startTurn() {

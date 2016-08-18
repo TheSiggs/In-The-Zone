@@ -1,11 +1,14 @@
 package inthezone.battle;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import nz.dcoder.ai.astar.AStarSearch;
 
 /**
  * This class keeps track of the state of the battle.  It does not know how to
@@ -36,8 +39,20 @@ public class BattleState {
 		return true;
 	}
 
-	public List<MapPoint> findPath(MapPoint start, MapPoint target) {
-		return null;
+	public List<MapPoint> findPath(
+		MapPoint start, MapPoint target, Player player
+	) {
+		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
+			.filter(c -> c.blocksPath(player))
+			.map(c -> c.getPos()).collect(Collectors.toList()));
+
+		AStarSearch<MapPoint> search = new AStarSearch<>(new PathFinderNode(
+			null, terrain.terrain, obstacles,
+			terrain.terrain.w, terrain.terrain.h,
+			start, target));
+
+		return search.search().stream()
+			.map(n -> n.getPosition()).collect(Collectors.toList());
 	}
 
 	public Collection<Targetable> getAbilityTargets(

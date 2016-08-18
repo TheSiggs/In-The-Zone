@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Character implements Targetable {
+public class Character implements Targetable, Obstacle {
 	public final String name;
  	public final Player player;
 	private final Collection<Ability> abilities;
@@ -109,6 +109,14 @@ public class Character implements Targetable {
 
 	@Override public Player getPlayer() {
 		return player;
+	}
+
+	@Override public boolean blocksSpace(Player player) {
+		return true;
+	}
+
+	@Override public boolean blocksPath(Player player) {
+		return this.player != player;
 	}
 }
 

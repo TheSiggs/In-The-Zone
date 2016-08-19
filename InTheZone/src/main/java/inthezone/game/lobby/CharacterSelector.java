@@ -89,9 +89,10 @@ public class CharacterSelector extends Canvas {
 				if (c.rootCharacter.name.equals(p.rootCharacter.name))
 					return "selected"; else return "idle";}).orElse("idle"));
 
-		a.renderFrame(gx, i * cw, h - (int) GlobalConstants.TILEH,
-			0, CameraAngle.UL, FacingDirection.DOWN);
-
+		gx.save();
+		gx.translate(i * cw, h - (int) GlobalConstants.TILEH);
+		a.renderFrame(gx, 0, 0, 0, CameraAngle.UL, FacingDirection.DOWN);
+		gx.restore();
 	}
 
 	public Optional<CharacterProfile> getSelectedCharacter() {

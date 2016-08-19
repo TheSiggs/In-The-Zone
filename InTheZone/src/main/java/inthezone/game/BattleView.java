@@ -13,6 +13,7 @@ import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
 import isogame.engine.SpriteDecalRenderer;
+import isogame.engine.Stage;
 import isogame.GlobalConstants;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -66,6 +67,8 @@ public class BattleView
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 		canvas.doOnSpriteSelection(handleSelection());
+		canvas.doOnMouseOver(handleMouseOver());
+		canvas.doOnMouseOut(handleMouseOut());
 
 		for (Sprite s : startBattle.makeSprites()) {
 			s.setDecalRenderer(renderDecals);
@@ -94,10 +97,11 @@ public class BattleView
 	public void selectCharacter(Optional<Character> c) {
 		selectedCharacter = c;
 
-		canvas.getStage().clearHighlighting(0);
+		canvas.getStage().clearAllHighlighting();
 		if (c.isPresent()) {
+			Stage stage = canvas.getStage();
 			getFutureWithRetry(battle.getMoveRange(c.get())).ifPresent(mr ->
-				mr.stream().forEach(p -> canvas.getStage().setHighlight(p, 0)));
+				mr.stream().forEach(p -> stage.setHighlight(p, 0)));
 		}
 	}
 
@@ -116,6 +120,24 @@ public class BattleView
 			} else {
 				selectCharacter(Optional.empty());
 			}
+		};
+	}
+
+	private Consumer<MapPoint> handleMouseOver() {
+		return p -> {
+			canvas.getStage().clearHighlighting(2);
+
+			selectedCharacter.ifPresent(c -> {
+				Stage stage = canvas.getStage();
+				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path ->
+					path.stream().forEach(pp -> stage.setHighlight(pp, 2)));
+			});
+		};
+	}
+
+	private Runnable handleMouseOut() {
+		return () -> {
+			canvas.getStage().clearHighlighting(2);
 		};
 	}
 

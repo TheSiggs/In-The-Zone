@@ -41,6 +41,17 @@ public class BattleState {
 	}
 
 	/**
+	 * Find a path that is guaranteed to be valid
+	 * @return The empty list if there is no valid path
+	 * */
+	public List<MapPoint> findValidPath(
+		MapPoint start, MapPoint target, Player player
+	) {
+		List<MapPoint> path = findPath(start, target, player);
+		if (canMove(path)) return path; else return new ArrayList<>();
+	}
+
+	/**
 	 * Determine if a path is valid.  A path is valid if it takes a character to
 	 * an unoccupied square and isn't longer than the character's mp.
 	 * */

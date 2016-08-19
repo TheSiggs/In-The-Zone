@@ -57,8 +57,10 @@ public class BattleInProgress implements Runnable {
 
 		// the subject of move range and targeting information requests
 		public Character subject = null;
+		public MapPoint target = null;
 		public Optional<CompletableFuture<Collection<MapPoint>>> moveRange = Optional.empty();
 		public Optional<CompletableFuture<Collection<MapPoint>>> targeting = Optional.empty();
+		public Optional<CompletableFuture<List<MapPoint>>> path = Optional.empty();
 
 		public Action(CommandRequest crq) {
 			this.crq = Optional.of(crq);
@@ -66,12 +68,16 @@ public class BattleInProgress implements Runnable {
 
 		public Action(
 			Character subject,
+			MapPoint target,
 			CompletableFuture<Collection<MapPoint>> moveRange,
-			CompletableFuture<Collection<MapPoint>> targeting
+			CompletableFuture<Collection<MapPoint>> targeting,
+			CompletableFuture<List<MapPoint>> path
 		) {
 			this.subject = subject;
+			this.target = target;
 			this.moveRange = Optional.ofNullable(moveRange);
 			this.targeting = Optional.ofNullable(targeting);
+			this.path = Optional.ofNullable(path);
 		}
 	}
 
@@ -117,6 +123,9 @@ public class BattleInProgress implements Runnable {
 				// handle a move range request
 				a.moveRange.ifPresent(moveRange ->
 					moveRange.complete(computeMoveRange(a.subject)));
+				a.path.ifPresent(path ->
+					path.complete(battle.battleState.findValidPath(
+						a.subject.getPos(), a.target, a.subject.player)));
 			} catch (InterruptedException e) {
 				// Do nothing
 			}
@@ -147,12 +156,28 @@ public class BattleInProgress implements Runnable {
 		queueActionWithRetry(new Action(cmd));
 	}
 
-	public Future<Collection<MapPoint>> getMoveRange(Character c) {
-		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, r, null));
+	/**
+	 * Get a path for a character to a target.
+	 * @return the empty list if there is no path.
+	 * */
+	public Future<List<MapPoint>> getPath(Character c, MapPoint target) {
+		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
+		queueActionWithRetry(new Action(c, target, null, null, r));
 		return r;
 	}
 
+	/**
+	 * Get all the points that a character could move to on this turn.
+	 * */
+	public Future<Collection<MapPoint>> getMoveRange(Character c) {
+		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
+		queueActionWithRetry(new Action(c, null, r, null, null));
+		return r;
+	}
+
+	/**
+	 * Compute all the points that a character could move to on this turn.
+	 * */
 	private Collection<MapPoint> computeMoveRange(Character c) {
 		Set<MapPoint> r = new HashSet<>();
 		int w = battle.battleState.terrain.terrain.w;
@@ -169,9 +194,12 @@ public class BattleInProgress implements Runnable {
 		return r;
 	}
 
+	/**
+	 * Get all of the possible targets for an ability.
+	 * */
 	public Future<Collection<MapPoint>> getTargetingInfo(Character c, Ability a) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, r));
+		queueActionWithRetry(new Action(c, null, null, r, null));
 		return r;
 	}
 }

@@ -77,12 +77,12 @@ public class BattleView
 		canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
-		canvas.doOnSpriteSelection(handleSelection());
-		canvas.doOnSelection(handleTarget());
+		canvas.doOnSelection(handleSelection());
 		canvas.doOnMouseOver(handleMouseOver());
 		canvas.doOnMouseOut(handleMouseOut());
 
-		for (Sprite s : startBattle.makeSprites()) {
+		Collection<Sprite> sprites = startBattle.makeSprites();
+		for (Sprite s : sprites) {
 			Stage stage = canvas.getStage();
 			stage.addSprite(s);
 			s.setDecalRenderer(renderDecals);
@@ -94,6 +94,8 @@ public class BattleView
 				if (selectedCharacter.isPresent()) setMode(MOVE); else setMode(SELECT);
 			});
 		}
+
+		canvas.setSelectableSprites(sprites);
 		
 		battle = new BattleInProgress(
 			startBattle, player, gameData, this);
@@ -130,14 +132,20 @@ public class BattleView
 				.filter(c -> c.getPos().equals(p)).findFirst();
 
 			switch (mode) {
-				case MOVE:
-					if (oc.isPresent() && oc.get().player == player) {
-						selectCharacter(Optional.of(oc.get()));
-					}
-					break;
 				case SELECT:
 					if (oc.isPresent() && oc.get().player == player) {
 						selectCharacter(Optional.of(oc.get()));
+					} else {
+						selectCharacter(Optional.empty());
+					}
+					break;
+				case MOVE:
+					if (oc.isPresent() && oc.get().player == player) {
+						selectCharacter(Optional.of(oc.get()));
+					} else if (canvas.isSelectable(p)) {
+						selectedCharacter.ifPresent(c -> battle.requestCommand(
+							new MoveCommandRequest(c.getPos(), p, c.player)));
+						setMode(MOVE);
 					} else {
 						selectCharacter(Optional.empty());
 					}
@@ -167,18 +175,6 @@ public class BattleView
 				});
 				break;
 		}
-	}
-
-	private Consumer<MapPoint> handleTarget() {
-		return p -> {
-			switch (mode) {
-				case MOVE:
-					selectedCharacter.ifPresent(c -> battle.requestCommand(
-						new MoveCommandRequest(c.getPos(), p, c.player)));
-					setMode(MOVE);
-					break;
-			}
-		};
 	}
 
 	private Consumer<MapPoint> handleMouseOver() {

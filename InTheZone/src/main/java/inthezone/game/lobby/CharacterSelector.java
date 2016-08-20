@@ -59,7 +59,7 @@ public class CharacterSelector extends Canvas {
 				x = (int) ((double) x - ((double) i * GlobalConstants.TILEW));
 				SpriteAnimation anim =
 					this.characters.get(i).rootCharacter.sprite.animations.get("idle");
-				if (anim.hitTest(x, y, 0)) {
+				if (anim.hitTest(x, y, 0, CameraAngle.UL, FacingDirection.DOWN)) {
 					selected = Optional.of(this.characters.get(i));
 					render();
 				}

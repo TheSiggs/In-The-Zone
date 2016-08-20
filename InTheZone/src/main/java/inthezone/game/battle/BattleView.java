@@ -4,6 +4,8 @@ import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.MoveCommand;
+import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
@@ -22,7 +24,10 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import static inthezone.game.battle.BattleViewMode.*;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -32,12 +37,13 @@ public class BattleView
 	private final Player player;
 	private final BattleInProgress battle;
 
-	// ready to accept command requests from the user
-	private boolean ready = true;
-	private Collection<Character> characters = null;
+	// Map from character ids to characters
+	private Map<Integer, Character> characters = new HashMap<>();
 
 	// the selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
+
+	private BattleViewMode mode = SELECT;
 
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
 	private final double[] sarrowx = new double[] {
@@ -68,6 +74,7 @@ public class BattleView
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 		canvas.doOnSpriteSelection(handleSelection());
+		canvas.doOnSelection(handleTarget());
 		canvas.doOnMouseOver(handleMouseOver());
 		canvas.doOnMouseOut(handleMouseOut());
 
@@ -97,29 +104,67 @@ public class BattleView
 
 	public void selectCharacter(Optional<Character> c) {
 		selectedCharacter = c;
-
-		canvas.getStage().clearAllHighlighting();
-		if (c.isPresent()) {
-			Stage stage = canvas.getStage();
-			getFutureWithRetry(battle.getMoveRange(c.get())).ifPresent(mr ->
-				mr.stream().forEach(p -> stage.setHighlight(p, 0)));
-		}
+		if (c.isPresent()) setMode(MOVE); else setMode(SELECT);
 	}
 
 	private Consumer<MapPoint> handleSelection() {
 		return p -> {
-			if (!ready && characters != null) return;
+			if (mode == ANIMATING) return;
 			if (p == null) {
 				selectCharacter(Optional.empty()); return;
 			}
 
-			Optional<Character> oc =
-				characters.stream().filter(c -> c.getPos() == p).findFirst();
+			Optional<Character> oc = characters.values().stream()
+				.filter(c -> c.getPos().equals(p)).findFirst();
 
-			if (oc.isPresent() && oc.get().player == player) {
-				selectCharacter(Optional.of(oc.get()));
-			} else {
-				selectCharacter(Optional.empty());
+			switch (mode) {
+				case MOVE:
+					if (oc.isPresent() && oc.get().player == player) {
+						selectCharacter(Optional.of(oc.get()));
+					}
+					break;
+				case SELECT:
+					if (oc.isPresent() && oc.get().player == player) {
+						selectCharacter(Optional.of(oc.get()));
+					} else {
+						selectCharacter(Optional.empty());
+					}
+					break;
+			}
+
+		};
+	}
+
+	private void setMode(BattleViewMode mode) {
+		this.mode = mode;
+		switch (mode) {
+			case ANIMATING:
+				canvas.getStage().clearAllHighlighting();
+				break;
+			case SELECT:
+				canvas.getStage().clearAllHighlighting();
+				break;
+			case MOVE:
+				canvas.getStage().clearAllHighlighting();
+				selectedCharacter.ifPresent(c -> {
+					Stage stage = canvas.getStage();
+					getFutureWithRetry(battle.getMoveRange(c)).ifPresent(mr -> {
+						mr.stream().forEach(p -> stage.setHighlight(p, 0));
+						canvas.setSelectable(mr);
+					});
+				});
+				break;
+		}
+	}
+
+	private Consumer<MapPoint> handleTarget() {
+		return p -> {
+			switch (mode) {
+				case MOVE:
+					selectedCharacter.ifPresent(c -> battle.requestCommand(
+						new MoveCommandRequest(c.getPos(), p, c.player)));
+					setMode(MOVE);
+					break;
 			}
 		};
 	}
@@ -170,11 +215,27 @@ public class BattleView
 
 	@Override
 	public void command(Command cmd) {
+		System.err.println("Command received");
+		if (cmd instanceof MoveCommand) {
+			//List<MapPoint> path = ((MoveCommand) cmd).path;
+			System.err.println("Move command");
+		}
 	}
 	
 	@Override
 	public void updateCharacters(Collection<Character> characters) {
-		this.characters = characters;
+		if (this.characters == null) {
+			for (Character c : characters) this.characters.put(c.id, c);
+			// TODO: init HUD
+		} else {
+			for (Character c : characters) {
+				Character old = this.characters.get(c.id);
+				if (old != null) {
+					// TODO: update the HUD
+				}
+				this.characters.put(c.id, c);
+			}
+		}
 	}
 }
 

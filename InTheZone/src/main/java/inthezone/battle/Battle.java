@@ -1,9 +1,8 @@
 package inthezone.battle;
 
+import isogame.engine.MapPoint;
 import java.util.Collection;
 import java.util.List;
-
-import isogame.engine.MapPoint;
 
 /**
  * This class processes battle commands.
@@ -15,7 +14,14 @@ public class Battle {
 		this.battleState = battleState;
 	}
 
+	/**
+	 * Perform a move operation on a character.  Assumes the path has been fully
+	 * validated.
+	 * */
 	public void doMove(List<MapPoint> path) {
+		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
+			c.moveTo(path.get(path.size() - 1));
+		});
 	}
 
 	public void doAttack(MapPoint agent, Collection<DamageToTarget> targets) {

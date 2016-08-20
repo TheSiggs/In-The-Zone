@@ -36,6 +36,10 @@ public class BattleState {
 		return characters.stream().filter(c -> c.getPos().equals(x)).findFirst();
 	}
 
+	/**
+	 * Get a copy of the characters list.  Prevents unintentional and potentially
+	 * unsafe mutation of the original character data.
+	 * */
 	public Collection<Character> cloneCharacters() {
 		return characters.stream().map(c -> c.clone()).collect(Collectors.toList());
 	}

@@ -110,7 +110,11 @@ public class BattleInProgress implements Runnable {
 				a.crq.ifPresent(crq -> {
 					try {
 						Command cmd = crq.makeCommand(battle.battleState);
-						Platform.runLater(() -> listener.command(cmd));
+						Collection<Character> affectedCharacters = cmd.doCmd(battle);
+						Platform.runLater(() -> {
+							listener.updateCharacters(affectedCharacters);
+							listener.command(cmd);
+						});
 						// TODO: hook into network code here
 						if (cmd instanceof EndTurnCommand) {
 							return;

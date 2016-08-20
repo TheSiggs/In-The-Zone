@@ -90,8 +90,9 @@ public class CharacterSelector extends Canvas {
 					return "selected"; else return "idle";}).orElse("idle"));
 
 		gx.save();
-		gx.translate(i * cw, h - (int) GlobalConstants.TILEH);
-		a.renderFrame(gx, 0, 0, 0, CameraAngle.UL, FacingDirection.DOWN);
+		gx.translate(i * cw, 0);
+		a.renderFrame(gx, 0, (int) GlobalConstants.TILEW, 0,
+			CameraAngle.UL, FacingDirection.DOWN);
 		gx.restore();
 	}
 

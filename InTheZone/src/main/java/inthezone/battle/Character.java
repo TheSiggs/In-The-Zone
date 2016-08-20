@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Character implements Targetable, Obstacle {
+	public final int id; // a unique identifier that can be used to track this character
 	public final String name;
  	public final Player player;
 	public final Collection<Ability> abilities;
@@ -25,6 +26,7 @@ public class Character implements Targetable, Obstacle {
 	private int hp = 0;
 
 	public Character(
+		int id,
 		String name,
 		Player player,
 		Collection<Ability> abilities,
@@ -38,6 +40,7 @@ public class Character implements Targetable, Obstacle {
 		int mp,
 		int hp
 	) {
+		this.id = id;
 		this.name = name;
 		this.player = player;
 		this.abilities = abilities;
@@ -57,6 +60,7 @@ public class Character implements Targetable, Obstacle {
 	 * */
 	public Character clone() {
 		return new Character(
+			id,
 			name,
 			player,
 			abilities,
@@ -73,8 +77,9 @@ public class Character implements Targetable, Obstacle {
 	}
 
 	public Character(
-		CharacterProfile profile, Player player, MapPoint pos
+		CharacterProfile profile, Player player, MapPoint pos, int id
 	) {
+		this.id = id;
 		this.name = profile.rootCharacter.name;
 		this.player = player;
 		this.baseStats = profile.getBaseStats();
@@ -94,6 +99,17 @@ public class Character implements Targetable, Obstacle {
 
 	public int getMP() {
 		return mp;
+	}
+
+	public void moveTo(MapPoint p) {
+		// TODO: reenable the mp adjustment code.
+		// mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
+		// if (mp < 0) mp = 0;
+		this.pos = p;
+	}
+
+	public void teleport(MapPoint p) {
+		this.pos = p;
 	}
 
 	@Override public Stats getStats() {

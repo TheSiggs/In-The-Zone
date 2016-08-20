@@ -56,11 +56,12 @@ public class StartBattleCommand {
 
 	public Battle doCmd(GameDataFactory gameData) {
 		Collection<Character> cs = new ArrayList<>();
+		int id = 0;
 		for (int i = 0; i < p1start.size(); i++) {
-			cs.add(new Character(p1.characters.get(i), Player.PLAYER_A, p1start.get(i)));
+			cs.add(new Character(p1.characters.get(i), Player.PLAYER_A, p1start.get(i), id++));
 		}
 		for (int i = 0; i < p2start.size(); i++) {
-			cs.add(new Character(p2.characters.get(i), Player.PLAYER_B, p2start.get(i)));
+			cs.add(new Character(p2.characters.get(i), Player.PLAYER_B, p2start.get(i), id++));
 		}
 		
 		return new Battle(new BattleState(gameData.getStage(stage), cs));

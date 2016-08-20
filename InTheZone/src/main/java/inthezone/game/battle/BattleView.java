@@ -162,7 +162,6 @@ public class BattleView
 					Stage stage = canvas.getStage();
 					getFutureWithRetry(battle.getMoveRange(c)).ifPresent(mr -> {
 						mr.stream().forEach(p -> stage.setHighlight(p, 0));
-						System.err.println("Make selectable: " + mr);
 						canvas.setSelectable(mr);
 					});
 				});
@@ -172,10 +171,8 @@ public class BattleView
 
 	private Consumer<MapPoint> handleTarget() {
 		return p -> {
-			System.err.println("Target point " + p);
 			switch (mode) {
 				case MOVE:
-					System.err.println("Move to " + p);
 					selectedCharacter.ifPresent(c -> battle.requestCommand(
 						new MoveCommandRequest(c.getPos(), p, c.player)));
 					setMode(MOVE);
@@ -189,7 +186,6 @@ public class BattleView
 			canvas.getStage().clearHighlighting(2);
 
 			selectedCharacter.ifPresent(c -> {
-				System.err.println(p);
 				Stage stage = canvas.getStage();
 				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path -> {
 					path.stream().forEach(pp -> stage.setHighlight(pp, 2));});

@@ -1,4 +1,4 @@
-package inthezone.game;
+package inthezone.game.battle;
 
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
@@ -9,6 +9,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
+import inthezone.game.DialogScreen;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;

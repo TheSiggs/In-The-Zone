@@ -7,6 +7,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
+import inthezone.game.battle.BattleView;
 import inthezone.game.loadoutEditor.LoadoutView;
 import inthezone.game.lobby.ChallengePane;
 import isogame.engine.CorruptDataException;

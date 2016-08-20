@@ -12,6 +12,7 @@ import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.game.DialogScreen;
+import isogame.engine.AnimationChain;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -25,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import static inthezone.game.battle.BattleViewMode.*;
@@ -79,8 +81,16 @@ public class BattleView
 		canvas.doOnMouseOut(handleMouseOut());
 
 		for (Sprite s : startBattle.makeSprites()) {
+			Stage stage = canvas.getStage();
+			stage.addSprite(s);
 			s.setDecalRenderer(renderDecals);
-			canvas.getStage().addSprite(s);
+
+			AnimationChain chain = new AnimationChain(s);
+			stage.registerAnimationChain(chain);
+			chain.doOnFinished(() -> {
+				s.setAnimation("idle");
+				if (selectedCharacter.isPresent()) setMode(MOVE); else setMode(SELECT);
+			});
 		}
 		
 		battle = new BattleInProgress(
@@ -175,8 +185,8 @@ public class BattleView
 
 			selectedCharacter.ifPresent(c -> {
 				Stage stage = canvas.getStage();
-				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path ->
-					path.stream().forEach(pp -> stage.setHighlight(pp, 2)));
+				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path -> {
+					path.stream().forEach(pp -> stage.setHighlight(pp, 2));});
 			});
 		};
 	}
@@ -215,10 +225,25 @@ public class BattleView
 
 	@Override
 	public void command(Command cmd) {
-		System.err.println("Command received");
 		if (cmd instanceof MoveCommand) {
-			//List<MapPoint> path = ((MoveCommand) cmd).path;
-			System.err.println("Move command");
+			List<MapPoint> path = ((MoveCommand) cmd).path;
+			if (path.size() < 2) return;
+
+			Stage stage = canvas.getStage();
+			MapPoint start = path.get(0);
+			MapPoint end = path.get(1);
+			MapPoint v = end.subtract(start);
+			Sprite s = stage.sprites.get(start);
+			for (MapPoint p : path.subList(2, path.size())) {
+				if (!end.add(v).equals(p)) {
+					stage.queueMoveSprite(s, start, end, "walk");
+					start = end;
+					v = p.subtract(start);
+				}
+				end = p;
+			}
+
+			stage.queueMoveSprite(s, start, end, "walk");
 		}
 	}
 	

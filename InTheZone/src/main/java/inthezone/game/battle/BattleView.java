@@ -34,6 +34,8 @@ import static inthezone.game.battle.BattleViewMode.*;
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
 {
+	private final static double walkSpeed = 1.2;
+
 	private final MapView canvas;
 	private final Paint[] highlights;
 	private final Player player;
@@ -160,6 +162,7 @@ public class BattleView
 					Stage stage = canvas.getStage();
 					getFutureWithRetry(battle.getMoveRange(c)).ifPresent(mr -> {
 						mr.stream().forEach(p -> stage.setHighlight(p, 0));
+						System.err.println("Make selectable: " + mr);
 						canvas.setSelectable(mr);
 					});
 				});
@@ -169,8 +172,10 @@ public class BattleView
 
 	private Consumer<MapPoint> handleTarget() {
 		return p -> {
+			System.err.println("Target point " + p);
 			switch (mode) {
 				case MOVE:
+					System.err.println("Move to " + p);
 					selectedCharacter.ifPresent(c -> battle.requestCommand(
 						new MoveCommandRequest(c.getPos(), p, c.player)));
 					setMode(MOVE);
@@ -184,6 +189,7 @@ public class BattleView
 			canvas.getStage().clearHighlighting(2);
 
 			selectedCharacter.ifPresent(c -> {
+				System.err.println(p);
 				Stage stage = canvas.getStage();
 				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path -> {
 					path.stream().forEach(pp -> stage.setHighlight(pp, 2));});
@@ -200,7 +206,7 @@ public class BattleView
 	private SpriteDecalRenderer renderDecals = (cx, s, t, angle) -> {
 		// selection arrow
 		selectedCharacter.ifPresent(c -> {
-			if (s.pos.equals(c.getPos())) {
+			if (s.userData.equals(c.id)) {
 				cx.setFill(sarrowColor);
 				cx.fillPolygon(sarrowx, sarrowy, 3);
 			}
@@ -229,6 +235,7 @@ public class BattleView
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
 
+			setMode(ANIMATING);
 			Stage stage = canvas.getStage();
 			MapPoint start = path.get(0);
 			MapPoint end = path.get(1);
@@ -236,14 +243,14 @@ public class BattleView
 			Sprite s = stage.sprites.get(start);
 			for (MapPoint p : path.subList(2, path.size())) {
 				if (!end.add(v).equals(p)) {
-					stage.queueMoveSprite(s, start, end, "walk");
+					stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
 					start = end;
 					v = p.subtract(start);
 				}
 				end = p;
 			}
 
-			stage.queueMoveSprite(s, start, end, "walk");
+			stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
 		}
 	}
 	
@@ -255,6 +262,9 @@ public class BattleView
 		} else {
 			for (Character c : characters) {
 				Character old = this.characters.get(c.id);
+				selectedCharacter.ifPresent(sc -> {
+					if (sc.id == c.id) selectedCharacter = Optional.of(c);
+				});
 				if (old != null) {
 					// TODO: update the HUD
 				}

@@ -4,6 +4,7 @@ import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import isogame.engine.MapPoint;
+import isogame.engine.SpriteInfo;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ public class Character implements Targetable, Obstacle {
 	public final int id; // a unique identifier that can be used to track this character
 	public final String name;
  	public final Player player;
+	public final SpriteInfo sprite;
 	public final Collection<Ability> abilities;
 	public final Ability basicAbility;
 	private final Stats baseStats;
@@ -29,6 +31,7 @@ public class Character implements Targetable, Obstacle {
 		int id,
 		String name,
 		Player player,
+		SpriteInfo sprite,
 		Collection<Ability> abilities,
 		Ability basicAbility,
 		Stats baseStats,
@@ -43,6 +46,7 @@ public class Character implements Targetable, Obstacle {
 		this.id = id;
 		this.name = name;
 		this.player = player;
+		this.sprite = sprite;
 		this.abilities = abilities;
 		this.basicAbility = basicAbility;
 		this.baseStats = baseStats;
@@ -63,6 +67,7 @@ public class Character implements Targetable, Obstacle {
 			id,
 			name,
 			player,
+			sprite,
 			abilities,
 			basicAbility,
 			baseStats,
@@ -82,6 +87,7 @@ public class Character implements Targetable, Obstacle {
 		this.id = id;
 		this.name = profile.rootCharacter.name;
 		this.player = player;
+		this.sprite = profile.rootCharacter.sprite;
 		this.baseStats = profile.getBaseStats();
 		this.abilities = profile.abilities.stream()
 			.map(i -> new Ability(i)).collect(Collectors.toList());

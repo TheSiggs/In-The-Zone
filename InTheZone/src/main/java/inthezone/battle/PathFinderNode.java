@@ -88,11 +88,13 @@ public class PathFinderNode extends Node<MapPoint> {
 		if (tfrom.slope != SlopeType.NONE) {
 			return
 				(slope == tfrom.slope && tto.elevation - tfrom.elevation == 1) ||
-				(slope == tfrom.slope.opposite() && tto.elevation - tfrom.elevation == -1);
+				(slope == tfrom.slope.opposite() && tto.elevation == tfrom.elevation);
 		} else if (tfrom.elevation == tto.elevation) {
 			return tto.slope == SlopeType.NONE || tto.slope == slope;
-		} else if (tfrom.elevation - tto.elevation == -1) {
+		} else if (tfrom.elevation - tto.elevation == 1) {
 			return tto.slope == slope.opposite();
+		} else if (tfrom.elevation - tto.elevation == -1) {
+			return tto.slope == slope;
 		} else return false;
 	}
 

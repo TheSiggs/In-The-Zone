@@ -16,21 +16,34 @@ import isogame.gui.PositiveIntegerField;
 import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CharacterPane extends TitledPane {
+	private final File dataRoot;
+	private final File gfxRoot;
+
 	private final GridPane grid = new GridPane();
+	private final Button portrait;
 	private final TextField name;
 	private final CheckBox playable;
 	private final ComboBox<SpriteInfo> sprite;
@@ -43,6 +56,9 @@ public class CharacterPane extends TitledPane {
 	private final PositiveIntegerField attack;
 	private final PositiveIntegerField defence;
 	private final TreeItem<AbilityInfoModel> abilitiesRoot;
+
+	private String portraitFilename;
+	private Image portraitImage;
 
 	public String getName() {
 		return name.getText() == null? "" : name.getText();
@@ -126,6 +142,8 @@ public class CharacterPane extends TitledPane {
 		return new CharacterInfo(
 			name.getText(),
 			sprite.getValue(),
+			portraitImage,
+			portraitFilename,
 			new Stats(
 				ap.getValue(), mp.getValue(),
 				power.getValue(), hp.getValue(),
@@ -164,6 +182,7 @@ public class CharacterPane extends TitledPane {
 	}
 
 	public CharacterPane(
+		File dataRoot,
 		CharacterInfo character,
 		GameDataFactory gameData,
 		WritableValue<Boolean> changed,
@@ -171,12 +190,19 @@ public class CharacterPane extends TitledPane {
 	) {
 		super();
 
+		this.dataRoot = dataRoot;
+		this.gfxRoot = new File(dataRoot, "gfx");
+
 		abilitiesRoot = new TreeItem<>(new AbilityInfoModel(false, false));
 		abilitiesRoot.setExpanded(true);
 
 		for (AbilityInfo i : character.abilities) {
 			decodeAbility(i, false, false, abilitiesRoot);
 		}
+
+		portraitFilename = character.portraitFile;
+		portraitImage = character.portrait;
+		portrait = new Button(null, new ImageView(portraitImage));
 
 		name = new TextField(character.name);
 		playable = new CheckBox("Playable");
@@ -189,15 +215,41 @@ public class CharacterPane extends TitledPane {
 		attack = new PositiveIntegerField(character.stats.attack);
 		defence = new PositiveIntegerField(character.stats.defence);
 
-		grid.addRow(0, new Label("Name"), name);
-		grid.add(playable, 1, 1);
-		grid.addRow(2, new Label("Sprite"), sprite);
-		grid.addRow(3, new Label("Base AP"), ap);
-		grid.addRow(4, new Label("Base MP"), mp);
-		grid.addRow(5, new Label("Base Power"), power);
-		grid.addRow(6, new Label("Base HP"), hp);
-		grid.addRow(7, new Label("Base Attack"), attack);
-		grid.addRow(8, new Label("Base Defence"), defence);
+		portrait.setOnAction(x -> {
+			changed.setValue(true);
+
+			FileChooser fc = new FileChooser();
+			fc.setTitle("Choose portrait file");
+			fc.setInitialDirectory(gfxRoot);
+			fc.getExtensionFilters().addAll(new ExtensionFilter("Graphics files",
+				"*.png", "*.PNG", "*.jpg", "*.JPG",
+				"*.jpeg", "*.JPEG", "*.bmp", "*.BMP"));
+			File r = fc.showOpenDialog(this.getScene().getWindow());
+			if (r != null) {
+				try {
+					String path = gfxRoot.toPath().relativize(r.toPath()).toString();
+					portraitImage = new Image(new FileInputStream(r));
+					portraitFilename = path;
+					portrait.setGraphic(new ImageView(portraitImage));
+				} catch (IOException e) {
+					Alert error = new Alert(Alert.AlertType.ERROR);
+					error.setTitle("Cannot load image from file " + r.toString());
+					error.setHeaderText(e.toString());
+					error.showAndWait();
+				}
+			}
+		});
+
+		grid.add(portrait, 1, 0);
+		grid.addRow(1, new Label("Name"), name);
+		grid.add(playable, 1, 2);
+		grid.addRow(3, new Label("Sprite"), sprite);
+		grid.addRow(4, new Label("Base AP"), ap);
+		grid.addRow(5, new Label("Base MP"), mp);
+		grid.addRow(6, new Label("Base Power"), power);
+		grid.addRow(7, new Label("Base HP"), hp);
+		grid.addRow(8, new Label("Base Attack"), attack);
+		grid.addRow(9, new Label("Base Defence"), defence);
 
 		name.textProperty().addListener(c -> changed.setValue(true));
 		sprite.valueProperty().addListener(c -> changed.setValue(true));

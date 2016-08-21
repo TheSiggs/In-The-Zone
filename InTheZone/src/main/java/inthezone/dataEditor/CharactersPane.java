@@ -11,6 +11,7 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.io.File;
@@ -55,7 +56,7 @@ public class CharactersPane extends VBox {
 
 		this.characters = new Accordion(
 			gameData.getCharacters().stream()
-				.map(c -> new CharacterPane(c, gameData, changed, abilities))
+				.map(c -> new CharacterPane(dataDir, c, gameData, changed, abilities))
 				.collect(Collectors.toList()).toArray(new CharacterPane[0]));
 
 		this.getChildren().addAll(tools, characters);
@@ -90,10 +91,21 @@ public class CharactersPane extends VBox {
 
 		add.setOnAction(event -> {
 			Stats s = new Stats(3, 3, 1, 1, 1, 1);
-			CharacterInfo c = new CharacterInfo("New character", null,
+
+			Image portrait;
+			try {
+				portrait = new Image((new File(dataDir,
+					"gfx/portrait/blank.png")).toString());
+			} catch (IllegalArgumentException e) {
+				portrait = null;
+			}
+
+			CharacterInfo c = new CharacterInfo(
+				"New character", null,
+				portrait, "portrait/blank.png",
 				s, new LinkedList<>(), true);
 			CharacterPane pane =
-				new CharacterPane(c, gameData, changed, abilities);
+				new CharacterPane(dataDir, c, gameData, changed, abilities);
 			characters.getPanes().add(pane);
 			characters.setExpandedPane(pane);
 			changed.setValue(true);

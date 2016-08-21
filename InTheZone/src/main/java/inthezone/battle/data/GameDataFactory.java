@@ -116,7 +116,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 			}
 
 			for (Object x : aCharacters) {
-				CharacterInfo i = CharacterInfo.fromJSON((JSONObject) x, globalLibrary);
+				CharacterInfo i =
+					CharacterInfo.fromJSON((JSONObject) x, loc, globalLibrary);
 				characters.put(i.name, i);
 			}
 

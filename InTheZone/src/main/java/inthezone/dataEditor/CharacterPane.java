@@ -181,6 +181,13 @@ public class CharacterPane extends TitledPane {
 			decodeAbility(a.mana.get(), true, false, baseItem);
 	}
 
+	private static ImageView makePortraitImage(Image img) {
+		ImageView r = new ImageView(img);
+		r.setFitHeight(80);
+		r.setPreserveRatio(true);
+		return r;
+	}
+
 	public CharacterPane(
 		File dataRoot,
 		CharacterInfo character,
@@ -202,7 +209,7 @@ public class CharacterPane extends TitledPane {
 
 		portraitFilename = character.portraitFile;
 		portraitImage = character.portrait;
-		portrait = new Button(null, new ImageView(portraitImage));
+		portrait = new Button(null, makePortraitImage(portraitImage));
 
 		name = new TextField(character.name);
 		playable = new CheckBox("Playable");
@@ -230,7 +237,7 @@ public class CharacterPane extends TitledPane {
 					String path = gfxRoot.toPath().relativize(r.toPath()).toString();
 					portraitImage = new Image(new FileInputStream(r));
 					portraitFilename = path;
-					portrait.setGraphic(new ImageView(portraitImage));
+					portrait.setGraphic(makePortraitImage(portraitImage));
 				} catch (IOException e) {
 					Alert error = new Alert(Alert.AlertType.ERROR);
 					error.setTitle("Cannot load image from file " + r.toString());

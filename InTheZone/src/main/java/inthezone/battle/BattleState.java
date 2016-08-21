@@ -20,9 +20,13 @@ public class BattleState {
 	public final Stage terrain;
 	public final Collection<Character> characters;
 
+	private final Set<MapPoint> terrainObstacles;
+
 	public BattleState(Stage terrain, Collection<Character> characters) {
 		this.terrain = terrain;
 		this.characters = characters;
+
+		terrainObstacles = new HashSet<>(terrain.sprites.keySet());
 	}
 
 	public Targetable getTargetableAt(MapPoint x) {
@@ -70,9 +74,11 @@ public class BattleState {
 	}
 
 	private Set<MapPoint> spaceObstacles(Player player) {
-		return new HashSet<>(characters.stream()
+		Set<MapPoint> r = new HashSet<>(characters.stream()
 			.filter(c -> c.blocksSpace(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
+		r.addAll(terrainObstacles);
+		return r;
 	}
 
 	/**
@@ -89,6 +95,7 @@ public class BattleState {
 		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
 			.filter(c -> c.blocksPath(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
+		obstacles.addAll(terrainObstacles);
 
 		AStarSearch<MapPoint> search = new AStarSearch<>(new PathFinderNode(
 			null, terrain.terrain, obstacles,

@@ -27,7 +27,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	public final ClientConfig config;
 	public final GameDataFactory gameData;
 
-	private Thread networkThread;
+	public final Thread networkThread;
 
 	private Pane currentPane;
 

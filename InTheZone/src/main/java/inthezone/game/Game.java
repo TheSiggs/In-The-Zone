@@ -23,6 +23,7 @@ public class Game extends Application {
 	}
 
 	private Network network = null;
+	private Thread networkThread = null;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -57,6 +58,7 @@ public class Game extends Application {
 				config, gameData, server, port, config.defaultPlayerName);
 
 			this.network = contentPane.network;
+			this.networkThread = contentPane.networkThread;
 
 			Scene scene = new Scene(contentPane, 960, 540);
 			scene.getStylesheets().add("HUD.css");
@@ -74,8 +76,11 @@ public class Game extends Application {
 	@Override
 	public void stop() {
 		if (network != null) {
-			//network.shutdown();
+			network.shutdown();
+			if (networkThread != null) networkThread.interrupt();
 		}
+
+		System.exit(0);
 	}
 }
 

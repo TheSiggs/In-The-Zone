@@ -47,6 +47,7 @@ public class Network implements Runnable {
 	private boolean stayConnected = true;
 	public synchronized void shutdown() {
 		stayConnected = false;
+		logout();
 		if (socket != null) try {
 			socket.close();
 		} catch (IOException e) {
@@ -58,13 +59,16 @@ public class Network implements Runnable {
 	public void run() {
 		while (stayConnected) {
 			synchronized (connect) {
-				while (!connect.get()) {
+				while (!connect.get() && stayConnected) {
 					try {
 						connect.wait();
 					} catch (InterruptedException e) {
 						/* ignore */
 					}
 				}
+
+				if (!stayConnected) return;
+
 				try {
 					doConnect();
 					(new Thread(new NetworkReader(

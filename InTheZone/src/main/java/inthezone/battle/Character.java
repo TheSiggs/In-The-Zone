@@ -116,9 +116,8 @@ public class Character implements Targetable, Obstacle {
 	}
 
 	public void moveTo(MapPoint p) {
-		// TODO: reenable the mp adjustment code.
-		// mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
-		// if (mp < 0) mp = 0;
+		mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
+		if (mp < 0) mp = 0;
 		this.pos = p;
 	}
 

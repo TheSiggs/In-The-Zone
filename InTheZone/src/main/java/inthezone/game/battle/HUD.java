@@ -4,9 +4,9 @@ import inthezone.battle.Character;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class HUD extends AnchorPane {
@@ -15,7 +15,7 @@ public class HUD extends AnchorPane {
 	private Button itemsButton = new Button("Items");
 	private Button abilitiesButton = new Button("Abilities");
 
-	private final List<CharacterInfoBox> characters = new ArrayList<>();
+	public final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 
 	public HUD() {
 		super();
@@ -39,7 +39,8 @@ public class HUD extends AnchorPane {
 
 	public void selectCharacter(Character c) {
 		int id = c == null? -1 : c.id;
-		for (CharacterInfoBox box : characters) box.setSelected(box.id == id);
+		for (CharacterInfoBox box : characters.values())
+			box.setSelected(box.id == id);
 	}
 
 	public void init(BattleView view, Collection<Character> characters) {
@@ -49,7 +50,7 @@ public class HUD extends AnchorPane {
 				view.selectCharacterById(c.id);
 				selectCharacter(c);
 			});
-			this.characters.add(box);
+			this.characters.put(c.id, box);
 			characterInfoBoxes.getChildren().add(box);
 		}
 	}

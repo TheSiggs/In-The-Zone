@@ -46,7 +46,7 @@ public class BattleView
 	private final HUD hud = new HUD();
 
 	// Map from character ids to characters
-	private Map<Integer, Character> characters = new HashMap<>();
+	private Map<Integer, Character> characters = null;
 
 	// the selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
@@ -234,8 +234,6 @@ public class BattleView
 	@Override
 	public void command(Command cmd, List<Character> affectedCharacters) {
 		if (cmd == null) {
-			hud.init(this, affectedCharacters.stream()
-				.filter(c -> c.player == player).collect(Collectors.toList()));
 			updateCharacters(affectedCharacters); return;
 		}
 
@@ -270,8 +268,10 @@ public class BattleView
 	
 	private void updateCharacters(List<Character> characters) {
 		if (this.characters == null) {
+			this.characters = new HashMap<>();
 			for (Character c : characters) this.characters.put(c.id, c);
-			// TODO: init HUD
+			hud.init(this, characters.stream()
+				.filter(c -> c.player == player).collect(Collectors.toList()));
 		} else {
 			for (Character c : characters) {
 				Character old = this.characters.get(c.id);
@@ -279,7 +279,12 @@ public class BattleView
 					if (sc.id == c.id) selectedCharacter = Optional.of(c);
 				});
 				if (old != null) {
-					// TODO: update the HUD
+					CharacterInfoBox box = hud.characters.get(c.id);
+					if (box != null) {
+						box.updateAP(c.getAP(), c.getStats().ap);
+						box.updateMP(c.getMP(), c.getStats().mp);
+						box.updateHP(c.getHP(), c.getMaxHP());
+					}
 				}
 				this.characters.put(c.id, c);
 			}

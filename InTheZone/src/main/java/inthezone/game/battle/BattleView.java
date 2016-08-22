@@ -120,9 +120,14 @@ public class BattleView
 		}
 	}
 
+	public void selectCharacterById(int id) {
+		selectCharacter(Optional.ofNullable(characters.get(id)));
+	}
+
 	public void selectCharacter(Optional<Character> c) {
 		selectedCharacter = c;
 		if (c.isPresent()) setMode(MOVE); else setMode(SELECT);
+		hud.selectCharacter(c.orElse(null));
 	}
 
 	private Consumer<MapPoint> handleSelection() {
@@ -161,6 +166,7 @@ public class BattleView
 
 	private void setMode(BattleViewMode mode) {
 		this.mode = mode;
+
 		switch (mode) {
 			case ANIMATING:
 				canvas.getStage().clearAllHighlighting();
@@ -228,7 +234,7 @@ public class BattleView
 	@Override
 	public void command(Command cmd, List<Character> affectedCharacters) {
 		if (cmd == null) {
-			hud.init(affectedCharacters.stream()
+			hud.init(this, affectedCharacters.stream()
 				.filter(c -> c.player == player).collect(Collectors.toList()));
 			updateCharacters(affectedCharacters); return;
 		}

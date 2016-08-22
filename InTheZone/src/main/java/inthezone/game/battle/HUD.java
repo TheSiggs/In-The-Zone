@@ -4,13 +4,18 @@ import inthezone.battle.Character;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public class HUD extends AnchorPane {
 	private FlowPane characterInfoBoxes = new FlowPane();
 	private Button endTurnButton = new Button("End turn");
 	private Button itemsButton = new Button("Items");
 	private Button abilitiesButton = new Button("Abilities");
+
+	private final List<CharacterInfoBox> characters = new ArrayList<>();
 
 	public HUD() {
 		super();
@@ -32,9 +37,20 @@ public class HUD extends AnchorPane {
 		);
 	}
 
-	public void init(Collection<Character> characters) {
+	public void selectCharacter(Character c) {
+		int id = c == null? -1 : c.id;
+		for (CharacterInfoBox box : characters) box.setSelected(box.id == id);
+	}
+
+	public void init(BattleView view, Collection<Character> characters) {
 		for (Character c : characters) {
-			characterInfoBoxes.getChildren().add(new CharacterInfoBox(c));
+			CharacterInfoBox box = new CharacterInfoBox(c);
+			box.setOnMouseClicked(event -> {
+				view.selectCharacterById(c.id);
+				selectCharacter(c);
+			});
+			this.characters.add(box);
+			characterInfoBoxes.getChildren().add(box);
 		}
 	}
 

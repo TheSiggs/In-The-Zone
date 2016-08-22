@@ -9,12 +9,18 @@ import javafx.scene.layout.GridPane;
  * Displays information about a character during battle.
  * */
 public class CharacterInfoBox extends GridPane {
+	public final int id;
+
 	private final ProgressBar ap = new ProgressBar(1);
 	private final ProgressBar mp = new ProgressBar(1);
 	private final ProgressBar hp = new ProgressBar(1);
 
+	private boolean isSelected = false;
+
 	public CharacterInfoBox(Character character) {
 		super();
+
+		this.id = character.id;
 
 		this.getStyleClass().add("character-info-box");
 
@@ -22,6 +28,10 @@ public class CharacterInfoBox extends GridPane {
 		this.addRow(1, new Label("ap"), ap);
 		this.addRow(2, new Label("mp"), mp);
 		this.addRow(3, new Label("hp"), hp);
+
+		ap.setMouseTransparent(true);
+		mp.setMouseTransparent(true);
+		hp.setMouseTransparent(true);
 
 		updateAP(character.getAP(), character.getStats().ap);
 		updateMP(character.getMP(), character.getStats().mp);
@@ -38,6 +48,17 @@ public class CharacterInfoBox extends GridPane {
 
 	public void updateHP(int hp, int max) {
 		this.hp.setProgress((double) hp / (double) max);
+	}
+
+	public void setSelected(boolean isSelected) {
+		if (this.isSelected != isSelected) {
+			this.isSelected = isSelected;
+			if (isSelected) {
+				this.getStyleClass().add("character-info-box-selected");
+			} else {
+				this.getStyleClass().remove("character-info-box-selected");
+			}
+		}
 	}
 }
 

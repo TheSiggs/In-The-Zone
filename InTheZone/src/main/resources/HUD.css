@@ -4,3 +4,7 @@
 	-fx-border-style: solid;
 }
 
+.character-info-box-selected {
+	-fx-background-color: yellow;
+}
+

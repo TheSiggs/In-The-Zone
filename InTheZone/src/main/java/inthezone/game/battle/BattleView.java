@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import static inthezone.game.battle.BattleViewMode.*;
 
 public class BattleView
@@ -40,6 +41,9 @@ public class BattleView
 	private final Paint[] highlights;
 	private final Player player;
 	private final BattleInProgress battle;
+
+	// The HUD GUI components
+	private final HUD hud = new HUD();
 
 	// Map from character ids to characters
 	private Map<Integer, Character> characters = new HashMap<>();
@@ -101,7 +105,7 @@ public class BattleView
 			startBattle, player, gameData, this);
 		(new Thread(battle)).start();
 
-		this.getChildren().addAll(canvas);
+		this.getChildren().addAll(canvas, hud);
 	}
 
 	private static <T> Optional<T> getFutureWithRetry(Future<T> f) {
@@ -224,6 +228,8 @@ public class BattleView
 	@Override
 	public void command(Command cmd, List<Character> affectedCharacters) {
 		if (cmd == null) {
+			hud.init(affectedCharacters.stream()
+				.filter(c -> c.player == player).collect(Collectors.toList()));
 			updateCharacters(affectedCharacters); return;
 		}
 

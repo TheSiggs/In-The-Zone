@@ -107,6 +107,14 @@ public class Character implements Targetable, Obstacle {
 		return mp;
 	}
 
+	public int getHP() {
+		return hp;
+	}
+
+	public int getMaxHP() {
+		return maxHP;
+	}
+
 	public void moveTo(MapPoint p) {
 		// TODO: reenable the mp adjustment code.
 		// mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);

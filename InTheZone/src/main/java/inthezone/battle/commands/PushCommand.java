@@ -5,6 +5,7 @@ import inthezone.battle.Character;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PushCommand extends Command {
@@ -19,7 +20,7 @@ public class PushCommand extends Command {
 	}
 
 	@Override
-	public Collection<Character> doCmd(Battle battle) throws CommandException {
+	public List<Character> doCmd(Battle battle) throws CommandException {
 		if (!battle.battleState.canPush(agent, target, effective))
 			throw new CommandException("Invalid push command");
 

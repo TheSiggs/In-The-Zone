@@ -6,6 +6,7 @@ import inthezone.battle.DamageToTarget;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class AttackCommand extends Command {
@@ -21,11 +22,11 @@ public class AttackCommand extends Command {
 	}
 
 	@Override
-	public Collection<Character> doCmd(Battle battle) throws CommandException {
+	public List<Character> doCmd(Battle battle) throws CommandException {
 		if (!battle.battleState.canAttack(agent, targets))
 			throw new CommandException("Invalid attack");
 
-		Collection<Character> r = new ArrayList<>();
+		List<Character> r = new ArrayList<>();
 		battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 		for (DamageToTarget d : targets)
 			battle.battleState.getCharacterAt(d.target).ifPresent(c -> r.add(c));

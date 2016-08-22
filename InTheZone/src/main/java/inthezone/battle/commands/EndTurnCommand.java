@@ -3,14 +3,14 @@ package inthezone.battle.commands;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class EndTurnCommand extends Command {
 	public EndTurnCommand() {
 	}
 
 	@Override
-	public Collection<Character> doCmd(Battle turn) {
+	public List<Character> doCmd(Battle turn) {
 		return new ArrayList<>();
 	}
 }

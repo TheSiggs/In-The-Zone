@@ -5,7 +5,7 @@ import inthezone.battle.Character;
 import inthezone.battle.Item;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public class UseItemCommand extends Command {
@@ -18,7 +18,7 @@ public class UseItemCommand extends Command {
 	}
 
 	@Override
-	public Collection<Character> doCmd(Battle battle) throws CommandException {
+	public List<Character> doCmd(Battle battle) throws CommandException {
 		if (!battle.battleState.canUseItem(agent, item))
 			throw new CommandException("Invalid item command");
 
@@ -26,7 +26,7 @@ public class UseItemCommand extends Command {
 
 		battle.doUseItem(agent, item);
 
-		Collection<Character> r = new ArrayList<>();
+		List<Character> r = new ArrayList<>();
 		oc.ifPresent(c -> r.add(c.clone()));
 		return r;
 	}

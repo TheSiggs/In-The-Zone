@@ -84,7 +84,7 @@ public class BattleInProgress implements Runnable {
 	@Override
 	public void run() {
 		boolean gameOver = false;
-		Platform.runLater(() -> listener.updateCharacters(
+		Platform.runLater(() -> listener.command(null, 
 			battle.battleState.cloneCharacters()));
 
 		if (!thisPlayerGoesFirst) {
@@ -110,10 +110,9 @@ public class BattleInProgress implements Runnable {
 				a.crq.ifPresent(crq -> {
 					try {
 						Command cmd = crq.makeCommand(battle.battleState);
-						Collection<Character> affectedCharacters = cmd.doCmd(battle);
+						List<Character> affectedCharacters = cmd.doCmd(battle);
 						Platform.runLater(() -> {
-							listener.updateCharacters(affectedCharacters);
-							listener.command(cmd);
+							listener.command(cmd, affectedCharacters);
 						});
 						// TODO: hook into network code here
 						if (cmd instanceof EndTurnCommand) {

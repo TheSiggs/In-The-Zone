@@ -156,7 +156,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 					characterSelector.setSelectedCharacter(Optional.empty());
 
 					if (characterByPosition.containsKey(p)) {
-						currentStage.removeSprite(p);
+						currentStage.clearTileOfSprites(p);
 						characterSelector.setSelectedCharacter(
 							Optional.ofNullable(characterByPosition.get(p)));
 						characterPositions.remove(characterByPosition.get(p).rootCharacter.name);
@@ -164,7 +164,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 					if (characterPositions.containsKey(c.rootCharacter.name)) {
 						MapPoint oldP = characterPositions.get(c.rootCharacter.name);
-						currentStage.removeSprite(oldP);
+						currentStage.clearTileOfSprites(oldP);
 						characterByPosition.remove(oldP);
 					}
 					currentStage.addSprite(s);

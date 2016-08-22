@@ -26,7 +26,8 @@ public class BattleState {
 		this.terrain = terrain;
 		this.characters = characters;
 
-		terrainObstacles = new HashSet<>(terrain.sprites.keySet());
+		terrainObstacles = new HashSet<>(terrain.allSprites.stream()
+			.map(s -> s.pos).collect(Collectors.toList()));
 	}
 
 	public Targetable getTargetableAt(MapPoint x) {
@@ -44,7 +45,7 @@ public class BattleState {
 	 * Get a copy of the characters list.  Prevents unintentional and potentially
 	 * unsafe mutation of the original character data.
 	 * */
-	public Collection<Character> cloneCharacters() {
+	public List<Character> cloneCharacters() {
 		return characters.stream().map(c -> c.clone()).collect(Collectors.toList());
 	}
 

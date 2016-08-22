@@ -8,7 +8,7 @@ import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class UseAbilityCommand extends Command {
@@ -25,7 +25,7 @@ public class UseAbilityCommand extends Command {
 	}
 
 	@Override
-	public Collection<Character> doCmd(Battle battle) throws CommandException {
+	public List<Character> doCmd(Battle battle) throws CommandException {
 		if (!battle.battleState.canDoAbility(agent, ability, targets))
 			throw new CommandException("Invalid ability command");
 

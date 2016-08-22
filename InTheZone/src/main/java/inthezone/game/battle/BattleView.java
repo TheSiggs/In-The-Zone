@@ -222,7 +222,11 @@ public class BattleView
 	}
 
 	@Override
-	public void command(Command cmd) {
+	public void command(Command cmd, List<Character> affectedCharacters) {
+		if (cmd == null) {
+			updateCharacters(affectedCharacters); return;
+		}
+
 		if (cmd instanceof MoveCommand) {
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
@@ -232,7 +236,11 @@ public class BattleView
 			MapPoint start = path.get(0);
 			MapPoint end = path.get(1);
 			MapPoint v = end.subtract(start);
-			Sprite s = stage.sprites.get(start);
+
+			int id = affectedCharacters.get(0).id;
+			Sprite s = stage.getSpritesByTile(start).stream()
+				.filter(x -> x.userData.equals(id)).findFirst().get();
+
 			for (MapPoint p : path.subList(2, path.size())) {
 				if (!end.add(v).equals(p)) {
 					stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
@@ -244,10 +252,11 @@ public class BattleView
 
 			stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
 		}
+
+		updateCharacters(affectedCharacters);
 	}
 	
-	@Override
-	public void updateCharacters(Collection<Character> characters) {
+	private void updateCharacters(List<Character> characters) {
 		if (this.characters == null) {
 			for (Character c : characters) this.characters.put(c.id, c);
 			// TODO: init HUD

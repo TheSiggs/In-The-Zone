@@ -5,7 +5,6 @@ import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
-import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
 import javafx.application.Platform;
 import java.util.concurrent.BlockingQueue;
@@ -15,9 +14,9 @@ import java.util.List;
  * A bridge between the battle controller and the network code.
  * */
 public class NetworkCommandGenerator implements CommandGenerator {
-	private final BlockingQueue<CommandRequest> commandQueue;
+	private final BlockingQueue<Command> commandQueue;
 
-	public NetworkCommandGenerator(BlockingQueue<CommandRequest> commandQueue) {
+	public NetworkCommandGenerator(BlockingQueue<Command> commandQueue) {
 		this.commandQueue = commandQueue;
 	}
 
@@ -25,10 +24,9 @@ public class NetworkCommandGenerator implements CommandGenerator {
 	public void generateCommands(Battle battle, BattleListener listener) {
 		while (true) {
 			try {
-				CommandRequest crq = commandQueue.take();
+				Command cmd = commandQueue.take();
 
 				try {
-					Command cmd = crq.makeCommand(battle.battleState);
 					List<Character> affectedCharacters = cmd.doCmd(battle);
 					Platform.runLater(() -> {
 						listener.command(cmd, affectedCharacters);

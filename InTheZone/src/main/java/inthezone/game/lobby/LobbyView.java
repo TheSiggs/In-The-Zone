@@ -1,5 +1,7 @@
 package inthezone.game.lobby;
 
+import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
@@ -27,12 +29,20 @@ public class LobbyView extends VBox {
 
 	private final Map<String, ServerPlayer>	playerNames = new HashMap<>();
 
+	private final ContentPane parent;
+	private final GameDataFactory gameData;
+	private final ClientConfig config;
+
 	public LobbyView(
 		ContentPane parent,
 		GameDataFactory gameData,
 		ClientConfig config
 	) {
 		super();
+
+		this.parent = parent;
+		this.gameData = gameData;
+		this.config = config;
 
 		final FlowPane toolbar = new FlowPane();
 		final Button logout = new Button("Logout");
@@ -106,6 +116,44 @@ public class LobbyView extends VBox {
 	public void playerEntersGame(String player) {
 		ServerPlayer p = playerNames.get(player);
 		if (p != null) p.setInGame();
+	}
+
+	public void challengeFrom(String player, StartBattleCommandRequest otherCmd) {
+		Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Accept this challenge?",
+			ButtonType.YES, ButtonType.NO);
+		a.setHeaderText(player + " challenges you to battle!");
+		a.showAndWait().ifPresent(r -> {
+			if (r == ButtonType.YES) {
+				try {
+					parent.showScreen(
+						new ChallengePane(gameData, config,
+							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer()), oCmdReq -> {
+								if (oCmdReq == null) {
+									parent.network.refuseChallenge(player);
+								} else {
+									try {
+										StartBattleCommandRequest cmdReq = oCmdReq.get();
+										StartBattleCommand ready = cmdReq.makeCommand(otherCmd, gameData);
+										parent.network.acceptChallenge(
+											ready, otherCmd.player.otherPlayer(), player);
+									} catch (CorruptDataException e) {
+										parent.network.refuseChallenge(player);
+										Alert ae = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+										ae.setHeaderText("Error initialising battle");
+										ae.showAndWait();
+									}
+								}
+							});
+				} catch (CorruptDataException e) {
+					parent.network.refuseChallenge(player);
+					Alert ae = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+					ae.setHeaderText("Error initialising challenge panel");
+					ae.showAndWait();
+				}
+			} else {
+				parent.network.refuseChallenge(player);
+			}
+		});
 	}
 }
 

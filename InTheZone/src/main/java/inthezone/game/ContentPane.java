@@ -1,10 +1,14 @@
 package inthezone.game;
 
+import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.LobbyListener;
 import inthezone.comptroller.Network;
+import inthezone.comptroller.NetworkCommandGenerator;
+import inthezone.game.battle.BattleView;
 import inthezone.game.lobby.LobbyView;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -163,10 +167,19 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	@Override
 	public void challengeFrom(String player, StartBattleCommandRequest cmd) {
+		Platform.runLater(() -> {
+		});
 	}
 
 	@Override
-	public void startBattle(BattleInProgress battle, String player) {
+	public void startBattle(
+		StartBattleCommand ready, Player player, String playerName
+	) {
+		Platform.runLater(() ->
+			showScreen(new BattleView(
+				ready, player,
+				new NetworkCommandGenerator(network.readCommandQueue),
+				gameData), winCond -> {}));
 	}
 }
 

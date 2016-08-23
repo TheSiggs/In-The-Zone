@@ -1,9 +1,10 @@
 package inthezone.comptroller;
 
+import inthezone.battle.commands.Command;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Loadout;
+import inthezone.battle.data.Player;
 import inthezone.protocol.Message;
 import inthezone.protocol.MessageKind;
 import inthezone.protocol.Protocol;
@@ -35,6 +36,7 @@ public class Network implements Runnable {
 	private UUID session = null;
 
 	private final BlockingQueue<Message> sendQueue = new LinkedBlockingQueue<>();
+	public final BlockingQueue<Command> readCommandQueue = new LinkedBlockingQueue<>();
 
 	public Network(
 		GameDataFactory gameData,
@@ -72,7 +74,7 @@ public class Network implements Runnable {
 				try {
 					doConnect();
 					(new Thread(new NetworkReader(
-						fromServer, lobbyListener, gameData,
+						fromServer, lobbyListener, readCommandQueue, gameData,
 							Thread.currentThread()))).start();
 				} catch (IOException e) {
 					cleanUpConnection();
@@ -208,11 +210,14 @@ public class Network implements Runnable {
 		}
 	}
 
+	/**
+	 * @param player The player accepting the challenge
+	 * @param otherPlayer The player who's challenge we're accepting
+	 * */
 	public synchronized void acceptChallenge(
-		StartBattleCommandRequest cmd, Loadout me, String player
+		StartBattleCommand cmd, Player player, String otherPlayer
 	) {
-		// generate a battle object, send it to the other player
-		// wait for a 'ready' response
+		Message.ACCEPT_CHALLENGE(otherPlayer, player, cmd.getJSON());
 	}
 
 	public void refuseChallenge(String player) {

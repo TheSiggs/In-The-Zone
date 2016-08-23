@@ -1,11 +1,14 @@
 package inthezone.comptroller;
 
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.protocol.Message;
 import inthezone.protocol.ProtocolException;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
 import org.json.simple.JSONObject;
 
 public class NetworkReader implements Runnable {
@@ -14,14 +17,18 @@ public class NetworkReader implements Runnable {
 	private final Thread parent;
 	private final GameDataFactory gameData;
 
+	private final BlockingQueue<Command> recQueue;
+
 	public NetworkReader(
 		BufferedReader in,
 		LobbyListener lobbyListener,
+		BlockingQueue<Command> recQueue,
 		GameDataFactory gameData,
 		Thread parent
 	) {
 		this.in = in;
 		this.lobbyListener = lobbyListener;
+		this.recQueue = recQueue;
 		this.gameData = gameData;
 		this.parent = parent;
 	}
@@ -51,16 +58,33 @@ public class NetworkReader implements Runnable {
 						}
 						break;
 
-					case ACCEPT_CHALLENGE:
-						// TODO: implement this
-						break;
-
 					case REJECT_CHALLENGE:
 						lobbyListener.playerRefusesChallenge(msg.parseName());
 						break;
 
-					case COMMAND:
+					case START_BATTLE:
+						Object ootherPlayer = msg.payload.get("otherPlayer");
+						if (ootherPlayer == null)
+							throw new ProtocolException("Invalid start battle command");
+						try {
+							lobbyListener.startBattle(
+								StartBattleCommand.fromJSON(msg.parseCommand(), gameData),
+								msg.parsePlayer(), (String) ootherPlayer);
+						} catch (ClassCastException e) {
+							throw new ProtocolException("Invalid start battle command");
+						}
+						break;
+
+					case CANCEL_BATTLE:
 						// TODO: implement this
+						break;
+
+					case COMMAND:
+						try {
+							recQueue.put(Command.fromJSON(msg.payload));
+						} catch (InterruptedException e) {
+							/* ignore */
+						}
 						break;
 
 					case GAME_OVER:

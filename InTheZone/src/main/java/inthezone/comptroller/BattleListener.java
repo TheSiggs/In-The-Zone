@@ -6,7 +6,8 @@ import inthezone.battle.commands.CommandException;
 import java.util.List;
 
 /**
- * Implemented by the GUI to process battle events.
+ * Implemented by the GUI to process battle events.  These methods must be
+ * invoked in the GUI thread.
  * */
 public interface BattleListener {
 	/**

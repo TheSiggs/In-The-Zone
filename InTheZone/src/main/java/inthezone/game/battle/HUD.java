@@ -10,15 +10,21 @@ import java.util.Map;
 import java.util.Optional;
 
 public class HUD extends AnchorPane {
-	private FlowPane characterInfoBoxes = new FlowPane();
-	private Button endTurnButton = new Button("End turn");
-	private Button itemsButton = new Button("Items");
-	private Button abilitiesButton = new Button("Abilities");
+	private final FlowPane characterInfoBoxes = new FlowPane();
+	private final Button endTurnButton = new Button("End turn");
+	private final Button itemsButton = new Button("Items");
+	private final Button abilitiesButton = new Button("Abilities");
+
+	private final BattleView view;
 
 	public final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 
-	public HUD() {
+	public HUD(BattleView view) {
 		super();
+
+		this.view = view;
+
+		endTurnButton.setOnAction(event -> view.sendEndTurn());
 
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
@@ -43,7 +49,7 @@ public class HUD extends AnchorPane {
 			box.setSelected(box.id == id);
 	}
 
-	public void init(BattleView view, Collection<Character> characters) {
+	public void init(Collection<Character> characters) {
 		for (Character c : characters) {
 			CharacterInfoBox box = new CharacterInfoBox(c);
 			box.setOnMouseClicked(event -> {
@@ -54,6 +60,5 @@ public class HUD extends AnchorPane {
 			characterInfoBoxes.getChildren().add(box);
 		}
 	}
-
 }
 

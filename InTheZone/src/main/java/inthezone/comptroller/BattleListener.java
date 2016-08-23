@@ -9,14 +9,31 @@ import java.util.List;
  * Implemented by the GUI to process battle events.
  * */
 public interface BattleListener {
-	public void startTurn();
-	public void endTurn();
+	/**
+	 * Start the player's turn.
+	 * @param characters Data for all the characters to update the HUD.
+	 * */
+	public void startTurn(List<Character> characters);
+
+	/**
+	 * Start the other player's turn.
+	 * @param characters Data for all the characters to update the HUD.
+	 * */
+	public void endTurn(List<Character> characters);
+
+	/**
+	 * Deal with the battle end condition.
+	 * */
 	public void endBattle(boolean playerWins);
+
+	/**
+	 * Handle a bad command.  This probably happens because the other player is
+	 * cheating.
+	 * */
 	public void badCommand(CommandException e);
 
 	/**
-	 * May be invoked with a null command, in which case we should just update
-	 * the characters list.
+	 * Execute a validated and not null command.
 	 * */
 	public void command(Command cmd, List<Character> affectedCharacters);
 }

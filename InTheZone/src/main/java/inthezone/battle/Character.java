@@ -121,8 +121,21 @@ public class Character implements Targetable, Obstacle {
 		this.pos = p;
 	}
 
+
 	public void teleport(MapPoint p) {
 		this.pos = p;
+	}
+
+	/**
+	 * Call this at the start of each turn.
+	 * @param player The player who's turn is starting
+	 * */
+	public void turnReset(Player player) {
+		if (this.player == player) {
+			Stats stats = getStats();
+			ap = stats.ap;
+			mp = stats.mp;
+		}
 	}
 
 	@Override public Stats getStats() {

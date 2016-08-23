@@ -1,5 +1,6 @@
 package inthezone.battle;
 
+import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import java.util.Collection;
 import java.util.List;
@@ -12,6 +13,13 @@ public class Battle {
 
 	public Battle(BattleState battleState) {
 		this.battleState = battleState;
+	}
+
+	/**
+	 * Perform operations at the start of a player's turn.
+	 * */
+	public void doTurnStart(Player player) {
+		for (Character c : battleState.characters) c.turnReset(player);
 	}
 
 	/**

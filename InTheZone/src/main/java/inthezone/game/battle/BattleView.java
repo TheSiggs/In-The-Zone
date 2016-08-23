@@ -1,9 +1,11 @@
 package inthezone.game.battle;
 
+import inthezone.ai.CommandGenerator;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
@@ -43,7 +45,7 @@ public class BattleView
 	private final BattleInProgress battle;
 
 	// The HUD GUI components
-	private final HUD hud = new HUD();
+	private final HUD hud = new HUD(this);
 
 	// Map from character ids to characters
 	private Map<Integer, Character> characters = null;
@@ -64,7 +66,8 @@ public class BattleView
 		0};
 
 	public BattleView(
-		StartBattleCommand startBattle, Player player, GameDataFactory gameData
+		StartBattleCommand startBattle, Player player,
+		CommandGenerator otherPlayer, GameDataFactory gameData
 	) {
 		super();
 
@@ -102,7 +105,7 @@ public class BattleView
 		canvas.setSelectableSprites(sprites);
 		
 		battle = new BattleInProgress(
-			startBattle, player, gameData, this);
+			startBattle, player, otherPlayer, gameData, this);
 		(new Thread(battle)).start();
 
 		this.getChildren().addAll(canvas, hud);
@@ -125,9 +128,11 @@ public class BattleView
 	}
 
 	public void selectCharacter(Optional<Character> c) {
-		selectedCharacter = c;
-		if (c.isPresent()) setMode(MOVE); else setMode(SELECT);
-		hud.selectCharacter(c.orElse(null));
+		if (mode != OTHER_TURN && mode != ANIMATING) {
+			selectedCharacter = c;
+			if (c.isPresent()) setMode(MOVE); else setMode(SELECT);
+			hud.selectCharacter(c.orElse(null));
+		}
 	}
 
 	private Consumer<MapPoint> handleSelection() {
@@ -165,9 +170,11 @@ public class BattleView
 	}
 
 	private void setMode(BattleViewMode mode) {
-		this.mode = mode;
-
 		switch (mode) {
+			case OTHER_TURN:
+				canvas.getStage().clearAllHighlighting();
+				selectCharacter(Optional.empty());
+				break;
 			case ANIMATING:
 				canvas.getStage().clearAllHighlighting();
 				break;
@@ -185,6 +192,7 @@ public class BattleView
 				});
 				break;
 		}
+		this.mode = mode;
 	}
 
 	private Consumer<MapPoint> handleMouseOver() {
@@ -215,12 +223,23 @@ public class BattleView
 		});
 	};
 
-	@Override
-	public void startTurn() {
+	/**
+	 * Send the end turn message;
+	 * */
+	public void sendEndTurn() {
+		battle.requestCommand(new EndTurnCommandRequest());
 	}
 
 	@Override
-	public void endTurn() {
+	public void startTurn(List<Character> characters) {
+		updateCharacters(characters);
+		setMode(SELECT);
+	}
+
+	@Override
+	public void endTurn(List<Character> characters) {
+		updateCharacters(characters);
+		setMode(OTHER_TURN);
 	}
 
 	@Override
@@ -233,10 +252,6 @@ public class BattleView
 
 	@Override
 	public void command(Command cmd, List<Character> affectedCharacters) {
-		if (cmd == null) {
-			updateCharacters(affectedCharacters); return;
-		}
-
 		if (cmd instanceof MoveCommand) {
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
@@ -270,7 +285,7 @@ public class BattleView
 		if (this.characters == null) {
 			this.characters = new HashMap<>();
 			for (Character c : characters) this.characters.put(c.id, c);
-			hud.init(this, characters.stream()
+			hud.init(characters.stream()
 				.filter(c -> c.player == player).collect(Collectors.toList()));
 		} else {
 			for (Character c : characters) {

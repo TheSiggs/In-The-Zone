@@ -1,5 +1,6 @@
 package inthezone.game;
 
+import inthezone.ai.SimpleAI;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.CharacterProfile;
@@ -112,8 +113,8 @@ public class DisconnectedView extends FlowPane {
 							.makeCommand(start, gameData);
 
 					// start the battle
-					parent.showScreen(new BattleView(ready, Player.PLAYER_A, gameData),
-						winCond -> {});
+					parent.showScreen(new BattleView(
+						ready, Player.PLAYER_A, new SimpleAI(), gameData), winCond -> {});
 				} catch (CorruptDataException e) {
 					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
 					a.setHeaderText("Error starting game");

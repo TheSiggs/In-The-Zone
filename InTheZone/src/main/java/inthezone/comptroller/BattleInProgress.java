@@ -1,5 +1,6 @@
 package inthezone.comptroller;
 
+import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
@@ -27,27 +28,31 @@ public class BattleInProgress implements Runnable {
 	private final Player thisPlayer;
 	private final boolean thisPlayerGoesFirst;
 	private final BattleListener listener;
+	private final CommandGenerator otherPlayer;
 
 	private final BlockingQueue<Action> commandRequests =
 		new LinkedBlockingQueue<>();
 	
 	public BattleInProgress(
 		StartBattleCommand cmd, Player thisPlayer,
+		CommandGenerator otherPlayer,
 		GameDataFactory gameData, BattleListener listener
 	) {
 		this(
 			cmd.doCmd(gameData),
 			thisPlayer,
+			otherPlayer,
 			cmd.p1GoesFirst == (thisPlayer == Player.PLAYER_A),
 			listener);
 	}
 
 	public BattleInProgress(
-		Battle battle, Player thisPlayer,
+		Battle battle, Player thisPlayer, CommandGenerator otherPlayer,
 		boolean thisPlayerGoesFirst, BattleListener listener
 	) {
 		this.battle = battle;
 		this.thisPlayer = thisPlayer;
+		this.otherPlayer = otherPlayer;
 		this.thisPlayerGoesFirst = thisPlayerGoesFirst;
 		this.listener = listener;
 	}
@@ -84,8 +89,6 @@ public class BattleInProgress implements Runnable {
 	@Override
 	public void run() {
 		boolean gameOver = false;
-		Platform.runLater(() -> listener.command(null, 
-			battle.battleState.cloneCharacters()));
 
 		if (!thisPlayerGoesFirst) {
 			otherTurn();
@@ -102,26 +105,31 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void turn() {
+		battle.doTurnStart(thisPlayer);
+		Platform.runLater(() ->
+			listener.startTurn(battle.battleState.cloneCharacters()));
+
 		while(true) {
 			try {
 				Action a = commandRequests.take();
 
 				// handle a command request
-				a.crq.ifPresent(crq -> {
+				if (a.crq.isPresent()) {
 					try {
-						Command cmd = crq.makeCommand(battle.battleState);
-						List<Character> affectedCharacters = cmd.doCmd(battle);
-						Platform.runLater(() -> {
-							listener.command(cmd, affectedCharacters);
-						});
+						Command cmd = a.crq.get().makeCommand(battle.battleState);
 						// TODO: hook into network code here
 						if (cmd instanceof EndTurnCommand) {
 							return;
 						}
+
+						List<Character> affectedCharacters = cmd.doCmd(battle);
+						Platform.runLater(() -> {
+							listener.command(cmd, affectedCharacters);
+						});
 					} catch (CommandException e) {
 						Platform.runLater(() -> listener.badCommand(e));
 					}
-				});
+				}
 
 				// handle a move range request
 				a.moveRange.ifPresent(moveRange ->
@@ -136,8 +144,11 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void otherTurn() {
-		// TODO: hook into network code here
-		return;
+		battle.doTurnStart(thisPlayer.otherPlayer());
+		Platform.runLater(() ->
+			listener.endTurn(battle.battleState.cloneCharacters()));
+
+		otherPlayer.generateCommands(battle, listener);
 	}
 
 	/**
@@ -188,7 +199,6 @@ public class BattleInProgress implements Runnable {
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				MapPoint p = new MapPoint(x, y);
-				if (r.contains(p)) continue;
 				List<MapPoint> path = battle.battleState.findPath(c.getPos(), p, c.player);
 				if (battle.battleState.canMove(path)) r.add(p);
 			}

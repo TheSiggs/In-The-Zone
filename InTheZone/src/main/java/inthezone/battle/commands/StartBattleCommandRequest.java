@@ -51,7 +51,7 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		startTiles.stream().map(x -> x.getJSON()).forEach(x -> a.add(x));
 		r.put("name", "startBattleReq");
 		r.put("stage", stage);
-		r.put("player", player);
+		r.put("player", player.toString());
 		r.put("starts", a);
 		r.put("loadout", me.getJSON());
 		return r;

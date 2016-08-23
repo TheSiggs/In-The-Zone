@@ -304,7 +304,7 @@ public class Message {
 			JSONObject json = (JSONObject) parser.parse(data);
 			return new Message(MessageKind.fromString(id), json);
 		} catch (ParseException e) {
-			throw new ProtocolException("Malformed JSON");
+			throw new ProtocolException("Malformed JSON " + data, e);
 		}
 	}
 

@@ -1,5 +1,7 @@
 package inthezone.protocol;
 
+import inthezone.battle.data.Player;
+import isogame.engine.CorruptDataException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +47,13 @@ public class Message {
 
 	public static Message DATA(JSONObject data) {
 		return new Message(MessageKind.GAME_DATA, data);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Message COMMAND(JSONObject cmd) {
+		JSONObject o = new JSONObject();
+		o.put("cmd", cmd);
+		return new Message(MessageKind.COMMAND, o);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -106,11 +115,48 @@ public class Message {
 		return new Message(MessageKind.CHALLENGE_PLAYER, o);
 	}
 
+	/**
+	 * @param name The name of the player who's challenge we're accepting
+	 * @param player The player accepting the challenge
+	 * */
+	@SuppressWarnings("unchecked")
+	public static Message ACCEPT_CHALLENGE(
+		String name, Player player, JSONObject cmd
+	) {
+		JSONObject o = new JSONObject();
+		o.put("name", name);
+		o.put("player", player.toString());
+		o.put("cmd", cmd);
+		return new Message(MessageKind.ACCEPT_CHALLENGE, o);
+	}
+
 	@SuppressWarnings("unchecked")
 	public static Message REJECT_CHALLENGE(String name) {
 		JSONObject o = new JSONObject();
 		o.put("name", name);
 		return new Message(MessageKind.REJECT_CHALLENGE, o);
+	}
+
+	/**
+	 * @param player The player that the recipient of this message should play.
+	 * */
+	@SuppressWarnings("unchecked")
+	public static Message START_BATTLE(JSONObject cmd, Player player, String otherPlayer) {
+		JSONObject o = new JSONObject();
+		o.put("player", player.toString());
+		o.put("otherPlayer", otherPlayer);
+		o.put("cmd", cmd);
+		return new Message(MessageKind.START_BATTLE, o);
+	}
+
+	/**
+	 * @param name The name of the player who challenged us.
+	 * */
+	@SuppressWarnings("unchecked")
+	public static Message CANCEL_BATTLE(String name) {
+		JSONObject o = new JSONObject();
+		o.put("name", name);
+		return new Message(MessageKind.CANCEL_BATTLE, o);
 	}
 
 	public static Message LOGOFF() {
@@ -129,12 +175,45 @@ public class Message {
 		if (kind != MessageKind.REQUEST_NAME &&
 			kind != MessageKind.CHALLENGE_PLAYER &&
 			kind != MessageKind.ACCEPT_CHALLENGE &&
-			kind != MessageKind.REJECT_CHALLENGE)
+			kind != MessageKind.REJECT_CHALLENGE &&
+			kind != MessageKind.CANCEL_BATTLE)
 				throw new ProtocolException("Expected name");
 		try {
 			Object v = payload.get("name");
 			if (v == null) throw new ProtocolException("Malformed message");
 			return (String) v;
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
+	public Player parsePlayer() throws ProtocolException {
+		if (kind != MessageKind.ACCEPT_CHALLENGE &&
+			kind != MessageKind.START_BATTLE)
+				throw new ProtocolException("Expected player");
+
+		try {
+			Object player = payload.get("player");
+			if (player == null) throw new ProtocolException("Malformed message");
+			return Player.fromString((String) player);
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		} catch (CorruptDataException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
+	public JSONObject parseCommand() throws ProtocolException {
+		if (kind != MessageKind.ACCEPT_CHALLENGE &&
+			kind != MessageKind.COMMAND &&
+			kind != MessageKind.START_BATTLE &&
+			kind != MessageKind.CHALLENGE_PLAYER)
+				throw new ProtocolException("Expected command");
+
+		try {
+			Object cmd = payload.get("cmd");
+			if (cmd == null) throw new ProtocolException("Malformed message");
+			return (JSONObject) cmd;
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Malformed message");
 		}

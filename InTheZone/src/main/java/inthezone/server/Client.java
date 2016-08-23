@@ -380,6 +380,9 @@ public class Client {
 		}
 	}
 
+	/**
+	 * @param client The client to start the battle with
+	 * */
 	private void doAcceptChallenge(Message msg, Client client)
 		throws ProtocolException
 	{
@@ -395,10 +398,17 @@ public class Client {
 				}
 			}
 
-			client.forwardMessage(msg);
-			channel.requestSend(Message.OK());
+			client.forwardMessage(Message.START_BATTLE(
+				msg.parseCommand(),
+				msg.parsePlayer().otherPlayer(),
+				this.name.orElse("")));
+
+			channel.requestSend(Message.START_BATTLE(
+				msg.parseCommand(),
+				msg.parsePlayer(),
+				msg.parseName()));
 		} else {
-			channel.requestSend(Message.NOK());
+			channel.requestSend(Message.CANCEL_BATTLE(client.name.orElse("")));
 		}
 	}
 }

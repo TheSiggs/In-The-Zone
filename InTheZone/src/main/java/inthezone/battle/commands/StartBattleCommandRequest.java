@@ -24,7 +24,7 @@ import org.json.simple.JSONObject;
  * */
 public class StartBattleCommandRequest implements HasJSONRepresentation {
 	public final String stage;
-	private final Player player;
+	public final Player player;
 	private final Loadout me;
 	private final List<MapPoint> startTiles;
 

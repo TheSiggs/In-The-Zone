@@ -32,7 +32,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
 		if (battleState.canDoAbility(agent, ability, targets)) {
-			return new UseAbilityCommand(agent, ability, targets);
+			return new UseAbilityCommand(agent, ability.info.name, targets);
 		} else {
 			throw new CommandException("Invalid ability command request");
 		}

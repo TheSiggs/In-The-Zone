@@ -200,7 +200,7 @@ public class Network implements Runnable {
 		}
 	}
 
-	public synchronized void challengePlayer(
+	public void challengePlayer(
 		StartBattleCommandRequest cmd, String player
 	) {
 		try {
@@ -214,7 +214,7 @@ public class Network implements Runnable {
 	 * @param player The player accepting the challenge
 	 * @param otherPlayer The player who's challenge we're accepting
 	 * */
-	public synchronized void acceptChallenge(
+	public void acceptChallenge(
 		StartBattleCommand cmd, Player player, String otherPlayer
 	) {
 		Message.ACCEPT_CHALLENGE(otherPlayer, player, cmd.getJSON());
@@ -223,6 +223,14 @@ public class Network implements Runnable {
 	public void refuseChallenge(String player) {
 		try {
 			sendQueue.put(Message.REJECT_CHALLENGE(player));
+		} catch (InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		}
+	}
+
+	public void sendCommand(Command cmd) {
+		try {
+			sendQueue.put(Message.COMMAND(cmd.getJSON()));
 		} catch (InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}

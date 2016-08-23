@@ -30,29 +30,38 @@ public class BattleInProgress implements Runnable {
 	private final BattleListener listener;
 	private final CommandGenerator otherPlayer;
 
+	private final Network network;
 	private final BlockingQueue<Action> commandRequests =
 		new LinkedBlockingQueue<>();
 	
 	public BattleInProgress(
 		StartBattleCommand cmd, Player thisPlayer,
 		CommandGenerator otherPlayer,
+		Network network,
 		GameDataFactory gameData, BattleListener listener
 	) {
 		this(
 			cmd.doCmd(gameData),
 			thisPlayer,
 			otherPlayer,
+			network,
 			cmd.p1GoesFirst == (thisPlayer == Player.PLAYER_A),
 			listener);
 	}
 
+	/**
+	 * @param network may be null if we are not in network mode
+	 * */
 	public BattleInProgress(
-		Battle battle, Player thisPlayer, CommandGenerator otherPlayer,
+		Battle battle, Player thisPlayer,
+		CommandGenerator otherPlayer,
+		Network network,
 		boolean thisPlayerGoesFirst, BattleListener listener
 	) {
 		this.battle = battle;
 		this.thisPlayer = thisPlayer;
 		this.otherPlayer = otherPlayer;
+		this.network = network;
 		this.thisPlayerGoesFirst = thisPlayerGoesFirst;
 		this.listener = listener;
 	}
@@ -117,7 +126,7 @@ public class BattleInProgress implements Runnable {
 				if (a.crq.isPresent()) {
 					try {
 						Command cmd = a.crq.get().makeCommand(battle.battleState);
-						// TODO: hook into network code here
+						if (network != null) network.sendCommand(cmd);
 						if (cmd instanceof EndTurnCommand) {
 							return;
 						}

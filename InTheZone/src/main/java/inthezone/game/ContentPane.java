@@ -179,7 +179,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			showScreen(new BattleView(
 				ready, player,
 				new NetworkCommandGenerator(network.readCommandQueue),
-				gameData), winCond -> {}));
+				network, gameData), winCond -> {}));
 	}
 }
 

@@ -13,6 +13,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
+import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
 import isogame.engine.AnimationChain;
 import isogame.engine.MapPoint;
@@ -67,7 +68,8 @@ public class BattleView
 
 	public BattleView(
 		StartBattleCommand startBattle, Player player,
-		CommandGenerator otherPlayer, GameDataFactory gameData
+		CommandGenerator otherPlayer,
+		Network network, GameDataFactory gameData
 	) {
 		super();
 
@@ -105,7 +107,7 @@ public class BattleView
 		canvas.setSelectableSprites(sprites);
 		
 		battle = new BattleInProgress(
-			startBattle, player, otherPlayer, gameData, this);
+			startBattle, player, otherPlayer, network, gameData, this);
 		(new Thread(battle)).start();
 
 		this.getChildren().addAll(canvas, hud);

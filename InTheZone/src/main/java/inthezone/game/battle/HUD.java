@@ -26,6 +26,10 @@ public class HUD extends AnchorPane {
 
 		endTurnButton.setOnAction(event -> view.sendEndTurn());
 
+		endTurnButton.disableProperty().bind(view.isMyTurn.not());
+		itemsButton.disableProperty().bind(view.isMyTurn.not());
+		abilitiesButton.disableProperty().bind(view.isMyTurn.not());
+
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
 

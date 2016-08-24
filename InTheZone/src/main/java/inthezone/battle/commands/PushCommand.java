@@ -26,7 +26,7 @@ public class PushCommand extends Command {
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
-		r.put("kind", CommandKind.PUSH);
+		r.put("kind", CommandKind.PUSH.toString());
 		r.put("agent", agent);
 		r.put("target", target);
 		r.put("effective", effective);

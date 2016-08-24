@@ -22,6 +22,8 @@ import isogame.engine.Sprite;
 import isogame.engine.SpriteDecalRenderer;
 import isogame.engine.Stage;
 import isogame.GlobalConstants;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
@@ -46,7 +48,7 @@ public class BattleView
 	private final BattleInProgress battle;
 
 	// The HUD GUI components
-	private final HUD hud = new HUD(this);
+	private final HUD hud;
 
 	// Map from character ids to characters
 	private Map<Integer, Character> characters = null;
@@ -55,6 +57,9 @@ public class BattleView
 	private Optional<Character> selectedCharacter = Optional.empty();
 
 	private BattleViewMode mode = SELECT;
+
+	// status properties for the HUD
+	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
 
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
 	private final double[] sarrowx = new double[] {
@@ -74,6 +79,7 @@ public class BattleView
 		super();
 
 		this.player = player;
+		this.hud = new HUD(this);
 
 		highlights = new Paint[] {
 			Color.rgb(0x00, 0xFF, 0x00, 0.2),
@@ -234,12 +240,14 @@ public class BattleView
 
 	@Override
 	public void startTurn(List<Character> characters) {
+		isMyTurn.setValue(true);
 		updateCharacters(characters);
 		setMode(SELECT);
 	}
 
 	@Override
 	public void endTurn(List<Character> characters) {
+		isMyTurn.setValue(false);
 		updateCharacters(characters);
 		setMode(OTHER_TURN);
 	}

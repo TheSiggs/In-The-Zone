@@ -50,9 +50,9 @@ public class NetworkReader implements Runnable {
 
 					case CHALLENGE_PLAYER:
 						try {
-						lobbyListener.challengeFrom(msg.parseName(),
-							StartBattleCommandRequest.fromJSON(
-								(JSONObject) msg.payload.get("cmd"), gameData));
+							lobbyListener.challengeFrom(msg.parseName(),
+								StartBattleCommandRequest.fromJSON(
+									(JSONObject) msg.payload.get("cmd"), gameData));
 						} catch (ClassCastException e) {
 							throw new ProtocolException("Malformed command", e);
 						}
@@ -75,13 +75,9 @@ public class NetworkReader implements Runnable {
 						}
 						break;
 
-					case CANCEL_BATTLE:
-						// TODO: implement this
-						break;
-
 					case COMMAND:
 						try {
-							recQueue.put(Command.fromJSON(msg.payload));
+							recQueue.put(Command.fromJSON(msg.parseCommand()));
 						} catch (InterruptedException e) {
 							/* ignore */
 						}
@@ -103,8 +99,17 @@ public class NetworkReader implements Runnable {
 						// TODO: implement this
 						break;
 
+					case ISSUE_CHALLENGE:
+						lobbyListener.challengeIssued(msg.parseName());
+						break;
+
+					case NOK:
+						lobbyListener.serverNotification(msg.parseMessage());
+						break;
+
 					default:
-						throw new ProtocolException("Server error: unexpected message");
+						throw new ProtocolException(
+							"Server error: unexpected message of kind " + msg.kind);
 				}
 			}
 		} catch (IOException e) {

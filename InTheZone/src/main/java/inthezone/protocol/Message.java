@@ -21,6 +21,11 @@ public class Message {
 	}
 
 	@SuppressWarnings("unchecked")
+	public void substitute(String key, Object value) {
+		payload.put(key, value);
+	}
+
+	@SuppressWarnings("unchecked")
 	public static Message SV(int v, UUID gameDataVersion, UUID sessionKey) {
 		JSONObject o = new JSONObject();
 		o.put("version", v);
@@ -41,12 +46,22 @@ public class Message {
 		return new Message(MessageKind.OK, new JSONObject());
 	}
 
-	public static Message NOK() {
-		return new Message(MessageKind.NOK, new JSONObject());
+	@SuppressWarnings("unchecked")
+	public static Message NOK(String msg) {
+		JSONObject o = new JSONObject();
+		o.put("m", msg);
+		return new Message(MessageKind.NOK, o);
 	}
 
 	public static Message DATA(JSONObject data) {
 		return new Message(MessageKind.GAME_DATA, data);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Message ISSUE_CHALLENGE(String name) {
+		JSONObject o = new JSONObject();
+		o.put("name", name);
+		return new Message(MessageKind.ISSUE_CHALLENGE, o);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -149,16 +164,6 @@ public class Message {
 		return new Message(MessageKind.START_BATTLE, o);
 	}
 
-	/**
-	 * @param name The name of the player who challenged us.
-	 * */
-	@SuppressWarnings("unchecked")
-	public static Message CANCEL_BATTLE(String name) {
-		JSONObject o = new JSONObject();
-		o.put("name", name);
-		return new Message(MessageKind.CANCEL_BATTLE, o);
-	}
-
 	public static Message LOGOFF() {
 		return new Message(MessageKind.LOGOFF, new JSONObject());
 	}
@@ -176,7 +181,7 @@ public class Message {
 			kind != MessageKind.CHALLENGE_PLAYER &&
 			kind != MessageKind.ACCEPT_CHALLENGE &&
 			kind != MessageKind.REJECT_CHALLENGE &&
-			kind != MessageKind.CANCEL_BATTLE)
+			kind != MessageKind.ISSUE_CHALLENGE)
 				throw new ProtocolException("Expected name");
 		try {
 			Object v = payload.get("name");
@@ -290,6 +295,19 @@ public class Message {
 			Object a = payload.get("game");
 			if (a == null) throw new ProtocolException("Malformed message");
 			return jsonArrayToList((JSONArray) a, String.class);
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
+	public String parseMessage() throws ProtocolException {
+		if (kind != MessageKind.NOK)
+			throw new ProtocolException("Expected message");
+
+		try {
+			Object m = payload.get("m");
+			if (m == null) throw new ProtocolException("Malformed message");
+			return (String) m;
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Malformed message");
 		}

@@ -4,7 +4,7 @@ public enum MessageKind {
 	S_VERSION, C_VERSION, OK, NOK, GAME_DATA, REQUEST_NAME, PLAYERS_JOIN,
 	CHALLENGE_PLAYER, ACCEPT_CHALLENGE, REJECT_CHALLENGE, COMMAND,
 	GAME_OVER, LOGOFF, RECONNECT, WAIT_FOR_RECONNECT,
-	START_BATTLE, CANCEL_BATTLE;
+	START_BATTLE, ISSUE_CHALLENGE;
 
 	// NOTE: REJECT_CHALLENGE can happen during a game, in which case it probably
 	// should not be reported.  Or perhaps the reporting could be delayed until
@@ -28,7 +28,7 @@ public enum MessageKind {
 			case "RT": return RECONNECT;
 			case "WR": return WAIT_FOR_RECONNECT;
 			case "SB": return START_BATTLE;
-			case "CB": return CANCEL_BATTLE;
+			case "IC": return ISSUE_CHALLENGE;
 			default:
 				throw new ProtocolException("Bad message kind " + in);
 		}
@@ -52,7 +52,7 @@ public enum MessageKind {
 			case RECONNECT: return "RT";
 			case WAIT_FOR_RECONNECT: return "WR";
 			case START_BATTLE: return "SB";
-			case CANCEL_BATTLE: return "CB";
+			case ISSUE_CHALLENGE: return "IC";
 			default:
 				throw new RuntimeException("This cannot happen");
 		}

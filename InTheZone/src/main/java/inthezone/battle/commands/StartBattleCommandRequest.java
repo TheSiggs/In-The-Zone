@@ -80,7 +80,13 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 			String name = (String) oname;
 			String stage = (String) ostage;
 			Player player = Player.fromString((String) oplayer);
-			List<MapPoint> starts = jsonArrayToList((JSONArray) ostarts, MapPoint.class);
+
+			JSONArray rawStarts = (JSONArray) ostarts;
+			List<MapPoint> starts = new ArrayList<>();
+			for (int i = 0; i < rawStarts.size(); i++) {
+				starts.add(MapPoint.fromJSON((JSONObject) rawStarts.get(i)));
+			}
+
 			Loadout loadout = Loadout.fromJSON((JSONObject) oloadout, gameData);
 			if (!name.equals("startBattleReq"))
 				throw new ProtocolException("Expected start battle request");
@@ -136,17 +142,6 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		return p == Player.PLAYER_A ?
 			s.terrain.getPlayerStartTiles() :
 			s.terrain.getAIStartTiles();
-	}
-
-	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
-		throws ClassCastException
-	{
-		List<T> r = new ArrayList<>();
-		int limit = a.size();
-		for (int i = 0; i < limit; i++) {
-			r.add(clazz.cast(a.get(i)));
-		}
-		return r;
 	}
 }
 

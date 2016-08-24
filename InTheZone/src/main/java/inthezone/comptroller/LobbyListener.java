@@ -15,6 +15,12 @@ public interface LobbyListener {
 	public Optional<String> tryDifferentPlayerName(String name);
 	public void errorConnectingToServer(Exception e);
 	public void serverError(Exception e);
+
+	/**
+	 * A message from the server that should be reported to the player.
+	 * */
+	public void serverNotification(String e);
+
 	public void connectionDropped();
 	public void loggedOff();
 	public void playerHasLoggedIn(String player);
@@ -22,6 +28,11 @@ public interface LobbyListener {
 	public void playerHasEnteredBattle(String player);
 	public void playerRefusesChallenge(String player);
 	public void challengeFrom(String player, StartBattleCommandRequest cmd);
+
+	/**
+	 * Our challenge has been issued to the named player.
+	 * */
+	public void challengeIssued(String player);
 
 
 	/**

@@ -33,7 +33,7 @@ public class UseAbilityCommand extends Command {
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
 		JSONArray a = new JSONArray();
-		r.put("kind", CommandKind.ABILITY);
+		r.put("kind", CommandKind.ABILITY.toString());
 		r.put("agent", agent);
 		r.put("ability", ability);
 		for (DamageToTarget d : targets) a.add(d.getJSON());

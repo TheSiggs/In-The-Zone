@@ -109,7 +109,7 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		if (op1Start == null) throw new ProtocolException("Missing p1 start positions");
 		if (op2Start == null) throw new ProtocolException("Missing p2 start positions");
 
-		if (((String) okind).equals("Start"))
+		if (!((String) okind).equals("Start"))
 			throw new ProtocolException("Expected start command");
 
 		try {

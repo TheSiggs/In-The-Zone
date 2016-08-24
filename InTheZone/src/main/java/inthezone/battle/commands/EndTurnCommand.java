@@ -15,7 +15,7 @@ public class EndTurnCommand extends Command {
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
-		r.put("kind", CommandKind.ENDTURN);
+		r.put("kind", CommandKind.ENDTURN.toString());
 		return r;
 	}
 

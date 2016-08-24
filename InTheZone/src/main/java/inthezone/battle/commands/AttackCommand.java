@@ -29,7 +29,7 @@ public class AttackCommand extends Command {
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
 		JSONArray a = new JSONArray();
-		r.put("kind", CommandKind.ATTACK);
+		r.put("kind", CommandKind.ATTACK.toString());
 		r.put("agent", agent.getJSON());
 		for (DamageToTarget d : targets) a.add(d.getJSON());
 		r.put("targets", a);

@@ -95,6 +95,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	@Override
 	public void connectedToServer(String playerName, Collection<String> players) {
 		Platform.runLater(() -> {
+			isConnected = true;
 			disconnected.endConnecting();
 			lobbyView.joinLobby(playerName, players);
 			if (screens.isEmpty()) switchPane(lobbyView);
@@ -109,6 +110,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	@Override
 	public void errorConnectingToServer(Exception e) {
 		Platform.runLater(() -> {
+			isConnected = false;
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Error connecting to server");
 			a.showAndWait();
@@ -120,6 +122,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	@Override
 	public void serverError(Exception e) {
 		Platform.runLater(() -> {
+			isConnected = false;
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Server error");
 			a.showAndWait();
@@ -128,13 +131,27 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+
+	@Override
+	public void serverNotification(String e) {
+		Platform.runLater(() -> {
+			Alert a = new Alert(Alert.AlertType.ERROR, e, ButtonType.CLOSE);
+			a.setHeaderText("Message from the server");
+			a.showAndWait();
+		});
+	}
+
 	@Override
 	public void connectionDropped() {
+		Platform.runLater(() -> {
+			isConnected = false;
+		});
 	}
 
 	@Override
 	public void loggedOff() {
 		Platform.runLater(() -> {
+			isConnected = false;
 			disconnected.endConnecting();
 			if (screens.isEmpty()) switchPane(disconnected);
 		});
@@ -166,8 +183,13 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 	@Override
+	public void challengeIssued(String player) {
+	}
+
+	@Override
 	public void challengeFrom(String player, StartBattleCommandRequest cmd) {
 		Platform.runLater(() -> {
+			lobbyView.challengeFrom(player, cmd);
 		});
 	}
 

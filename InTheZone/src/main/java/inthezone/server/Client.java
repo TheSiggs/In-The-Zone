@@ -178,6 +178,7 @@ public class Client {
 	 * */
 	public void startGameWith(Client client) {
 		state = ClientState.GAME;
+		challenges.remove(client);
 		inGameWith = Optional.of(client);
 	}
 
@@ -186,6 +187,13 @@ public class Client {
 	 * */
 	public void challengeRejected(Client client) {
 		challenged.remove(client);
+	}
+
+	/**
+	 * @param client The client issuing the challenge
+	 * */
+	public void challenge(Client client) {
+		challenges.add(client);
 	}
 
 	/**
@@ -285,7 +293,7 @@ public class Client {
 					UUID connectTo = msg.parseSessionKey();
 					Client old = sessions.get(connectTo);
 					if (old == null) {
-						channel.requestSend(Message.NOK());
+						channel.requestSend(Message.NOK("Cannot reconnect"));
 					} else {
 						old.reconnect(connection, channel);
 						channel.requestSend(Message.OK());
@@ -297,7 +305,7 @@ public class Client {
 					}
 				} else if (msg.kind == MessageKind.REQUEST_NAME) {
 					if (namedClients.containsKey(name)) {
-						channel.requestSend(Message.NOK());
+						channel.requestSend(Message.NOK("That name is already in use"));
 					} else {
 						this.name = Optional.of(name);
 						for (Client c : namedClients.values()) {
@@ -317,10 +325,10 @@ public class Client {
 			case LOBBY:
 				Client client = namedClients.get(msg.parseName());
 				if (client == null) {
-					channel.requestSend(Message.NOK());
+					channel.requestSend(Message.NOK("No such player"));
 				} else {
 					if (msg.kind == MessageKind.CHALLENGE_PLAYER) {
-						doChallenge(client);
+						doChallenge(msg, client);
 					} else if (msg.kind == MessageKind.REJECT_CHALLENGE) {
 						doRejectChallenge(msg, client);
 					} else if (msg.kind == MessageKind.ACCEPT_CHALLENGE) {
@@ -360,12 +368,16 @@ public class Client {
 		}
 	}
 
-	private void doChallenge(Client client) {
-		if (challenged.size() < MAX_CHALLENGES) {
+	private void doChallenge(Message msg, Client client) {
+		if (challenged.size() < MAX_CHALLENGES && client.name.isPresent()) {
 			challenged.add(client);
-			channel.requestSend(Message.OK());
+			client.challenge(this);
+			channel.requestSend(Message.ISSUE_CHALLENGE(client.name.get()));
+			msg.substitute("name", this.name.orElse(""));
+			client.forwardMessage(msg);
 		} else {
-			channel.requestSend(Message.NOK());
+			channel.requestSend(
+				Message.NOK("Cannot challenge " + client.name.orElse("")));
 		}
 	}
 
@@ -374,9 +386,8 @@ public class Client {
 			challenges.remove(client);
 			client.challengeRejected(this);
 			client.forwardMessage(msg);
-			channel.requestSend(Message.OK());
 		} else {
-			channel.requestSend(Message.NOK());
+			channel.requestSend(Message.NOK("No such challenge to reject"));
 		}
 	}
 
@@ -386,6 +397,7 @@ public class Client {
 	private void doAcceptChallenge(Message msg, Client client)
 		throws ProtocolException
 	{
+		System.err.println("challenges: " + challenges.toString() + "? " + client.toString());
 		if (challenges.contains(client) && client.isReadyToPlay()) {
 			challenges.remove(client);
 			startGameWith(client);
@@ -408,7 +420,8 @@ public class Client {
 				msg.parsePlayer(),
 				msg.parseName()));
 		} else {
-			channel.requestSend(Message.CANCEL_BATTLE(client.name.orElse("")));
+			channel.requestSend(Message.NOK(client.name.orElse("") +
+				" is already in battle with someone else"));
 		}
 	}
 }

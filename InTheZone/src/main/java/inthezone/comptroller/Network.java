@@ -217,7 +217,11 @@ public class Network implements Runnable {
 	public void acceptChallenge(
 		StartBattleCommand cmd, Player player, String otherPlayer
 	) {
-		Message.ACCEPT_CHALLENGE(otherPlayer, player, cmd.getJSON());
+		try {
+			sendQueue.put(Message.ACCEPT_CHALLENGE(otherPlayer, player, cmd.getJSON()));
+		} catch (InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		}
 	}
 
 	public void refuseChallenge(String player) {

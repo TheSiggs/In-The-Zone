@@ -24,7 +24,7 @@ public class MoveCommand extends Command {
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
 		JSONArray a = new JSONArray();
-		r.put("kind", CommandKind.MOVE);
+		r.put("kind", CommandKind.MOVE.toString());
 		for (MapPoint p : path) a.add(p.getJSON());
 		r.put("path", a);
 		return r;

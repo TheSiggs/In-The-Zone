@@ -174,6 +174,7 @@ public class BattleView
 						selectCharacter(Optional.empty());
 					}
 					break;
+
 				case MOVE:
 					if (oc.isPresent() && oc.get().player == player) {
 						selectCharacter(Optional.of(oc.get()));
@@ -184,6 +185,9 @@ public class BattleView
 					} else {
 						selectCharacter(Optional.empty());
 					}
+					break;
+
+				case TARGET:
 					break;
 			}
 

@@ -115,7 +115,32 @@ public class BattleState {
 	public Collection<MapPoint> getTargetableArea(
 		MapPoint agent, Ability ability
 	) {
-		return LineOfSight.getDiamond(agent, ability.info.range.range);
+		Collection<MapPoint> diamond =
+			LineOfSight.getDiamond(agent, ability.info.range.range);
+
+		if (!ability.info.range.los) {
+			return diamond;
+		} else {
+			Player player = getCharacterAt(agent).map(c -> c.player)
+				.orElseThrow(() -> new RuntimeException(
+					"Attempted to get targeting information for a non-existent character"));
+
+			Set<MapPoint> obstacles = new HashSet<>(characters.stream()
+				.filter(c -> c.blocksPath(player))
+				.map(c -> c.getPos()).collect(Collectors.toList()));
+			obstacles.addAll(terrainObstacles);
+
+			// check line of sight
+			return diamond.stream().filter(p -> {
+				List<MapPoint> los1 = LineOfSight.getLOS(agent, p, true);
+				List<MapPoint> los2 = LineOfSight.getLOS(agent, p, false);
+				los1.remove(los1.size() - 1); // we only need LOS up to the square
+				los2.remove(los2.size() - 1); // the square itself may be blocked
+				
+				return !los1.stream().anyMatch(lp -> obstacles.contains(lp)) ||
+					!los2.stream().anyMatch(lp -> obstacles.contains(lp));
+			}).collect(Collectors.toList());
+		}
 	}
 
 	public Collection<Targetable> getAbilityTargets(

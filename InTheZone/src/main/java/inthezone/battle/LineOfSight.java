@@ -109,11 +109,12 @@ public class LineOfSight {
 			ds = new MapPoint(0, 0);
 		}
 
-		if (dy >= 0) {
-			return LineOfSight.getLOS0(p0, p1, dp, ds, dsdp, bias);
-		} else {
-			return LineOfSight.getLOS0(p0, p1, dp, ds, dsdp, !bias);
-		}
+		List<MapPoint> r;
+		boolean useBias = dy >= 0? bias : !bias;
+		r = LineOfSight.getLOS0(p0, p1, dp, ds, dsdp, useBias);
+		if (r == null)
+			return LineOfSight.getLOS0(p0, p1, dp, ds, dsdp, !useBias);
+		return r;
 	}
 
 	/**
@@ -138,6 +139,9 @@ public class LineOfSight {
 		return r;
 	}
 
+	/**
+	 * Returns null if the bias choice was not possible.
+	 * */
 	private static List<MapPoint> getLOS0(
 		MapPoint p0,   // start position
 		MapPoint p1,   // target position
@@ -152,6 +156,8 @@ public class LineOfSight {
 		MapPoint p = p0;
 		r.add(p);
 
+		int count = 0;
+
 		// This is essentially Bresenham's line algorithm modified to give a
 		// manhatten path
 		while (!p.equals(p1)) {
@@ -163,13 +169,17 @@ public class LineOfSight {
 			} else {
 				// primary and secondary directions
 				if (bias) {
+					if (p.add(ds).equals(p1)) return null;
 					p = p.add(dp);
 					r.add(p);
+					if (p.equals(p1)) break;
 					p = p.add(ds);
 					r.add(p);
 				} else {
+					if (p.add(dp).equals(p1)) return null;
 					p = p.add(ds);
 					r.add(p);
+					if (p.equals(p1)) break;
 					p = p.add(dp);
 					r.add(p);
 				}

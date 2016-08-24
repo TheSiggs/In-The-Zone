@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.ai.CommandGenerator;
+import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
@@ -60,6 +61,7 @@ public class BattleView
 
 	// status properties for the HUD
 	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
+	public final BooleanProperty isCharacterSelected = new SimpleBooleanProperty(false);
 
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
 	private final double[] sarrowx = new double[] {
@@ -138,7 +140,13 @@ public class BattleView
 	public void selectCharacter(Optional<Character> c) {
 		if (mode != OTHER_TURN && mode != ANIMATING) {
 			selectedCharacter = c;
-			if (c.isPresent()) setMode(MOVE); else setMode(SELECT);
+			if (c.isPresent()) {
+				isCharacterSelected.setValue(true);
+				setMode(MOVE);
+			} else {
+				isCharacterSelected.setValue(false);
+				setMode(SELECT);
+			}
 			hud.selectCharacter(c.orElse(null));
 		}
 	}
@@ -232,10 +240,28 @@ public class BattleView
 	};
 
 	/**
-	 * Send the end turn message;
+	 * Send the end turn message.
 	 * */
 	public void sendEndTurn() {
 		battle.requestCommand(new EndTurnCommandRequest());
+	}
+
+	/**
+	 * The selected character uses an ability.
+	 * */
+	public void useAbility(Ability ability) {
+	}
+
+	/**
+	 * The selected character attacks.
+	 * */
+	public void useAttack() {
+	}
+
+	/**
+	 * The selected character initiates a push.
+	 * */
+	public void usePush() {
 	}
 
 	@Override

@@ -109,6 +109,15 @@ public class BattleState {
 			return new ArrayList<>(); else return r;
 	}
 
+	/**
+	 * Get all the tiles that can be targeted by an ability.
+	 * */
+	public Collection<MapPoint> getTargetableArea(
+		MapPoint agent, Ability ability
+	) {
+		return LineOfSight.getDiamond(agent, ability.info.range.range);
+	}
+
 	public Collection<Targetable> getAbilityTargets(
 		MapPoint agent, Ability ability, MapPoint target
 	) {

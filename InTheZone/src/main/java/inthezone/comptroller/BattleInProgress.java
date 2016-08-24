@@ -71,6 +71,7 @@ public class BattleInProgress implements Runnable {
 
 		// the subject of move range and targeting information requests
 		public Character subject = null;
+		public Ability ability = null;
 		public MapPoint target = null;
 		public Optional<CompletableFuture<Collection<MapPoint>>> moveRange = Optional.empty();
 		public Optional<CompletableFuture<Collection<MapPoint>>> targeting = Optional.empty();
@@ -82,12 +83,14 @@ public class BattleInProgress implements Runnable {
 
 		public Action(
 			Character subject,
+			Ability ability,
 			MapPoint target,
 			CompletableFuture<Collection<MapPoint>> moveRange,
 			CompletableFuture<Collection<MapPoint>> targeting,
 			CompletableFuture<List<MapPoint>> path
 		) {
 			this.subject = subject;
+			this.ability = ability;
 			this.target = target;
 			this.moveRange = Optional.ofNullable(moveRange);
 			this.targeting = Optional.ofNullable(targeting);
@@ -146,6 +149,10 @@ public class BattleInProgress implements Runnable {
 				a.path.ifPresent(path ->
 					path.complete(battle.battleState.findValidPath(
 						a.subject.getPos(), a.target, a.subject.player)));
+
+				// handle targeting request
+				a.targeting.ifPresent(targeting ->
+					targeting.complete(computeTargeting(a.subject, a.ability)));
 			} catch (InterruptedException e) {
 				// Do nothing
 			}
@@ -185,7 +192,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	public Future<List<MapPoint>> getPath(Character c, MapPoint target) {
 		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, target, null, null, r));
+		queueActionWithRetry(new Action(c, null, target, null, null, r));
 		return r;
 	}
 
@@ -194,7 +201,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	public Future<Collection<MapPoint>> getMoveRange(Character c) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, r, null, null));
+		queueActionWithRetry(new Action(c, null, null, r, null, null));
 		return r;
 	}
 
@@ -217,11 +224,18 @@ public class BattleInProgress implements Runnable {
 	}
 
 	/**
+	 * Compute all the points this ability could hit.
+	 * */
+	private Collection<MapPoint> computeTargeting(Character c, Ability a) {
+		return battle.battleState.getTargetableArea(c.getPos(), a);
+	}
+
+	/**
 	 * Get all of the possible targets for an ability.
 	 * */
 	public Future<Collection<MapPoint>> getTargetingInfo(Character c, Ability a) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, null, r, null));
+		queueActionWithRetry(new Action(c, a, null, null, r, null));
 		return r;
 	}
 }

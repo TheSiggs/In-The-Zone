@@ -44,9 +44,16 @@ public class BattleView
 	private final static double walkSpeed = 1.2;
 
 	private final MapView canvas;
-	private final Paint[] highlights;
 	private final Player player;
 	private final BattleInProgress battle;
+
+	private final static int HIGHLIGHT_TARGET = 0;
+	private final static int HIGHLIGHT_MOVE = 1;
+	private final static int HIGHLIGHT_PATH = 2;
+	private final Paint[] highlights = new Paint[] {
+		Color.rgb(0xFF, 0x00, 0x00, 0.2),
+		Color.rgb(0x00, 0xFF, 0x00, 0.2),
+		Color.rgb(0x00, 0x00, 0xFF, 0.2)};
 
 	// The HUD GUI components
 	private final HUD hud;
@@ -56,6 +63,9 @@ public class BattleView
 
 	// the selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
+
+	// the current ability.  If mode is TARGET then this must not be null.
+	private Ability targetingAbility = null;
 
 	private BattleViewMode mode = SELECT;
 
@@ -82,11 +92,6 @@ public class BattleView
 
 		this.player = player;
 		this.hud = new HUD(this);
-
-		highlights = new Paint[] {
-			Color.rgb(0x00, 0xFF, 0x00, 0.2),
-			Color.rgb(0xFF, 0x00, 0x00, 0.2),
-			Color.rgb(0x00, 0x00, 0xFF, 0.2)};
 
 		this.canvas = new MapView(this,
 			gameData.getStage(startBattle.stage), true, highlights);
@@ -186,26 +191,48 @@ public class BattleView
 	}
 
 	private void setMode(BattleViewMode mode) {
+		Stage stage;
+		Character c;
+
 		switch (mode) {
 			case OTHER_TURN:
 				canvas.getStage().clearAllHighlighting();
 				selectCharacter(Optional.empty());
 				break;
+
 			case ANIMATING:
 				canvas.getStage().clearAllHighlighting();
 				break;
+
 			case SELECT:
 				canvas.getStage().clearAllHighlighting();
 				break;
+
 			case MOVE:
 				canvas.getStage().clearAllHighlighting();
-				selectedCharacter.ifPresent(c -> {
-					Stage stage = canvas.getStage();
-					getFutureWithRetry(battle.getMoveRange(c)).ifPresent(mr -> {
-						mr.stream().forEach(p -> stage.setHighlight(p, 0));
-						canvas.setSelectable(mr);
-					});
+				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
+					"Attempted to move but no character was selected"));
+
+				stage = canvas.getStage();
+				getFutureWithRetry(battle.getMoveRange(c)).ifPresent(mr -> {
+					mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
+					canvas.setSelectable(mr);
 				});
+				break;
+
+			case TARGET:
+				canvas.getStage().clearAllHighlighting();
+				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
+					"Attempted to move but no character was selected"));
+				if (targetingAbility == null)
+					throw new RuntimeException("Attempted to target null ability");
+
+				stage = canvas.getStage();
+				getFutureWithRetry(battle.getTargetingInfo(c, targetingAbility))
+					.ifPresent(tr -> {
+						tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
+						canvas.setSelectable(tr);
+					});
 				break;
 		}
 		this.mode = mode;
@@ -218,7 +245,7 @@ public class BattleView
 			selectedCharacter.ifPresent(c -> {
 				Stage stage = canvas.getStage();
 				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path -> {
-					path.stream().forEach(pp -> stage.setHighlight(pp, 2));});
+					path.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH));});
 			});
 		};
 	}
@@ -250,6 +277,10 @@ public class BattleView
 	 * The selected character uses an ability.
 	 * */
 	public void useAbility(Ability ability) {
+		if (!selectedCharacter.isPresent()) throw new RuntimeException(
+			"Attempted to target ability but no character was selected");
+		targetingAbility = ability;
+		setMode(TARGET);
 	}
 
 	/**

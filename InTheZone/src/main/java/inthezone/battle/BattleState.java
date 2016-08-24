@@ -93,11 +93,8 @@ public class BattleState {
 	) {
 		if (start.equals(target)) return new ArrayList<>();
 
-		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
-			.filter(c -> c.blocksPath(player))
-			.map(c -> c.getPos()).collect(Collectors.toList()));
-		obstacles.addAll(terrainObstacles);
-
+		Set<MapPoint> obstacles = movementObstacles(player);
+		
 		AStarSearch<MapPoint> search = new AStarSearch<>(new PathFinderNode(
 			null, terrain.terrain, obstacles,
 			terrain.terrain.w, terrain.terrain.h,
@@ -107,6 +104,36 @@ public class BattleState {
 			.map(n -> n.getPosition()).collect(Collectors.toList());
 		if (r.size() >= 1 && !r.get(r.size() - 1).equals(target))
 			return new ArrayList<>(); else return r;
+	}
+
+	private Set<MapPoint> movementObstacles(Player player) {
+		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
+			.filter(c -> c.blocksPath(player))
+			.map(c -> c.getPos()).collect(Collectors.toList()));
+		obstacles.addAll(terrainObstacles);
+		return obstacles;
+	}
+
+	/**
+	 * Attempt to get a valid LOS path.  Returns null if there is no such path.
+	 * */
+	private List<MapPoint> getLOS(
+		MapPoint from, MapPoint to, Set<MapPoint> obstacles
+	) {
+		List<MapPoint> los1 = LineOfSight.getLOS(from, to, true);
+		List<MapPoint> los2 = LineOfSight.getLOS(from, to, false);
+		los1.remove(los1.size() - 1); // we only need LOS up to the square
+		los2.remove(los2.size() - 1); // the square itself may be blocked
+
+		if (!los1.stream().anyMatch(lp -> obstacles.contains(lp))) {
+			los1.add(to);
+			return los1;
+		} else if (los2.stream().anyMatch(lp -> obstacles.contains(lp))) {
+			los2.add(to);
+			return los2;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -125,22 +152,34 @@ public class BattleState {
 				.orElseThrow(() -> new RuntimeException(
 					"Attempted to get targeting information for a non-existent character"));
 
-			Set<MapPoint> obstacles = new HashSet<>(characters.stream()
-				.filter(c -> c.blocksPath(player))
-				.map(c -> c.getPos()).collect(Collectors.toList()));
-			obstacles.addAll(terrainObstacles);
+			Set<MapPoint> obstacles = movementObstacles(player);
 
 			// check line of sight
-			return diamond.stream().filter(p -> {
-				List<MapPoint> los1 = LineOfSight.getLOS(agent, p, true);
-				List<MapPoint> los2 = LineOfSight.getLOS(agent, p, false);
-				los1.remove(los1.size() - 1); // we only need LOS up to the square
-				los2.remove(los2.size() - 1); // the square itself may be blocked
-				
-				return !los1.stream().anyMatch(lp -> obstacles.contains(lp)) ||
-					!los2.stream().anyMatch(lp -> obstacles.contains(lp));
-			}).collect(Collectors.toList());
+			return diamond.stream().filter(p ->
+				getLOS(agent, p, obstacles) != null).collect(Collectors.toList());
 		}
+	}
+
+	/**
+	 * Get all the tiles that will be affected by an ability.
+	 * */
+	public Collection<MapPoint> getAffectedArea(
+		MapPoint agent, Ability ability, MapPoint target
+	) {
+		Collection<MapPoint> r =
+			LineOfSight.getDiamond(target, ability.info.range.radius);
+		if (ability.info.range.piercing) {
+			Player player = getCharacterAt(agent).map(c -> c.player)
+				.orElseThrow(() -> new RuntimeException(
+					"Attempted to get targeting information for a non-existent character"));
+
+			Set<MapPoint> pr = new HashSet<>(r);
+			Collection<MapPoint> los = getLOS(agent, target, movementObstacles(player));
+			if (los != null) pr.addAll(los);
+			return pr;
+		}
+
+		return r;
 	}
 
 	public Collection<Targetable> getAbilityTargets(

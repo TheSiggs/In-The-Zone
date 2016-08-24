@@ -66,6 +66,10 @@ public class BattleInProgress implements Runnable {
 		this.listener = listener;
 	}
 
+	/**
+	 * This is a very ugly and bug prone hack.  I miss sum types and pattern
+	 * matching.
+	 * */
 	private class Action {
 		public Optional<CommandRequest> crq = Optional.empty();
 
@@ -76,6 +80,7 @@ public class BattleInProgress implements Runnable {
 		public Optional<CompletableFuture<Collection<MapPoint>>> moveRange = Optional.empty();
 		public Optional<CompletableFuture<Collection<MapPoint>>> targeting = Optional.empty();
 		public Optional<CompletableFuture<List<MapPoint>>> path = Optional.empty();
+		public Optional<CompletableFuture<Collection<MapPoint>>> attackArea = Optional.empty();
 
 		public Action(CommandRequest crq) {
 			this.crq = Optional.of(crq);
@@ -87,7 +92,8 @@ public class BattleInProgress implements Runnable {
 			MapPoint target,
 			CompletableFuture<Collection<MapPoint>> moveRange,
 			CompletableFuture<Collection<MapPoint>> targeting,
-			CompletableFuture<List<MapPoint>> path
+			CompletableFuture<List<MapPoint>> path,
+			CompletableFuture<Collection<MapPoint>> attackArea
 		) {
 			this.subject = subject;
 			this.ability = ability;
@@ -95,6 +101,7 @@ public class BattleInProgress implements Runnable {
 			this.moveRange = Optional.ofNullable(moveRange);
 			this.targeting = Optional.ofNullable(targeting);
 			this.path = Optional.ofNullable(path);
+			this.attackArea = Optional.ofNullable(attackArea);
 		}
 	}
 
@@ -152,7 +159,11 @@ public class BattleInProgress implements Runnable {
 
 				// handle targeting request
 				a.targeting.ifPresent(targeting ->
-					targeting.complete(computeTargeting(a.subject, a.ability)));
+					targeting.complete(battle.battleState.getTargetableArea(
+						a.subject.getPos(), a.ability)));
+				a.attackArea.ifPresent(attackArea ->
+					attackArea.complete(battle.battleState.getAffectedArea(
+						a.subject.getPos(), a.ability, a.target)));
 			} catch (InterruptedException e) {
 				// Do nothing
 			}
@@ -192,7 +203,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	public Future<List<MapPoint>> getPath(Character c, MapPoint target) {
 		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, target, null, null, r));
+		queueActionWithRetry(new Action(c, null, target, null, null, r, null));
 		return r;
 	}
 
@@ -201,7 +212,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	public Future<Collection<MapPoint>> getMoveRange(Character c) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, null, r, null, null));
+		queueActionWithRetry(new Action(c, null, null, r, null, null, null));
 		return r;
 	}
 
@@ -224,18 +235,23 @@ public class BattleInProgress implements Runnable {
 	}
 
 	/**
-	 * Compute all the points this ability could hit.
-	 * */
-	private Collection<MapPoint> computeTargeting(Character c, Ability a) {
-		return battle.battleState.getTargetableArea(c.getPos(), a);
-	}
-
-	/**
 	 * Get all of the possible targets for an ability.
 	 * */
 	public Future<Collection<MapPoint>> getTargetingInfo(Character c, Ability a) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, a, null, null, r, null));
+		queueActionWithRetry(new Action(c, a, null, null, r, null, null));
+		return r;
+	}
+
+	/**
+	 * Get all of the points that would be affected if we target the specified
+	 * square.
+	 * */
+	public Future<Collection<MapPoint>> getAttackArea(
+		Character c, MapPoint target, Ability a
+	) {
+		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
+		queueActionWithRetry(new Action(c, a, target, null, null, null, r));
 		return r;
 	}
 }

@@ -50,10 +50,12 @@ public class BattleView
 	private final static int HIGHLIGHT_TARGET = 0;
 	private final static int HIGHLIGHT_MOVE = 1;
 	private final static int HIGHLIGHT_PATH = 2;
+	private final static int HIGHLIGHT_ATTACKAREA = 3;
 	private final Paint[] highlights = new Paint[] {
-		Color.rgb(0xFF, 0x00, 0x00, 0.2),
+		Color.rgb(0xFF, 0xFF, 0x00, 0.2),
 		Color.rgb(0x00, 0xFF, 0x00, 0.2),
-		Color.rgb(0x00, 0x00, 0xFF, 0.2)};
+		Color.rgb(0x00, 0x00, 0xFF, 0.2),
+		Color.rgb(0xFF, 0x00, 0x00, 0.2)};
 
 	// The HUD GUI components
 	private final HUD hud;
@@ -244,19 +246,40 @@ public class BattleView
 
 	private Consumer<MapPoint> handleMouseOver() {
 		return p -> {
-			canvas.getStage().clearHighlighting(2);
+			Stage stage = canvas.getStage();
 
-			selectedCharacter.ifPresent(c -> {
-				Stage stage = canvas.getStage();
-				getFutureWithRetry(battle.getPath(c, p)).ifPresent(path -> {
-					path.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH));});
-			});
+			switch (mode) {
+				case MOVE:
+					stage.clearHighlighting(HIGHLIGHT_PATH);
+
+					selectedCharacter.ifPresent(c -> {
+						getFutureWithRetry(battle.getPath(c, p)).ifPresent(path ->
+							path.stream().forEach(pp ->
+								stage.setHighlight(pp, HIGHLIGHT_PATH)));
+					});
+				break;
+
+				case TARGET:
+					stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
+					if (!stage.isHighlighted(p)) return;
+
+					selectedCharacter.ifPresent(c -> {
+						getFutureWithRetry(battle.getAttackArea(c, p, targetingAbility))
+							.ifPresent(area -> area.stream().forEach(pp ->
+								stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
+					});
+			}
 		};
 	}
 
 	private Runnable handleMouseOut() {
 		return () -> {
-			canvas.getStage().clearHighlighting(2);
+			switch (mode) {
+				case MOVE:
+					canvas.getStage().clearHighlighting(HIGHLIGHT_PATH);
+				case TARGET:
+					canvas.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
+			}
 		};
 	}
 

@@ -54,5 +54,11 @@ public class Battle {
 
 	public void doPush(MapPoint agent, MapPoint target, boolean effective) {
 	}
+
+	public void doResign(Player player) {
+		battleState.characters.stream()
+			.filter(c -> c.player == player)
+			.forEach(c -> c.kill());
+	}
 }
 

@@ -130,6 +130,10 @@ public class Character implements Targetable, Obstacle {
 		}
 	}
 
+	public void kill() {
+		hp = 0;
+	}
+
 	public boolean isDead() {
 		return hp == 0;
 	}

@@ -32,6 +32,29 @@ public class BattleState {
 	}
 
 	/**
+	 * Determine the outcome of the battle from the point of view of a player.
+	 * */
+	public Optional<BattleOutcome> getBattleOutcome(Player player) {
+		boolean playerDead = characters.stream()
+			.filter(c -> c.player == player)
+			.allMatch(c -> c.isDead());
+
+		boolean otherPlayerDead = characters.stream()
+			.filter(c -> c.player != player)
+			.allMatch(c -> c.isDead());
+
+		if (playerDead && otherPlayerDead) {
+			return Optional.of(BattleOutcome.DRAW);
+		} else if (playerDead) {
+			return Optional.of(BattleOutcome.LOSE);
+		} else if (otherPlayerDead) {
+			return Optional.of(BattleOutcome.WIN);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	/**
 	 * Get targetable objects at a particular point.
 	 * */
 	public Optional<? extends Targetable> getTargetableAt(MapPoint x) {
@@ -202,13 +225,20 @@ public class BattleState {
 	}
 
 	public boolean canAttack(MapPoint agent, Collection<DamageToTarget> targets) {
-		return true;
+		return getCharacterAt(agent).map(c ->
+			canDoAbility(agent, c.basicAbility, targets)).orElse(false);
 	}
 
 	public boolean canDoAbility(
 		MapPoint agent, Ability ability, Collection<DamageToTarget> targets
 	) {
-		return true;
+		Optional<Player> player = getCharacterAt(agent).map(c -> c.player);
+		if (!player.isPresent()) return false;
+		Set<MapPoint> obstacles = movementObstacles(player.get());
+
+		return targets.stream().allMatch(d ->
+			d.target.distance(agent) <= ability.info.range.range &&
+			(!ability.info.range.los || getLOS(agent, d.target, obstacles) != null));
 	}
 
 	public boolean canUseItem(MapPoint agent, Item item) {

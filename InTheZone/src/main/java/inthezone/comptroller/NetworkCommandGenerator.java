@@ -6,6 +6,8 @@ import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.ResignCommand;
+import inthezone.battle.data.Player;
 import javafx.application.Platform;
 import java.util.concurrent.BlockingQueue;
 import java.util.List;
@@ -21,7 +23,9 @@ public class NetworkCommandGenerator implements CommandGenerator {
 	}
 
 	@Override
-	public void generateCommands(Battle battle, BattleListener listener) {
+	public void generateCommands(
+		Battle battle, BattleListener listener, Player forPlayer
+	) {
 		while (true) {
 			try {
 				Command cmd = commandQueue.take();
@@ -31,9 +35,12 @@ public class NetworkCommandGenerator implements CommandGenerator {
 					Platform.runLater(() -> {
 						listener.command(cmd, affectedCharacters);
 					});
-					if (cmd instanceof EndTurnCommand) {
+
+					if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
 						return;
 					}
+
+					if (cmd instanceof EndTurnCommand) return;
 				} catch (CommandException e) {
 					Platform.runLater(() -> listener.badCommand(e));
 				}

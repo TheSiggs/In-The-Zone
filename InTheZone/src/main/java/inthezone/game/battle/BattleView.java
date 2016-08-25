@@ -9,6 +9,8 @@ import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
+import inthezone.battle.commands.ResignCommand;
+import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.GameDataFactory;
@@ -26,6 +28,8 @@ import isogame.engine.Stage;
 import isogame.GlobalConstants;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.Collection;
@@ -310,6 +314,10 @@ public class BattleView
 		battle.requestCommand(new EndTurnCommandRequest());
 	}
 
+	public void sendResign() {
+		battle.requestCommand(new ResignCommandRequest(player));
+	}
+
 	/**
 	 * The selected character uses an ability.
 	 * */
@@ -347,11 +355,15 @@ public class BattleView
 	}
 
 	@Override
-	public void endBattle(boolean playerWins) {
+	public void endBattle(BattleOutcome outcome) {
+		onDone.accept(Optional.of(outcome));
 	}
 
 	@Override
 	public void badCommand(CommandException e) {
+		Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+		a.setHeaderText("Game error!");
+		a.showAndWait();
 	}
 
 	@Override
@@ -380,6 +392,13 @@ public class BattleView
 			}
 
 			stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
+
+		} else if (cmd instanceof ResignCommand) {
+			if (((ResignCommand) cmd).player != player) {
+				Alert a = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
+				a.setHeaderText("Opponent resigns");
+				a.showAndWait();
+			}
 		}
 
 		updateCharacters(affectedCharacters);

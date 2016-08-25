@@ -8,6 +8,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,9 @@ import java.util.Optional;
 
 public class HUD extends AnchorPane {
 	private final FlowPane characterInfoBoxes = new FlowPane();
+	private final VBox endButtons = new VBox();
 	private final Button endTurnButton = new Button("End turn");
+	private final Button resignButton = new Button("Resign");
 	private final Button itemsButton = new Button("Items");
 	private final Button abilitiesButton = new Button("Abilities");
 
@@ -36,6 +39,10 @@ public class HUD extends AnchorPane {
 		pushItem.setOnAction(event -> view.usePush());
 
 		endTurnButton.setOnAction(event -> view.sendEndTurn());
+		resignButton.setOnAction(event -> view.sendResign());
+
+		endButtons.getChildren().addAll(endTurnButton, resignButton);
+
 		abilitiesButton.setOnAction(event ->
 			abilitiesMenu.show(abilitiesButton, Side.TOP, 0, 0));
 
@@ -48,8 +55,8 @@ public class HUD extends AnchorPane {
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
 
-		AnchorPane.setTopAnchor(endTurnButton, 0d);
-		AnchorPane.setRightAnchor(endTurnButton, 0d);
+		AnchorPane.setTopAnchor(endButtons, 0d);
+		AnchorPane.setRightAnchor(endButtons, 0d);
 
 		AnchorPane.setBottomAnchor(abilitiesButton, 0d);
 		AnchorPane.setRightAnchor(abilitiesButton, 0d);
@@ -58,7 +65,7 @@ public class HUD extends AnchorPane {
 		AnchorPane.setLeftAnchor(itemsButton, 0d);
 
 		this.getChildren().addAll(
-			characterInfoBoxes, endTurnButton, abilitiesButton, itemsButton
+			characterInfoBoxes, endButtons, abilitiesButton, itemsButton
 		);
 	}
 

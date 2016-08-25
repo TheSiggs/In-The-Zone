@@ -240,6 +240,14 @@ public class Network implements Runnable {
 		}
 	}
 
+	public void gameOver() {
+		try {
+			sendQueue.put(Message.GAME_OVER());
+		} catch (InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		}
+	}
+
 	public void logout() {
 		try {
 			sendQueue.put(Message.LOGOFF());

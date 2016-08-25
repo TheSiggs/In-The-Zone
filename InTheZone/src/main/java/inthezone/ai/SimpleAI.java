@@ -7,6 +7,7 @@ import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.EndTurnCommandRequest;
+import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleListener;
 import javafx.application.Platform;
 import java.util.List;
@@ -16,7 +17,9 @@ public class SimpleAI implements CommandGenerator {
 	}
 
 	@Override
-	public void generateCommands(Battle battle, BattleListener listener) {
+	public void generateCommands(
+		Battle battle, BattleListener listener, Player forPlayer
+	) {
 		while (true) {
 			CommandRequest crq = nextCommand();
 

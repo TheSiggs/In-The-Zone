@@ -57,6 +57,10 @@ public class Message {
 		return new Message(MessageKind.GAME_DATA, data);
 	}
 
+	public static Message GAME_OVER() {
+		return new Message(MessageKind.GAME_OVER, new JSONObject());
+	}
+
 	@SuppressWarnings("unchecked")
 	public static Message ISSUE_CHALLENGE(String name) {
 		JSONObject o = new JSONObject();

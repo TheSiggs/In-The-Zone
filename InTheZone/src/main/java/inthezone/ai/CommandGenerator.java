@@ -1,6 +1,7 @@
 package inthezone.ai;
 
 import inthezone.battle.Battle;
+import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleListener;
 
 /**
@@ -10,6 +11,7 @@ public interface CommandGenerator {
 	/**
 	 * Generate commands, execute them, and forward them on to the GUI.
 	 * */
-	public void generateCommands(Battle battle, BattleListener listener);
+	public void generateCommands(
+		Battle battle, BattleListener listener, Player forPlayer);
 }
 

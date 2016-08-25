@@ -1,5 +1,6 @@
 package inthezone.game;
 
+import inthezone.battle.BattleOutcome;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
@@ -201,7 +202,20 @@ public class ContentPane extends StackPane implements LobbyListener {
 			showScreen(new BattleView(
 				ready, player,
 				new NetworkCommandGenerator(network.readCommandQueue),
-				network, gameData), winCond -> {}));
+				network, gameData), (Optional<BattleOutcome> oWinCond) -> {
+					String message = null;
+					if (oWinCond.isPresent()) {
+						switch (oWinCond.get()) {
+							case WIN: message = "You win!"; break;
+							case LOSE: message = "You lose."; break;
+							case DRAW: message = "It's a draw"; break;
+						}
+					}
+
+					Alert a = new Alert(Alert.AlertType.ERROR, message, ButtonType.CLOSE);
+					a.setHeaderText("Battle over");
+					a.showAndWait();
+				}));
 	}
 }
 

@@ -1,5 +1,6 @@
 package inthezone.comptroller;
 
+import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
@@ -25,7 +26,7 @@ public interface BattleListener {
 	/**
 	 * Deal with the battle end condition.
 	 * */
-	public void endBattle(boolean playerWins);
+	public void endBattle(BattleOutcome outcome);
 
 	/**
 	 * Handle a bad command.  This probably happens because the other player is

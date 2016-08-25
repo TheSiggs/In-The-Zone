@@ -323,6 +323,8 @@ public class Client {
 				break;
 
 			case LOBBY:
+				if (msg.kind == MessageKind.GAME_OVER) break;
+
 				Client client = namedClients.get(msg.parseName());
 				if (client == null) {
 					channel.requestSend(Message.NOK("No such player"));

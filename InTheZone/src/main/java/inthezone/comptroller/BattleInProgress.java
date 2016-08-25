@@ -3,11 +3,13 @@ package inthezone.comptroller;
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
+import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
@@ -107,20 +109,23 @@ public class BattleInProgress implements Runnable {
 
 	@Override
 	public void run() {
-		boolean gameOver = false;
-
 		if (!thisPlayerGoesFirst) {
 			otherTurn();
 		}
 
-		while (!gameOver) {
+		Optional<BattleOutcome> outcome =
+			battle.battleState.getBattleOutcome(thisPlayer);
+		while (!outcome.isPresent()) {
 			turn();
+			outcome = battle.battleState.getBattleOutcome(thisPlayer);
+			if (outcome.isPresent()) break;
 			otherTurn();
-			// TODO: check for game over condition
+			outcome = battle.battleState.getBattleOutcome(thisPlayer);
 		}
 
-		// TODO: determine win condition
-		Platform.runLater(() -> listener.endBattle(true));
+		if (network != null) network.gameOver();
+		final BattleOutcome finalOutcome = outcome.get();
+		Platform.runLater(() -> listener.endBattle(finalOutcome));
 	}
 
 	private void turn() {
@@ -137,14 +142,17 @@ public class BattleInProgress implements Runnable {
 					try {
 						Command cmd = a.crq.get().makeCommand(battle.battleState);
 						if (network != null) network.sendCommand(cmd);
-						if (cmd instanceof EndTurnCommand) {
-							return;
-						}
 
 						List<Character> affectedCharacters = cmd.doCmd(battle);
 						Platform.runLater(() -> {
 							listener.command(cmd, affectedCharacters);
 						});
+
+						if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
+							return;
+						}
+
+						if (cmd instanceof EndTurnCommand) return;
 					} catch (CommandException e) {
 						Platform.runLater(() -> listener.badCommand(e));
 					}
@@ -175,7 +183,7 @@ public class BattleInProgress implements Runnable {
 		Platform.runLater(() ->
 			listener.endTurn(battle.battleState.cloneCharacters()));
 
-		otherPlayer.generateCommands(battle, listener);
+		otherPlayer.generateCommands(battle, listener, thisPlayer.otherPlayer());
 	}
 
 	/**

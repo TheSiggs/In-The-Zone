@@ -19,8 +19,8 @@ public class Character implements Targetable, Obstacle {
 	private final Stats baseStats;
 	private final int maxHP;
 
-	private Optional<StatusEffect> statusBuff;
-	private Optional<StatusEffect> statusDebuff;
+	private Optional<StatusEffect> statusBuff = Optional.empty();
+	private Optional<StatusEffect> statusDebuff = Optional.empty();
 
 	private MapPoint pos = new MapPoint(0, 0);
 	private int ap = 0;
@@ -121,6 +121,14 @@ public class Character implements Targetable, Obstacle {
 		this.pos = p;
 	}
 
+	public void useAbility(Ability ability) {
+		if (!ability.isSubsequent && ability.recursionLevel == 0) {
+			ap -= ability.info.ap;
+			mp -= ability.info.mp;
+			if (ap < 0) ap = 0;
+			if (mp < 0) mp = 0;
+		}
+	}
 
 	public void teleport(MapPoint p) {
 		this.pos = p;
@@ -160,6 +168,7 @@ public class Character implements Targetable, Obstacle {
 
 	@Override public void dealDamage(int damage) {
 		hp = Math.max(0, hp - damage);
+		System.err.println("HP: " + hp + " after damage " + damage);
 	}
 
 	@Override public boolean isPushable() {

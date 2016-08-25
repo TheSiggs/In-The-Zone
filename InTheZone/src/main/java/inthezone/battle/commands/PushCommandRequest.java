@@ -18,7 +18,8 @@ public class PushCommandRequest extends CommandRequest {
 
 	@Override
 	public Command makeCommand(BattleState battleState) throws CommandException {
-		Targetable t = battleState.getTargetableAt(target);
+		Targetable t = battleState.getTargetableAt(target)
+			.orElseThrow(() -> new CommandException("Invalid push command"));
 
 		return battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {

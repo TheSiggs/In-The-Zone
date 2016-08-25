@@ -4,12 +4,38 @@ import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.Range;
 import inthezone.battle.data.Stats;
+import java.util.Optional;
 
 public class Ability {
 	public final AbilityInfo info;
 
+	public final boolean isSubsequent;
+	public final int recursionLevel;
+
 	public Ability(AbilityInfo info) {
 		this.info = info;
+		this.isSubsequent = false;
+		this.recursionLevel = 0;
+	}
+
+	private Ability(
+		AbilityInfo info, boolean isSubsequent, int recursionLevel
+	) {
+		this.info = info;
+		this.isSubsequent = isSubsequent;
+		this.recursionLevel = recursionLevel;
+	}
+
+	public Optional<Ability> getSubsequent() {
+		return info.subsequent.map(i -> new Ability(i, true, 0));
+	}
+
+	public Optional<Ability> getNextRecursion() {
+		if (recursionLevel < info.recursion) {
+			return Optional.of(new Ability(info, isSubsequent, recursionLevel + 1));
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	private final double const_a = 3;
@@ -46,13 +72,13 @@ public class Ability {
 			healingFormula(a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats) :
 			damageFormula(a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats);
 
-		return new DamageToTarget(t.getPos(), (int) damage,
+		return new DamageToTarget(t.getPos(), (int) Math.ceil(damage),
 			imposeEffect(info.chance, info.statusEffect.orElse(null)),
 			imposeEffect(info.chance, info.instantBefore.orElse(null)),
 			imposeEffect(info.chance, info.instantAfter.orElse(null)));
 	}
 
-	public <T> T imposeEffect(double p, T effect) {
+	private <T> T imposeEffect(double p, T effect) {
 		return Math.random() < p ? effect : null;
 	}
 }

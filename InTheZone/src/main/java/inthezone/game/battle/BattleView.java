@@ -10,6 +10,7 @@ import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
@@ -190,6 +191,14 @@ public class BattleView
 					break;
 
 				case TARGET:
+					if (canvas.isSelectable(p)) {
+						selectedCharacter.ifPresent(c ->
+							battle.requestCommand(new UseAbilityCommandRequest(
+								c.getPos(), p, targetingAbility)));
+						setMode(MOVE);
+					} else {
+						selectCharacter(Optional.empty());
+					}
 					break;
 			}
 
@@ -388,6 +397,7 @@ public class BattleView
 					if (sc.id == c.id) selectedCharacter = Optional.of(c);
 				});
 				if (old != null) {
+					if (c.player == player) hud.updateAbilities(c);
 					CharacterInfoBox box = hud.characters.get(c.id);
 					if (box != null) {
 						box.updateAP(c.getAP(), c.getStats().ap);

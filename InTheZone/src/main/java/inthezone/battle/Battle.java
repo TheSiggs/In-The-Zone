@@ -38,6 +38,15 @@ public class Battle {
 	public void doAbility(
 		MapPoint agent, Ability ability, Collection<DamageToTarget> targets
 	) {
+		battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
+
+		for (DamageToTarget d : targets) {
+			Targetable t = battleState.getTargetableAt(d.target)
+				.orElseThrow(() -> new RuntimeException(
+					"Attempted to attack non-target, command verification code failed"));
+
+			t.dealDamage(d.damage);
+		}
 	}
 
 	public void doUseItem(MapPoint agent, Item item) {

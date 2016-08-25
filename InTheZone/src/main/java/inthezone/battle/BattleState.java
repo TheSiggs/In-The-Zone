@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import nz.dcoder.ai.astar.AStarSearch;
 
 /**
@@ -30,8 +31,11 @@ public class BattleState {
 			.map(s -> s.pos).collect(Collectors.toList()));
 	}
 
-	public Targetable getTargetableAt(MapPoint x) {
-		return null;
+	/**
+	 * Get targetable objects at a particular point.
+	 * */
+	public Optional<? extends Targetable> getTargetableAt(MapPoint x) {
+		return getCharacterAt(x);
 	}
 
 	/**
@@ -185,7 +189,10 @@ public class BattleState {
 	public Collection<Targetable> getAbilityTargets(
 		MapPoint agent, Ability ability, MapPoint target
 	) {
-		return null;
+		return getAffectedArea(agent, ability, target).stream()
+			.flatMap(p -> getTargetableAt(p)
+				.map(x -> Stream.of(x)).orElse(Stream.empty()))
+			.collect(Collectors.toList());
 	}
 
 	public boolean canAttack(MapPoint agent, Collection<DamageToTarget> targets) {

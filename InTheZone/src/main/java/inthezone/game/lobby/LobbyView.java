@@ -92,7 +92,10 @@ public class LobbyView extends VBox {
 		players.stream()
 			.filter(x -> !x.equals(playerName))
 			.map(x -> new ServerPlayer(x, false))
-			.forEach(x -> this.players.add(x));
+			.forEach(x -> {
+				this.players.add(x);
+				this.playerNames.put(x.name, x);
+			});
 	}
 
 	public void playerJoins(String player) {

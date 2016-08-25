@@ -130,6 +130,10 @@ public class Character implements Targetable, Obstacle {
 		}
 	}
 
+	public boolean isDead() {
+		return hp == 0;
+	}
+
 	public void teleport(MapPoint p) {
 		this.pos = p;
 	}
@@ -184,7 +188,7 @@ public class Character implements Targetable, Obstacle {
 	}
 
 	@Override public boolean blocksPath(Player player) {
-		return this.player != player;
+		return !(hp == 0 || this.player == player);
 	}
 }
 

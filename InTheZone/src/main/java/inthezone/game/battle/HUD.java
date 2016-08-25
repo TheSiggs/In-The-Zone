@@ -87,7 +87,6 @@ public class HUD extends AnchorPane {
 			CharacterInfoBox box = new CharacterInfoBox(c);
 			box.setOnMouseClicked(event -> {
 				view.selectCharacterById(c.id);
-				selectCharacter(c);
 			});
 			this.characters.put(c.id, box);
 			characterInfoBoxes.getChildren().add(box);

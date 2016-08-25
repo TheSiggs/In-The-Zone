@@ -78,12 +78,26 @@ public class BattleState {
 		}).orElse(false);
 	}
 
+	/**
+	 * Points that are already occupied.
+	 * */
 	private Set<MapPoint> spaceObstacles(Player player) {
 		Set<MapPoint> r = new HashSet<>(characters.stream()
 			.filter(c -> c.blocksSpace(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		r.addAll(terrainObstacles);
 		return r;
+	}
+
+	/**
+	 * Obstacles that cannot be moved through.
+	 * */
+	private Set<MapPoint> movementObstacles(Player player) {
+		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
+			.filter(c -> c.blocksPath(player))
+			.map(c -> c.getPos()).collect(Collectors.toList()));
+		obstacles.addAll(terrainObstacles);
+		return obstacles;
 	}
 
 	/**
@@ -108,14 +122,6 @@ public class BattleState {
 			.map(n -> n.getPosition()).collect(Collectors.toList());
 		if (r.size() >= 1 && !r.get(r.size() - 1).equals(target))
 			return new ArrayList<>(); else return r;
-	}
-
-	private Set<MapPoint> movementObstacles(Player player) {
-		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
-			.filter(c -> c.blocksPath(player))
-			.map(c -> c.getPos()).collect(Collectors.toList()));
-		obstacles.addAll(terrainObstacles);
-		return obstacles;
 	}
 
 	/**

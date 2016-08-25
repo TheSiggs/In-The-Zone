@@ -147,11 +147,12 @@ public class BattleView
 
 	public void selectCharacter(Optional<Character> c) {
 		if (mode != OTHER_TURN && mode != ANIMATING) {
-			selectedCharacter = c;
-			if (c.isPresent()) {
+			if (c.isPresent() && !c.get().isDead()) {
+				selectedCharacter = c;
 				isCharacterSelected.setValue(true);
 				setMode(MOVE);
 			} else {
+				selectedCharacter = Optional.empty();
 				isCharacterSelected.setValue(false);
 				setMode(SELECT);
 			}
@@ -396,6 +397,7 @@ public class BattleView
 				selectedCharacter.ifPresent(sc -> {
 					if (sc.id == c.id) selectedCharacter = Optional.of(c);
 				});
+
 				if (old != null) {
 					if (c.player == player) hud.updateAbilities(c);
 					CharacterInfoBox box = hud.characters.get(c.id);
@@ -404,7 +406,15 @@ public class BattleView
 						box.updateMP(c.getMP(), c.getStats().mp);
 						box.updateHP(c.getHP(), c.getMaxHP());
 					}
+
 				}
+
+				if (c.isDead()) {
+					Sprite s = canvas.getStage().getSpritesByTile(c.getPos()).stream()
+						.filter(x -> x.userData.equals(c.id)).findFirst().get();
+					s.setAnimation("dead");
+				}
+
 				this.characters.put(c.id, c);
 			}
 		}

@@ -76,7 +76,8 @@ public class BattleView
 	private Optional<Character> selectedCharacter = Optional.empty();
 
 	// the current ability.  If mode is TARGET then this must not be null.
-	private Ability targetingAbility = null;
+	private Optional<Ability> rootTargetingAbility = Optional.empty();
+	private Optional<Ability> targetingAbility = Optional.empty();
 	private Collection<MapPoint> targets = new ArrayList<>();
 
 	private BattleViewMode mode = SELECT;
@@ -257,11 +258,11 @@ public class BattleView
 				canvas.getStage().clearAllHighlighting();
 				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
 					"Attempted to move but no character was selected"));
-				if (targetingAbility == null)
+				if (!targetingAbility.isPresent())
 					throw new RuntimeException("Attempted to target null ability");
 
 				stage = canvas.getStage();
-				getFutureWithRetry(battle.getTargetingInfo(c, targetingAbility))
+				getFutureWithRetry(battle.getTargetingInfo(c, targetingAbility.get()))
 					.ifPresent(tr -> {
 						tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 						canvas.setSelectable(tr);
@@ -291,7 +292,7 @@ public class BattleView
 					if (!stage.isHighlighted(p)) return;
 
 					selectedCharacter.ifPresent(c -> {
-						getFutureWithRetry(battle.getAttackArea(c, p, targetingAbility))
+						getFutureWithRetry(battle.getAttackArea(c, p, targetingAbility.get()))
 							.ifPresent(area -> area.stream().forEach(pp ->
 								stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
 					});
@@ -337,10 +338,17 @@ public class BattleView
 	public void useAbility(Ability ability) {
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to target ability but no character was selected");
-		targetingAbility = ability;
-		numTargets.setValue(ability.info.range.nTargets);
-		multiTargeting.setValue(ability.info.range.nTargets > 1);
-		setMode(TARGET);
+		rootTargetingAbility = Optional.of(ability);
+		targetingAbility = Optional.of(ability);
+		setupTargeting();
+	}
+
+	private void setupTargeting() {
+		targetingAbility.ifPresent(a -> {
+			numTargets.setValue(a.info.range.nTargets);
+			multiTargeting.setValue(a.info.range.nTargets > 1);
+			setMode(TARGET);
+		});
 	}
 
 	/**
@@ -351,12 +359,24 @@ public class BattleView
 		if (targets.size() > 0) {
 			selectedCharacter.ifPresent(c ->
 				battle.requestCommand(new UseAbilityCommandRequest(
-					c.getPos(), targets, targetingAbility)));
+					c.getPos(), c.getPos(), targets, targetingAbility.get())));
 		}
 		targets.clear();
-		numTargets.setValue(0);
-		multiTargeting.setValue(false);
-		setMode(MOVE);
+
+		targetingAbility = targetingAbility.flatMap(a -> a.getSubsequent());
+		if (targetingAbility.isPresent()) {
+			setupTargeting();
+		} else {
+			targetingAbility = rootTargetingAbility.flatMap(a -> a.getRecursion());
+			if (targetingAbility.isPresent()) {
+				// TODO: recursion has weird targeting
+				setupTargeting();
+			} else {
+				numTargets.setValue(0);
+				multiTargeting.setValue(false);
+				setMode(MOVE);
+			}
+		}
 	}
 
 	/**

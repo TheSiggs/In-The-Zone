@@ -21,7 +21,6 @@ public abstract class Command implements HasJSONRepresentation {
 		Object okind = json.get("kind");
 		if (okind == null) throw new ProtocolException("Missing command kind");
 		switch (CommandKind.fromString((String) okind)) {
-			case ATTACK: return AttackCommand.fromJSON(json);
 			case ENDTURN: return EndTurnCommand.fromJSON(json);
 			case MOVE: return MoveCommand.fromJSON(json);
 			case PUSH: return PushCommand.fromJSON(json);

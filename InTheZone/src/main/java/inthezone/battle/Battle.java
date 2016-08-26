@@ -36,7 +36,9 @@ public class Battle {
 	}
 
 	public void doAbility(
-		MapPoint agent, Ability ability, Collection<DamageToTarget> targets
+		MapPoint agent,
+		Ability ability,
+		Collection<DamageToTarget> targets
 	) {
 		battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
 

@@ -11,13 +11,16 @@ import java.util.stream.Collectors;
 
 public class UseAbilityCommandRequest extends CommandRequest {
 	private final MapPoint agent;
+	private final MapPoint castFrom;
 	private final Collection<MapPoint> targets = new ArrayList<>();;
 	private final Ability ability;
 
 	public UseAbilityCommandRequest(
-		MapPoint agent, Collection<MapPoint> targets, Ability ability
+		MapPoint agent, MapPoint castFrom,
+		Collection<MapPoint> targets, Ability ability
 	) {
 		this.agent = agent;
+		this.castFrom = castFrom;
 		this.targets.addAll(targets);
 		this.ability = ability;
 	}
@@ -33,8 +36,9 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					.collect(Collectors.toList())
 			).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
-		if (battleState.canDoAbility(agent, ability, allTargets)) {
-			return new UseAbilityCommand(agent, ability.info.name, allTargets);
+		if (battleState.canDoAbility(agent, castFrom, ability, allTargets)) {
+			return new UseAbilityCommand(agent, castFrom, ability.rootName,
+				allTargets, ability.subsequentLevel, ability.recursionLevel);
 		} else {
 			throw new CommandException("Invalid ability command request");
 		}

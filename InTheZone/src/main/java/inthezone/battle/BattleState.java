@@ -227,21 +227,17 @@ public class BattleState {
 		).orElse(new ArrayList<>());
 	}
 
-	public boolean canAttack(MapPoint agent, Collection<DamageToTarget> targets) {
-		return getCharacterAt(agent).map(c ->
-			canDoAbility(agent, c.basicAbility, targets)).orElse(false);
-	}
-
 	public boolean canDoAbility(
-		MapPoint agent, Ability ability, Collection<DamageToTarget> targets
+		MapPoint agent, MapPoint castFrom,
+		Ability ability, Collection<DamageToTarget> targets
 	) {
 		Optional<Player> player = getCharacterAt(agent).map(c -> c.player);
 		if (!player.isPresent()) return false;
 		Set<MapPoint> obstacles = movementObstacles(player.get());
 
 		return targets.stream().allMatch(d ->
-			d.target.distance(agent) <= ability.info.range.range &&
-			(!ability.info.range.los || getLOS(agent, d.target, obstacles) != null));
+			d.target.distance(castFrom) <= ability.info.range.range &&
+			(!ability.info.range.los || getLOS(castFrom, d.target, obstacles) != null));
 	}
 
 	public boolean canUseItem(MapPoint agent, Item item) {

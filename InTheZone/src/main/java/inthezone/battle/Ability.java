@@ -9,33 +9,55 @@ import java.util.Optional;
 public class Ability {
 	public final AbilityInfo info;
 
-	public final boolean isSubsequent;
+	public final String rootName;
+	public final int subsequentLevel;
 	public final int recursionLevel;
 
 	public Ability(AbilityInfo info) {
 		this.info = info;
-		this.isSubsequent = false;
+		this.rootName = info.name;
+		this.subsequentLevel = 0;
 		this.recursionLevel = 0;
 	}
 
 	private Ability(
-		AbilityInfo info, boolean isSubsequent, int recursionLevel
+		AbilityInfo info, String name,
+		int subsequentLevel, int recursionLevel
 	) {
 		this.info = info;
-		this.isSubsequent = isSubsequent;
+		this.rootName = name;
+		this.subsequentLevel = subsequentLevel;
 		this.recursionLevel = recursionLevel;
 	}
 
 	public Optional<Ability> getSubsequent() {
-		return info.subsequent.map(i -> new Ability(i, true, 0));
+		return info.subsequent.map(i ->
+			new Ability(i, rootName, subsequentLevel + 1, 0));
 	}
 
-	public Optional<Ability> getNextRecursion() {
+	public Optional<Ability> getRecursion() {
 		if (recursionLevel < info.recursion) {
-			return Optional.of(new Ability(info, isSubsequent, recursionLevel + 1));
+			return Optional.of(new Ability(
+				info, rootName, subsequentLevel, recursionLevel + 1));
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	public Optional<Ability> getNext(int subsequentLevel, int recursionLevel) {
+		Optional<Ability> r = Optional.of(this);
+		for (int i = 0; i < subsequentLevel; i++) {
+			r = r.flatMap(a -> getSubsequent());
+		}
+
+		return r.flatMap(a -> {
+				if (recursionLevel < a.info.recursion) {
+					return Optional.of(new Ability(
+						a.info, rootName, a.subsequentLevel, recursionLevel));
+				} else {
+					return Optional.empty();
+				}
+			});
 	}
 
 	/**

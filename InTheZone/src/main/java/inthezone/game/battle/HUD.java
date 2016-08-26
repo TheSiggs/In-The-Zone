@@ -21,6 +21,7 @@ public class HUD extends AnchorPane {
 	private final Button resignButton = new Button("Resign");
 	private final Button itemsButton = new Button("Items");
 	private final Button abilitiesButton = new Button("Abilities");
+	private final MultiTargetAssistant multiTargetAssistant;
 
 	private final ContextMenu abilitiesMenu = new ContextMenu();
 	private final MenuItem attackItem = new MenuItem("Attack");
@@ -34,6 +35,7 @@ public class HUD extends AnchorPane {
 		super();
 
 		this.view = view;
+		this.multiTargetAssistant = new MultiTargetAssistant(view);
 
 		attackItem.setOnAction(event -> view.useAttack());
 		pushItem.setOnAction(event -> view.usePush());
@@ -65,8 +67,12 @@ public class HUD extends AnchorPane {
 		AnchorPane.setBottomAnchor(itemsButton, 0d);
 		AnchorPane.setLeftAnchor(itemsButton, 0d);
 
+		AnchorPane.setBottomAnchor(multiTargetAssistant, 0d);
+		AnchorPane.setLeftAnchor(multiTargetAssistant, 200d);
+
 		this.getChildren().addAll(
-			characterInfoBoxes, endButtons, abilitiesButton, itemsButton
+			characterInfoBoxes, endButtons,
+			abilitiesButton, itemsButton, multiTargetAssistant
 		);
 	}
 

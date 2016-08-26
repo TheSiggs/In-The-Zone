@@ -4,6 +4,10 @@
 	-fx-border-style: solid;
 }
 
+.multitarget-assistant {
+	-fx-background-color: white;
+}
+
 .character-info-box-selected {
 	-fx-background-color: yellow;
 }

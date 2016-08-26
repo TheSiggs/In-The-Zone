@@ -27,11 +27,14 @@ import isogame.engine.SpriteDecalRenderer;
 import isogame.engine.Stage;
 import isogame.GlobalConstants;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -73,12 +76,15 @@ public class BattleView
 
 	// the current ability.  If mode is TARGET then this must not be null.
 	private Ability targetingAbility = null;
+	private Collection<MapPoint> targets = new ArrayList<>();
 
 	private BattleViewMode mode = SELECT;
 
 	// status properties for the HUD
 	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
 	public final BooleanProperty isCharacterSelected = new SimpleBooleanProperty(false);
+	public final BooleanProperty multiTargeting = new SimpleBooleanProperty(false);
+	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
 
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
 	private final double[] sarrowx = new double[] {
@@ -164,6 +170,13 @@ public class BattleView
 		}
 	}
 
+	private void addTarget(MapPoint p) {
+		targets.add(p);
+		numTargets.setValue(numTargets.getValue() - 1);
+		if (numTargets.getValue() == 0) applyAbility();
+	}
+
+
 	private Consumer<MapPoint> handleSelection() {
 		return p -> {
 			if (mode == ANIMATING) return;
@@ -197,10 +210,7 @@ public class BattleView
 
 				case TARGET:
 					if (canvas.isSelectable(p)) {
-						selectedCharacter.ifPresent(c ->
-							battle.requestCommand(new UseAbilityCommandRequest(
-								c.getPos(), p, targetingAbility)));
-						setMode(MOVE);
+						addTarget(p);
 					} else {
 						selectCharacter(Optional.empty());
 					}
@@ -325,7 +335,25 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to target ability but no character was selected");
 		targetingAbility = ability;
+		numTargets.setValue(ability.info.range.nTargets);
+		multiTargeting.setValue(ability.info.range.nTargets > 1);
 		setMode(TARGET);
+	}
+
+	/**
+	 * Apply the selected ability now, even if we haven't selected the maximum
+	 * number of targets.
+	 * */
+	public void applyAbility() {
+		if (targets.size() > 0) {
+			selectedCharacter.ifPresent(c ->
+				battle.requestCommand(new UseAbilityCommandRequest(
+					c.getPos(), targets, targetingAbility)));
+		}
+		targets.clear();
+		numTargets.setValue(0);
+		multiTargeting.setValue(false);
+		setMode(MOVE);
 	}
 
 	/**

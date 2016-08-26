@@ -11,6 +11,6 @@ public interface Targetable {
 	public double getDefenceBuff();
 	public void dealDamage(int damage);
 	public boolean isPushable();
-	public Player getPlayer();
+	public boolean isEnemyOf(Character character);
 }
 

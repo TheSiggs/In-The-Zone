@@ -218,10 +218,13 @@ public class BattleState {
 	public Collection<Targetable> getAbilityTargets(
 		MapPoint agent, Ability ability, MapPoint target
 	) {
-		return getAffectedArea(agent, ability, target).stream()
-			.flatMap(p -> getTargetableAt(p)
-				.map(x -> Stream.of(x)).orElse(Stream.empty()))
-			.collect(Collectors.toList());
+		return getCharacterAt(agent).map(c ->
+			getAffectedArea(agent, ability, target).stream()
+				.flatMap(p -> getTargetableAt(p)
+					.map(x -> Stream.of(x)).orElse(Stream.empty()))
+				.filter(t -> ability.canTarget(c, t))
+				.collect(Collectors.toList())
+		).orElse(new ArrayList<>());
 	}
 
 	public boolean canAttack(MapPoint agent, Collection<DamageToTarget> targets) {

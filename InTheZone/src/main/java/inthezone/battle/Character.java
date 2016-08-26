@@ -183,8 +183,8 @@ public class Character implements Targetable, Obstacle {
 		return true;
 	}
 
-	@Override public Player getPlayer() {
-		return player;
+	@Override public boolean isEnemyOf(Character c) {
+		return player != c.player;
 	}
 
 	@Override public boolean blocksSpace(Player player) {

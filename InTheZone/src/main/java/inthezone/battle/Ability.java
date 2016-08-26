@@ -38,6 +38,16 @@ public class Ability {
 		}
 	}
 
+	/**
+	 * Determine if this ability can be applied to a particular target.
+	 * */
+	public boolean canTarget(Character agent, Targetable target) {
+		return
+			(info.range.targetMode.self && target.getPos().equals(agent.getPos())) ||
+			(info.range.targetMode.enemies && target.isEnemyOf(agent)) ||
+			(info.range.targetMode.allies && !target.isEnemyOf(agent));
+	}
+
 	private final double const_a = 3;
 	private final double const_b = 4;
 	private final double const_h = 12;

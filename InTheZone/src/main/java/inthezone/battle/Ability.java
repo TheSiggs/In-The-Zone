@@ -51,7 +51,7 @@ public class Ability {
 		}
 
 		return r.flatMap(a -> {
-				if (recursionLevel < a.info.recursion) {
+				if (recursionLevel <= a.info.recursion) {
 					return Optional.of(new Ability(
 						a.info, rootName, a.subsequentLevel, recursionLevel));
 				} else {

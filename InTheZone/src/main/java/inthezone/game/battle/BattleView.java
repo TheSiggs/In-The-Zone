@@ -397,10 +397,12 @@ public class BattleView
 
 		targetingAbility = targetingAbility.flatMap(a -> a.getSubsequent());
 		if (targetingAbility.isPresent()) {
+			System.err.println("Subsequent!");
 			setupTargeting();
 		} else {
 			targetingAbility = rootTargetingAbility.flatMap(a -> a.getRecursion());
 			if (targetingAbility.isPresent()) {
+				System.err.println("Recursive!");
 				setupTargeting();
 			} else {
 				cancelAbility();
@@ -481,7 +483,9 @@ public class BattleView
 				a.showAndWait();
 			}
 
-		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue()) {
+		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
+			targetingAbility.map(a -> a.recursionLevel > 0).orElse(false)
+		) {
 			for (DamageToTarget d: ((UseAbilityCommand) cmd).targets) {
 				recastFrom.add(d.target);
 			}

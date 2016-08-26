@@ -161,7 +161,7 @@ public class BattleState {
 		if (!los1.stream().anyMatch(lp -> obstacles.contains(lp))) {
 			los1.add(to);
 			return los1;
-		} else if (los2.stream().anyMatch(lp -> obstacles.contains(lp))) {
+		} else if (!los2.stream().anyMatch(lp -> obstacles.contains(lp))) {
 			los2.add(to);
 			return los2;
 		} else {

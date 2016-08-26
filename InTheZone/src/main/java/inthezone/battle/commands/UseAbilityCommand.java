@@ -104,7 +104,7 @@ public class UseAbilityCommand extends Command {
 			.orElseThrow(() -> new CommandException("Invalid ability command"));
 
 		if (!battle.battleState.canDoAbility(agent, castFrom, abilityData, targets))
-			throw new CommandException("Invalid ability command");
+			throw new CommandException("Invalid ability command (cannot cast ability)");
 
 		Collection<Character> r = new ArrayList<>();
 		battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));

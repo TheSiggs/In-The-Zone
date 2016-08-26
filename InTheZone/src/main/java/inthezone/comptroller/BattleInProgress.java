@@ -69,55 +69,6 @@ public class BattleInProgress implements Runnable {
 		this.listener = listener;
 	}
 
-	/**
-	 * This is a very ugly and bug prone hack.  I miss sum types and pattern
-	 * matching.
-	 * */
-	private class Action {
-		public Optional<CommandRequest> crq = Optional.empty();
-
-		// the subject of move range and targeting information requests
-		public Character subject = null;
-		public MapPoint castFrom = null;
-		public Ability ability = null;
-		public MapPoint target = null;
-		public Optional<CompletableFuture<Collection<MapPoint>>> moveRange = Optional.empty();
-		public Optional<CompletableFuture<Collection<MapPoint>>> targeting = Optional.empty();
-		public Optional<CompletableFuture<List<MapPoint>>> path = Optional.empty();
-		public Optional<CompletableFuture<Collection<MapPoint>>> attackArea = Optional.empty();
-
-		public Action(CommandRequest crq) {
-			this.crq = Optional.of(crq);
-		}
-
-		public Action(
-			Character subject,
-			MapPoint castFrom,
-			Ability ability,
-			MapPoint target,
-			CompletableFuture<Collection<MapPoint>> moveRange,
-			CompletableFuture<Collection<MapPoint>> targeting,
-			CompletableFuture<List<MapPoint>> path,
-			CompletableFuture<Collection<MapPoint>> attackArea
-		) {
-			this.subject = subject;
-			this.castFrom = castFrom;
-			this.ability = ability;
-			this.target = target;
-			this.moveRange = Optional.ofNullable(moveRange);
-			this.targeting = Optional.ofNullable(targeting);
-			this.path = Optional.ofNullable(path);
-			this.attackArea = Optional.ofNullable(attackArea);
-		}
-
-		public void cancel() {
-			moveRange.ifPresent(f -> f.cancel(true));
-			targeting.ifPresent(f -> f.cancel(true));
-			path.ifPresent(f -> f.cancel(true));
-			attackArea.ifPresent(f -> f.cancel(true));
-		}
-	}
-
 	private volatile boolean accepting = true;
 	public void shutdownActionQueue() {
 		Collection<Action> actions = new ArrayList<>();
@@ -188,9 +139,10 @@ public class BattleInProgress implements Runnable {
 						a.subject.getPos(), a.target, a.subject.player)));
 
 				// handle targeting request
-				a.targeting.ifPresent(targeting ->
-					targeting.complete(battle.battleState.getTargetableArea(
-						a.subject.getPos(), a.castFrom, a.ability)));
+				a.targeting.ifPresent(targeting -> {
+						targeting.complete(battle.battleState.getTargetableArea(
+							a.subject.getPos(), a.castFrom, a.ability));
+					});
 				a.attackArea.ifPresent(attackArea ->
 					attackArea.complete(battle.battleState.getAffectedArea(
 						a.subject.getPos(), a.castFrom, a.ability, a.target)));
@@ -239,7 +191,7 @@ public class BattleInProgress implements Runnable {
 		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, null, null, target, null, null, r, null));
+			queueActionWithRetry(Action.path(c, target, r));
 		}
 		return r;
 	}
@@ -251,7 +203,7 @@ public class BattleInProgress implements Runnable {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, null, null, null, r, null, null, null));
+			queueActionWithRetry(Action.moveRange(c, r));
 		}
 		return r;
 	}
@@ -283,7 +235,7 @@ public class BattleInProgress implements Runnable {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, castFrom, a, null, null, r, null, null));
+			queueActionWithRetry(Action.targeting(c, castFrom, a, r));
 		}
 		return r;
 	}
@@ -298,7 +250,7 @@ public class BattleInProgress implements Runnable {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, castFrom, a, target, null, null, null, r));
+			queueActionWithRetry(Action.attackArea(c, castFrom, target, a, r));
 		}
 		return r;
 	}

@@ -15,6 +15,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import javafx.application.Platform;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -105,6 +106,24 @@ public class BattleInProgress implements Runnable {
 			this.path = Optional.ofNullable(path);
 			this.attackArea = Optional.ofNullable(attackArea);
 		}
+
+		public void cancel() {
+			moveRange.ifPresent(f -> f.cancel(true));
+			targeting.ifPresent(f -> f.cancel(true));
+			path.ifPresent(f -> f.cancel(true));
+			attackArea.ifPresent(f -> f.cancel(true));
+		}
+	}
+
+	private volatile boolean accepting = true;
+	public void shutdownActionQueue() {
+		Collection<Action> actions = new ArrayList<>();
+		synchronized (this) {
+			this.accepting = false;
+			commandRequests.drainTo(actions);
+		}
+
+		for (Action a : actions) a.cancel();
 	}
 
 	@Override
@@ -126,6 +145,8 @@ public class BattleInProgress implements Runnable {
 		if (network != null) network.gameOver();
 		final BattleOutcome finalOutcome = outcome.get();
 		Platform.runLater(() -> listener.endBattle(finalOutcome));
+
+		shutdownActionQueue();
 	}
 
 	private void turn() {
@@ -144,9 +165,7 @@ public class BattleInProgress implements Runnable {
 						if (network != null) network.sendCommand(cmd);
 
 						List<Character> affectedCharacters = cmd.doCmd(battle);
-						Platform.runLater(() -> {
-							listener.command(cmd, affectedCharacters);
-						});
+						Platform.runLater(() -> listener.command(cmd, affectedCharacters));
 
 						if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
 							return;
@@ -189,7 +208,10 @@ public class BattleInProgress implements Runnable {
 	/**
 	 * Put an action on the queue, retrying if interrupted
 	 * */
-	private void queueActionWithRetry(Action a) {
+	private synchronized void queueActionWithRetry(Action a) {
+		if (!accepting) throw new RuntimeException(
+			"Attempted to enqueue a action, but the queue is not accepting new actions");
+
 		boolean retry = true;
 		while (retry) {
 			try {
@@ -201,7 +223,8 @@ public class BattleInProgress implements Runnable {
 		}
 	}
 
-	public void requestCommand(CommandRequest cmd) {
+	public synchronized void requestCommand(CommandRequest cmd) {
+		if (!accepting) return;
 		queueActionWithRetry(new Action(cmd));
 	}
 
@@ -209,18 +232,24 @@ public class BattleInProgress implements Runnable {
 	 * Get a path for a character to a target.
 	 * @return the empty list if there is no path.
 	 * */
-	public Future<List<MapPoint>> getPath(Character c, MapPoint target) {
+	public synchronized Future<List<MapPoint>> getPath(Character c, MapPoint target) {
 		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, target, null, null, r, null));
+
+		if (!accepting) r.cancel(true); else {
+			queueActionWithRetry(new Action(c, null, target, null, null, r, null));
+		}
 		return r;
 	}
 
 	/**
 	 * Get all the points that a character could move to on this turn.
 	 * */
-	public Future<Collection<MapPoint>> getMoveRange(Character c) {
+	public synchronized Future<Collection<MapPoint>> getMoveRange(Character c) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, null, null, r, null, null, null));
+
+		if (!accepting) r.cancel(true); else {
+			queueActionWithRetry(new Action(c, null, null, r, null, null, null));
+		}
 		return r;
 	}
 
@@ -245,9 +274,14 @@ public class BattleInProgress implements Runnable {
 	/**
 	 * Get all of the possible targets for an ability.
 	 * */
-	public Future<Collection<MapPoint>> getTargetingInfo(Character c, Ability a) {
+	public synchronized Future<Collection<MapPoint>> getTargetingInfo(
+		Character c, Ability a
+	) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, a, null, null, r, null, null));
+
+		if (!accepting) r.cancel(true); else {
+			queueActionWithRetry(new Action(c, a, null, null, r, null, null));
+		}
 		return r;
 	}
 
@@ -255,11 +289,14 @@ public class BattleInProgress implements Runnable {
 	 * Get all of the points that would be affected if we target the specified
 	 * square.
 	 * */
-	public Future<Collection<MapPoint>> getAttackArea(
+	public synchronized Future<Collection<MapPoint>> getAttackArea(
 		Character c, MapPoint target, Ability a
 	) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-		queueActionWithRetry(new Action(c, a, target, null, null, null, r));
+
+		if (!accepting) r.cancel(true); else {
+			queueActionWithRetry(new Action(c, a, target, null, null, null, r));
+		}
 		return r;
 	}
 }

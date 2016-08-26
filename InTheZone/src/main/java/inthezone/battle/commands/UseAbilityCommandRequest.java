@@ -24,8 +24,6 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 	@Override
 	public Command makeCommand(BattleState battleState) throws CommandException {
-		System.err.println("Hit " + agent + " " + targets);
-
 		Collection<DamageToTarget> allTargets =
 			battleState.getCharacterAt(agent).map(a ->
 				targets.stream()

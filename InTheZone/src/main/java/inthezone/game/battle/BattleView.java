@@ -36,6 +36,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -147,7 +148,9 @@ public class BattleView
 				/* ignore */
 			} catch (ExecutionException e) {
 				return Optional.empty();
-			}
+			} catch (CancellationException e) {
+				return Optional.empty();
+			} 
 		}
 	}
 

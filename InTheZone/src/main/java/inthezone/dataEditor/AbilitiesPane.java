@@ -154,8 +154,8 @@ public class AbilitiesPane extends VBox {
 
 				@Override
 				protected boolean computeValue() {
-					if (selected.size() < 1) return false;
 					TreeItem<AbilityInfoModel> item = table.getTreeItem(selected.get(0));
+					if (item == null) return false;
 					AbilityInfoModel v = item.getValue();
 					AbilityInfoModel pv = item.getParent().getValue();
 					boolean hasMana = item.getChildren().stream()

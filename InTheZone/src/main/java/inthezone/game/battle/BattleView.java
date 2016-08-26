@@ -12,7 +12,9 @@ import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.commands.UseAbilityCommand;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.BattleInProgress;
@@ -41,9 +43,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.stream.Collectors;
 import static inthezone.game.battle.BattleViewMode.*;
 
@@ -79,6 +83,10 @@ public class BattleView
 	private Optional<Ability> rootTargetingAbility = Optional.empty();
 	private Optional<Ability> targetingAbility = Optional.empty();
 	private Collection<MapPoint> targets = new ArrayList<>();
+
+	// A queue of points from which to recast a recursive ability
+	private MapPoint castFrom = null;
+	private Queue<MapPoint> recastFrom = new LinkedList<>();
 
 	private BattleViewMode mode = SELECT;
 
@@ -128,7 +136,12 @@ public class BattleView
 			stage.registerAnimationChain(chain);
 			chain.doOnFinished(() -> {
 				s.setAnimation("idle");
-				if (selectedCharacter.isPresent()) setMode(MOVE); else setMode(SELECT);
+				if (isMyTurn.getValue()) {
+					if (selectedCharacter.isPresent())
+						setMode(MOVE); else setMode(SELECT);
+				} else {
+					setMode(OTHER_TURN);
+				}
 			});
 		}
 
@@ -230,6 +243,7 @@ public class BattleView
 
 		switch (mode) {
 			case OTHER_TURN:
+				cancelAbility();
 				canvas.getStage().clearAllHighlighting();
 				selectCharacter(Optional.empty());
 				break;
@@ -239,10 +253,12 @@ public class BattleView
 				break;
 
 			case SELECT:
+				cancelAbility();
 				canvas.getStage().clearAllHighlighting();
 				break;
 
 			case MOVE:
+				cancelAbility();
 				canvas.getStage().clearAllHighlighting();
 				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
 					"Attempted to move but no character was selected"));
@@ -262,7 +278,14 @@ public class BattleView
 					throw new RuntimeException("Attempted to target null ability");
 
 				stage = canvas.getStage();
-				getFutureWithRetry(battle.getTargetingInfo(c, targetingAbility.get()))
+				if (targetingAbility.get().recursionLevel > 0) {
+					this.castFrom = recastFrom.poll();
+					if (castFrom == null) {
+						setMode(MOVE); return;
+					}
+				}
+
+				getFutureWithRetry(battle.getTargetingInfo(c, castFrom, targetingAbility.get()))
 					.ifPresent(tr -> {
 						tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 						canvas.setSelectable(tr);
@@ -292,7 +315,8 @@ public class BattleView
 					if (!stage.isHighlighted(p)) return;
 
 					selectedCharacter.ifPresent(c -> {
-						getFutureWithRetry(battle.getAttackArea(c, p, targetingAbility.get()))
+						getFutureWithRetry(battle.getAttackArea(
+								c, castFrom, p, targetingAbility.get()))
 							.ifPresent(area -> area.stream().forEach(pp ->
 								stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
 					});
@@ -344,11 +368,19 @@ public class BattleView
 	}
 
 	private void setupTargeting() {
+		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
+
 		targetingAbility.ifPresent(a -> {
 			numTargets.setValue(a.info.range.nTargets);
 			multiTargeting.setValue(a.info.range.nTargets > 1);
-			setMode(TARGET);
+			setMode(a.recursionLevel > 0 ? ANIMATING : TARGET);
 		});
+	}
+
+	private void cancelAbility() {
+		recastFrom.clear();
+		numTargets.setValue(0);
+		multiTargeting.setValue(false);
 	}
 
 	/**
@@ -369,11 +401,9 @@ public class BattleView
 		} else {
 			targetingAbility = rootTargetingAbility.flatMap(a -> a.getRecursion());
 			if (targetingAbility.isPresent()) {
-				// TODO: recursion has weird targeting
 				setupTargeting();
 			} else {
-				numTargets.setValue(0);
-				multiTargeting.setValue(false);
+				cancelAbility();
 				setMode(MOVE);
 			}
 		}
@@ -450,6 +480,12 @@ public class BattleView
 				a.setHeaderText("Opponent resigns");
 				a.showAndWait();
 			}
+
+		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue()) {
+			for (DamageToTarget d: ((UseAbilityCommand) cmd).targets) {
+				recastFrom.add(d.target);
+			}
+			setMode(TARGET);
 		}
 
 		updateCharacters(affectedCharacters);

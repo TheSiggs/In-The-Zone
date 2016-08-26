@@ -31,7 +31,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			battleState.getCharacterAt(agent).map(a ->
 				targets.stream()
 					.flatMap(t ->
-						battleState.getAbilityTargets(agent, ability, t).stream())
+						battleState.getAbilityTargets(agent, castFrom, ability, t).stream())
 					.map(t -> ability.computeDamageToTarget(a, t))
 					.collect(Collectors.toList())
 			).orElseThrow(() -> new CommandException("Invalid ability command request"));

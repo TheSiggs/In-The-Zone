@@ -78,6 +78,7 @@ public class BattleInProgress implements Runnable {
 
 		// the subject of move range and targeting information requests
 		public Character subject = null;
+		public MapPoint castFrom = null;
 		public Ability ability = null;
 		public MapPoint target = null;
 		public Optional<CompletableFuture<Collection<MapPoint>>> moveRange = Optional.empty();
@@ -91,6 +92,7 @@ public class BattleInProgress implements Runnable {
 
 		public Action(
 			Character subject,
+			MapPoint castFrom,
 			Ability ability,
 			MapPoint target,
 			CompletableFuture<Collection<MapPoint>> moveRange,
@@ -99,6 +101,7 @@ public class BattleInProgress implements Runnable {
 			CompletableFuture<Collection<MapPoint>> attackArea
 		) {
 			this.subject = subject;
+			this.castFrom = castFrom;
 			this.ability = ability;
 			this.target = target;
 			this.moveRange = Optional.ofNullable(moveRange);
@@ -187,10 +190,10 @@ public class BattleInProgress implements Runnable {
 				// handle targeting request
 				a.targeting.ifPresent(targeting ->
 					targeting.complete(battle.battleState.getTargetableArea(
-						a.subject.getPos(), a.ability)));
+						a.subject.getPos(), a.castFrom, a.ability)));
 				a.attackArea.ifPresent(attackArea ->
 					attackArea.complete(battle.battleState.getAffectedArea(
-						a.subject.getPos(), a.ability, a.target)));
+						a.subject.getPos(), a.castFrom, a.ability, a.target)));
 			} catch (InterruptedException e) {
 				// Do nothing
 			}
@@ -236,7 +239,7 @@ public class BattleInProgress implements Runnable {
 		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, null, target, null, null, r, null));
+			queueActionWithRetry(new Action(c, null, null, target, null, null, r, null));
 		}
 		return r;
 	}
@@ -248,7 +251,7 @@ public class BattleInProgress implements Runnable {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, null, null, r, null, null, null));
+			queueActionWithRetry(new Action(c, null, null, null, r, null, null, null));
 		}
 		return r;
 	}
@@ -275,12 +278,12 @@ public class BattleInProgress implements Runnable {
 	 * Get all of the possible targets for an ability.
 	 * */
 	public synchronized Future<Collection<MapPoint>> getTargetingInfo(
-		Character c, Ability a
+		Character c, MapPoint castFrom, Ability a
 	) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, a, null, null, r, null, null));
+			queueActionWithRetry(new Action(c, castFrom, a, null, null, r, null, null));
 		}
 		return r;
 	}
@@ -290,12 +293,12 @@ public class BattleInProgress implements Runnable {
 	 * square.
 	 * */
 	public synchronized Future<Collection<MapPoint>> getAttackArea(
-		Character c, MapPoint target, Ability a
+		Character c, MapPoint castFrom, MapPoint target, Ability a
 	) {
 		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
 
 		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(new Action(c, a, target, null, null, null, r));
+			queueActionWithRetry(new Action(c, castFrom, a, target, null, null, null, r));
 		}
 		return r;
 	}

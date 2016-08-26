@@ -173,10 +173,10 @@ public class BattleState {
 	 * Get all the tiles that can be targeted by an ability.
 	 * */
 	public Collection<MapPoint> getTargetableArea(
-		MapPoint agent, Ability ability
+		MapPoint agent, MapPoint castFrom, Ability ability
 	) {
 		Collection<MapPoint> diamond =
-			LineOfSight.getDiamond(agent, ability.info.range.range);
+			LineOfSight.getDiamond(castFrom, ability.info.range.range);
 
 		if (!ability.info.range.los) {
 			return diamond;
@@ -189,7 +189,7 @@ public class BattleState {
 
 			// check line of sight
 			return diamond.stream().filter(p ->
-				getLOS(agent, p, obstacles) != null).collect(Collectors.toList());
+				getLOS(castFrom, p, obstacles) != null).collect(Collectors.toList());
 		}
 	}
 
@@ -197,7 +197,7 @@ public class BattleState {
 	 * Get all the tiles that will be affected by an ability.
 	 * */
 	public Collection<MapPoint> getAffectedArea(
-		MapPoint agent, Ability ability, MapPoint target
+		MapPoint agent, MapPoint castFrom, Ability ability, MapPoint target
 	) {
 		Collection<MapPoint> r =
 			LineOfSight.getDiamond(target, ability.info.range.radius);
@@ -207,7 +207,7 @@ public class BattleState {
 					"Attempted to get targeting information for a non-existent character"));
 
 			Set<MapPoint> pr = new HashSet<>(r);
-			Collection<MapPoint> los = getLOS(agent, target, movementObstacles(player));
+			Collection<MapPoint> los = getLOS(castFrom, target, movementObstacles(player));
 			if (los != null) pr.addAll(los);
 			return pr;
 		}
@@ -216,10 +216,10 @@ public class BattleState {
 	}
 
 	public Collection<Targetable> getAbilityTargets(
-		MapPoint agent, Ability ability, MapPoint target
+		MapPoint agent, MapPoint castFrom, Ability ability, MapPoint target
 	) {
 		return getCharacterAt(agent).map(c ->
-			getAffectedArea(agent, ability, target).stream()
+			getAffectedArea(agent, castFrom, ability, target).stream()
 				.flatMap(p -> getTargetableAt(p)
 					.map(x -> Stream.of(x)).orElse(Stream.empty()))
 				.filter(t -> ability.canTarget(c, t))

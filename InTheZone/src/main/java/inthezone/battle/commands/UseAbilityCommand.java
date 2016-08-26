@@ -19,7 +19,7 @@ public class UseAbilityCommand extends Command {
 	private final MapPoint agent;
 	private final MapPoint castFrom;
 	private final String ability;
-	private final Collection<DamageToTarget> targets;
+	public final Collection<DamageToTarget> targets;
 	private final int subsequentLevel;
 	private final int recursionLevel;
 

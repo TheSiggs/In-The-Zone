@@ -78,20 +78,22 @@ public class HUD extends AnchorPane {
 
 	public void selectCharacter(Character c) {
 		int id = c == null? -1 : c.id;
-		if (c != null) updateAbilities(c);
+		if (c != null) updateAbilities(c, c.hasMana());
 
 		for (CharacterInfoBox box : characters.values())
 			box.setSelected(box.id == id);
 	}
 
-	public void updateAbilities(Character c) {
+	public void updateAbilities(Character c, boolean mana) {
 		abilitiesMenu.getItems().clear();
 		abilitiesMenu.getItems().addAll(attackItem, pushItem);
 
 		for (Ability a : c.abilities) {
-			MenuItem i = new MenuItem(a.info.name);
-			i.setDisable(a.info.ap > c.getAP() || a.info.mp > c.getMP());
-			i.setOnAction(event -> view.useAbility(a));
+			final Ability ability = mana ? a.getMana() : a;
+
+			MenuItem i = new MenuItem(ability.info.name);
+			i.setDisable(ability.info.ap > c.getAP() || ability.info.mp > c.getMP());
+			i.setOnAction(event -> view.useAbility(ability));
 			abilitiesMenu.getItems().add(i);
 		}
 	}

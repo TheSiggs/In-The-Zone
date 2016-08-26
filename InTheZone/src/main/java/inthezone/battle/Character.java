@@ -22,6 +22,7 @@ public class Character implements Targetable, Obstacle {
 	private Optional<StatusEffect> statusBuff = Optional.empty();
 	private Optional<StatusEffect> statusDebuff = Optional.empty();
 
+	private boolean hasMana = false;
 	private MapPoint pos = new MapPoint(0, 0);
 	private int ap = 0;
 	private int mp = 0;
@@ -38,6 +39,7 @@ public class Character implements Targetable, Obstacle {
 		int maxHP,
 		Optional<StatusEffect> statusBuff,
 		Optional<StatusEffect> statusDebuff,
+		boolean hasMana,
 		MapPoint pos,
 		int ap,
 		int mp,
@@ -53,6 +55,7 @@ public class Character implements Targetable, Obstacle {
 		this.maxHP = maxHP;
 		this.statusBuff = statusBuff;
 		this.statusDebuff = statusDebuff;
+		this.hasMana = hasMana;
 		this.pos = pos;
 		this.ap = ap;
 		this.mp = mp;
@@ -74,6 +77,7 @@ public class Character implements Targetable, Obstacle {
 			maxHP,
 			statusBuff,
 			statusDebuff,
+			hasMana,
 			pos,
 			ap,
 			mp,
@@ -82,7 +86,11 @@ public class Character implements Targetable, Obstacle {
 	}
 
 	public Character(
-		CharacterProfile profile, Player player, MapPoint pos, int id
+		CharacterProfile profile,
+		Player player,
+		boolean hasMana,
+		MapPoint pos,
+		int id
 	) {
 		this.id = id;
 		this.name = profile.rootCharacter.name;
@@ -92,6 +100,7 @@ public class Character implements Targetable, Obstacle {
 		this.abilities = profile.abilities.stream()
 			.map(i -> new Ability(i)).collect(Collectors.toList());
 		this.basicAbility = new Ability(profile.basicAbility);
+		this.hasMana = hasMana;
 		this.pos = pos;
 		this.maxHP = baseStats.hp;
 		this.ap = baseStats.ap;
@@ -115,7 +124,12 @@ public class Character implements Targetable, Obstacle {
 		return maxHP;
 	}
 
-	public void moveTo(MapPoint p) {
+	public boolean hasMana() {
+		return hasMana;
+	}
+
+	public void moveTo(MapPoint p, boolean hasMana) {
+		this.hasMana = hasMana;
 		mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
 		if (mp < 0) mp = 0;
 		this.pos = p;
@@ -138,7 +152,8 @@ public class Character implements Targetable, Obstacle {
 		return hp == 0;
 	}
 
-	public void teleport(MapPoint p) {
+	public void teleport(MapPoint p, boolean hasMana) {
+		this.hasMana = hasMana;
 		this.pos = p;
 	}
 

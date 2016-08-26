@@ -28,7 +28,8 @@ public class Battle {
 	 * */
 	public void doMove(List<MapPoint> path) {
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
-			c.moveTo(path.get(path.size() - 1));
+			MapPoint target = path.get(path.size() - 1);
+			c.moveTo(target, battleState.hasMana(target));
 		});
 	}
 

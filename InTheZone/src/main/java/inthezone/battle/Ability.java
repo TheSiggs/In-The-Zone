@@ -30,6 +30,10 @@ public class Ability {
 		this.recursionLevel = recursionLevel;
 	}
 
+	public Ability getMana() {
+		return info.mana.map(m -> new Ability(m, rootName, 0, 0)).orElse(this);
+	}
+
 	public Optional<Ability> getSubsequent() {
 		return info.subsequent.map(i ->
 			new Ability(i, rootName, subsequentLevel + 1, 0));
@@ -44,8 +48,17 @@ public class Ability {
 		}
 	}
 
-	public Optional<Ability> getNext(int subsequentLevel, int recursionLevel) {
+	public Optional<Ability> getNext(
+		boolean mana, int subsequentLevel, int recursionLevel
+	) {
 		Optional<Ability> r = Optional.of(this);
+
+		if (mana) {
+			Optional<Ability> manaAbility =
+				r.flatMap(a -> a.info.mana.map(aa -> new Ability(aa)));
+			if (manaAbility.isPresent()) r = manaAbility;
+		}
+
 		for (int i = 0; i < subsequentLevel; i++) {
 			r = r.flatMap(a -> getSubsequent());
 		}

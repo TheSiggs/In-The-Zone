@@ -509,7 +509,7 @@ public class BattleView
 				});
 
 				if (old != null) {
-					if (c.player == player) hud.updateAbilities(c);
+					if (c.player == player) hud.updateAbilities(c, c.hasMana());
 					CharacterInfoBox box = hud.characters.get(c.id);
 					if (box != null) {
 						box.updateAP(c.getAP(), c.getStats().ap);

@@ -48,11 +48,11 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		int id = 0;
 		for (int i = 0; i < p1start.size(); i++) {
 			characters.add(new Character(p1.characters.get(i),
-				Player.PLAYER_A, p1start.get(i), id++));
+				Player.PLAYER_A, false, p1start.get(i), id++));
 		}
 		for (int i = 0; i < p2start.size(); i++) {
 			characters.add(new Character(p2.characters.get(i),
-				Player.PLAYER_B, p2start.get(i), id++));
+				Player.PLAYER_B, false, p2start.get(i), id++));
 		}
 	}
 

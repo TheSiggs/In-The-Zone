@@ -32,6 +32,13 @@ public class BattleState {
 	}
 
 	/**
+	 * Determine if a terrain tile is a mana zone
+	 * */
+	public boolean hasMana(MapPoint p) {
+		return terrain.terrain.getTile(p).isManaZone;
+	}
+
+	/**
 	 * Determine the outcome of the battle from the point of view of a player.
 	 * */
 	public Optional<BattleOutcome> getBattleOutcome(Player player) {

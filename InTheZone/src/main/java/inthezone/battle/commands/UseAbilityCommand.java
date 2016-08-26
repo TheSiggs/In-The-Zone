@@ -100,7 +100,8 @@ public class UseAbilityCommand extends Command {
 		Ability abilityData = battle.battleState.getCharacterAt(agent)
 			.flatMap(c -> c.abilities.stream()
 				.filter(a -> a.info.name.equals(ability)).findFirst())
-			.flatMap(a -> a.getNext(subsequentLevel, recursionLevel))
+			.flatMap(a -> a.getNext(
+				battle.battleState.hasMana(agent), subsequentLevel, recursionLevel))
 			.orElseThrow(() -> new CommandException("Invalid ability command"));
 
 		if (!battle.battleState.canDoAbility(agent, castFrom, abilityData, targets))

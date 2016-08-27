@@ -12,15 +12,15 @@ public class DamageToTarget implements HasJSONRepresentation {
 	public final MapPoint target;
 	public final int damage;
 	public final StatusEffectInfo statusEffect;
-	public final InstantEffectInfo pre;
-	public final InstantEffectInfo post;
+	public final boolean pre;
+	public final boolean post;
 
 	public DamageToTarget(
 		MapPoint target,
 		int damage,
 		StatusEffectInfo statusEffect,
-		InstantEffectInfo pre,
-		InstantEffectInfo post
+		boolean pre,
+		boolean post
 	) {
 		this.target = target;
 		this.damage = damage;
@@ -50,7 +50,7 @@ public class DamageToTarget implements HasJSONRepresentation {
 		try {
 			MapPoint target = MapPoint.fromJSON((JSONObject) otarget);
 			Number damage = (Number) odamage;
-			return new DamageToTarget(target, damage.intValue(), null, null, null);
+			return new DamageToTarget(target, damage.intValue(), null, false, false);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing damage", e);
 		} catch (CorruptDataException e) {

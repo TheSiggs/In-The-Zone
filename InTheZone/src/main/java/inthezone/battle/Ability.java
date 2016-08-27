@@ -119,8 +119,7 @@ public class Ability {
 
 		return new DamageToTarget(t.getPos(), (int) Math.ceil(damage),
 			imposeEffect(info.chance, info.statusEffect.orElse(null)),
-			imposeEffect(info.chance, info.instantBefore.orElse(null)),
-			imposeEffect(info.chance, info.instantAfter.orElse(null)));
+			Math.random() < info.chance, Math.random() < info.chance);
 	}
 
 	private <T> T imposeEffect(double p, T effect) {

@@ -4,6 +4,8 @@ import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class processes battle commands.
@@ -56,6 +58,13 @@ public class Battle {
 	}
 
 	public void doPush(MapPoint agent, MapPoint target, boolean effective) {
+	}
+
+	public List<Character> doCleanse(MapPoint target) {
+		return battleState.getCharacterAt(target).map(c -> {
+			c.cleanse();
+			return Stream.of(c);
+		}).orElse(Stream.empty()).collect(Collectors.toList());
 	}
 
 	public void doResign(Player player) {

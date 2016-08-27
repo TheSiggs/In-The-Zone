@@ -3,6 +3,8 @@ package inthezone.battle.commands;
 import inthezone.battle.BattleState;
 import inthezone.battle.Item;
 import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UseItemCommandRequest extends CommandRequest {
 	private final MapPoint agent;
@@ -14,9 +16,11 @@ public class UseItemCommandRequest extends CommandRequest {
 	}
 
 	@Override
-	public Command makeCommand(BattleState battleState) throws CommandException {
+	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		if (battleState.canUseItem(agent, item)) {
-			return new UseItemCommand(agent, item);
+			List<Command> r = new ArrayList<>();
+			r.add(new UseItemCommand(agent, item));
+			return r;
 		} else {
 			throw new CommandException("Invalid item command request");
 		}

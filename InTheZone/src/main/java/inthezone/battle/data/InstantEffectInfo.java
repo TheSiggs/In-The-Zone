@@ -13,7 +13,7 @@ public class InstantEffectInfo {
 	{
 		String parts[] = effect.split("\\s");
 		if (parts.length < 1) throw new CorruptDataException("Expected instant effect");
-		this.type = InstantEffectType.parse(parts[0]);
+		this.type = InstantEffectType.fromString(parts[0]);
 
 		int paramv = DEFAULT_PARAMETER;
 		if (parts.length >= 2) {

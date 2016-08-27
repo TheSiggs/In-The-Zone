@@ -169,6 +169,14 @@ public class Character implements Targetable, Obstacle {
 		}
 	}
 
+	/**
+	 * Remove all status effects
+	 * */
+	public void cleanse() {
+		statusBuff = Optional.empty();
+		statusDebuff = Optional.empty();
+	}
+
 	@Override public Stats getStats() {
 		return baseStats;
 	}

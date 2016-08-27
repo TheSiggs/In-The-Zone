@@ -24,17 +24,19 @@ public class SimpleAI implements CommandGenerator {
 			CommandRequest crq = nextCommand();
 
 			try {
-				Command cmd = crq.makeCommand(battle.battleState);
-				List<Character> affectedCharacters = cmd.doCmd(battle);
-				Platform.runLater(() -> {
-					listener.command(cmd, affectedCharacters);
-				});
+				List<Command> cmds = crq.makeCommand(battle.battleState);
+				for (Command cmd : cmds) {
+					List<Character> affectedCharacters = cmd.doCmd(battle);
+					Platform.runLater(() -> {
+						listener.command(cmd, affectedCharacters);
+					});
 
-				if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
-					return;
+					if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
+						return;
+					}
+
+					if (cmd instanceof EndTurnCommand) return;
 				}
-
-				if (cmd instanceof EndTurnCommand) return;
 			} catch (CommandException e) {
 				Platform.runLater(() -> listener.badCommand(e));
 			}

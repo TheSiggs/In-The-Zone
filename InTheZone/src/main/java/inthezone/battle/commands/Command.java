@@ -25,6 +25,7 @@ public abstract class Command implements HasJSONRepresentation {
 			case MOVE: return MoveCommand.fromJSON(json);
 			case PUSH: return PushCommand.fromJSON(json);
 			case ABILITY: return UseAbilityCommand.fromJSON(json);
+			case INSTANT: return InstantEffectCommand.fromJSON(json);
 			case ITEM: return UseItemCommand.fromJSON(json);
 			case RESIGN: return ResignCommand.fromJSON(json);
 			default: throw new RuntimeException("This cannot happen");

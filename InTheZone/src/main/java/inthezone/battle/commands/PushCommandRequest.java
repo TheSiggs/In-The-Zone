@@ -5,6 +5,8 @@ import inthezone.battle.Character;
 import inthezone.battle.data.Stats;
 import inthezone.battle.Targetable;
 import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class PushCommandRequest extends CommandRequest {
@@ -17,11 +19,11 @@ public class PushCommandRequest extends CommandRequest {
 	}
 
 	@Override
-	public Command makeCommand(BattleState battleState) throws CommandException {
+	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		Targetable t = battleState.getTargetableAt(target)
 			.orElseThrow(() -> new CommandException("Invalid push command"));
 
-		return battleState.getCharacterAt(agent).flatMap(a -> {
+		Command r = battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {
 				boolean effective = t.isPushable();
 				if (battleState.canPush(agent, target, effective)) {
@@ -31,6 +33,10 @@ public class PushCommandRequest extends CommandRequest {
 
 			return Optional.empty();
 		}).orElseThrow(() -> new CommandException("Invalid push command request"));
+
+		List<Command> lr = new ArrayList<>();
+		lr.add(r);
+		return lr;
 	}
 }
 

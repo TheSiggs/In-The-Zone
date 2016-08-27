@@ -115,17 +115,20 @@ public class BattleInProgress implements Runnable {
 				// handle a command request
 				if (a.crq.isPresent()) {
 					try {
-						Command cmd = a.crq.get().makeCommand(battle.battleState);
-						if (network != null) network.sendCommand(cmd);
+						List<Command> cmds = a.crq.get().makeCommand(battle.battleState);
 
-						List<Character> affectedCharacters = cmd.doCmd(battle);
-						Platform.runLater(() -> listener.command(cmd, affectedCharacters));
+						for (Command cmd : cmds) {
+							if (network != null) network.sendCommand(cmd);
 
-						if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
-							return;
+							List<Character> affectedCharacters = cmd.doCmd(battle);
+							Platform.runLater(() -> listener.command(cmd, affectedCharacters));
+
+							if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
+								return;
+							}
+
+							if (cmd instanceof EndTurnCommand) return;
 						}
-
-						if (cmd instanceof EndTurnCommand) return;
 					} catch (CommandException e) {
 						Platform.runLater(() -> listener.badCommand(e));
 					}

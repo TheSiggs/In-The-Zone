@@ -5,7 +5,7 @@ import isogame.engine.CorruptDataException;
 public enum InstantEffectType {
 	CLEANSE, DEFUSE, PURGE, PUSH, PULL, SCAN, TELEPORT;
 
-	public static InstantEffectType parse(String s)
+	public static InstantEffectType fromString(String s)
 		throws CorruptDataException
 	{
 		switch(s.toLowerCase()) {

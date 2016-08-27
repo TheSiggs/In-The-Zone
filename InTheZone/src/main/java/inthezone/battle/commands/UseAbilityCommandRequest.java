@@ -4,9 +4,11 @@ import inthezone.battle.Ability;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
+import inthezone.battle.instant.InstantEffectFactory;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class UseAbilityCommandRequest extends CommandRequest {
@@ -26,7 +28,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	}
 
 	@Override
-	public Command makeCommand(BattleState battleState) throws CommandException {
+	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		Collection<DamageToTarget> allTargets =
 			battleState.getCharacterAt(agent).map(a ->
 				targets.stream()
@@ -36,12 +38,41 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					.collect(Collectors.toList())
 			).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
+		Collection<MapPoint> preTargets = new ArrayList<>();
+		Collection<MapPoint> postTargets = new ArrayList<>();
+		for (DamageToTarget t : allTargets) {
+			if (t.pre) preTargets.add(t.target);
+			if (t.post) preTargets.add(t.target);
+		}
+
+		List<Command> r = new ArrayList<>();
+
+		// Instant effect
+		Collection<MapPoint> targetArea = null;
+		if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
+			targetArea = battleState.getTargetableArea(agent, castFrom, ability);
+			r.add(new InstantEffectCommand(InstantEffectFactory.getEffect(
+				ability.info.instantBefore.get(), castFrom, targetArea, preTargets)));
+		}
+
+		// Main damage
 		if (battleState.canDoAbility(agent, castFrom, ability, allTargets)) {
-			return new UseAbilityCommand(agent, castFrom, ability.rootName,
-				allTargets, ability.subsequentLevel, ability.recursionLevel);
+			r.add(new UseAbilityCommand(agent, castFrom, ability.rootName,
+				allTargets, ability.subsequentLevel, ability.recursionLevel));
 		} else {
 			throw new CommandException("Invalid ability command request");
 		}
+			
+		// Instant effect
+		if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {
+			if (targetArea == null) targetArea =
+				battleState.getTargetableArea(agent, castFrom, ability);
+
+			r.add(new InstantEffectCommand(InstantEffectFactory.getEffect(
+				ability.info.instantAfter.get(), castFrom, targetArea, preTargets)));
+		}
+
+		return r;
 	}
 }
 

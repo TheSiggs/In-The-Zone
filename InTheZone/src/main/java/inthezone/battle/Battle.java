@@ -2,6 +2,7 @@ package inthezone.battle;
 
 import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +58,23 @@ public class Battle {
 	public void doUseItem(MapPoint agent, Item item) {
 	}
 
-	public void doPush(MapPoint agent, MapPoint target, boolean effective) {
+	public List<Character> doPush(MapPoint agent, MapPoint target, int amount) {
+		if (agent.x == target.x || agent.y == target.y) {
+			MapPoint dp = target.subtract(agent).normalise();
+			MapPoint x = target;
+			for (int i = 0; i < amount; i++) {
+				MapPoint z = x.add(dp);
+				if (battleState.isSpaceFree(z)) x = z; else break;
+			}
+
+			final MapPoint destination = x;
+			return battleState.getCharacterAt(target).map(c -> {
+				c.teleport(destination, battleState.hasMana(destination));
+				return Stream.of(c);
+			}).orElse(Stream.empty()).collect(Collectors.toList());
+		} else {
+			return new ArrayList<>();
+		}
 	}
 
 	public List<Character> doCleanse(MapPoint target) {

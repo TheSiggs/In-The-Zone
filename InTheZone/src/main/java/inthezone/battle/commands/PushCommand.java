@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONObject;
 
 public class PushCommand extends Command {
+	public static final int DEFAULT_PUSH_AMOUNT = 1;
+
 	private final MapPoint agent;
 	private final MapPoint target;
 	private final boolean effective; // determines if the push is effective
@@ -63,14 +65,13 @@ public class PushCommand extends Command {
 
 	@Override
 	public List<Character> doCmd(Battle battle) throws CommandException {
-		if (!battle.battleState.canPush(agent, target, effective))
-			throw new CommandException("Invalid push command");
-
 		Collection<Character> r = new ArrayList<>();
 		battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 		battle.battleState.getCharacterAt(target).ifPresent(c -> r.add(c));
 
-		battle.doPush(agent, target, effective);
+		if (effective) {
+			battle.doPush(agent, target, DEFAULT_PUSH_AMOUNT);
+		}
 
 		return r.stream().map(c -> c.clone()).collect(Collectors.toList());
 	}

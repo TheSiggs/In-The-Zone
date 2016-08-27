@@ -26,9 +26,7 @@ public class PushCommandRequest extends CommandRequest {
 		Command r = battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {
 				boolean effective = t.isPushable();
-				if (battleState.canPush(agent, target, effective)) {
-					return Optional.of(new PushCommand(agent, target, effective));
-				}
+				return Optional.of(new PushCommand(agent, target, effective));
 			}
 
 			return Optional.empty();

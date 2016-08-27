@@ -20,6 +20,7 @@ public class InstantEffectFactory {
 	) {
 		switch (info.type) {
 			case CLEANSE: return Cleanse.getEffect(targets);
+			case PUSH: return Push.getEffect(info, castFrom, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}
 	}
@@ -31,6 +32,7 @@ public class InstantEffectFactory {
 			InstantEffectType kind = InstantEffectType.fromString((String) okind);
 			switch (kind) {
 				case CLEANSE: return Cleanse.fromJSON(o);
+				case PUSH: return Push.fromJSON(o);
 				default: throw new ProtocolException("Unimplemented effect " + kind);
 			}
 		} catch (ClassCastException e) {

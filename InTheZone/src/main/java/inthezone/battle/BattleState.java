@@ -109,6 +109,14 @@ public class BattleState {
 	}
 
 	/**
+	 * Determine if it is possible to place a character in a particular tile.
+	 * */
+	public boolean isSpaceFree(MapPoint p) {
+		return !(terrainObstacles.contains(p) ||
+			characters.stream().anyMatch(c -> c.getPos().equals(p)));
+	}
+
+	/**
 	 * Points that are already occupied.
 	 * */
 	private Set<MapPoint> spaceObstacles(Player player) {
@@ -248,10 +256,6 @@ public class BattleState {
 	}
 
 	public boolean canUseItem(MapPoint agent, Item item) {
-		return true;
-	}
-
-	public boolean canPush(MapPoint agent, MapPoint target, boolean effective) {
 		return true;
 	}
 }

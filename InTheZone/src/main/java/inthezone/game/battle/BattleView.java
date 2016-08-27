@@ -400,7 +400,8 @@ public class BattleView
 			System.err.println("Subsequent!");
 			setupTargeting();
 		} else {
-			targetingAbility = rootTargetingAbility.flatMap(a -> a.getRecursion());
+			rootTargetingAbility = rootTargetingAbility.flatMap(a -> a.getRecursion());
+			targetingAbility = rootTargetingAbility;
 			if (targetingAbility.isPresent()) {
 				System.err.println("Recursive!");
 				setupTargeting();

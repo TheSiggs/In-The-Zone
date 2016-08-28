@@ -11,6 +11,7 @@ import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.battle.commands.PushCommand;
+import inthezone.battle.commands.PushCommandRequest;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
@@ -240,8 +241,21 @@ public class BattleView
 					break;
 
 				case TELEPORT:
-					teleportDestinations.add(p);
-					setMode(TELEPORT);
+					if (canvas.isSelectable(p)) {
+						teleportDestinations.add(p);
+						setMode(TELEPORT);
+					}
+					break;
+
+				case PUSH:
+					if (canvas.isSelectable(p)) {
+						selectedCharacter.ifPresent(c -> battle.requestCommand(
+							new PushCommandRequest(c.getPos(), p)));
+						setMode(MOVE);
+					} else {
+						selectCharacter(Optional.empty());
+					}
+					break;
 
 				case TARGET:
 					if (canvas.isSelectable(p)) {
@@ -273,6 +287,19 @@ public class BattleView
 			case SELECT:
 				cancelAbility();
 				canvas.getStage().clearAllHighlighting();
+				break;
+
+			case PUSH:
+				canvas.getStage().clearAllHighlighting();
+				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
+					"Attempted to move but no character was selected"));
+
+				getFutureWithRetry(battle.getTeleportRange(c, 1))
+					.ifPresent(mr -> {
+						mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
+						canvas.setSelectable(mr);
+					});
+
 				break;
 
 			case MOVE:
@@ -444,15 +471,13 @@ public class BattleView
 	}
 
 	/**
-	 * The selected character attacks.
-	 * */
-	public void useAttack() {
-	}
-
-	/**
 	 * The selected character initiates a push.
 	 * */
 	public void usePush() {
+		if (!selectedCharacter.isPresent()) throw new RuntimeException(
+			"Attempted to push but no character was selected");
+
+		setMode(PUSH);
 	}
 
 	@Override

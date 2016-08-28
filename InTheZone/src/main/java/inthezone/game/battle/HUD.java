@@ -37,7 +37,6 @@ public class HUD extends AnchorPane {
 		this.view = view;
 		this.multiTargetAssistant = new MultiTargetAssistant(view);
 
-		attackItem.setOnAction(event -> view.useAttack());
 		pushItem.setOnAction(event -> view.usePush());
 
 		endTurnButton.setOnAction(event -> view.sendEndTurn());
@@ -87,6 +86,11 @@ public class HUD extends AnchorPane {
 	public void updateAbilities(Character c, boolean mana) {
 		abilitiesMenu.getItems().clear();
 		abilitiesMenu.getItems().addAll(attackItem, pushItem);
+
+		attackItem.setOnAction(event ->
+			view.useAbility(mana ? c.basicAbility.getMana() : c.basicAbility));
+
+		pushItem.setOnAction(event -> view.usePush());
 
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;

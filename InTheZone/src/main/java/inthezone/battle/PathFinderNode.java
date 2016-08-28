@@ -78,10 +78,29 @@ public class PathFinderNode extends Node<MapPoint> {
 		return new PathFinderNode(this, terrain, obstacles, width, height, x, getGoal());
 	}
 
+	private boolean canTraverseBoundary(MapPoint from, MapPoint to, SlopeType slope) {
+		return canTraverseBoundary(from, to, slope, terrain);
+	}
+
+	public static boolean canTraverseBoundary(
+		MapPoint from, MapPoint to, StageInfo terrain
+	) {
+		MapPoint dp = from.subtract(to).normalise();
+		SlopeType slope;
+		if (dp.x == 1) slope = SlopeType.E;
+		else if (dp.x == -1) slope = SlopeType.W;
+		else if (dp.y == 1) slope = SlopeType.S;
+		else if (dp.y == -1) slope = SlopeType.N;
+		else slope = SlopeType.NONE;
+		return canTraverseBoundary(from, to, slope, terrain);
+	}
+
 	/**
 	 * Determine if the elevation rules allow us to pass from one point to another.
 	 * */
-	private boolean canTraverseBoundary(MapPoint from, MapPoint to, SlopeType slope) {
+	private static boolean canTraverseBoundary(
+		MapPoint from, MapPoint to, SlopeType slope, StageInfo terrain
+	) {
 		Tile tfrom = terrain.getTile(from);
 		Tile tto = terrain.getTile(to);
 

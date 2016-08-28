@@ -55,7 +55,7 @@ public class Battle {
 	public void doUseItem(MapPoint agent, Item item) {
 	}
 
-	public List<Character> doPush(List<MapPoint> path) {
+	public List<Character> doPushPull(List<MapPoint> path) {
 		List<Character> r = new ArrayList<>();
 		if (path.size() < 2) return r;
 

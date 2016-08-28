@@ -5,24 +5,25 @@ import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.LineOfSight;
+import inthezone.battle.PathFinderNode;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Push implements InstantEffect {
+public class Pull implements InstantEffect {
 	private final MapPoint castFrom;
 	private final List<List<MapPoint>> paths;
 
-	private Push(
+	private Pull(
 		MapPoint castFrom, List<List<MapPoint>> paths
 	) {
 		this.castFrom = castFrom;
@@ -33,7 +34,7 @@ public class Push implements InstantEffect {
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
-		o.put("kind", InstantEffectType.PUSH.toString());
+		o.put("kind", InstantEffectType.PULL.toString());
 		o.put("castFrom", castFrom.getJSON());
 		for (List<MapPoint> path : paths) {
 			JSONArray pp = new JSONArray();
@@ -44,7 +45,7 @@ public class Push implements InstantEffect {
 		return o;
 	}
 
-	public static Push fromJSON(JSONObject json)
+	public static Pull fromJSON(JSONObject json)
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
@@ -56,8 +57,8 @@ public class Push implements InstantEffect {
 		if (opaths == null) throw new ProtocolException("Missing effect paths");
 
 		try {
-			if (InstantEffectType.fromString((String) okind) != InstantEffectType.PUSH)
-				throw new ProtocolException("Expected push effect");
+			if (InstantEffectType.fromString((String) okind) != InstantEffectType.PULL)
+				throw new ProtocolException("Expected pull effect");
 
 			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
 			JSONArray rawPaths = (JSONArray) opaths;
@@ -71,15 +72,15 @@ public class Push implements InstantEffect {
 
 				paths.add(path);
 			}
-			return new Push(castFrom, paths);
+			return new Pull(castFrom, paths);
 		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing push effect", e);
+			throw new ProtocolException("Error parsing pull effect", e);
 		} catch (CorruptDataException e) {
-			throw new ProtocolException("Error parsing push effect", e);
+			throw new ProtocolException("Error parsing pull effect", e);
 		}
 	}
 
-	public static Push getEffect(
+	public static Pull getEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
@@ -88,29 +89,38 @@ public class Push implements InstantEffect {
 		List<List<MapPoint>> paths = new ArrayList<>();
 
 		List<MapPoint> sortedTargets = new ArrayList<>(targets);
-		sortedTargets.sort(Collections.reverseOrder(
-			Comparator.comparingInt(x -> castFrom.distance(x))));
+		sortedTargets.sort(Comparator.comparingInt(x -> castFrom.distance(x)));
 
 		for (MapPoint t : sortedTargets) {
-			if (castFrom.x == t.x || castFrom.y == t.y) {
-				MapPoint dp = t.subtract(castFrom).normalise();
-				List<MapPoint> path = new ArrayList<>();
+			List<MapPoint> path1 = getPullPath(battle, t, castFrom, true);
+			List<MapPoint> path2 = getPullPath(battle, t, castFrom, false);
 
-				MapPoint x = t;
-				path.add(x);
-				for (int i = 0; i < info.param; i++) {
-					MapPoint z = x.add(dp);
-					if (!battle.isSpaceFree(z)) break; else {
-						x = z;
-						path.add(x);
-					}
-				}
-
-				paths.add(path);
-			}
+			if (path1.size() > path2.size()) paths.add(path1); else paths.add(path2);
 		}
 
-		return new Push(castFrom, paths);
+		return new Pull(castFrom, paths);
+	}
+
+	private static List<MapPoint> getPullPath(
+		BattleState battle, MapPoint from, MapPoint to, boolean bias
+	) {
+		List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
+		List<MapPoint> path = new ArrayList<>();
+
+		if (los == null || los.size() < 1) return path;
+
+		MapPoint last = los.remove(0);
+		while (
+			los.size() > 0 &&
+			battle.isSpaceFree(los.get(0)) &&
+			PathFinderNode.canTraverseBoundary(
+				last, los.get(0), battle.terrain.terrain)
+		) {
+			last = los.remove(0);
+			path.add(last);
+		}
+
+		return path;
 	}
 
 	@Override public List<Character> apply(Battle battle) {

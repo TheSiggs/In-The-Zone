@@ -26,6 +26,10 @@ public class Teleport implements InstantEffect {
 		this.destinations = destinations;
 	}
 
+	public List<MapPoint> getDestinations() {
+		return destinations;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();

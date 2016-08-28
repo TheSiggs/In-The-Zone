@@ -7,8 +7,10 @@ import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
+import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
+import inthezone.battle.commands.PushCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
@@ -18,6 +20,10 @@ import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.instant.InstantEffect;
+import inthezone.battle.instant.InstantEffect;
+import inthezone.battle.instant.Pull;
+import inthezone.battle.instant.Push;
+import inthezone.battle.instant.Teleport;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
@@ -56,6 +62,7 @@ public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
 {
 	private final static double walkSpeed = 1.2;
+	private final static double pushSpeed = 2;
 
 	private final MapView canvas;
 	private final Player player;
@@ -457,26 +464,13 @@ public class BattleView
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
 
-			setMode(ANIMATING);
-			Stage stage = canvas.getStage();
-			MapPoint start = path.get(0);
-			MapPoint end = path.get(1);
-			MapPoint v = end.subtract(start);
+			scheduleMovement("walk", walkSpeed, path, affectedCharacters.get(0));
 
-			int id = affectedCharacters.get(0).id;
-			Sprite s = stage.getSpritesByTile(start).stream()
-				.filter(x -> x.userData.equals(id)).findFirst().get();
+		} else if (cmd instanceof PushCommand) {
+			instantEffect(((PushCommand) cmd).effect, affectedCharacters);
 
-			for (MapPoint p : path.subList(2, path.size())) {
-				if (!end.add(v).equals(p)) {
-					stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
-					start = end;
-					v = p.subtract(start);
-				}
-				end = p;
-			}
-
-			stage.queueMoveSprite(s, start, end, "walk", walkSpeed);
+		} else if (cmd instanceof InstantEffectCommand) {
+			instantEffect(((InstantEffectCommand) cmd).effect, affectedCharacters);
 
 		} else if (cmd instanceof ResignCommand) {
 			if (((ResignCommand) cmd).player != player) {
@@ -495,6 +489,77 @@ public class BattleView
 		}
 
 		updateCharacters(affectedCharacters);
+	}
+
+	private void instantEffect(
+		InstantEffect effect, List<Character> affectedCharacters
+	) {
+		Stage stage = canvas.getStage();
+
+		if (effect instanceof Push) {
+			Push push = (Push) effect;
+			if (push.paths.size() != affectedCharacters.size()) {
+				throw new RuntimeException("Invalid push, this cannot happen");
+			}
+
+			for (int i = 0; i < push.paths.size(); i++) {
+				scheduleMovement("idle", pushSpeed,
+					push.paths.get(i), affectedCharacters.get(i));
+			}
+
+		} else if (effect instanceof Pull) {
+			Pull pull = (Pull) effect;
+			if (pull.paths.size() != affectedCharacters.size()) {
+				throw new RuntimeException("Invalid pull, this cannot happen");
+			}
+
+			for (int i = 0; i < pull.paths.size(); i++) {
+				scheduleMovement("idle", pushSpeed,
+					pull.paths.get(i), affectedCharacters.get(i));
+			}
+
+		} else if (effect instanceof Teleport) {
+			Teleport teleport = (Teleport) effect;
+			List<MapPoint> destinations = teleport.getDestinations();
+			if (destinations == null || destinations.size() != affectedCharacters.size()) {
+				throw new RuntimeException("Invalid teleport, this cannot happen");
+			}
+
+			for (int i = 0; i < destinations.size(); i++) {
+				MapPoint tile = affectedCharacters.get(i).getPos();
+				int id = affectedCharacters.get(i).id;
+				Sprite s = stage.getSpritesByTile(tile).stream()
+					.filter(x -> x.userData.equals(id)).findFirst().get();
+				stage.removeSprite(s);
+				s.pos = destinations.get(i);
+				stage.addSprite(s);
+			}
+		}
+	}
+
+	private void scheduleMovement(
+		String animation, double speed, List<MapPoint> path, Character affected
+	) {
+		setMode(ANIMATING);
+		Stage stage = canvas.getStage();
+		MapPoint start = path.get(0);
+		MapPoint end = path.get(1);
+		MapPoint v = end.subtract(start);
+
+		int id = affected.id;
+		Sprite s = stage.getSpritesByTile(start).stream()
+			.filter(x -> x.userData.equals(id)).findFirst().get();
+
+		for (MapPoint p : path.subList(2, path.size())) {
+			if (!end.add(v).equals(p)) {
+				stage.queueMoveSprite(s, start, end, animation, speed);
+				start = end;
+				v = p.subtract(start);
+			}
+			end = p;
+		}
+
+		stage.queueMoveSprite(s, start, end, animation, speed);
 	}
 
 	private void updateCharacters(List<Character> characters) {

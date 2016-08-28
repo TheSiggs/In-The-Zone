@@ -21,7 +21,7 @@ import org.json.simple.JSONObject;
 
 public class Pull implements InstantEffect {
 	private final MapPoint castFrom;
-	private final List<List<MapPoint>> paths;
+	public final List<List<MapPoint>> paths;
 
 	private Pull(
 		MapPoint castFrom, List<List<MapPoint>> paths

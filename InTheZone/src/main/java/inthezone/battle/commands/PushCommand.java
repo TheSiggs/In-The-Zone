@@ -13,10 +13,8 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONObject;
 
 public class PushCommand extends Command {
-	public static final int DEFAULT_PUSH_AMOUNT = 1;
-
 	private final MapPoint agent;
-	private final Push effect;
+	public final Push effect;
 	private final boolean effective; // determines if the push is effective
 
 	public PushCommand(MapPoint agent, Push effect, boolean effective) {

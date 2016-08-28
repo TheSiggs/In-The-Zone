@@ -20,7 +20,7 @@ import org.json.simple.JSONObject;
 
 public class Push implements InstantEffect {
 	private final MapPoint castFrom;
-	private final List<List<MapPoint>> paths;
+	public final List<List<MapPoint>> paths;
 
 	private Push(
 		MapPoint castFrom, List<List<MapPoint>> paths

@@ -567,6 +567,8 @@ public class BattleView
 			}
 
 		} else if (effect instanceof Teleport) {
+			System.err.println("Teleport!");
+
 			Teleport teleport = (Teleport) effect;
 			List<MapPoint> destinations = teleport.getDestinations();
 			if (destinations == null || destinations.size() != affectedCharacters.size()) {
@@ -574,8 +576,8 @@ public class BattleView
 			}
 
 			for (int i = 0; i < destinations.size(); i++) {
-				MapPoint tile = affectedCharacters.get(i).getPos();
 				int id = affectedCharacters.get(i).id;
+				MapPoint tile = characters.get(id).getPos();
 				Sprite s = stage.getSpritesByTile(tile).stream()
 					.filter(x -> x.userData.equals(id)).findFirst().get();
 				stage.removeSprite(s);
@@ -583,6 +585,8 @@ public class BattleView
 				stage.addSprite(s);
 			}
 		}
+
+		updateCharacters(affectedCharacters);
 	}
 
 	private void scheduleMovement(

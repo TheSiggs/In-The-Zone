@@ -118,13 +118,13 @@ public class BattleInProgress implements Runnable {
 		while(true) {
 			try {
 				Action a = commandRequests.take();
+				System.err.println("Handle action");
 
 				// handle a command request
 				if (a.crq.isPresent()) {
 					try {
 						commandQueue.addAll(a.crq.get().makeCommand(battle.battleState));
-						doCommands();
-
+						if (doCommands()) return;
 					} catch (CommandException e) {
 						Platform.runLater(() -> listener.badCommand(e));
 					}
@@ -149,23 +149,20 @@ public class BattleInProgress implements Runnable {
 						a.subject.getPos(), a.castFrom, a.ability, a.target)));
 
 				// handle command completion
-				a.completion.ifPresent(completion -> {
+				if (a.completion.isPresent()) {
 					try {
 						Command cmd = commandQueue.peek();
 						if (cmd == null)
 							throw new CommandException("No command to complete");
 						InstantEffectCommand i = (InstantEffectCommand) cmd;
-						i.complete(completion);
-					} catch (CommandException e) {
-						Platform.runLater(() -> listener.badCommand(e));
+						i.complete(a.completion.get());
+
+						if (doCommands()) return;
 					} catch (ClassCastException e) {
 						Platform.runLater(() -> listener.badCommand(
 							new CommandException("Expected instant effect command", e)));
 					}
-				});
-
-				// Execute any commands left on the queue
-				if (doCommands()) return;
+				}
 			} catch (InterruptedException e) {
 				// Do nothing
 			} catch (CommandException e) {
@@ -179,7 +176,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	private boolean doCommands() throws CommandException {
 		while (!commandQueue.isEmpty()) {
-			Command cmd = commandQueue.poll();
+			Command cmd = commandQueue.peek();
 
 			if (cmd instanceof InstantEffectCommand) {
 				InstantEffectCommand i = (InstantEffectCommand) cmd;
@@ -188,6 +185,8 @@ public class BattleInProgress implements Runnable {
 					return false;
 				}
 			}
+
+			commandQueue.poll();
 
 			if (network != null) network.sendCommand(cmd);
 

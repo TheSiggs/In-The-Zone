@@ -42,7 +42,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		List<MapPoint> postTargets = new ArrayList<>();
 		for (DamageToTarget t : allTargets) {
 			if (t.pre) preTargets.add(t.target);
-			if (t.post) preTargets.add(t.target);
+			if (t.post) postTargets.add(t.target);
 		}
 
 		List<Command> r = new ArrayList<>();

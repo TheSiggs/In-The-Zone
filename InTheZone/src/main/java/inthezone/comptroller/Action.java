@@ -15,7 +15,7 @@ import java.util.Optional;
 class Action {
 	public final Optional<CommandRequest> crq;
 
-	public final Optional<MapPoint> completion;
+	public final Optional<List<MapPoint>> completion;
 
 	// the subject of move range and targeting information requests
 	public final Character subject;
@@ -27,7 +27,7 @@ class Action {
 	public final Optional<CompletableFuture<List<MapPoint>>> path;
 	public final Optional<CompletableFuture<Collection<MapPoint>>> attackArea;
 
-	public Action(MapPoint completion) {
+	public Action(List<MapPoint> completion) {
 		this.crq = Optional.empty();
 		this.completion = Optional.of(completion);
 		this.subject = null;

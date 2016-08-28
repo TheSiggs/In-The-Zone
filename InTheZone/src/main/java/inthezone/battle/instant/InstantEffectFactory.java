@@ -7,6 +7,7 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.Collection;
+import java.util.List;
 import org.json.simple.JSONObject;
 
 /**
@@ -18,7 +19,7 @@ public class InstantEffectFactory {
 		InstantEffectInfo info,
 		MapPoint castFrom,
 		Collection<MapPoint> attackArea,
-		Collection<MapPoint> targets
+		List<MapPoint> targets
 	) {
 		switch (info.type) {
 			case CLEANSE: return Cleanse.getEffect(targets);

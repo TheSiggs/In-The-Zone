@@ -119,6 +119,6 @@ public class Push implements InstantEffect {
 	}
 
 	@Override public boolean isComplete() {return true;}
-	@Override public boolean complete(MapPoint p) {return true;}
+	@Override public boolean complete(List<MapPoint> p) {return true;}
 }
 

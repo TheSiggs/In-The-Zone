@@ -38,8 +38,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					.collect(Collectors.toList())
 			).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
-		Collection<MapPoint> preTargets = new ArrayList<>();
-		Collection<MapPoint> postTargets = new ArrayList<>();
+		List<MapPoint> preTargets = new ArrayList<>();
+		List<MapPoint> postTargets = new ArrayList<>();
 		for (DamageToTarget t : allTargets) {
 			if (t.pre) preTargets.add(t.target);
 			if (t.post) preTargets.add(t.target);

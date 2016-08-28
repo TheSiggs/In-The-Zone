@@ -1,0 +1,107 @@
+package inthezone.battle.instant;
+
+import inthezone.battle.Battle;
+import inthezone.battle.Character;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.protocol.ProtocolException;
+import isogame.engine.CorruptDataException;
+import isogame.engine.HasJSONRepresentation;
+import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+public class Teleport implements InstantEffect {
+	public final List<MapPoint> targets;
+	private List<MapPoint> destinations;
+
+	private Teleport(
+		List<MapPoint> targets, List<MapPoint> destinations
+	) {
+		this.targets = targets;
+		this.destinations = destinations;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override public JSONObject getJSON() {
+		JSONObject o = new JSONObject();
+		o.put("kind", InstantEffectType.TELEPORT.toString());
+
+		JSONArray ts = new JSONArray();
+		JSONArray ds = new JSONArray();
+		for (MapPoint t : targets) ts.add(t.getJSON());
+		for (MapPoint d : destinations) ds.add(d.getJSON());
+
+		o.put("targets", ts);
+		o.put("destinations", ds);
+		return o;
+	}
+
+	public static Teleport fromJSON(JSONObject json)
+		throws ProtocolException
+	{
+		Object okind = json.get("kind");
+		Object otargets = json.get("targets");
+		Object odestinations = json.get("destinations");
+
+		if (okind == null) throw new ProtocolException("Missing effect type");
+		if (otargets == null) throw new ProtocolException("Missing effect targets");
+		if (odestinations == null) throw new ProtocolException("Missing effect destinations");
+
+		try {
+			if (InstantEffectType.fromString((String) okind) != InstantEffectType.TELEPORT)
+				throw new ProtocolException("Expected teleport effect");
+
+			List<MapPoint> targets = new ArrayList<>();
+			List<MapPoint> destinations = new ArrayList<>();
+
+			JSONArray rawTargets = (JSONArray) otargets;
+			JSONArray rawDestinations = (JSONArray) odestinations;
+			for (int i = 0; i < rawTargets.size(); i++) {
+				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
+			}
+			for (int i = 0; i < rawDestinations.size(); i++) {
+				destinations.add(MapPoint.fromJSON((JSONObject) rawDestinations.get(i)));
+			}
+
+			return new Teleport(targets, destinations);
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Error parsing teleport effect", e);
+		} catch (CorruptDataException e) {
+			throw new ProtocolException("Error parsing teleport effect", e);
+		}
+	}
+
+	public static Teleport getEffect(
+		List<MapPoint> targets
+	) {
+		return new Teleport(targets, null);
+	}
+
+	@Override public List<Character> apply(Battle battle)
+		throws CommandException
+	{
+		if (destinations == null || targets.size() != destinations.size())
+			throw new CommandException("Attempted to apply incomplete teleport");
+
+		List<Character> r = new ArrayList<>();
+		for (int i = 0; i < targets.size(); i++) {
+			r.addAll(battle.doTeleport(targets.get(i), destinations.get(i)));
+		}
+
+		return r;
+	}
+
+	@Override public boolean isComplete() {return !(destinations == null);}
+	@Override public boolean complete(List<MapPoint> ps) {
+		destinations = new ArrayList<>();
+		destinations.addAll(ps);
+		return destinations != null && targets.size() == destinations.size();
+	}
+}
+
+

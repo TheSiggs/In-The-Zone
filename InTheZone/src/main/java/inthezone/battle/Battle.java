@@ -36,9 +36,6 @@ public class Battle {
 		});
 	}
 
-	public void doAttack(MapPoint agent, Collection<DamageToTarget> targets) {
-	}
-
 	public void doAbility(
 		MapPoint agent,
 		Ability ability,
@@ -69,6 +66,13 @@ public class Battle {
 		});
 
 		return r;
+	}
+
+	public List<Character> doTeleport(MapPoint source, MapPoint destination) {
+		return battleState.getCharacterAt(source).map(c -> {
+			c.teleport(destination, battleState.hasMana(destination));
+			return Stream.of(c);
+		}).orElse(Stream.empty()).collect(Collectors.toList());
 	}
 
 	public List<Character> doCleanse(MapPoint target) {

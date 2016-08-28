@@ -2,10 +2,14 @@ package inthezone.battle.commands;
 
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
+import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.Stats;
+import inthezone.battle.instant.Push;
 import inthezone.battle.Targetable;
+import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +17,17 @@ public class PushCommandRequest extends CommandRequest {
 	private final MapPoint agent;
 	private final MapPoint target;
 
+	private final InstantEffectInfo pushEffect;
+
 	public PushCommandRequest(MapPoint agent, MapPoint target) {
 		this.agent = agent;
 		this.target = target;
+
+		try {
+			pushEffect = new InstantEffectInfo("push 1");
+		} catch (CorruptDataException e) {
+			throw new RuntimeException("This cannot happen");
+		}
 	}
 
 	@Override
@@ -23,10 +35,14 @@ public class PushCommandRequest extends CommandRequest {
 		Targetable t = battleState.getTargetableAt(target)
 			.orElseThrow(() -> new CommandException("Invalid push command"));
 
+		Collection<MapPoint> targets = new ArrayList<>();
+		targets.add(target);
+
 		Command r = battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {
 				boolean effective = t.isPushable();
-				return Optional.of(new PushCommand(agent, target, effective));
+				return Optional.of(new PushCommand(agent, Push.getEffect(
+					battleState, pushEffect, agent, targets), effective));
 			}
 
 			return Optional.empty();

@@ -1,5 +1,6 @@
 package inthezone.battle.instant;
 
+import inthezone.battle.BattleState;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.protocol.ProtocolException;
@@ -13,6 +14,7 @@ import org.json.simple.JSONObject;
  * */
 public class InstantEffectFactory {
 	public static InstantEffect getEffect(
+		BattleState battleState,
 		InstantEffectInfo info,
 		MapPoint castFrom,
 		Collection<MapPoint> attackArea,
@@ -20,7 +22,7 @@ public class InstantEffectFactory {
 	) {
 		switch (info.type) {
 			case CLEANSE: return Cleanse.getEffect(targets);
-			case PUSH: return Push.getEffect(info, castFrom, targets);
+			case PUSH: return Push.getEffect(battleState, info, castFrom, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}
 	}

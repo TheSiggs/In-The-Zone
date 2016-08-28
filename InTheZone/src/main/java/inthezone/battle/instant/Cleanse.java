@@ -57,7 +57,7 @@ public class Cleanse implements InstantEffect {
 		}
 	}
 
-	public static InstantEffect getEffect(
+	public static Cleanse getEffect(
 		Collection<MapPoint> targets
 	) {
 		return new Cleanse(targets);

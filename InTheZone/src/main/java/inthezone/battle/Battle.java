@@ -58,23 +58,17 @@ public class Battle {
 	public void doUseItem(MapPoint agent, Item item) {
 	}
 
-	public List<Character> doPush(MapPoint agent, MapPoint target, int amount) {
-		if (agent.x == target.x || agent.y == target.y) {
-			MapPoint dp = target.subtract(agent).normalise();
-			MapPoint x = target;
-			for (int i = 0; i < amount; i++) {
-				MapPoint z = x.add(dp);
-				if (battleState.isSpaceFree(z)) x = z; else break;
-			}
+	public List<Character> doPush(List<MapPoint> path) {
+		List<Character> r = new ArrayList<>();
+		if (path.size() < 2) return r;
 
-			final MapPoint destination = x;
-			return battleState.getCharacterAt(target).map(c -> {
-				c.teleport(destination, battleState.hasMana(destination));
-				return Stream.of(c);
-			}).orElse(Stream.empty()).collect(Collectors.toList());
-		} else {
-			return new ArrayList<>();
-		}
+		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
+			MapPoint t = path.get(path.size() - 1);
+			c.teleport(t, battleState.hasMana(t));
+			r.add(c);
+		});
+
+		return r;
 	}
 
 	public List<Character> doCleanse(MapPoint target) {

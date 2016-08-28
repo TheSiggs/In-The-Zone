@@ -2,6 +2,7 @@ package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
+import inthezone.battle.instant.Push;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -15,12 +16,12 @@ public class PushCommand extends Command {
 	public static final int DEFAULT_PUSH_AMOUNT = 1;
 
 	private final MapPoint agent;
-	private final MapPoint target;
+	private final Push effect;
 	private final boolean effective; // determines if the push is effective
 
-	public PushCommand(MapPoint agent, MapPoint target, boolean effective) {
+	public PushCommand(MapPoint agent, Push effect, boolean effective) {
 		this.agent = agent;
-		this.target = target;
+		this.effect = effect;
 		this.effective = effective;
 	}
 
@@ -30,7 +31,7 @@ public class PushCommand extends Command {
 		JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.PUSH.toString());
 		r.put("agent", agent);
-		r.put("target", target);
+		r.put("effect", effect.getJSON());
 		r.put("effective", effective);
 		return r;
 	}
@@ -40,12 +41,12 @@ public class PushCommand extends Command {
 	{
 		Object okind = json.get("kind");
 		Object oagent = json.get("agent");
-		Object otarget = json.get("target");
+		Object oeffect = json.get("effect");
 		Object oeffective = json.get("effective");
 
 		if (okind == null) throw new ProtocolException("Missing command type");
 		if (oagent == null) throw new ProtocolException("Missing push agent");
-		if (otarget == null) throw new ProtocolException("Missing push target");
+		if (oeffect == null) throw new ProtocolException("Missing push effect");
 		if (oeffective == null) throw new ProtocolException("Missing push effective");
 
 		if (CommandKind.fromString((String) okind) != CommandKind.PUSH)
@@ -53,9 +54,9 @@ public class PushCommand extends Command {
 
 		try {
 			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			MapPoint target = MapPoint.fromJSON((JSONObject) otarget);
+			Push effect = Push.fromJSON((JSONObject) oeffect);
 			boolean effective = (Boolean) oeffective;
-			return new PushCommand(agent, target, effective);
+			return new PushCommand(agent, effect, effective);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing push command", e);
 		} catch (CorruptDataException e) {
@@ -65,15 +66,11 @@ public class PushCommand extends Command {
 
 	@Override
 	public List<Character> doCmd(Battle battle) throws CommandException {
-		Collection<Character> r = new ArrayList<>();
-		battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
-		battle.battleState.getCharacterAt(target).ifPresent(c -> r.add(c));
-
 		if (effective) {
-			battle.doPush(agent, target, DEFAULT_PUSH_AMOUNT);
+			return effect.apply(battle);
+		} else {
+			return new ArrayList<>();
 		}
-
-		return r.stream().map(c -> c.clone()).collect(Collectors.toList());
 	}
 }
 

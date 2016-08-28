@@ -52,7 +52,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
 			targetArea = battleState.getTargetableArea(agent, castFrom, ability);
 			r.add(new InstantEffectCommand(InstantEffectFactory.getEffect(
-				ability.info.instantBefore.get(), castFrom, targetArea, preTargets)));
+				battleState, ability.info.instantBefore.get(),
+				castFrom, targetArea, preTargets)));
 		}
 
 		// Main damage
@@ -69,7 +70,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 				battleState.getTargetableArea(agent, castFrom, ability);
 
 			r.add(new InstantEffectCommand(InstantEffectFactory.getEffect(
-				ability.info.instantAfter.get(), castFrom, targetArea, preTargets)));
+				battleState, ability.info.instantAfter.get(),
+				castFrom, targetArea, preTargets)));
 		}
 
 		return r;

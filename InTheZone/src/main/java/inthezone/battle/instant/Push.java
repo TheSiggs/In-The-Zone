@@ -1,6 +1,7 @@
 package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
@@ -18,15 +19,13 @@ import org.json.simple.JSONObject;
 
 public class Push implements InstantEffect {
 	private final MapPoint castFrom;
-	private final Collection<MapPoint> targets;
-	private final int amount;
+	private final List<List<MapPoint>> paths;
 
 	private Push(
-		MapPoint castFrom, Collection<MapPoint> targets, int amount
+		MapPoint castFrom, List<List<MapPoint>> paths
 	) {
 		this.castFrom = castFrom;
-		this.targets = targets;
-		this.amount = amount;
+		this.paths = paths;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -34,10 +33,13 @@ public class Push implements InstantEffect {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
 		o.put("kind", InstantEffectType.PUSH.toString());
-		o.put("amount", amount);
 		o.put("castFrom", castFrom.getJSON());
-		for (MapPoint t : targets) a.add(t.getJSON());
-		o.put("targets", a);
+		for (List<MapPoint> path : paths) {
+			JSONArray pp = new JSONArray();
+			for (MapPoint p : path) pp.add(p.getJSON());
+			a.add(pp);
+		}
+		o.put("paths", a);
 		return o;
 	}
 
@@ -46,46 +48,74 @@ public class Push implements InstantEffect {
 	{
 		Object okind = json.get("kind");
 		Object ocastFrom = json.get("castFrom");
-		Object otargets = json.get("targets");
-		Object oamount = json.get("amount");
+		Object opaths = json.get("paths");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
 		if (ocastFrom == null) throw new ProtocolException("Missing tile where effect acts from");
-		if (otargets == null) throw new ProtocolException("Missing effect targets");
-		if (oamount == null) throw new ProtocolException("Missing effect amount");
+		if (opaths == null) throw new ProtocolException("Missing effect paths");
 
 		try {
 			if (InstantEffectType.fromString((String) okind) != InstantEffectType.PUSH)
 				throw new ProtocolException("Expected push effect");
 
-			Number amount = (Number) oamount;
 			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
-			JSONArray rawTargets = (JSONArray) otargets;
-			List<MapPoint> targets = new ArrayList<>();
-			for (int i = 0; i < rawTargets.size(); i++) {
-				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
+			JSONArray rawPaths = (JSONArray) opaths;
+			List<List<MapPoint>> paths = new ArrayList<>();
+			for (int i = 0; i < rawPaths.size(); i++) {
+				List<MapPoint> path = new ArrayList<>();
+				JSONArray rawPath = (JSONArray) rawPaths.get(i);
+				for (int j = 0; j < rawPath.size(); j++) {
+					path.add(MapPoint.fromJSON((JSONObject) rawPath.get(j)));
+				}
+
+				paths.add(path);
 			}
-			return new Push(castFrom, targets, amount.intValue());
+			return new Push(castFrom, paths);
 		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing cleanse effect", e);
+			throw new ProtocolException("Error parsing push effect", e);
 		} catch (CorruptDataException e) {
-			throw new ProtocolException("Error parsing cleanse effect", e);
+			throw new ProtocolException("Error parsing push effect", e);
 		}
 	}
 
-	public static InstantEffect getEffect(
-		InstantEffectInfo info, MapPoint castFrom, Collection<MapPoint> targets
+	public static Push getEffect(
+		BattleState battle,
+		InstantEffectInfo info,
+		MapPoint castFrom,
+		Collection<MapPoint> targets
 	) {
-		return new Push(castFrom, targets, info.param);
+		List<List<MapPoint>> paths = new ArrayList<>();
+
+		List<MapPoint> sortedTargets = new ArrayList<>(targets);
+		sortedTargets.sort(Comparator.comparingInt(x -> castFrom.distance(x)));
+
+		for (MapPoint t : sortedTargets) {
+			if (castFrom.x == t.x || castFrom.y == t.y) {
+				MapPoint dp = t.subtract(castFrom).normalise();
+				List<MapPoint> path = new ArrayList<>();
+
+				MapPoint x = t;
+				path.add(x);
+				for (int i = 0; i < info.param; i++) {
+					MapPoint z = x.add(dp);
+					if (!battle.isSpaceFree(z)) break; else {
+						x = z;
+						path.add(x);
+					}
+				}
+
+				paths.add(path);
+			}
+		}
+
+		return new Push(castFrom, paths);
 	}
 
 	@Override public List<Character> apply(Battle battle) {
-		return targets.stream()
-			.sorted(Comparator.comparingInt(x -> castFrom.distance(x)))
-			.flatMap(t ->
-				battle.doPush(castFrom, t, amount).stream())
+		return paths.stream()
+			.filter(p -> p.size() >= 2)
+			.flatMap(path -> battle.doPush(path).stream())
 			.collect(Collectors.toList());
 	}
 }
-
 

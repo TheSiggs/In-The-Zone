@@ -24,6 +24,8 @@ public class InstantEffectFactory {
 		switch (info.type) {
 			case CLEANSE: return Cleanse.getEffect(targets);
 			case PUSH: return Push.getEffect(battleState, info, castFrom, targets);
+			case PULL: return Pull.getEffect(battleState, info, castFrom, targets);
+			case TELEPORT: return Teleport.getEffect(battleState, info, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}
 	}
@@ -36,6 +38,8 @@ public class InstantEffectFactory {
 			switch (kind) {
 				case CLEANSE: return Cleanse.fromJSON(o);
 				case PUSH: return Push.fromJSON(o);
+				case PULL: return Pull.fromJSON(o);
+				case TELEPORT: return Teleport.fromJSON(o);
 				default: throw new ProtocolException("Unimplemented effect " + kind);
 			}
 		} catch (ClassCastException e) {

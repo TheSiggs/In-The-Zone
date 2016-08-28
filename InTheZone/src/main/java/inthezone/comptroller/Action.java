@@ -22,10 +22,12 @@ class Action {
 	public final MapPoint castFrom;
 	public final Ability ability;
 	public final MapPoint target;
+	public final int range;
 	public final Optional<CompletableFuture<Collection<MapPoint>>> moveRange;
 	public final Optional<CompletableFuture<Collection<MapPoint>>> targeting;
 	public final Optional<CompletableFuture<List<MapPoint>>> path;
 	public final Optional<CompletableFuture<Collection<MapPoint>>> attackArea;
+	public final Optional<CompletableFuture<Collection<MapPoint>>> teleportRange;
 
 	public Action(List<MapPoint> completion) {
 		this.crq = Optional.empty();
@@ -34,10 +36,12 @@ class Action {
 		this.castFrom = null;
 		this.ability = null;
 		this.target = null;
+		this.range = 0;
 		this.moveRange = Optional.empty();
 		this.targeting = Optional.empty();
 		this.path = Optional.empty();
 		this.attackArea = Optional.empty();
+		this.teleportRange = Optional.empty();
 	}
 
 	public Action(CommandRequest crq) {
@@ -47,17 +51,26 @@ class Action {
 		this.castFrom = null;
 		this.ability = null;
 		this.target = null;
+		this.range = 0;
 		this.moveRange = Optional.empty();
 		this.targeting = Optional.empty();
 		this.path = Optional.empty();
 		this.attackArea = Optional.empty();
+		this.teleportRange = Optional.empty();
 	}
 
 	public static Action moveRange(
 		Character subject,
 		CompletableFuture<Collection<MapPoint>> r
 	) {
-		return new Action(subject, null, null, null, r, null, null, null);
+		return new Action(subject, null, null, null, 0, r, null, null, null, null);
+	}
+
+	public static Action teleportRange(
+		Character subject, int range,
+		CompletableFuture<Collection<MapPoint>> r
+	) {
+		return new Action(subject, null, null, null, range, null, null, null, null, r);
 	}
 
 	public static Action path(
@@ -65,7 +78,7 @@ class Action {
 		MapPoint target,
 		CompletableFuture<List<MapPoint>> r
 	) {
-		return new Action(subject, null, null, target, null, null, r, null);
+		return new Action(subject, null, null, target, 0, null, null, r, null, null);
 	}
 
 	public static Action targeting(
@@ -74,7 +87,7 @@ class Action {
 		Ability a,
 		CompletableFuture<Collection<MapPoint>> r
 	) {
-		return new Action(subject, castFrom, a, null, null, r, null, null);
+		return new Action(subject, castFrom, a, null, 0, null, r, null, null, null);
 	}
 
 	public static Action attackArea(
@@ -84,7 +97,7 @@ class Action {
 		Ability a,
 		CompletableFuture<Collection<MapPoint>> r
 	) {
-		return new Action(subject, castFrom, a, target, null, null, null, r);
+		return new Action(subject, castFrom, a, target, 0, null, null, null, r, null);
 	}
 
 	private Action(
@@ -92,10 +105,12 @@ class Action {
 		MapPoint castFrom,
 		Ability ability,
 		MapPoint target,
+		int range,
 		CompletableFuture<Collection<MapPoint>> moveRange,
 		CompletableFuture<Collection<MapPoint>> targeting,
 		CompletableFuture<List<MapPoint>> path,
-		CompletableFuture<Collection<MapPoint>> attackArea
+		CompletableFuture<Collection<MapPoint>> attackArea,
+		CompletableFuture<Collection<MapPoint>> teleportRange
 	) {
 		this.crq = Optional.empty();
 		this.completion = Optional.empty();
@@ -103,10 +118,12 @@ class Action {
 		this.castFrom = castFrom;
 		this.ability = ability;
 		this.target = target;
+		this.range = range;
 		this.moveRange = Optional.ofNullable(moveRange);
 		this.targeting = Optional.ofNullable(targeting);
 		this.path = Optional.ofNullable(path);
 		this.attackArea = Optional.ofNullable(attackArea);
+		this.teleportRange = Optional.ofNullable(teleportRange);
 	}
 
 	public void cancel() {

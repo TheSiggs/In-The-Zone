@@ -96,6 +96,12 @@ public class BattleView
 	private MapPoint castFrom = null;
 	private Queue<MapPoint> recastFrom = new LinkedList<>();
 
+	// A queue of characters to retarget
+	private int teleportRange = 0;
+	private Character teleporting = null;
+	private Queue<Character> teleportQueue = new LinkedList<>();
+	private List<MapPoint> teleportDestinations = new ArrayList<>();
+
 	private BattleViewMode mode = SELECT;
 
 	// status properties for the HUD
@@ -233,6 +239,10 @@ public class BattleView
 					}
 					break;
 
+				case TELEPORT:
+					teleportDestinations.add(p);
+					setMode(TELEPORT);
+
 				case TARGET:
 					if (canvas.isSelectable(p)) {
 						addTarget(p);
@@ -246,7 +256,7 @@ public class BattleView
 	}
 
 	private void setMode(BattleViewMode mode) {
-		Stage stage;
+		Stage stage = canvas.getStage();
 		Character c;
 
 		switch (mode) {
@@ -267,25 +277,38 @@ public class BattleView
 
 			case MOVE:
 				cancelAbility();
-				canvas.getStage().clearAllHighlighting();
+				stage.clearAllHighlighting();
 				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
 					"Attempted to move but no character was selected"));
 
-				stage = canvas.getStage();
 				getFutureWithRetry(battle.getMoveRange(c)).ifPresent(mr -> {
 					mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
 					canvas.setSelectable(mr);
 				});
 				break;
 
+			case TELEPORT:
+				teleporting = teleportQueue.poll();
+				if (teleporting == null) {
+					battle.completeEffect(teleportDestinations);
+					setMode(MOVE);
+				} else {
+					canvas.getStage().clearAllHighlighting();
+					getFutureWithRetry(battle.getTeleportRange(teleporting, teleportRange))
+						.ifPresent(mr -> {
+							mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
+							canvas.setSelectable(mr);
+						});
+				}
+				break;
+
 			case TARGET:
-				canvas.getStage().clearAllHighlighting();
+				stage.clearAllHighlighting();
 				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
 					"Attempted to move but no character was selected"));
 				if (!targetingAbility.isPresent())
 					throw new RuntimeException("Attempted to target null ability");
 
-				stage = canvas.getStage();
 				if (targetingAbility.get().recursionLevel > 0) {
 					this.castFrom = recastFrom.poll();
 					if (castFrom == null) {
@@ -599,8 +622,16 @@ public class BattleView
 
 	@Override
 	public void completeEffect(InstantEffect e) {
-		// TODO: command completion
-		System.err.println("Need to complete instant effect");
+		if (e instanceof Teleport) {
+			Teleport teleport = (Teleport) e;
+			teleportRange = teleport.range;
+			teleportQueue.clear();
+			teleportQueue.addAll(teleport.affectedCharacters);
+			teleportDestinations.clear();
+			setMode(TELEPORT);
+		} else {
+			throw new RuntimeException("Cannot complete instant effect " + e);
+		}
 	}
 }
 

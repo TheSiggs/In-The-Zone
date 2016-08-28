@@ -1,6 +1,7 @@
 package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.data.InstantEffectInfo;
@@ -12,16 +13,26 @@ import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Teleport implements InstantEffect {
-	public final List<MapPoint> targets;
+	public final int range;
+	public final List<Character> affectedCharacters;
+
+	private final List<MapPoint> targets;
 	private List<MapPoint> destinations;
 
 	private Teleport(
-		List<MapPoint> targets, List<MapPoint> destinations
+		List<Character> affectedCharacters,
+		int range,
+		List<MapPoint> targets,
+		List<MapPoint> destinations
 	) {
+		this.affectedCharacters = affectedCharacters;
+		this.range = range;
 		this.targets = targets;
 		this.destinations = destinations;
 	}
@@ -34,6 +45,7 @@ public class Teleport implements InstantEffect {
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		o.put("kind", InstantEffectType.TELEPORT.toString());
+		o.put("range", range);
 
 		JSONArray ts = new JSONArray();
 		JSONArray ds = new JSONArray();
@@ -49,10 +61,12 @@ public class Teleport implements InstantEffect {
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
+		Object orange = json.get("range");
 		Object otargets = json.get("targets");
 		Object odestinations = json.get("destinations");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
+		if (orange == null) throw new ProtocolException("Missing effect range");
 		if (otargets == null) throw new ProtocolException("Missing effect targets");
 		if (odestinations == null) throw new ProtocolException("Missing effect destinations");
 
@@ -72,7 +86,8 @@ public class Teleport implements InstantEffect {
 				destinations.add(MapPoint.fromJSON((JSONObject) rawDestinations.get(i)));
 			}
 
-			return new Teleport(targets, destinations);
+			Number range = (Number) orange;
+			return new Teleport(null, range.intValue(), targets, destinations);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing teleport effect", e);
 		} catch (CorruptDataException e) {
@@ -81,9 +96,13 @@ public class Teleport implements InstantEffect {
 	}
 
 	public static Teleport getEffect(
-		List<MapPoint> targets
+		BattleState battle, InstantEffectInfo info, List<MapPoint> targets
 	) {
-		return new Teleport(targets, null);
+		List<Character> affected = targets.stream()
+			.flatMap(x -> battle.getCharacterAt(x)
+				.map(v -> Stream.of(v)).orElse(Stream.empty()))
+			.collect(Collectors.toList());
+		return new Teleport(affected, info.param, targets, null);
 	}
 
 	@Override public List<Character> apply(Battle battle)

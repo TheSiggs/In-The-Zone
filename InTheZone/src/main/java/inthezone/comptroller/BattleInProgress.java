@@ -14,6 +14,7 @@ import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
+import inthezone.battle.LineOfSight;
 import isogame.engine.MapPoint;
 import javafx.application.Platform;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BattleInProgress implements Runnable {
 	private final Battle battle;
@@ -134,6 +136,8 @@ public class BattleInProgress implements Runnable {
 				a.path.ifPresent(path ->
 					path.complete(battle.battleState.findValidPath(
 						a.subject.getPos(), a.target, a.subject.player)));
+				a.teleportRange.ifPresent(teleportRange ->
+					teleportRange.complete(computeTeleportRange(a.subject, a.range)));
 
 				// handle targeting request
 				a.targeting.ifPresent(targeting -> {
@@ -274,6 +278,13 @@ public class BattleInProgress implements Runnable {
 		return r;
 	}
 
+	private Collection<MapPoint> computeTeleportRange(Character c, int range) {
+		Collection<MapPoint> diamond = LineOfSight.getDiamond(c.getPos(), range);
+		return diamond.stream()
+			.filter(p -> battle.battleState.isSpaceFree(p))
+			.collect(Collectors.toList());
+	}
+
 	/**
 	 * Get all of the possible targets for an ability.
 	 * */
@@ -301,6 +312,30 @@ public class BattleInProgress implements Runnable {
 			queueActionWithRetry(Action.attackArea(c, castFrom, target, a, r));
 		}
 		return r;
+	}
+
+	/**
+	 * Get all the tiles we can teleport to.
+	 * */
+	public synchronized Future<Collection<MapPoint>> getTeleportRange(
+		Character c, int range
+	) {
+		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
+
+		if (!accepting) r.cancel(true); else {
+			queueActionWithRetry(Action.teleportRange(c, range, r));
+		}
+		return r;
+	}
+
+	/**
+	 * Complete a command (e.g. a teleport command that requires extra targeting
+	 * information)
+	 * */
+	public synchronized void completeEffect(List<MapPoint> completion) {
+		if (accepting) {
+			queueActionWithRetry(new Action(completion));
+		}
 	}
 }
 

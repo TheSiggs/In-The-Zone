@@ -8,6 +8,7 @@ public enum BattleViewMode {
 	ANIMATING, // waiting for an animation to complete
 	SELECT, // waiting for a character to be selected
 	MOVE, // waiting for a move target
-	TARGET; // waiting for the player to select a target
+	TARGET, // waiting for the player to select a target
+	TELEPORT; // waiting for the player to select teleport targets
 }
 

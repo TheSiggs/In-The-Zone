@@ -4,6 +4,7 @@ import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.instant.InstantEffect;
 import java.util.List;
 
 /**
@@ -38,5 +39,10 @@ public interface BattleListener {
 	 * Execute a validated and not null command.
 	 * */
 	public void command(Command cmd, List<Character> affectedCharacters);
+
+	/**
+	 * Complete an instant effect with extra targeting information
+	 * */
+	public void completeEffect(InstantEffect e);
 }
 

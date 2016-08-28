@@ -9,6 +9,7 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
@@ -22,8 +23,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 
 public class BattleInProgress implements Runnable {
@@ -36,6 +39,8 @@ public class BattleInProgress implements Runnable {
 	private final Network network;
 	private final BlockingQueue<Action> commandRequests =
 		new LinkedBlockingQueue<>();
+	
+	private final Queue<Command> commandQueue = new LinkedList<>();
 	
 	public BattleInProgress(
 		StartBattleCommand cmd, Player thisPlayer,
@@ -115,20 +120,9 @@ public class BattleInProgress implements Runnable {
 				// handle a command request
 				if (a.crq.isPresent()) {
 					try {
-						List<Command> cmds = a.crq.get().makeCommand(battle.battleState);
+						commandQueue.addAll(a.crq.get().makeCommand(battle.battleState));
+						doCommands();
 
-						for (Command cmd : cmds) {
-							if (network != null) network.sendCommand(cmd);
-
-							List<Character> affectedCharacters = cmd.doCmd(battle);
-							Platform.runLater(() -> listener.command(cmd, affectedCharacters));
-
-							if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
-								return;
-							}
-
-							if (cmd instanceof EndTurnCommand) return;
-						}
 					} catch (CommandException e) {
 						Platform.runLater(() -> listener.badCommand(e));
 					}
@@ -149,10 +143,61 @@ public class BattleInProgress implements Runnable {
 				a.attackArea.ifPresent(attackArea ->
 					attackArea.complete(battle.battleState.getAffectedArea(
 						a.subject.getPos(), a.castFrom, a.ability, a.target)));
+
+				// handle command completion
+				a.completion.ifPresent(completion -> {
+					try {
+						Command cmd = commandQueue.peek();
+						if (cmd == null)
+							throw new CommandException("No command to complete");
+						InstantEffectCommand i = (InstantEffectCommand) cmd;
+						i.complete(completion);
+					} catch (CommandException e) {
+						Platform.runLater(() -> listener.badCommand(e));
+					} catch (ClassCastException e) {
+						Platform.runLater(() -> listener.badCommand(
+							new CommandException("Expected instant effect command", e)));
+					}
+				});
+
+				// Execute any commands left on the queue
+				if (doCommands()) return;
 			} catch (InterruptedException e) {
 				// Do nothing
+			} catch (CommandException e) {
+				Platform.runLater(() -> listener.badCommand(e));
 			}
 		}
+	}
+
+	/**
+	 * @return true to end turn, false otherwise
+	 * */
+	private boolean doCommands() throws CommandException {
+		while (!commandQueue.isEmpty()) {
+			Command cmd = commandQueue.poll();
+
+			if (cmd instanceof InstantEffectCommand) {
+				InstantEffectCommand i = (InstantEffectCommand) cmd;
+				if (!i.isCompletedOrRequestCompletion()) {
+					Platform.runLater(() -> listener.completeEffect(i.effect));
+					return false;
+				}
+			}
+
+			if (network != null) network.sendCommand(cmd);
+
+			List<Character> affectedCharacters = cmd.doCmd(battle);
+			Platform.runLater(() -> listener.command(cmd, affectedCharacters));
+
+			if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
+				return true;
+			}
+
+			if (cmd instanceof EndTurnCommand) return true;
+		}
+
+		return false;
 	}
 
 	private void otherTurn() {

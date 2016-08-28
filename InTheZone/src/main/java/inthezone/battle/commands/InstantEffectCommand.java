@@ -5,14 +5,44 @@ import inthezone.battle.Character;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.InstantEffectFactory;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.MapPoint;
 import java.util.List;
 import org.json.simple.JSONObject;
 
 public class InstantEffectCommand extends Command {
 	public final InstantEffect effect;
+	private boolean isComplete;
+	private boolean waitingForCompletion = false;
 
 	public InstantEffectCommand(InstantEffect effect) {
 		this.effect = effect;
+		isComplete = effect.isComplete();
+	}
+
+	/**
+	 * Returns true if the command is ready to run, otherwise false.
+	 * @throws CommandException if it is called while the command is already
+	 * waiting for completion.
+	 * */
+	public boolean isCompletedOrRequestCompletion() throws CommandException {
+		if (isComplete) return true; else {
+			if (waitingForCompletion) {
+				throw new CommandException("Incomplete instant effect");
+			} else {
+				waitingForCompletion = true;
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * Attempt to complete this command.
+	 * */
+	public void complete(MapPoint p) throws CommandException {
+		if (!effect.complete(p))
+			throw new CommandException("Could not complete instant effect");
+		isComplete = true;
+		waitingForCompletion = false;
 	}
 
 	@Override 

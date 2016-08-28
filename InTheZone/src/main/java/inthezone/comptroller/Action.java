@@ -15,6 +15,8 @@ import java.util.Optional;
 class Action {
 	public final Optional<CommandRequest> crq;
 
+	public final Optional<MapPoint> completion;
+
 	// the subject of move range and targeting information requests
 	public final Character subject;
 	public final MapPoint castFrom;
@@ -25,8 +27,22 @@ class Action {
 	public final Optional<CompletableFuture<List<MapPoint>>> path;
 	public final Optional<CompletableFuture<Collection<MapPoint>>> attackArea;
 
+	public Action(MapPoint completion) {
+		this.crq = Optional.empty();
+		this.completion = Optional.of(completion);
+		this.subject = null;
+		this.castFrom = null;
+		this.ability = null;
+		this.target = null;
+		this.moveRange = Optional.empty();
+		this.targeting = Optional.empty();
+		this.path = Optional.empty();
+		this.attackArea = Optional.empty();
+	}
+
 	public Action(CommandRequest crq) {
 		this.crq = Optional.of(crq);
+		this.completion = Optional.empty();
 		this.subject = null;
 		this.castFrom = null;
 		this.ability = null;
@@ -82,6 +98,7 @@ class Action {
 		CompletableFuture<Collection<MapPoint>> attackArea
 	) {
 		this.crq = Optional.empty();
+		this.completion = Optional.empty();
 		this.subject = subject;
 		this.castFrom = castFrom;
 		this.ability = ability;

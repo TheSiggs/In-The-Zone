@@ -117,5 +117,8 @@ public class Push implements InstantEffect {
 			.flatMap(path -> battle.doPush(path).stream())
 			.collect(Collectors.toList());
 	}
+
+	@Override public boolean isComplete() {return true;}
+	@Override public boolean complete(MapPoint p) {return true;}
 }
 

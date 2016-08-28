@@ -67,5 +67,8 @@ public class Cleanse implements InstantEffect {
 		return targets.stream().flatMap(t ->
 			battle.doCleanse(t).stream()).collect(Collectors.toList());
 	}
+
+	@Override public boolean isComplete() {return true;}
+	@Override public boolean complete(MapPoint p) {return true;}
 }
 

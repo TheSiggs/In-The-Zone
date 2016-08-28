@@ -17,6 +17,7 @@ import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
+import inthezone.battle.instant.InstantEffect;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
@@ -495,7 +496,7 @@ public class BattleView
 
 		updateCharacters(affectedCharacters);
 	}
-	
+
 	private void updateCharacters(List<Character> characters) {
 		if (this.characters == null) {
 			this.characters = new HashMap<>();
@@ -529,6 +530,12 @@ public class BattleView
 				this.characters.put(c.id, c);
 			}
 		}
+	}
+
+	@Override
+	public void completeEffect(InstantEffect e) {
+		// TODO: command completion
+		System.err.println("Need to complete instant effect");
 	}
 }
 

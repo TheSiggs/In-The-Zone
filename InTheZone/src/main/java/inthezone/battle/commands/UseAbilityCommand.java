@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -101,8 +102,9 @@ public class UseAbilityCommand extends Command {
 	@Override
 	public List<Character> doCmd(Battle battle) throws CommandException {
 		Ability abilityData = battle.battleState.getCharacterAt(agent)
-			.flatMap(c -> c.abilities.stream()
-				.filter(a -> a.info.name.equals(ability)).findFirst())
+			.flatMap(c -> Stream.concat(Stream.of(c.basicAbility),
+				c.abilities.stream()
+					.filter(a -> a.info.name.equals(ability))).findFirst())
 			.flatMap(a -> a.getNext(
 				battle.battleState.hasMana(agent), subsequentLevel, recursionLevel))
 			.orElseThrow(() -> new CommandException("Invalid ability command"));

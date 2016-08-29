@@ -35,7 +35,8 @@ public class BattleState {
 	 * Determine if a terrain tile is a mana zone
 	 * */
 	public boolean hasMana(MapPoint p) {
-		return terrain.terrain.getTile(p).isManaZone;
+		return terrain.terrain.hasTile(p) &&
+			terrain.terrain.getTile(p).isManaZone;
 	}
 
 	/**
@@ -112,8 +113,9 @@ public class BattleState {
 	 * Determine if it is possible to place a character in a particular tile.
 	 * */
 	public boolean isSpaceFree(MapPoint p) {
-		return !(terrainObstacles.contains(p) ||
-			characters.stream().anyMatch(c -> c.getPos().equals(p)));
+		return terrain.terrain.hasTile(p) &&
+			!(terrainObstacles.contains(p) ||
+				characters.stream().anyMatch(c -> c.getPos().equals(p)));
 	}
 
 	/**
@@ -168,6 +170,8 @@ public class BattleState {
 	private List<MapPoint> getLOS(
 		MapPoint from, MapPoint to, Set<MapPoint> obstacles
 	) {
+		if (!terrain.terrain.hasTile(from) || !terrain.terrain.hasTile(to)) return null;
+
 		List<MapPoint> los1 = LineOfSight.getLOS(from, to, true);
 		List<MapPoint> los2 = LineOfSight.getLOS(from, to, false);
 		los1.remove(los1.size() - 1); // we only need LOS up to the square
@@ -215,7 +219,10 @@ public class BattleState {
 		MapPoint agent, MapPoint castFrom, Ability ability, MapPoint target
 	) {
 		Collection<MapPoint> r =
-			LineOfSight.getDiamond(target, ability.info.range.radius);
+			LineOfSight.getDiamond(target, ability.info.range.radius).stream()
+				.filter(p -> terrain.terrain.hasTile(p))
+				.collect(Collectors.toList());
+
 		if (ability.info.range.piercing) {
 			Player player = getCharacterAt(agent).map(c -> c.player)
 				.orElseThrow(() -> new RuntimeException(

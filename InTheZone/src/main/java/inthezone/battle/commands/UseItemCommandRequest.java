@@ -17,13 +17,9 @@ public class UseItemCommandRequest extends CommandRequest {
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
-		if (battleState.canUseItem(agent, item)) {
-			List<Command> r = new ArrayList<>();
-			r.add(new UseItemCommand(agent, item));
-			return r;
-		} else {
-			throw new CommandException("Invalid item command request");
-		}
+		List<Command> r = new ArrayList<>();
+		r.add(new UseItemCommand(agent, item));
+		return r;
 	}
 }
 

@@ -116,7 +116,7 @@ public class Push implements InstantEffect {
 					}
 				}
 
-				paths.add(path);
+				if (path.size() >= 2) paths.add(path);
 			}
 		}
 

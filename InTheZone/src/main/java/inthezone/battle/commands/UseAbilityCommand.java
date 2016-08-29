@@ -107,9 +107,6 @@ public class UseAbilityCommand extends Command {
 				battle.battleState.hasMana(agent), subsequentLevel, recursionLevel))
 			.orElseThrow(() -> new CommandException("Invalid ability command"));
 
-		if (!battle.battleState.canDoAbility(agent, castFrom, abilityData, targets))
-			throw new CommandException("Invalid ability command (cannot cast ability)");
-
 		Collection<Character> r = new ArrayList<>();
 		battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 		for (DamageToTarget d : targets)

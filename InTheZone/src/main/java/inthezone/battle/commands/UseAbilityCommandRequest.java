@@ -52,12 +52,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		InstantEffectCommand postEffect = null;
 
 		// Main damage
-		if (battleState.canDoAbility(agent, castFrom, ability, allTargets)) {
-			mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
-				allTargets, ability.subsequentLevel, ability.recursionLevel);
-		} else {
-			throw new CommandException("Invalid ability command request");
-		}
+		mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
+			allTargets, ability.subsequentLevel, ability.recursionLevel);
 			
 		// Post instant effect
 		if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {

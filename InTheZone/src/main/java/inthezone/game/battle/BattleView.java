@@ -152,8 +152,9 @@ public class BattleView
 			chain.doOnFinished(() -> {
 				s.setAnimation("idle");
 				if (isMyTurn.getValue()) {
-					if (selectedCharacter.isPresent())
-						setMode(MOVE); else setMode(SELECT);
+					if (teleportQueue.size() > 0) setMode(TELEPORT);
+					else if (selectedCharacter.isPresent()) setMode(MOVE);
+					else setMode(SELECT);
 				} else {
 					setMode(OTHER_TURN);
 				}
@@ -243,6 +244,7 @@ public class BattleView
 				case TELEPORT:
 					if (canvas.isSelectable(p)) {
 						teleportDestinations.add(p);
+						teleportQueue.remove();
 						setMode(TELEPORT);
 					}
 					break;
@@ -319,7 +321,7 @@ public class BattleView
 				break;
 
 			case TELEPORT:
-				teleporting = teleportQueue.poll();
+				teleporting = teleportQueue.peek();
 				if (teleporting == null) {
 					battle.completeEffect(teleportDestinations);
 					setMode(MOVE);
@@ -327,6 +329,7 @@ public class BattleView
 					canvas.getStage().clearAllHighlighting();
 					getFutureWithRetry(battle.getTeleportRange(teleporting, teleportRange))
 						.ifPresent(mr -> {
+							mr.removeAll(teleportDestinations);
 							mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
 							canvas.setSelectable(mr);
 						});

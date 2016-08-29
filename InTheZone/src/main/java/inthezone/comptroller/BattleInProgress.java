@@ -175,9 +175,11 @@ public class BattleInProgress implements Runnable {
 	 * */
 	private boolean doCommands() throws CommandException {
 		while (!commandQueue.isEmpty()) {
+			System.err.println("queue");
 			Command cmd = commandQueue.peek();
 
 			if (cmd instanceof InstantEffectCommand) {
+				System.err.println("complete");
 				InstantEffectCommand i = (InstantEffectCommand) cmd;
 				if (!i.isCompletedOrRequestCompletion()) {
 					Platform.runLater(() -> listener.completeEffect(i.getEffect()));

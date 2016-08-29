@@ -102,17 +102,18 @@ public class Pull implements InstantEffect {
 		sortedTargets.sort(Comparator.comparingInt(x -> castFrom.distance(x)));
 
 		for (MapPoint t : sortedTargets) {
-			List<MapPoint> path1 = getPullPath(battle, t, castFrom, true);
-			List<MapPoint> path2 = getPullPath(battle, t, castFrom, false);
+			List<MapPoint> path1 = getPullPath(battle, t, castFrom, info.param, true);
+			List<MapPoint> path2 = getPullPath(battle, t, castFrom, info.param, false);
 
-			if (path1.size() > path2.size()) paths.add(path1); else paths.add(path2);
+			List<MapPoint> path = path1.size() > path2.size()?  path1 : path2; 
+			if (path.size() > 0) paths.add(path);
 		}
 
 		return new Pull(info.param, castFrom, paths);
 	}
 
 	private static List<MapPoint> getPullPath(
-		BattleState battle, MapPoint from, MapPoint to, boolean bias
+		BattleState battle, MapPoint from, MapPoint to, int limit, boolean bias
 	) {
 		List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
 		List<MapPoint> path = new ArrayList<>();
@@ -120,7 +121,9 @@ public class Pull implements InstantEffect {
 		if (los == null || los.size() < 1) return path;
 
 		MapPoint last = los.remove(0);
+		path.add(last);
 		while (
+			path.size() <= limit &&
 			los.size() > 0 &&
 			battle.isSpaceFree(los.get(0)) &&
 			PathFinderNode.canTraverseBoundary(
@@ -130,12 +133,11 @@ public class Pull implements InstantEffect {
 			path.add(last);
 		}
 
-		return path;
+		return path.size() >= 2? path : new ArrayList<>();
 	}
 
 	@Override public List<Character> apply(Battle battle) {
 		return paths.stream()
-			.filter(p -> p.size() >= 2)
 			.flatMap(path -> battle.doPushPull(path).stream())
 			.collect(Collectors.toList());
 	}

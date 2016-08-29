@@ -241,22 +241,5 @@ public class BattleState {
 				.collect(Collectors.toList())
 		).orElse(new ArrayList<>());
 	}
-
-	public boolean canDoAbility(
-		MapPoint agent, MapPoint castFrom,
-		Ability ability, Collection<DamageToTarget> targets
-	) {
-		Optional<Player> player = getCharacterAt(agent).map(c -> c.player);
-		if (!player.isPresent()) return false;
-		Set<MapPoint> obstacles = movementObstacles(player.get());
-
-		return targets.stream().allMatch(d ->
-			d.target.distance(castFrom) <= ability.info.range.range &&
-			(!ability.info.range.los || getLOS(castFrom, d.target, obstacles) != null));
-	}
-
-	public boolean canUseItem(MapPoint agent, Item item) {
-		return true;
-	}
 }
 

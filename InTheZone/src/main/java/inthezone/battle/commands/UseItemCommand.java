@@ -32,9 +32,6 @@ public class UseItemCommand extends Command {
 
 	@Override
 	public List<Character> doCmd(Battle battle) throws CommandException {
-		if (!battle.battleState.canUseItem(agent, item))
-			throw new CommandException("Invalid item command");
-
 		Optional<Character> oc = battle.battleState.getCharacterAt(agent);
 
 		battle.doUseItem(agent, item);

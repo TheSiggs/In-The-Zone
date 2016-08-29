@@ -36,6 +36,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 	public static final String gameDataName = "game_data.json";
 	public static final File gameDataCacheDir =
 		new File(System.getProperty("user.home"), ".inthezone");
+	
+	private final boolean updateCache;
 
 	private JSONObject json = null;
 
@@ -47,8 +49,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 		if (baseDir.isPresent()) {
 			this.loc = new DevelopmentResourceLocator(baseDir.get());
+			this.updateCache = false;
 		} else {
 			this.loc = new CompiledResourceLocator(gameDataCacheDir);
+			this.updateCache = true;
 		}
 
 		this.globalLibrary = Library.fromFile(
@@ -81,13 +85,17 @@ public class GameDataFactory implements HasJSONRepresentation {
 		stages.clear();
 		characters.clear();
 		loadGameData(json);
-	}
 
-	/**
-	 * Update the cached game data to this version of the game data.
-	 * */
-	public void update() {
-		// TODO: implement this
+		if (updateCache) {
+			try (PrintWriter out =
+				new PrintWriter(new OutputStreamWriter(new FileOutputStream(
+					loc.gameDataFilename()), "UTF-8"));
+			) {
+				out.print(json);
+			} catch (IOException e) {
+				throw new CorruptDataException("IO error writing back to cache", e);
+			}
+		}
 	}
 
 	private void loadGameData(JSONObject json) throws CorruptDataException {

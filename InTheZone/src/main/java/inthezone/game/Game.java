@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.Scene;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import java.util.Map;
@@ -35,6 +36,9 @@ public class Game extends Application {
 		int port;
 		if (IS_DEVEL_BUILD) {
 			basedir = Optional.ofNullable(args.get("basedir"));
+			if (!basedir.isPresent() && args.get("dev") != null) {
+				basedir = Optional.ofNullable(getDataDir(primaryStage));
+			}
 			server = args.getOrDefault("server", "127.0.0.1");
 			try {
 				port = Optional.ofNullable(args.get("port"))
@@ -71,6 +75,13 @@ public class Game extends Application {
 			a.setHeaderText("Error starting game client");
 			a.showAndWait();
 		}
+	}
+
+	public String getDataDir(Stage primaryStage) {
+		final DirectoryChooser directoryChooser = new DirectoryChooser();
+		directoryChooser.setTitle("Select data directory...");
+		File dataDir = directoryChooser.showDialog(primaryStage);
+		return dataDir.toString();
 	}
 
 	@Override

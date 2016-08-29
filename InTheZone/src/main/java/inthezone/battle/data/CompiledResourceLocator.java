@@ -49,7 +49,7 @@ public class CompiledResourceLocator implements ResourceLocator {
 	}
 
 	public InputStream internalGameData() throws IOException {
-		InputStream r = this.getClass().getResourceAsStream(gameDataFilename());
+		InputStream r = this.getClass().getResourceAsStream("/gamedata/game_data.json");
 		if (r != null) return r; else
 			throw new FileNotFoundException("Missing internal game data");
 	}

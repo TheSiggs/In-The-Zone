@@ -1,6 +1,7 @@
 package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.protocol.ProtocolException;
@@ -9,7 +10,9 @@ import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -68,6 +71,15 @@ public class Cleanse implements InstantEffect {
 			battle.doCleanse(t).stream()).collect(Collectors.toList());
 	}
 
+	@Override public InstantEffect retarget(
+		BattleState battle, Map<MapPoint, MapPoint> retarget
+	) {
+		return new Cleanse(targets.stream()
+			.map(x -> retarget.getOrDefault(x, x))
+			.collect(Collectors.toList()));
+	}
+
+	@Override public Map<MapPoint, MapPoint> getRetargeting() {return new HashMap<>();}
 	@Override public boolean isComplete() {return true;}
 	@Override public boolean complete(List<MapPoint> p) {return true;}
 }

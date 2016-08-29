@@ -4,11 +4,13 @@ import inthezone.battle.Ability;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
+import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.instant.InstantEffectFactory;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UseAbilityCommandRequest extends CommandRequest {
@@ -45,36 +47,51 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			if (t.post) postTargets.add(t.target);
 		}
 
-		List<Command> r = new ArrayList<>();
-
-		// Instant effect
-		Collection<MapPoint> targetArea = null;
-		if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
-			targetArea = battleState.getTargetableArea(agent, castFrom, ability);
-			r.add(new InstantEffectCommand(InstantEffectFactory.getEffect(
-				battleState, ability.info.instantBefore.get(),
-				castFrom, targetArea, preTargets)));
-		}
+		InstantEffectCommand preEffect = null;
+		UseAbilityCommand mainEffect;
+		InstantEffectCommand postEffect = null;
 
 		// Main damage
 		if (battleState.canDoAbility(agent, castFrom, ability, allTargets)) {
-			r.add(new UseAbilityCommand(agent, castFrom, ability.rootName,
-				allTargets, ability.subsequentLevel, ability.recursionLevel));
+			mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
+				allTargets, ability.subsequentLevel, ability.recursionLevel);
 		} else {
 			throw new CommandException("Invalid ability command request");
 		}
 			
-		// Instant effect
+		// Post instant effect
 		if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {
-			if (targetArea == null) targetArea =
-				battleState.getTargetableArea(agent, castFrom, ability);
-
-			r.add(new InstantEffectCommand(InstantEffectFactory.getEffect(
-				battleState, ability.info.instantAfter.get(),
-				castFrom, targetArea, preTargets)));
+			postEffect = makeInstantEffect(
+				battleState, postTargets, ability.info.instantAfter.get(),
+				Optional.empty(), Optional.empty());
 		}
 
+		// pre instant effect
+		if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
+			preEffect = makeInstantEffect(
+				battleState, preTargets, ability.info.instantBefore.get(),
+				Optional.of(mainEffect), Optional.ofNullable(postEffect));
+		}
+
+		List<Command> r = new ArrayList<>();
+		if (preEffect != null) r.add(preEffect);
+		r.add(mainEffect);
+		if (postEffect != null) r.add(postEffect);
 		return r;
+	}
+
+	private InstantEffectCommand makeInstantEffect(
+		BattleState battleState,
+		List<MapPoint> effectTargets,
+		InstantEffectInfo effect,
+		Optional<UseAbilityCommand> postCommand,
+		Optional<InstantEffectCommand> postEffect
+	) {
+		Collection<MapPoint> targetArea =
+			battleState.getTargetableArea(agent, castFrom, ability);
+		return new InstantEffectCommand(InstantEffectFactory.getEffect(
+			battleState, effect, castFrom, targetArea, effectTargets),
+			postCommand, postEffect);
 	}
 }
 

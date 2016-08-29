@@ -11,17 +11,20 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class UseAbilityCommand extends Command {
-	private final MapPoint agent;
+	private MapPoint agent;
 	private final MapPoint castFrom;
 	private final String ability;
-	public final Collection<DamageToTarget> targets;
+	private Collection<DamageToTarget> targets;
 	private final int subsequentLevel;
 	private final int recursionLevel;
+
+	public Collection<DamageToTarget> getTargets() {return targets;}
 
 	public UseAbilityCommand(
 		MapPoint agent, MapPoint castFrom, String ability,
@@ -115,6 +118,23 @@ public class UseAbilityCommand extends Command {
 		battle.doAbility(agent, abilityData, targets);
 
 		return r.stream().map(c -> c.clone()).collect(Collectors.toList());
+	}
+
+	/**
+	 * Called when the targets are moved by an instant effect
+	 * */
+	public void retarget(Map<MapPoint, MapPoint> retarget) {
+		Collection<DamageToTarget> newDTT = new ArrayList<>();
+		for (MapPoint x : retarget.keySet()) {
+			if (agent.equals(x)) {
+				this.agent = retarget.get(x);
+			} else {
+				this.targets.stream()
+					.filter(t -> t.target.equals(x)).findFirst()
+					.ifPresent(t -> newDTT.add(t.retarget(retarget.get(x))));
+			}
+		}
+		this.targets = newDTT;
 	}
 }
 

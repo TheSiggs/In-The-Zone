@@ -1,21 +1,37 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.InstantEffectFactory;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.json.simple.JSONObject;
 
 public class InstantEffectCommand extends Command {
-	public final InstantEffect effect;
+	private InstantEffect effect;
 	private boolean isComplete;
 	private boolean waitingForCompletion = false;
 
-	public InstantEffectCommand(InstantEffect effect) {
+	private final Optional<UseAbilityCommand> postAbility;
+	private final Optional<InstantEffectCommand> postEffect;
+
+	public InstantEffect getEffect() {
+		return effect;
+	}
+
+	public InstantEffectCommand(
+		InstantEffect effect,
+		Optional<UseAbilityCommand> postAbility,
+		Optional<InstantEffectCommand> postEffect
+	) {
 		this.effect = effect;
+		this.postAbility = postAbility;
+		this.postEffect = postEffect;
 		isComplete = effect.isComplete();
 	}
 
@@ -68,15 +84,28 @@ public class InstantEffectCommand extends Command {
 
 		try {
 			return new InstantEffectCommand(
-				InstantEffectFactory.fromJSON((JSONObject) oeffect));
+				InstantEffectFactory.fromJSON((JSONObject) oeffect),
+				Optional.empty(), Optional.empty());
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing effect command", e);
 		}
 	}
 
+	private void retarget(BattleState battle, Map<MapPoint, MapPoint> retarget) {
+		this.effect = effect.retarget(battle, retarget);
+	}
+
 	@Override
 	public List<Character> doCmd(Battle battle) throws CommandException {
-		return effect.apply(battle);
+		List<Character> affected = effect.apply(battle);
+
+		if (postAbility.isPresent() || postEffect.isPresent()) {
+			Map<MapPoint, MapPoint> retarget = effect.getRetargeting();
+			postAbility.ifPresent(a -> a.retarget(retarget));
+			postEffect.ifPresent(a -> a.retarget(battle.battleState, retarget));
+		}
+
+		return affected;
 	}
 }
 

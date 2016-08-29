@@ -14,7 +14,9 @@ import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,10 +24,14 @@ import org.json.simple.JSONObject;
 public class Pull implements InstantEffect {
 	private final MapPoint castFrom;
 	public final List<List<MapPoint>> paths;
+	private final int param;
 
 	private Pull(
-		MapPoint castFrom, List<List<MapPoint>> paths
+		int param,
+		MapPoint castFrom,
+		List<List<MapPoint>> paths
 	) {
+		this.param = param;
 		this.castFrom = castFrom;
 		this.paths = paths;
 	}
@@ -35,6 +41,7 @@ public class Pull implements InstantEffect {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
 		o.put("kind", InstantEffectType.PULL.toString());
+		o.put("param", param);
 		o.put("castFrom", castFrom.getJSON());
 		for (List<MapPoint> path : paths) {
 			JSONArray pp = new JSONArray();
@@ -49,10 +56,12 @@ public class Pull implements InstantEffect {
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
+		Object oparam = json.get("param");
 		Object ocastFrom = json.get("castFrom");
 		Object opaths = json.get("paths");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
+		if (oparam == null) throw new ProtocolException("Missing effect parameter");
 		if (ocastFrom == null) throw new ProtocolException("Missing tile where effect acts from");
 		if (opaths == null) throw new ProtocolException("Missing effect paths");
 
@@ -61,6 +70,7 @@ public class Pull implements InstantEffect {
 				throw new ProtocolException("Expected pull effect");
 
 			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
+			Number param = (Number) oparam;
 			JSONArray rawPaths = (JSONArray) opaths;
 			List<List<MapPoint>> paths = new ArrayList<>();
 			for (int i = 0; i < rawPaths.size(); i++) {
@@ -72,7 +82,7 @@ public class Pull implements InstantEffect {
 
 				paths.add(path);
 			}
-			return new Pull(castFrom, paths);
+			return new Pull(param.intValue(), castFrom, paths);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing pull effect", e);
 		} catch (CorruptDataException e) {
@@ -98,7 +108,7 @@ public class Pull implements InstantEffect {
 			if (path1.size() > path2.size()) paths.add(path1); else paths.add(path2);
 		}
 
-		return new Pull(castFrom, paths);
+		return new Pull(info.param, castFrom, paths);
 	}
 
 	private static List<MapPoint> getPullPath(
@@ -128,6 +138,27 @@ public class Pull implements InstantEffect {
 			.filter(p -> p.size() >= 2)
 			.flatMap(path -> battle.doPushPull(path).stream())
 			.collect(Collectors.toList());
+	}
+
+	@Override public Map<MapPoint, MapPoint> getRetargeting() {
+		Map<MapPoint, MapPoint> r = new HashMap<>();
+
+		for (List<MapPoint> path : paths) {
+			r.put(path.get(0), path.get(path.size() - 1));
+		}
+		return r;
+	}
+
+	@Override public InstantEffect retarget(
+		BattleState battle, Map<MapPoint, MapPoint> retarget
+	) {
+		Collection<MapPoint> targets =
+			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
+			.collect(Collectors.toList());
+
+		return getEffect(battle,
+			new InstantEffectInfo(InstantEffectType.PULL, param),
+			castFrom, targets);
 	}
 
 	@Override public boolean isComplete() {return true;}

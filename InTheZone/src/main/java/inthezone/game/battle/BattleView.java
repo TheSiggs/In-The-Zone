@@ -518,7 +518,7 @@ public class BattleView
 			instantEffect(((PushCommand) cmd).effect, affectedCharacters);
 
 		} else if (cmd instanceof InstantEffectCommand) {
-			instantEffect(((InstantEffectCommand) cmd).effect, affectedCharacters);
+			instantEffect(((InstantEffectCommand) cmd).getEffect(), affectedCharacters);
 
 		} else if (cmd instanceof ResignCommand) {
 			if (((ResignCommand) cmd).player != player) {
@@ -530,7 +530,7 @@ public class BattleView
 		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
 			targetingAbility.map(a -> a.recursionLevel > 0).orElse(false)
 		) {
-			for (DamageToTarget d: ((UseAbilityCommand) cmd).targets) {
+			for (DamageToTarget d: ((UseAbilityCommand) cmd).getTargets()) {
 				recastFrom.add(d.target);
 			}
 			setMode(TARGET);

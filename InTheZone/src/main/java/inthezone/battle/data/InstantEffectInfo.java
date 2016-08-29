@@ -8,6 +8,11 @@ public class InstantEffectInfo {
 
 	private static final int DEFAULT_PARAMETER = 0;
 
+	public InstantEffectInfo(InstantEffectType type, int param) {
+		this.type = type;
+		this.param = param;
+	}
+
 	public InstantEffectInfo(String effect)
 		throws CorruptDataException
 	{

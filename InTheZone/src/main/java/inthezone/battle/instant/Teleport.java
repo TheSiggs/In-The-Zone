@@ -12,7 +12,9 @@ import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.json.simple.JSONArray;
@@ -117,6 +119,26 @@ public class Teleport implements InstantEffect {
 		}
 
 		return r;
+	}
+
+	@Override public Map<MapPoint, MapPoint> getRetargeting() {
+		Map<MapPoint, MapPoint> r = new HashMap<>();
+
+		for (int i = 0; i < targets.size(); i++) {
+			r.put(targets.get(i), destinations.get(i));
+		}
+		return r;
+	}
+
+	@Override public InstantEffect retarget(
+		BattleState battle, Map<MapPoint, MapPoint> retarget
+	) {
+		List<MapPoint> newTargets =
+			targets.stream().map(t -> retarget.getOrDefault(t, t))
+			.collect(Collectors.toList());
+
+		return getEffect(battle,
+			new InstantEffectInfo(InstantEffectType.TELEPORT, range), newTargets);
 	}
 
 	@Override public boolean isComplete() {return !(destinations == null);}

@@ -58,5 +58,11 @@ public class DamageToTarget implements HasJSONRepresentation {
 		}
 	}
 
+	/**
+	 * The target has moved since the damage was calculated
+	 * */
+	public DamageToTarget retarget(MapPoint to) {
+		return new DamageToTarget(to, damage, statusEffect, pre, post);
+	}
 }
 

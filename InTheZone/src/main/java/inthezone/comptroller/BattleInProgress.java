@@ -118,7 +118,6 @@ public class BattleInProgress implements Runnable {
 		while(true) {
 			try {
 				Action a = commandRequests.take();
-				System.err.println("Handle action");
 
 				// handle a command request
 				if (a.crq.isPresent()) {
@@ -181,7 +180,7 @@ public class BattleInProgress implements Runnable {
 			if (cmd instanceof InstantEffectCommand) {
 				InstantEffectCommand i = (InstantEffectCommand) cmd;
 				if (!i.isCompletedOrRequestCompletion()) {
-					Platform.runLater(() -> listener.completeEffect(i.effect));
+					Platform.runLater(() -> listener.completeEffect(i.getEffect()));
 					return false;
 				}
 			}

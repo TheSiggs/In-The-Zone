@@ -126,8 +126,7 @@ public class MessageChannel {
 			return Optional.empty();
 		} else {
 			int t = msgBuffer.position();
-			msgBuffer.mark();
-			msgBuffer.position(t);
+			msgBuffer.position(0).mark().position(t);
 			return Optional.of(Message.fromString(msg));
 		}
 	}

@@ -64,10 +64,18 @@ public class PushCommand extends Command {
 
 	@Override
 	public List<Character> doCmd(Battle battle) throws CommandException {
+		List<Character> r = new ArrayList<>();
 		if (effective) {
-			return effect.apply(battle);
+			Character user = battle.battleState.getCharacterAt(agent)
+				.orElseThrow(() -> new CommandException("Cannot find push agent"));
+
+			user.usePush();
+			// by convention, we always put the agent first in the affected characters list.
+			r.add(user);
+			r.addAll(effect.apply(battle));
+			return r;
 		} else {
-			return new ArrayList<>();
+			return r;
 		}
 	}
 }

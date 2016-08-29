@@ -19,10 +19,10 @@ import org.json.simple.JSONObject;
 public class UseAbilityCommand extends Command {
 	private MapPoint agent;
 	private final MapPoint castFrom;
-	private final String ability;
+	public final String ability;
 	private Collection<DamageToTarget> targets;
-	private final int subsequentLevel;
-	private final int recursionLevel;
+	public final int subsequentLevel;
+	public final int recursionLevel;
 
 	public Collection<DamageToTarget> getTargets() {return targets;}
 

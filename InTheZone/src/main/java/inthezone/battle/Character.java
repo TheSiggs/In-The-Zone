@@ -144,6 +144,11 @@ public class Character implements Targetable, Obstacle {
 		}
 	}
 
+	public void usePush() {
+		ap -= 1;
+		if (ap < 0) ap = 0;
+	}
+
 	public void kill() {
 		hp = 0;
 	}

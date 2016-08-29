@@ -213,7 +213,7 @@ public class BattleView
 	private Consumer<MapPoint> handleSelection() {
 		return p -> {
 			if (mode == ANIMATING) return;
-			if (p == null) {
+			if (p == null && mode != TELEPORT) {
 				selectCharacter(Optional.empty()); return;
 			}
 
@@ -329,8 +329,9 @@ public class BattleView
 					canvas.getStage().clearAllHighlighting();
 					getFutureWithRetry(battle.getTeleportRange(teleporting, teleportRange))
 						.ifPresent(mr -> {
+							mr.add(teleporting.getPos());
 							mr.removeAll(teleportDestinations);
-							mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
+							mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 							canvas.setSelectable(mr);
 						});
 				}
@@ -440,12 +441,17 @@ public class BattleView
 			"Attempted to target ability but no character was selected");
 		rootTargetingAbility = Optional.of(ability);
 		targetingAbility = Optional.of(ability);
+		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
 		setupTargeting();
+
+		// range 0 abilities get applied immediately
+		if (ability.info.range.range == 0) {
+			targets.add(castFrom);
+			applyAbility();
+		}
 	}
 
 	private void setupTargeting() {
-		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
-
 		targetingAbility.ifPresent(a -> {
 			numTargets.setValue(a.info.range.nTargets);
 			multiTargeting.setValue(a.info.range.nTargets > 1);
@@ -473,13 +479,13 @@ public class BattleView
 
 		targetingAbility = targetingAbility.flatMap(a -> a.getSubsequent());
 		if (targetingAbility.isPresent()) {
-			System.err.println("Subsequent!");
+			hud.writeMessage("Subsequent!");
 			setupTargeting();
 		} else {
 			rootTargetingAbility = rootTargetingAbility.flatMap(a -> a.getRecursion());
 			targetingAbility = rootTargetingAbility;
 			if (targetingAbility.isPresent()) {
-				System.err.println("Recursive!");
+				hud.writeMessage("Recursive rebound!");
 				setupTargeting();
 			} else {
 				cancelAbility();
@@ -526,6 +532,12 @@ public class BattleView
 
 	@Override
 	public void command(Command cmd, List<Character> affectedCharacters) {
+		if (cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
+			UseAbilityCommand ua = (UseAbilityCommand) cmd;
+			hud.writeMessage(
+				affectedCharacters.get(0).name + " uses " + ua.ability + "!");
+		}
+
 		if (cmd instanceof MoveCommand) {
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
@@ -533,7 +545,11 @@ public class BattleView
 			scheduleMovement("walk", walkSpeed, path, affectedCharacters.get(0));
 
 		} else if (cmd instanceof PushCommand) {
-			instantEffect(((PushCommand) cmd).effect, affectedCharacters);
+			// The first element in the affected characters list for a push command
+			// is the agent of the push.  This element must be removed before
+			// proceeding to the processing of the push effect.
+			instantEffect(((PushCommand) cmd).effect,
+				affectedCharacters.subList(1, affectedCharacters.size()));
 
 		} else if (cmd instanceof InstantEffectCommand) {
 			instantEffect(((InstantEffectCommand) cmd).getEffect(), affectedCharacters);
@@ -548,6 +564,7 @@ public class BattleView
 		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
 			targetingAbility.map(a -> a.recursionLevel > 0).orElse(false)
 		) {
+			// add all of the targets of this ability to the recast from list
 			for (DamageToTarget d: ((UseAbilityCommand) cmd).getTargets()) {
 				recastFrom.add(d.target);
 			}
@@ -666,6 +683,7 @@ public class BattleView
 	@Override
 	public void completeEffect(InstantEffect e) {
 		if (e instanceof Teleport) {
+			hud.writeMessage("Select teleport destination");
 			Teleport teleport = (Teleport) e;
 			teleportRange = teleport.range;
 			teleportQueue.clear();

@@ -2,6 +2,7 @@ package inthezone.game.battle;
 
 import inthezone.battle.Ability;
 import inthezone.battle.Character;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -21,7 +22,10 @@ public class HUD extends AnchorPane {
 	private final Button resignButton = new Button("Resign");
 	private final Button itemsButton = new Button("Items");
 	private final Button abilitiesButton = new Button("Abilities");
+
 	private final MultiTargetAssistant multiTargetAssistant;
+	private final MessageLine messageLine = new MessageLine();
+	private final VBox assistanceLine = new VBox();
 
 	private final ContextMenu abilitiesMenu = new ContextMenu();
 	private final MenuItem attackItem = new MenuItem("Attack");
@@ -54,6 +58,10 @@ public class HUD extends AnchorPane {
 		abilitiesButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.isCharacterSelected.not()));
 
+		assistanceLine.setAlignment(Pos.CENTER);
+		assistanceLine.setFillWidth(false);
+		assistanceLine.getChildren().addAll(messageLine, multiTargetAssistant);
+
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
 
@@ -66,13 +74,18 @@ public class HUD extends AnchorPane {
 		AnchorPane.setBottomAnchor(itemsButton, 0d);
 		AnchorPane.setLeftAnchor(itemsButton, 0d);
 
-		AnchorPane.setBottomAnchor(multiTargetAssistant, 0d);
-		AnchorPane.setLeftAnchor(multiTargetAssistant, 200d);
+		AnchorPane.setBottomAnchor(assistanceLine, 0d);
+		AnchorPane.setLeftAnchor(assistanceLine, 0d);
+		AnchorPane.setRightAnchor(assistanceLine, 0d);
 
 		this.getChildren().addAll(
-			characterInfoBoxes, endButtons,
-			abilitiesButton, itemsButton, multiTargetAssistant
+			assistanceLine, characterInfoBoxes,  endButtons,
+			abilitiesButton, itemsButton
 		);
+	}
+
+	public void writeMessage(String message) {
+		messageLine.writeMessage(message);
 	}
 
 	public void selectCharacter(Character c) {

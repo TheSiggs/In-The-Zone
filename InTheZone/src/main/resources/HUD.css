@@ -12,3 +12,8 @@
 	-fx-background-color: yellow;
 }
 
+.message-line {
+	-fx-background-color: white;
+	-fx-opacity: 0.0;
+}
+

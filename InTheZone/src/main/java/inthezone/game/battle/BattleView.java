@@ -132,7 +132,7 @@ public class BattleView
 		this.hud = new HUD(this);
 
 		this.canvas = new MapView(this,
-			gameData.getStage(startBattle.stage), true, highlights);
+			gameData.getStage(startBattle.stage), true, false, highlights);
 		canvas.widthProperty().bind(this.widthProperty());
 		canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
@@ -294,11 +294,15 @@ public class BattleView
 				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
 					"Attempted to move but no character was selected"));
 
-				getFutureWithRetry(battle.getTeleportRange(c, 1))
-					.ifPresent(mr -> {
-						mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
-						canvas.setSelectable(mr);
-					});
+				MapPoint centre = c.getPos();
+				Collection<MapPoint> r = new ArrayList<>();
+				r.add(centre.add(new MapPoint( 1, 0)));
+				r.add(centre.add(new MapPoint(-1, 0)));
+				r.add(centre.add(new MapPoint( 0, 1)));
+				r.add(centre.add(new MapPoint( 0, -1)));
+
+				r.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
+				canvas.setSelectable(r);
 
 				break;
 
@@ -378,6 +382,17 @@ public class BattleView
 							.ifPresent(area -> area.stream().forEach(pp ->
 								stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
 					});
+					break;
+
+				case PUSH:
+					stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
+					if (canvas.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_ATTACKAREA);
+					break;
+
+				case TELEPORT:
+					stage.clearHighlighting(HIGHLIGHT_PATH);
+					if (canvas.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_PATH);
+					break;
 			}
 		};
 	}

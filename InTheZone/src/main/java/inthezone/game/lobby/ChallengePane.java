@@ -102,7 +102,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		this.startPosChooser = new MapView(this,
 			useStage.map(s -> gameData.getStage(s)).orElse(null),
-			true, highlights);
+			true, false, highlights);
 		startPosChooser.widthProperty().bind(this.widthProperty());
 		startPosChooser.heightProperty().bind(this.heightProperty());
 		startPosChooser.startAnimating();

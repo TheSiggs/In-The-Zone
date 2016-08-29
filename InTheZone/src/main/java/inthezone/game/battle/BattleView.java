@@ -567,8 +567,6 @@ public class BattleView
 			}
 
 		} else if (effect instanceof Teleport) {
-			System.err.println("Teleport!");
-
 			Teleport teleport = (Teleport) effect;
 			List<MapPoint> destinations = teleport.getDestinations();
 			if (destinations == null || destinations.size() != affectedCharacters.size()) {
@@ -580,9 +578,7 @@ public class BattleView
 				MapPoint tile = characters.get(id).getPos();
 				Sprite s = stage.getSpritesByTile(tile).stream()
 					.filter(x -> x.userData.equals(id)).findFirst().get();
-				stage.removeSprite(s);
-				s.pos = destinations.get(i);
-				stage.addSprite(s);
+				stage.queueTeleportSprite(s, destinations.get(i));
 			}
 		}
 

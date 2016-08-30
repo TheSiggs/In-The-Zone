@@ -28,7 +28,7 @@ public class PushCommand extends Command {
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.PUSH.toString());
-		r.put("agent", agent);
+		r.put("agent", agent.getJSON());
 		r.put("effect", effect.getJSON());
 		r.put("effective", effective);
 		return r;

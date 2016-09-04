@@ -3,6 +3,7 @@ package inthezone.battle.commands;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.instant.Push;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -63,8 +64,8 @@ public class PushCommand extends Command {
 	}
 
 	@Override
-	public List<Character> doCmd(Battle battle) throws CommandException {
-		List<Character> r = new ArrayList<>();
+	public List<Targetable> doCmd(Battle battle) throws CommandException {
+		List<Targetable> r = new ArrayList<>();
 		if (effective) {
 			Character user = battle.battleState.getCharacterAt(agent)
 				.orElseThrow(() -> new CommandException("Cannot find push agent"));

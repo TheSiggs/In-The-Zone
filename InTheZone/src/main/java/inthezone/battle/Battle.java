@@ -36,6 +36,10 @@ public class Battle {
 		});
 	}
 
+	/**
+	 * Perform an ability and update the game state accordingly.  Instant effects
+	 * are handled separately.
+	 * */
 	public void doAbility(
 		MapPoint agent,
 		Ability ability,
@@ -49,14 +53,15 @@ public class Battle {
 					"Attempted to attack non-target, command verification code failed"));
 
 			t.dealDamage(d.damage);
+			if (t.reap()) battleState.removeObstacle(t);
 		}
 	}
 
 	public void doUseItem(MapPoint agent, Item item) {
 	}
 
-	public List<Character> doPushPull(List<MapPoint> path) {
-		List<Character> r = new ArrayList<>();
+	public List<Targetable> doPushPull(List<MapPoint> path) {
+		List<Targetable> r = new ArrayList<>();
 		if (path.size() < 2) return r;
 
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
@@ -68,18 +73,26 @@ public class Battle {
 		return r;
 	}
 
-	public List<Character> doTeleport(MapPoint source, MapPoint destination) {
+	public List<Targetable> doTeleport(MapPoint source, MapPoint destination) {
 		return battleState.getCharacterAt(source).map(c -> {
 			c.teleport(destination, battleState.hasMana(destination));
 			return Stream.of(c);
 		}).orElse(Stream.empty()).collect(Collectors.toList());
 	}
 
-	public List<Character> doCleanse(MapPoint target) {
+	public List<Targetable> doCleanse(MapPoint target) {
 		return battleState.getCharacterAt(target).map(c -> {
 			c.cleanse();
 			return Stream.of(c);
 		}).orElse(Stream.empty()).collect(Collectors.toList());
+	}
+
+	public List<Targetable> doObstacles(Collection<MapPoint> obstacles) {
+		List<Targetable> r = new ArrayList<>();
+		for (MapPoint p : obstacles) {
+			r.add(battleState.placeObstacle(p));
+		}
+		return r;
 	}
 
 	public void doResign(Player player) {

@@ -2,9 +2,9 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
-import inthezone.battle.Character;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
@@ -123,7 +123,7 @@ public class Push implements InstantEffect {
 		return new Push(info.param, castFrom, paths);
 	}
 
-	@Override public List<Character> apply(Battle battle) {
+	@Override public List<Targetable> apply(Battle battle) {
 		return paths.stream()
 			.filter(p -> p.size() >= 2)
 			.flatMap(path -> battle.doPushPull(path).stream())

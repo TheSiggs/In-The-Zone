@@ -1,7 +1,7 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
-import inthezone.battle.Character;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.List;
@@ -12,7 +12,7 @@ public abstract class Command implements HasJSONRepresentation {
 	 * Do a command.
 	 * @return All the characters that were affected by the command
 	 * */
-	public abstract List<Character> doCmd(Battle turn) throws CommandException;
+	public abstract List<Targetable> doCmd(Battle turn) throws CommandException;
 
 	/**
 	 * Parse a command.

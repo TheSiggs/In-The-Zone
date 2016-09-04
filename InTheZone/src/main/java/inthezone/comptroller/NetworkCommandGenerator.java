@@ -2,12 +2,12 @@ package inthezone.comptroller;
 
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Battle;
-import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.data.Player;
+import inthezone.battle.Targetable;
 import javafx.application.Platform;
 import java.util.concurrent.BlockingQueue;
 import java.util.List;
@@ -31,7 +31,7 @@ public class NetworkCommandGenerator implements CommandGenerator {
 				Command cmd = commandQueue.take();
 
 				try {
-					List<Character> affectedCharacters = cmd.doCmd(battle);
+					List<Targetable> affectedCharacters = cmd.doCmd(battle);
 					Platform.runLater(() -> {
 						listener.command(cmd, affectedCharacters);
 					});

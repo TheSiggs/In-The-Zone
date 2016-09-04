@@ -6,12 +6,14 @@ import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.json.simple.JSONArray;
@@ -100,7 +102,7 @@ public class UseAbilityCommand extends Command {
 	}
 
 	@Override
-	public List<Character> doCmd(Battle battle) throws CommandException {
+	public List<Targetable> doCmd(Battle battle) throws CommandException {
 		Ability abilityData = battle.battleState.getCharacterAt(agent)
 			.flatMap(c -> Stream.concat(Stream.of(c.basicAbility),
 				c.abilities.stream()
@@ -109,14 +111,20 @@ public class UseAbilityCommand extends Command {
 				battle.battleState.hasMana(agent), subsequentLevel, recursionLevel))
 			.orElseThrow(() -> new CommandException("Invalid ability command"));
 
-		Collection<Character> r = new ArrayList<>();
+		List<Targetable> r = new ArrayList<>();
 		battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
-		for (DamageToTarget d : targets)
-			battle.battleState.getCharacterAt(d.target).ifPresent(c -> r.add(c));
+		for (DamageToTarget d : targets) {
+			Optional<Character> oc = battle.battleState.getCharacterAt(d.target);
+			if (oc.isPresent()) {
+				oc.ifPresent(c -> r.add(c.clone()));
+			} else {
+				battle.battleState.getTargetableAt(d.target).ifPresent(t -> r.add(t));
+			}
+		}
 
 		battle.doAbility(agent, abilityData, targets);
 
-		return r.stream().map(c -> c.clone()).collect(Collectors.toList());
+		return r;
 	}
 
 	/**

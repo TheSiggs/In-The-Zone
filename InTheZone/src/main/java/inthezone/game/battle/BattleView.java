@@ -25,6 +25,7 @@ import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.Pull;
 import inthezone.battle.instant.Push;
 import inthezone.battle.instant.Teleport;
+import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
@@ -530,19 +531,23 @@ public class BattleView
 		a.showAndWait();
 	}
 
+	private static Character getAgent(List<Targetable> ts) {
+		return (Character) ts.get(0);
+	}
+
 	@Override
-	public void command(Command cmd, List<Character> affectedCharacters) {
+	public void command(Command cmd, List<Targetable> affectedCharacters) {
 		if (cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
 			UseAbilityCommand ua = (UseAbilityCommand) cmd;
 			hud.writeMessage(
-				affectedCharacters.get(0).name + " uses " + ua.ability + "!");
+				getAgent(affectedCharacters).name + " uses " + ua.ability + "!");
 		}
 
 		if (cmd instanceof MoveCommand) {
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
 
-			scheduleMovement("walk", walkSpeed, path, affectedCharacters.get(0));
+			scheduleMovement("walk", walkSpeed, path, getAgent(affectedCharacters));
 
 		} else if (cmd instanceof PushCommand) {
 			// The first element in the affected characters list for a push command
@@ -575,7 +580,7 @@ public class BattleView
 	}
 
 	private void instantEffect(
-		InstantEffect effect, List<Character> affectedCharacters
+		InstantEffect effect, List<Targetable> affectedCharacters
 	) {
 		Stage stage = canvas.getStage();
 
@@ -587,7 +592,7 @@ public class BattleView
 
 			for (int i = 0; i < push.paths.size(); i++) {
 				scheduleMovement("idle", pushSpeed,
-					push.paths.get(i), affectedCharacters.get(i));
+					push.paths.get(i), (Character) affectedCharacters.get(i));
 			}
 
 		} else if (effect instanceof Pull) {
@@ -598,7 +603,7 @@ public class BattleView
 
 			for (int i = 0; i < pull.paths.size(); i++) {
 				scheduleMovement("idle", pushSpeed,
-					pull.paths.get(i), affectedCharacters.get(i));
+					pull.paths.get(i), (Character) affectedCharacters.get(i));
 			}
 
 		} else if (effect instanceof Teleport) {
@@ -609,7 +614,7 @@ public class BattleView
 			}
 
 			for (int i = 0; i < destinations.size(); i++) {
-				int id = affectedCharacters.get(i).id;
+				int id = ((Character) affectedCharacters.get(i)).id;
 				MapPoint tile = characters.get(id).getPos();
 				Sprite s = stage.getSpritesByTile(tile).stream()
 					.filter(x -> x.userData.equals(id)).findFirst().get();
@@ -645,37 +650,43 @@ public class BattleView
 		stage.queueMoveSprite(s, start, end, animation, speed);
 	}
 
-	private void updateCharacters(List<Character> characters) {
+	private void updateCharacters(List<? extends Targetable> characters) {
 		if (this.characters == null) {
 			this.characters = new HashMap<>();
-			for (Character c : characters) this.characters.put(c.id, c);
-			hud.init(characters.stream()
+			for (Targetable c : characters) {
+				if (c instanceof Character)
+					this.characters.put(((Character) c).id, (Character) c);
+			}
+			hud.init(this.characters.values().stream()
 				.filter(c -> c.player == player).collect(Collectors.toList()));
 		} else {
-			for (Character c : characters) {
-				Character old = this.characters.get(c.id);
-				selectedCharacter.ifPresent(sc -> {
-					if (sc.id == c.id) selectedCharacter = Optional.of(c);
-				});
+			for (Targetable t : characters) {
+				if (t instanceof Character) {
+					Character c = (Character) t;
+					Character old = this.characters.get(c.id);
+					selectedCharacter.ifPresent(sc -> {
+						if (sc.id == c.id) selectedCharacter = Optional.of(c);
+					});
 
-				if (old != null) {
-					if (c.player == player) hud.updateAbilities(c, c.hasMana());
-					CharacterInfoBox box = hud.characters.get(c.id);
-					if (box != null) {
-						box.updateAP(c.getAP(), c.getStats().ap);
-						box.updateMP(c.getMP(), c.getStats().mp);
-						box.updateHP(c.getHP(), c.getMaxHP());
+					if (old != null) {
+						if (c.player == player) hud.updateAbilities(c, c.hasMana());
+						CharacterInfoBox box = hud.characters.get(c.id);
+						if (box != null) {
+							box.updateAP(c.getAP(), c.getStats().ap);
+							box.updateMP(c.getMP(), c.getStats().mp);
+							box.updateHP(c.getHP(), c.getMaxHP());
+						}
+
 					}
 
-				}
+					if (c.isDead()) {
+						Sprite s = canvas.getStage().getSpritesByTile(c.getPos()).stream()
+							.filter(x -> x.userData.equals(c.id)).findFirst().get();
+						s.setAnimation("dead");
+					}
 
-				if (c.isDead()) {
-					Sprite s = canvas.getStage().getSpritesByTile(c.getPos()).stream()
-						.filter(x -> x.userData.equals(c.id)).findFirst().get();
-					s.setAnimation("dead");
+					this.characters.put(c.id, c);
 				}
-
-				this.characters.put(c.id, c);
 			}
 		}
 	}

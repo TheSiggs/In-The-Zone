@@ -2,11 +2,11 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
-import inthezone.battle.Character;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.LineOfSight;
 import inthezone.battle.PathFinderNode;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
@@ -136,7 +136,7 @@ public class Pull implements InstantEffect {
 		return path.size() >= 2? path : new ArrayList<>();
 	}
 
-	@Override public List<Character> apply(Battle battle) {
+	@Override public List<Targetable> apply(Battle battle) {
 		return paths.stream()
 			.flatMap(path -> battle.doPushPull(path).stream())
 			.collect(Collectors.toList());

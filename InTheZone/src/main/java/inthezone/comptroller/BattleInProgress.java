@@ -15,6 +15,7 @@ import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.LineOfSight;
+import inthezone.battle.Targetable;
 import isogame.engine.MapPoint;
 import javafx.application.Platform;
 import java.util.ArrayList;
@@ -187,10 +188,13 @@ public class BattleInProgress implements Runnable {
 
 			commandQueue.poll();
 
-			if (network != null) network.sendCommand(cmd);
-
-			List<Character> affectedCharacters = cmd.doCmd(battle);
+			List<Targetable> affectedCharacters = cmd.doCmd(battle);
 			Platform.runLater(() -> listener.command(cmd, affectedCharacters));
+
+			// don't send the command to the network until it's been completed
+			// locally.  This allows the commands to update themselves when we have
+			// instant effects that mess with the game state.
+			if (network != null) network.sendCommand(cmd);
 
 			if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
 				return true;

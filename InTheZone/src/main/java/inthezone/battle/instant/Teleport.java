@@ -6,6 +6,7 @@ import inthezone.battle.Character;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
@@ -107,13 +108,13 @@ public class Teleport implements InstantEffect {
 		return new Teleport(affected, info.param, targets, null);
 	}
 
-	@Override public List<Character> apply(Battle battle)
+	@Override public List<Targetable> apply(Battle battle)
 		throws CommandException
 	{
 		if (destinations == null || targets.size() != destinations.size())
 			throw new CommandException("Attempted to apply incomplete teleport");
 
-		List<Character> r = new ArrayList<>();
+		List<Targetable> r = new ArrayList<>();
 		for (int i = 0; i < targets.size(); i++) {
 			r.addAll(battle.doTeleport(targets.get(i), destinations.get(i)));
 		}

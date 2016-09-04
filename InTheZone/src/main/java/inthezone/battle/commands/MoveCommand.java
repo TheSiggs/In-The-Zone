@@ -2,6 +2,7 @@ package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -59,13 +60,13 @@ public class MoveCommand extends Command {
 	}
 
 	@Override
-	public List<Character> doCmd(Battle battle) throws CommandException {
+	public List<Targetable> doCmd(Battle battle) throws CommandException {
 		if (!battle.battleState.canMove(path)) throw new CommandException("Invalid move command");
 		Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
 
 		battle.doMove(path);
 
-		List<Character> r = new ArrayList<>();
+		List<Targetable> r = new ArrayList<>();
 		oc.ifPresent(c -> r.add(c.clone()));
 		return r;
 	}

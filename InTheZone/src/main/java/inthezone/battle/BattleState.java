@@ -21,11 +21,16 @@ public class BattleState {
 	public final Stage terrain;
 	public final Collection<Character> characters;
 
+	// superlist of all targetables (including characters and obstacles)
+	public final Collection<Targetable> targetable;
+
 	private final Set<MapPoint> terrainObstacles;
 
 	public BattleState(Stage terrain, Collection<Character> characters) {
 		this.terrain = terrain;
 		this.characters = characters;
+		this.targetable = new ArrayList<>();
+		this.targetable.addAll(characters);
 
 		terrainObstacles = new HashSet<>(terrain.allSprites.stream()
 			.map(s -> s.pos).collect(Collectors.toList()));
@@ -37,6 +42,22 @@ public class BattleState {
 	public boolean hasMana(MapPoint p) {
 		return terrain.terrain.hasTile(p) &&
 			terrain.terrain.getTile(p).isManaZone;
+	}
+
+	/**
+	 * Place a new obstacle.
+	 * */
+	public RoadBlock placeObstacle(MapPoint p) {
+		RoadBlock r = new RoadBlock(p);
+		targetable.add(r);
+		return r;
+	}
+
+	/**
+	 * Remove a targetable object.
+	 * */
+	public void removeObstacle(Targetable t) {
+		targetable.remove(t);
 	}
 
 	/**
@@ -66,7 +87,7 @@ public class BattleState {
 	 * Get targetable objects at a particular point.
 	 * */
 	public Optional<? extends Targetable> getTargetableAt(MapPoint x) {
-		return getCharacterAt(x);
+		return targetable.stream().filter(c -> c.getPos().equals(x)).findFirst();
 	}
 
 	/**
@@ -115,14 +136,14 @@ public class BattleState {
 	public boolean isSpaceFree(MapPoint p) {
 		return terrain.terrain.hasTile(p) &&
 			!(terrainObstacles.contains(p) ||
-				characters.stream().anyMatch(c -> c.getPos().equals(p)));
+				targetable.stream().anyMatch(c -> c.getPos().equals(p)));
 	}
 
 	/**
 	 * Points that are already occupied.
 	 * */
 	private Set<MapPoint> spaceObstacles(Player player) {
-		Set<MapPoint> r = new HashSet<>(characters.stream()
+		Set<MapPoint> r = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksSpace(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		r.addAll(terrainObstacles);
@@ -133,7 +154,7 @@ public class BattleState {
 	 * Obstacles that cannot be moved through.
 	 * */
 	private Set<MapPoint> movementObstacles(Player player) {
-		Set<MapPoint> obstacles = new HashSet<>(characters.stream()
+		Set<MapPoint> obstacles = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksPath(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		obstacles.addAll(terrainObstacles);

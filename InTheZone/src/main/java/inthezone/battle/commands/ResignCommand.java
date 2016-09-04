@@ -1,8 +1,8 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
-import inthezone.battle.Character;
 import inthezone.battle.data.Player;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import java.util.List;
@@ -47,7 +47,7 @@ public class ResignCommand extends Command {
 	}
 
 	@Override
-	public List<Character> doCmd(Battle turn) {
+	public List<Targetable> doCmd(Battle turn) {
 		turn.doResign(player);
 		return turn.battleState.characters.stream()
 			.filter(c -> c.player == player).collect(Collectors.toList());

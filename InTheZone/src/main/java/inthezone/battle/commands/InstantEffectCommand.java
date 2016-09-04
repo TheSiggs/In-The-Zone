@@ -2,9 +2,9 @@ package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
-import inthezone.battle.Character;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.InstantEffectFactory;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
 import java.util.List;
@@ -96,8 +96,8 @@ public class InstantEffectCommand extends Command {
 	}
 
 	@Override
-	public List<Character> doCmd(Battle battle) throws CommandException {
-		List<Character> affected = effect.apply(battle);
+	public List<Targetable> doCmd(Battle battle) throws CommandException {
+		List<Targetable> affected = effect.apply(battle);
 
 		if (postAbility.isPresent() || postEffect.isPresent()) {
 			Map<MapPoint, MapPoint> retarget = effect.getRetargeting();

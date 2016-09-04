@@ -2,15 +2,15 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
-import inthezone.battle.Character;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.Targetable;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.List;
 import java.util.Map;
 
 public interface InstantEffect extends HasJSONRepresentation {
-	public List<Character> apply(Battle battle) throws CommandException;
+	public List<Targetable> apply(Battle battle) throws CommandException;
 
 	/**
 	 * Get information pertaining to targets that were moved by this effect.

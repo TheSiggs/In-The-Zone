@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Character implements Targetable, Obstacle {
+public class Character implements Targetable {
 	public final int id; // a unique identifier that can be used to track this character
 	public final String name;
  	public final Player player;
@@ -153,7 +153,7 @@ public class Character implements Targetable, Obstacle {
 		hp = 0;
 	}
 
-	public boolean isDead() {
+	@Override public boolean isDead() {
 		return hp == 0;
 	}
 
@@ -214,6 +214,8 @@ public class Character implements Targetable, Obstacle {
 	@Override public boolean isEnemyOf(Character c) {
 		return player != c.player;
 	}
+
+	@Override public boolean reap() {return false;}
 
 	@Override public boolean blocksSpace(Player player) {
 		return true;

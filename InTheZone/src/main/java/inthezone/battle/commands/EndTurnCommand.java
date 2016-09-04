@@ -1,10 +1,10 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
-import inthezone.battle.Character;
+import inthezone.battle.Targetable;
+import inthezone.protocol.ProtocolException;
 import java.util.ArrayList;
 import java.util.List;
-import inthezone.protocol.ProtocolException;
 import org.json.simple.JSONObject;
 
 public class EndTurnCommand extends Command {
@@ -33,7 +33,7 @@ public class EndTurnCommand extends Command {
 	}
 
 	@Override
-	public List<Character> doCmd(Battle turn) {
+	public List<Targetable> doCmd(Battle turn) {
 		return new ArrayList<>();
 	}
 }

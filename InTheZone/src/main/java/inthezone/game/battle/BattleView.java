@@ -86,6 +86,9 @@ public class BattleView
 	// Map from character ids to characters
 	private Map<Integer, Character> characters = null;
 
+	// Temporary objects that are immobile, such as roadblocks
+	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
+
 	// the selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
 
@@ -687,6 +690,23 @@ public class BattleView
 
 					this.characters.put(c.id, c);
 				}
+			}
+		}
+
+		handleTemporaryImmobileObjects(characters);
+	}
+
+	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
+		for (Targetable t : tios) {
+			if (!temporaryImmobileObjects.containsKey(t.getPos())) {
+				Sprite s = new Sprite(t.getSprite());
+				s.pos = t.getPos();
+				canvas.getStage().addSprite(s);
+				temporaryImmobileObjects.put(t.getPos(), s);
+			} else if (t.reap()) {
+				Sprite s = temporaryImmobileObjects.get(t.getPos());
+				canvas.getStage().removeSprite(s);
+				temporaryImmobileObjects.remove(t.getPos());
 			}
 		}
 	}

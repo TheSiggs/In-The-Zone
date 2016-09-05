@@ -1,6 +1,7 @@
 package inthezone.battle;
 
 import inthezone.battle.data.Player;
+import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
@@ -47,8 +48,8 @@ public class BattleState {
 	/**
 	 * Place a new obstacle.
 	 * */
-	public RoadBlock placeObstacle(MapPoint p) {
-		RoadBlock r = new RoadBlock(p);
+	public RoadBlock placeObstacle(MapPoint p, StandardSprites sprites) {
+		RoadBlock r = new RoadBlock(p, sprites);
 		targetable.add(r);
 		return r;
 	}

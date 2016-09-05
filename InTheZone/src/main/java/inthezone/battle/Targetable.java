@@ -3,6 +3,7 @@ package inthezone.battle;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import isogame.engine.MapPoint;
+import isogame.engine.SpriteInfo;
 
 public interface Targetable extends Obstacle {
 	public Stats getStats();
@@ -13,6 +14,9 @@ public interface Targetable extends Obstacle {
 	public boolean isPushable();
 	public boolean isEnemyOf(Character character);
 	public boolean isDead();
+
+	// get the sprite that represents this object
+	public SpriteInfo getSprite();
 
 	// return true if this targetable should be removed from the board
 	public boolean reap();

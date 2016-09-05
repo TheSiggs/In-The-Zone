@@ -169,6 +169,17 @@ public class GameDataFactory implements HasJSONRepresentation {
 	}
 
 	/**
+	 * Get the standard sprites.  May return null.
+	 * */
+	public StandardSprites getStandardSprites() {
+		try {
+			return new StandardSprites(globalLibrary);
+		} catch (CorruptDataException e) {
+			return null;
+		}
+	}
+
+	/**
 	 * May return null
 	 * */
 	public CharacterInfo getCharacter(String name) {

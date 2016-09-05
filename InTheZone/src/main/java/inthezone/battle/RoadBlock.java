@@ -1,17 +1,21 @@
 package inthezone.battle;
 
 import inthezone.battle.data.Player;
+import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
 import isogame.engine.MapPoint;
+import isogame.engine.SpriteInfo;
 
 public class RoadBlock implements Targetable {
 	private final static int HITS_TO_DESTROY = 2;
 	private final MapPoint pos;
 	private int hits;
+	private final SpriteInfo sprite;
 
-	public RoadBlock(MapPoint pos) {
+	public RoadBlock(MapPoint pos, StandardSprites sprites) {
 		this.pos = pos;
 		hits = HITS_TO_DESTROY;
+		this.sprite = sprites.roadBlock;
 	}
 
 	@Override public boolean blocksSpace(Player player) {return true;}
@@ -29,5 +33,7 @@ public class RoadBlock implements Targetable {
 	@Override public boolean isEnemyOf(Character character) {return true;}
 	@Override public boolean isDead() {return hits == 0;}
 	@Override public boolean reap() {return isDead();}
+
+	@Override public SpriteInfo getSprite() {return sprite;}
 }
 

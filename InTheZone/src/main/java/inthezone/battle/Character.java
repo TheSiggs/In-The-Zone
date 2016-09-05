@@ -217,6 +217,8 @@ public class Character implements Targetable {
 
 	@Override public boolean reap() {return false;}
 
+	@Override public SpriteInfo getSprite() {return sprite;}
+
 	@Override public boolean blocksSpace(Player player) {
 		return true;
 	}

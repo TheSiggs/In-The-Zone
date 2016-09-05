@@ -138,7 +138,9 @@ public class StartBattleCommand implements HasJSONRepresentation {
 	}
 
 	public Battle doCmd(GameDataFactory gameData) {
-		return new Battle(new BattleState(gameData.getStage(stage), characters));
+		return new Battle(
+			new BattleState(gameData.getStage(stage), characters),
+			gameData.getStandardSprites());
 	}
 }
 

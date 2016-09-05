@@ -1,6 +1,7 @@
 package inthezone.battle;
 
 import inthezone.battle.data.Player;
+import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,9 +14,11 @@ import java.util.stream.Stream;
  * */
 public class Battle {
 	public BattleState battleState;
+	private StandardSprites sprites;
 
-	public Battle(BattleState battleState) {
+	public Battle(BattleState battleState, StandardSprites sprites) {
 		this.battleState = battleState;
+		this.sprites = sprites;
 	}
 
 	/**
@@ -90,7 +93,7 @@ public class Battle {
 	public List<Targetable> doObstacles(Collection<MapPoint> obstacles) {
 		List<Targetable> r = new ArrayList<>();
 		for (MapPoint p : obstacles) {
-			r.add(battleState.placeObstacle(p));
+			r.add(battleState.placeObstacle(p, sprites));
 		}
 		return r;
 	}

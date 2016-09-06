@@ -46,6 +46,10 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			if (t.pre) preTargets.add(t.target);
 			if (t.post) postTargets.add(t.target);
 		}
+		ability.info.instantBefore.ifPresent(i -> {
+			if (i.isField()) preTargets.add(new MapPoint(0, 0));});
+		ability.info.instantAfter.ifPresent(i -> {
+			if (i.isField()) postTargets.add(new MapPoint(0, 0));});
 
 		InstantEffectCommand preEffect = null;
 		UseAbilityCommand mainEffect;
@@ -83,8 +87,11 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		Optional<UseAbilityCommand> postCommand,
 		Optional<InstantEffectCommand> postEffect
 	) {
-		Collection<MapPoint> targetArea =
-			battleState.getTargetableArea(agent, castFrom, ability);
+		Collection<MapPoint> targetArea = targets.stream()
+			.flatMap(t -> battleState.getAffectedArea(
+				agent, castFrom, ability, t).stream())
+			.collect(Collectors.toList());
+
 		return new InstantEffectCommand(InstantEffectFactory.getEffect(
 			battleState, effect, castFrom, targetArea, effectTargets),
 			postCommand, postEffect);

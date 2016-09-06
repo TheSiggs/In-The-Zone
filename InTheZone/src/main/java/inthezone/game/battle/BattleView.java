@@ -698,6 +698,7 @@ public class BattleView
 
 	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
 		for (Targetable t : tios) {
+			if (t instanceof Character) continue;
 			if (!temporaryImmobileObjects.containsKey(t.getPos())) {
 				Sprite s = new Sprite(t.getSprite());
 				s.pos = t.getPos();

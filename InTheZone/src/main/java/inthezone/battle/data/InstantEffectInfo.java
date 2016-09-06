@@ -2,6 +2,9 @@ package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
 
+/**
+ * Static data regarding an instant effect.
+ * */
 public class InstantEffectInfo {
 	public final InstantEffectType type;
 	public final int param;
@@ -29,6 +32,14 @@ public class InstantEffectInfo {
 			}
 		}
 		this.param = paramv;
+	}
+
+	/**
+	 * Determine if this instant effect is a field effect (i.e. it doesn't need
+	 * an explicit target).
+	 * */
+	public boolean isField() {
+		return type == InstantEffectType.OBSTACLES;
 	}
 
 	@Override

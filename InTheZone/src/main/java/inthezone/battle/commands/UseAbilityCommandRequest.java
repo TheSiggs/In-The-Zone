@@ -47,9 +47,9 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			if (t.post) postTargets.add(t.target);
 		}
 		ability.info.instantBefore.ifPresent(i -> {
-			if (i.isField()) preTargets.add(new MapPoint(0, 0));});
+			if (i.isField()) preTargets.addAll(targets);});
 		ability.info.instantAfter.ifPresent(i -> {
-			if (i.isField()) postTargets.add(new MapPoint(0, 0));});
+			if (i.isField()) postTargets.addAll(targets);});
 
 		InstantEffectCommand preEffect = null;
 		UseAbilityCommand mainEffect;

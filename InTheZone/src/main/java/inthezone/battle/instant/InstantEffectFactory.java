@@ -26,7 +26,7 @@ public class InstantEffectFactory {
 			case PUSH: return Push.getEffect(battleState, info, castFrom, targets);
 			case PULL: return Pull.getEffect(battleState, info, castFrom, targets);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets);
-			case OBSTACLES: return Obstacles.getEffect(battleState, info, attackArea);
+			case OBSTACLES: return Obstacles.getEffect(battleState, info, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}
 	}

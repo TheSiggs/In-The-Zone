@@ -21,33 +21,16 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Obstacles implements InstantEffect {
-	private final int param;
 	private final Collection<MapPoint> placements;
-	private Collection<MapPoint> attackArea = null;
 
-	private Obstacles(
-		int param,
-		Collection<MapPoint> placements
-	) {
-		this.param = param;
+	private Obstacles(Collection<MapPoint> placements) {
 		this.placements = placements;
-	}
-
-	private Obstacles(
-		int param,
-		Collection<MapPoint> placements,
-		Collection<MapPoint> attackArea
-	) {
-		this.param = param;
-		this.placements = placements;
-		this.attackArea = attackArea;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		o.put("kind", InstantEffectType.OBSTACLES.toString());
-		o.put("param", param);
 
 		JSONArray a = new JSONArray();
 		for (MapPoint p : placements) a.add(p.getJSON());
@@ -59,11 +42,9 @@ public class Obstacles implements InstantEffect {
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
-		Object oparam = json.get("param");
 		Object oplacements = json.get("paths");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (oparam == null) throw new ProtocolException("Missing effect parameter");
 		if (oplacements == null) throw new ProtocolException("Missing effect placements");
 
 		try {
@@ -71,12 +52,11 @@ public class Obstacles implements InstantEffect {
 				throw new ProtocolException("Expected obstacles effect");
 
 			Collection<MapPoint> placements = new ArrayList<>();
-			Number param = (Number) oparam;
 			JSONArray rawPlacements = (JSONArray) oplacements;
 			for (int i = 0; i < rawPlacements.size(); i++) {
 				placements.add(MapPoint.fromJSON((JSONObject) rawPlacements.get(i)));
 			}
-			return new Obstacles(param.intValue(), placements);
+			return new Obstacles(placements);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing obstacles effect", e);
 		} catch (CorruptDataException e) {
@@ -87,23 +67,15 @@ public class Obstacles implements InstantEffect {
 	public static Obstacles getEffect(
 		BattleState battle,
 		InstantEffectInfo info,
-		Collection<MapPoint> attackArea
+		Collection<MapPoint> targets
 	) {
-		List<MapPoint> area = attackArea.stream()
-			.filter(p -> battle.isSpaceFree(p))
-			.collect(Collectors.toList());
-		Collections.shuffle(area);
-		int n = info.param > area.size() ? area.size() : info.param;
-		Collection<MapPoint> placements = new ArrayList<>();
-		placements.addAll(area.subList(0, n));
-		return new Obstacles(info.param, placements, attackArea);
+		return new Obstacles(targets);
 	}
 
 	@Override public List<Targetable> apply(Battle battle) throws CommandException {
-		if (!placements.stream().allMatch(p -> battle.battleState.isSpaceFree(p)))
-			throw new CommandException("Attempted to place obstacles in occupied space");
-
-		return battle.doObstacles(placements);
+		return battle.doObstacles(placements.stream()
+			.filter(p -> battle.battleState.isSpaceFree(p))
+			.collect(Collectors.toList()));
 	}
 
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {
@@ -113,9 +85,7 @@ public class Obstacles implements InstantEffect {
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget
 	) {
-		return getEffect(battle,
-			new InstantEffectInfo(InstantEffectType.OBSTACLES, this.param),
-			this.attackArea);
+		return this;
 	}
 
 	@Override public boolean isComplete() {return true;}

@@ -4,8 +4,9 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '1.2.3'
   id 'java'
   id 'application'
+  id 'distribution'
 }
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
@@ -54,17 +55,30 @@ run {
 */
 
 // The following doesn't work yet:
+/*
 task serverJar(type: ShadowJar) {
 	archiveName = 'foo.jar'
     version = version
-	/*
 	manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
         	'Implementation-Version': version,
         	'Main-Class': mainClassName
     }
-	*/
     //baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     //with jar
+}
+*/
+
+task server {
+	mainClass = serverClass
+}
+distributions {
+    main {
+        baseName = 'game'
+		contents {
+            from { 'src/main/resources' }
+			from { 'start_scripts' }
+        }
+    }
 }

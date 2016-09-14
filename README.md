@@ -15,3 +15,25 @@ Note that currently, this file requires manual unzipping and
 assumes that Java 8 RE is installed correctly.
 
 Bundled JRE to come.
+
+With
+
+```bash
+./gradlew clean installDist
+```
+
+you can unzip and test the distribution.
+
+Starting The Game
+=================
+
+To start the game and test it, you need to run
+
+```bash
+./start_server_unix.sh # Linux, Mac OS and other Unix OS
+start_server # Windows
+
+# start the game client
+./game.sh # Unix (Mac OS, Linux etc)
+
+```

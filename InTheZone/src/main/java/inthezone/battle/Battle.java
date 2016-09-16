@@ -1,5 +1,6 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.Command;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
@@ -24,8 +25,10 @@ public class Battle {
 	/**
 	 * Perform operations at the start of a player's turn.
 	 * */
-	public void doTurnStart(Player player) {
-		for (Character c : battleState.characters) c.turnReset(player);
+	public List<Command> doTurnStart(Player player) {
+		return battleState.characters.stream()
+			.flatMap(c -> c.turnReset(this, player).stream())
+			.collect(Collectors.toList());
 	}
 
 	/**

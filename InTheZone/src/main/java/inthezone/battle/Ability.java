@@ -117,9 +117,11 @@ public class Ability {
 			healingFormula(a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats) :
 			damageFormula(a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats);
 
+		double chance = info.chance + a.getChanceBuff();
+
 		return new DamageToTarget(t.getPos(), (int) Math.ceil(damage),
-			imposeEffect(info.chance, info.statusEffect.orElse(null)),
-			Math.random() < info.chance, Math.random() < info.chance);
+			imposeEffect(chance, info.statusEffect.orElse(null)),
+			Math.random() < chance, Math.random() < chance);
 	}
 
 	private <T> T imposeEffect(double p, T effect) {

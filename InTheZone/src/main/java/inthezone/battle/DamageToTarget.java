@@ -2,6 +2,7 @@ package inthezone.battle;
 
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.StatusEffectInfo;
+import inthezone.battle.status.StatusEffect;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;

@@ -18,16 +18,14 @@ public class PathFinderNode extends Node<MapPoint> {
 		Node<MapPoint> parent,
 		StageInfo terrain,
 		Set<MapPoint> obstacles,
-		int width,
-		int height,
 		MapPoint start,
 		MapPoint goal
 	) {
 		super(parent, start, goal);
 		this.terrain = terrain;
 		this.obstacles = obstacles;
-		this.width = width;
-		this.height = height;
+		this.width = terrain.w;
+		this.height = terrain.h;
 	}
 
 	@Override
@@ -38,8 +36,6 @@ public class PathFinderNode extends Node<MapPoint> {
 			this.getParent(),
 			terrain,
 			this.obstacles,
-			this.width,
-			this.height,
 			goal,
 			goal);
 	}
@@ -75,7 +71,7 @@ public class PathFinderNode extends Node<MapPoint> {
 	}
 
 	private PathFinderNode nextNode(MapPoint x) {
-		return new PathFinderNode(this, terrain, obstacles, width, height, x, getGoal());
+		return new PathFinderNode(this, terrain, obstacles, x, getGoal());
 	}
 
 	private boolean canTraverseBoundary(MapPoint from, MapPoint to, SlopeType slope) {

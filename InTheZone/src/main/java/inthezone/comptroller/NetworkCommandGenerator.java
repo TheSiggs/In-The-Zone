@@ -26,6 +26,8 @@ public class NetworkCommandGenerator implements CommandGenerator {
 	public void generateCommands(
 		Battle battle, BattleListener listener, Player forPlayer
 	) {
+		battle.doTurnStart(forPlayer);
+
 		while (true) {
 			try {
 				Command cmd = commandQueue.take();

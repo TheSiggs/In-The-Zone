@@ -143,7 +143,7 @@ public class BattleState {
 	/**
 	 * Points that are already occupied.
 	 * */
-	private Set<MapPoint> spaceObstacles(Player player) {
+	public Set<MapPoint> spaceObstacles(Player player) {
 		Set<MapPoint> r = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksSpace(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
@@ -154,7 +154,7 @@ public class BattleState {
 	/**
 	 * Obstacles that cannot be moved through.
 	 * */
-	private Set<MapPoint> movementObstacles(Player player) {
+	public Set<MapPoint> movementObstacles(Player player) {
 		Set<MapPoint> obstacles = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksPath(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
@@ -176,9 +176,7 @@ public class BattleState {
 		Set<MapPoint> obstacles = movementObstacles(player);
 		
 		AStarSearch<MapPoint> search = new AStarSearch<>(new PathFinderNode(
-			null, terrain.terrain, obstacles,
-			terrain.terrain.w, terrain.terrain.h,
-			start, target));
+			null, terrain.terrain, obstacles, start, target));
 
 		List<MapPoint> r = search.search().stream()
 			.map(n -> n.getPosition()).collect(Collectors.toList());

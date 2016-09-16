@@ -112,7 +112,13 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void turn() {
-		battle.doTurnStart(thisPlayer);
+		try {
+			commandQueue.addAll(battle.doTurnStart(thisPlayer));
+			if (doCommands()) return;
+		} catch (CommandException e) {
+			Platform.runLater(() -> listener.badCommand(e));
+		}
+
 		Platform.runLater(() ->
 			listener.startTurn(battle.battleState.cloneCharacters()));
 

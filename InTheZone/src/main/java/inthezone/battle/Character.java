@@ -1,11 +1,15 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.Command;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
+import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -128,6 +132,19 @@ public class Character implements Targetable {
 		return hasMana;
 	}
 
+	/**
+	 * Buff or debuff this character's points. Should be done after the turn reset.
+	 * */
+	public void pointsBuff(int ap, int mp, int hp) {
+		this.ap += ap;
+		this.mp += mp;
+		this.hp += hp;
+		if (this.hp > maxHP) this.hp = maxHP;
+		if (this.ap < 0) ap = 0;
+		if (this.mp < 0) mp = 0;
+		if (this.hp < 0) hp = 0;
+	}
+
 	public void moveTo(MapPoint p, boolean hasMana) {
 		this.hasMana = hasMana;
 		mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
@@ -166,12 +183,26 @@ public class Character implements Targetable {
 	 * Call this at the start of each turn.
 	 * @param player The player who's turn is starting
 	 * */
-	public void turnReset(Player player) {
+	public List<Command> turnReset(Battle battle, Player player) {
 		if (this.player == player) {
 			Stats stats = getStats();
 			ap = stats.ap;
 			mp = stats.mp;
 		}
+
+		// handle status effects
+		List<Command> r = new ArrayList<>();
+		statusBuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
+		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
+
+		statusBuff.ifPresent(s -> {
+			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
+		});
+		statusDebuff.ifPresent(s -> {
+			if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
+		});
+
+		return r;
 	}
 
 	/**
@@ -191,15 +222,19 @@ public class Character implements Targetable {
 	}
 
 	@Override public double getAttackBuff() {
-		double buff = statusBuff.map(s -> s.attackBuff).orElse(0.0);
-		double debuff = statusDebuff.map(s -> s.attackBuff).orElse(0.0);
+		double buff = statusBuff.map(s -> s.getAttackBuff()).orElse(0.0);
+		double debuff = statusDebuff.map(s -> s.getAttackBuff()).orElse(0.0);
 		return buff - debuff;
 	}
 
 	@Override public double getDefenceBuff() {
-		double buff = statusBuff.map(s -> s.defenceBuff).orElse(0.0);
-		double debuff = statusDebuff.map(s -> s.defenceBuff).orElse(0.0);
+		double buff = statusBuff.map(s -> s.getDefenceBuff()).orElse(0.0);
+		double debuff = statusDebuff.map(s -> s.getDefenceBuff()).orElse(0.0);
 		return buff - debuff;
+	}
+
+	public double getChanceBuff() {
+		return statusBuff.map(s -> s.getChanceBuff()).orElse(0.0);
 	}
 
 	@Override public void dealDamage(int damage) {

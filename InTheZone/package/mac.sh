@@ -9,7 +9,11 @@ baseName=$4
 postFix=$5
 packageName="$baseName$postFix"
 
-javapackager \
+jdk=$(/usr/libexec/java_home)
+export JAVA_HOME=$jdk
+
+#
+$jdk/bin/javapackager \
     -deploy \
     -BappVersion=$version \
     -Bmac.CFBundleIdentifier=$packageName \

@@ -45,3 +45,12 @@ task packageNative(type: Exec, dependsOn:shadowJar) {
 
 	args project.version, shadowJar.archivePath, mainClassName, baseName, 'Server'
 }
+distributions {
+	main {
+		baseName = 'game'
+			contents {
+				from { 'src/main/resources' }
+				from { 'start_scripts' }
+			}
+	}
+}

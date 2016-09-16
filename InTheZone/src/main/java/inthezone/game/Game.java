@@ -2,6 +2,7 @@ package inthezone.game;
 
 import inthezone.battle.data.GameDataFactory;
 import inthezone.comptroller.Network;
+import inthezone.server.Server;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,7 +18,8 @@ public class Game extends Application {
 	/* TODO: find a way to set these from the build system */
 	private final static boolean IS_DEVEL_BUILD = true;
 	private final static String DEFAULT_SERVER = "127.0.0.1"; // TODO: update with the ip of the real sever
-	private final static int DEFAULT_PORT = 8000; // TODO: update this with the real default port
+	// get the default port from the server!
+	//private final static int DEFAULT_PORT = 8000; // TODO: update this with the real default port
 
 	public static void main(final String[] arguments) {
 		Application.launch(arguments);
@@ -42,7 +44,7 @@ public class Game extends Application {
 			server = args.getOrDefault("server", "127.0.0.1");
 			try {
 				port = Optional.ofNullable(args.get("port"))
-					.map(x -> Integer.parseInt(x)).orElse(DEFAULT_PORT);
+					.map(x -> Integer.parseInt(x)).orElse(Server.DEFAULT_PORT);
 			} catch (NumberFormatException e) {
 				port = 0; // need to set this to prevent compiler error
 				System.err.println("Port parameter must be a number");
@@ -51,7 +53,7 @@ public class Game extends Application {
 		} else {
 			basedir = Optional.empty();
 			server = DEFAULT_SERVER;
-			port = DEFAULT_PORT;
+			port = Server.DEFAULT_PORT;
 		}
 
 		try {

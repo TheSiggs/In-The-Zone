@@ -16,4 +16,6 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'InTheZone'
+//rootProject.name = 'InTheZone'
+include 'client'
+include 'server'

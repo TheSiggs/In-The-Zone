@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class Server {
 	public static final int DEFAULT_BACKLOG = 10;
-	public static final int DEFAULT_PORT = 80;
+	public static final int DEFAULT_PORT = 8000; // for now!
 
 	public static void main(String args[]) {
 		Map<String, String> parsedArgs = new HashMap<>();

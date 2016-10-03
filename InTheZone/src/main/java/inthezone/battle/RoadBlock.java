@@ -3,6 +3,7 @@ package inthezone.battle;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
+import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
@@ -29,6 +30,7 @@ public class RoadBlock implements Targetable {
 		hits -= 1;
 		if (hits < 0) hits = 0;
 	}
+	@Override public void applyStatus(StatusEffect status) {return;}
 	@Override public boolean isPushable() {return false;}
 	@Override public boolean isEnemyOf(Character character) {return true;}
 	@Override public boolean isDead() {return hits == 0;}

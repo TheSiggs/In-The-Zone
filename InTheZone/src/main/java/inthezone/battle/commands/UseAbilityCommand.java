@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.Targetable;
@@ -58,7 +59,7 @@ public class UseAbilityCommand extends Command {
 		return r;
 	}
 
-	public static UseAbilityCommand fromJSON(JSONObject json)
+	public static UseAbilityCommand fromJSON(JSONObject json, BattleState battle)
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
@@ -89,7 +90,7 @@ public class UseAbilityCommand extends Command {
 			JSONArray rawTargets = (JSONArray) otargets;
 			Collection<DamageToTarget> targets = new ArrayList<>();
 			for (int i = 0; i < rawTargets.size(); i++) {
-				targets.add(DamageToTarget.fromJSON((JSONObject) rawTargets.get(i)));
+				targets.add(DamageToTarget.fromJSON((JSONObject) rawTargets.get(i), battle));
 			}
 			return new UseAbilityCommand(
 				agent, castFrom, ability, targets,

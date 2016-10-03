@@ -5,6 +5,7 @@ import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.MoveCommand;
+import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.PathFinderNode;
 import isogame.engine.MapPoint;
 import java.util.LinkedList;
@@ -13,6 +14,10 @@ import java.util.Set;
 import nz.dcoder.ai.astar.Node;
 
 public class PanickedStatusEffect extends StatusEffect {
+	public PanickedStatusEffect(StatusEffectInfo info) {
+		super(info);
+	}
+
 	public List<Command> doBeforeTurn(Battle battle, Character c) {
 		final Set<MapPoint> obstacles = battle.battleState.spaceObstacles(c.player);
 

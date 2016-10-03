@@ -1,14 +1,17 @@
 package inthezone.battle.status;
 
+import inthezone.battle.data.StatusEffectInfo;
+
 public class BasicStatusEffect extends StatusEffect {
 	private final double attackBuff;
 	private final double defenceBuff;
 	private final double chanceBuff;
 
 	public BasicStatusEffect(
+		StatusEffectInfo info,
 		double attackBuff, double defenceBuff, double chanceBuff
 	) {
-		super();
+		super(info);
 
 		this.attackBuff = attackBuff;
 		this.defenceBuff = defenceBuff;

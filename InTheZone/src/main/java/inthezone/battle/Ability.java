@@ -4,6 +4,7 @@ import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.Range;
 import inthezone.battle.data.Stats;
+import inthezone.battle.status.StatusEffectFactory;
 import java.util.Optional;
 
 public class Ability {
@@ -116,16 +117,19 @@ public class Ability {
 		double damage = info.heal?
 			healingFormula(a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats) :
 			damageFormula(a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats);
+		int rdamage = (int) Math.ceil(damage);
 
 		double chance = info.chance + a.getChanceBuff();
 
-		return new DamageToTarget(t.getPos(), (int) Math.ceil(damage),
-			imposeEffect(chance, info.statusEffect.orElse(null)),
+		return new DamageToTarget(t.getPos(), rdamage,
+			imposeEffect(chance, info.statusEffect
+				.map(i -> StatusEffectFactory.getEffect(i, rdamage, a))
+				.orElse(null)),
 			Math.random() < chance, Math.random() < chance);
 	}
 
-	private <T> T imposeEffect(double p, T effect) {
-		return Math.random() < p ? effect : null;
+	private <T> Optional<T> imposeEffect(double p, T effect) {
+		return Optional.ofNullable(Math.random() < p ? effect : null);
 	}
 }
 

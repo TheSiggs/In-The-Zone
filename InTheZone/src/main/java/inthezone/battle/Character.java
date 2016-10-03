@@ -4,6 +4,8 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
+import inthezone.battle.data.StatusEffectInfo;
+import inthezone.battle.data.StatusEffectKind;
 import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
@@ -240,6 +242,15 @@ public class Character implements Targetable {
 	@Override public void dealDamage(int damage) {
 		hp = Math.max(0, hp - damage);
 		System.err.println("HP: " + hp + " after damage " + damage);
+	}
+
+	@Override public void applyStatus(StatusEffect status) {
+		final StatusEffectInfo info = status.getInfo();
+		if (info.kind == StatusEffectKind.BUFF) {
+			statusBuff = Optional.of(status);
+		} else {
+			statusDebuff = Optional.of(status);
+		}
 	}
 
 	@Override public boolean isPushable() {

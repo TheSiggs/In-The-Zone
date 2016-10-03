@@ -59,6 +59,7 @@ public class Battle {
 					"Attempted to attack non-target, command verification code failed"));
 
 			t.dealDamage(d.damage);
+			d.statusEffect.ifPresent(s -> t.applyStatus(s));
 			if (t.reap()) battleState.removeObstacle(t);
 		}
 	}

@@ -134,6 +134,14 @@ public class Character implements Targetable {
 		return hasMana;
 	}
 
+	public Optional<StatusEffect> getStatusBuff() {
+		return statusBuff;
+	}
+
+	public Optional<StatusEffect> getStatusDebuff() {
+		return statusDebuff;
+	}
+
 	/**
 	 * Buff or debuff this character's points. Should be done after the turn reset.
 	 * */

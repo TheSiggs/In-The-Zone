@@ -16,6 +16,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final double chance;
 	public final boolean heal;
 	public final Range range;
+	public final boolean isMana;
 	public final Optional<AbilityInfo> mana;
 	public final Optional<AbilityInfo> subsequent;
 	public final int recursion;
@@ -56,6 +57,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.chance = chance;
 		this.heal = heal;
 		this.range = range;
+		this.isMana = false;
 		this.mana = mana;
 		this.subsequent = subsequent;
 		this.recursion = recursion;

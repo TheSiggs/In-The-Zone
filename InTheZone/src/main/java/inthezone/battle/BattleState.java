@@ -22,6 +22,8 @@ public class BattleState {
 	public final Stage terrain;
 	public final Collection<Character> characters;
 
+	private final double[] revengeBonus = {0, 0.2, 0.4, 0.9};
+
 	// superlist of all targetables (including characters and obstacles)
 	public final Collection<Targetable> targetable;
 
@@ -35,6 +37,14 @@ public class BattleState {
 
 		terrainObstacles = new HashSet<>(terrain.allSprites.stream()
 			.map(s -> s.pos).collect(Collectors.toList()));
+	}
+
+	/**
+	 * Get the revenge bonus for a player
+	 * */
+	public double getRevengeBonus(Player p) {
+		long cs = characters.stream().filter(c -> c.player == p).count();
+		if (cs == 0 || cs > 4) return 0; else return revengeBonus[(int) (4 - cs)];
 	}
 
 	/**

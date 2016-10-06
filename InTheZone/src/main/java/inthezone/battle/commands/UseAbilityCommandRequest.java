@@ -31,14 +31,17 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
+
 		Collection<DamageToTarget> allTargets =
-			battleState.getCharacterAt(agent).map(a ->
-				targets.stream()
+			battleState.getCharacterAt(agent).map(a -> {
+				double revengeBonus = battleState.getRevengeBonus(a.player);
+
+				return targets.stream()
 					.flatMap(t ->
 						battleState.getAbilityTargets(agent, castFrom, ability, t).stream())
-					.map(t -> ability.computeDamageToTarget(a, t))
-					.collect(Collectors.toList())
-			).orElseThrow(() -> new CommandException("Invalid ability command request"));
+					.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
+					.collect(Collectors.toList());
+			}).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
 		List<MapPoint> preTargets = new ArrayList<>();
 		List<MapPoint> postTargets = new ArrayList<>();

@@ -29,7 +29,7 @@ public class StatusEffectFactory {
 			case IMPRISONED: return new Imprisoned(info);
 			case FEARED: return new FearedStatusEffect(info, agent);
 			case PANICKED: return new PanickedStatusEffect(info);
-			case VAMPIRISM: throw new RuntimeException("Vampirism not implemented yet");
+			case VAMPIRISM: return new Vampirism(info);
 			default: throw new RuntimeException("This cannot happen");
 		}
 	}

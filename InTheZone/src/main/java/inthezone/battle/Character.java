@@ -7,6 +7,7 @@ import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.StatusEffectKind;
 import inthezone.battle.status.StatusEffect;
+import inthezone.battle.status.Vampirism;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 import java.util.ArrayList;
@@ -132,6 +133,10 @@ public class Character implements Targetable {
 
 	public boolean hasMana() {
 		return hasMana;
+	}
+
+	public boolean isVampiric() {
+		return statusBuff.map(s -> s instanceof Vampirism).orElse(false);
 	}
 
 	public Optional<StatusEffect> getStatusBuff() {

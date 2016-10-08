@@ -7,7 +7,7 @@ import inthezone.protocol.ProtocolException;
  * which behaves a little differently to the others.
  * */
 public enum CommandKind {
-	ENDTURN, MOVE, PUSH, ABILITY, INSTANT, ITEM, RESIGN;
+	ENDTURN, MOVE, PUSH, ABILITY, INSTANT, ITEM, RESIGN, FATIGUE;
 
 	@Override
 	public String toString() {
@@ -19,6 +19,7 @@ public enum CommandKind {
 			case INSTANT: return "Instant";
 			case ITEM: return "Item";
 			case RESIGN: return "Resign";
+			case FATIGUE: return "Fatigue";
 			default: throw new RuntimeException("This cannot happen");
 		}
 	}
@@ -32,6 +33,7 @@ public enum CommandKind {
 			case "Instant": return CommandKind.INSTANT;
 			case "Item": return CommandKind.ITEM;
 			case "Resign": return CommandKind.RESIGN;
+			case "Fatigue": return CommandKind.FATIGUE;
 			default: throw new ProtocolException("Unrecognised command kind " + s);
 		}
 	}

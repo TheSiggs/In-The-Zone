@@ -34,7 +34,7 @@ public class StatusEffectFactory {
 		}
 	}
 
-	public static StatusEffect fromJSON(JSONObject json, BattleState battle)
+	public static StatusEffect fromJSON(JSONObject json)
 		throws ProtocolException
 	{
 		Object oinfo = json.get("info");
@@ -45,7 +45,7 @@ public class StatusEffectFactory {
 			switch (info.type) {
 				case ONGOING:
 				case REGENERATION: return PointStatusEffect.fromJSON(json);
-				case FEARED: return FearedStatusEffect.fromJSON(json, battle);
+				case FEARED: return FearedStatusEffect.fromJSON(json);
 				default: return getEffect(info, 0, null);
 			}
 		} catch (CorruptDataException|ClassCastException e) {

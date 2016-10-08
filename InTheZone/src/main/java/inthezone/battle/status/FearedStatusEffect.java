@@ -19,12 +19,24 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 public class FearedStatusEffect extends StatusEffect {
+	private final MapPoint agentPos;
 	private final Character agent;
 	private final int g;
 
 	public FearedStatusEffect(StatusEffectInfo info, Character agent) {
 		super(info);
+		this.agentPos = agent.getPos();
 		this.agent = agent;
+		g = info.param;
+	}
+
+	/**
+	 * Construct an unresolved FearedStatusEffect
+	 * */
+	private FearedStatusEffect(StatusEffectInfo info, MapPoint agent) {
+		super(info);
+		this.agent = null;
+		this.agentPos = agent;
 		g = info.param;
 	}
 
@@ -37,7 +49,7 @@ public class FearedStatusEffect extends StatusEffect {
 		return r;
 	}
 
-	public static FearedStatusEffect fromJSON(JSONObject o, BattleState battle)
+	public static FearedStatusEffect fromJSON(JSONObject o)
 		throws ProtocolException
 	{
 		Object oagent = o.get("agent");
@@ -48,16 +60,19 @@ public class FearedStatusEffect extends StatusEffect {
 
 		try {
 			StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
-	
-			Character agent =
-				battle.getCharacterAt(
-					MapPoint.fromJSON((JSONObject) oagent))
-				.orElseThrow(() ->
-					new ProtocolException("Cannot find feared agent"));
-
+			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
 			return new FearedStatusEffect(info, agent);
 		} catch (ClassCastException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing feared status effect", e);
+		}
+	}
+
+	@Override
+	public StatusEffect resolve(BattleState battle) throws ProtocolException {
+		if (agent != null) return this; else {
+			return new FearedStatusEffect(info, 
+				battle.getCharacterAt(agentPos).orElseThrow(() ->
+					new ProtocolException("Cannot find feared agent")));
 		}
 	}
 

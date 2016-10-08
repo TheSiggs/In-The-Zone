@@ -96,6 +96,24 @@ public class Ability {
 	private static final double const_m = 0.5;
 	private static final double const_f = 0.15;
 
+	/**
+	 * The damage formula.
+	 * */
+	public static double damageFormulaStatic(
+		double q,
+		double manaBonus,
+		double r,
+		double attackBuff,
+		double defenceBuff,
+		Stats a, Stats t
+	) {
+		return
+			q * (1 + manaBonus + attackBuff - defenceBuff + r) *
+			(0.9 + (0.2 * Math.random())) *
+			(((double) a.attack) - ((double) t.defence)) *
+			((const_b * ((double) a.power)) / const_a);
+	}
+
 	private double damageFormula(
 		boolean agentHasMana,
 		double r,
@@ -105,12 +123,9 @@ public class Ability {
 	) {
 		double q = info.type == AbilityType.BASIC? 1 : info.eff;
 		double manaBonus = agentHasMana && !isMana? const_m : 0;
-		return
-			q * (1 + manaBonus + attackBuff - defenceBuff + r) *
-			(0.9 + (0.2 * Math.random())) *
-			(((double) a.attack) - ((double) t.defence)) *
-			((const_b * ((double) a.power)) / const_a);
+		return damageFormulaStatic(q, manaBonus, r, attackBuff, defenceBuff, a, t);
 	}
+
 
 	private double healingFormula(boolean manaBonus, double q, Stats t) {
 		return (const_h * (q + (manaBonus? const_m : 0)) *

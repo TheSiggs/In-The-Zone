@@ -1,6 +1,7 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
@@ -17,7 +18,9 @@ public abstract class Command implements HasJSONRepresentation {
 	/**
 	 * Parse a command.
 	 * */
-	public static Command fromJSON(JSONObject json) throws ProtocolException {
+	public static Command fromJSON(JSONObject json)
+		throws ProtocolException
+	{
 		Object okind = json.get("kind");
 		if (okind == null) throw new ProtocolException("Missing command kind");
 		switch (CommandKind.fromString((String) okind)) {
@@ -28,6 +31,7 @@ public abstract class Command implements HasJSONRepresentation {
 			case INSTANT: return InstantEffectCommand.fromJSON(json);
 			case ITEM: return UseItemCommand.fromJSON(json);
 			case RESIGN: return ResignCommand.fromJSON(json);
+			case FATIGUE: return FatigueCommand.fromJSON(json);
 			default: throw new RuntimeException("This cannot happen");
 		}
 	}

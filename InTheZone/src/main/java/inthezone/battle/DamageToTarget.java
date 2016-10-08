@@ -40,7 +40,7 @@ public class DamageToTarget implements HasJSONRepresentation {
 		return r;
 	}
 
-	public static DamageToTarget fromJSON(JSONObject json, BattleState battle)
+	public static DamageToTarget fromJSON(JSONObject json)
 		throws ProtocolException
 	{
 		Object otarget = json.get("target");
@@ -56,7 +56,7 @@ public class DamageToTarget implements HasJSONRepresentation {
 
 			Optional<StatusEffect> effect = Optional.empty();
 			if (ostatus != null) {
-				effect = Optional.of(StatusEffectFactory.fromJSON((JSONObject) ostatus, battle));
+				effect = Optional.of(StatusEffectFactory.fromJSON((JSONObject) ostatus));
 			}
 
 			return new DamageToTarget(target, damage.intValue(), effect, false, false);

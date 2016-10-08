@@ -1,9 +1,11 @@
 package inthezone.battle.status;
 
 import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.data.StatusEffectInfo;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,15 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	public double getChanceBuff() {return 0.0;}
 	public List<Command> doBeforeTurn(Battle battle, Character c) {
 		return new ArrayList<>();
+	}
+
+	/**
+	 * Some status effects require extra information not available at parsing
+	 * time.  This command supplies the extra information.  It should be called
+	 * before applying a status effect to a character.
+	 * */
+	public StatusEffect resolve(BattleState battle) throws ProtocolException {
+		return this;
 	}
 
 	@Override

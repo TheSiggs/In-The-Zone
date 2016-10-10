@@ -110,11 +110,17 @@ public class HUD extends AnchorPane {
 
 		pushItem.setOnAction(event -> view.usePush());
 
+		attackItem.setDisable(c.isStunned() || c.getAP() < 1);
+		pushItem.setDisable(c.isStunned() || c.getAP() < 1);
+
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
 			MenuItem i = new MenuItem(ability.info.name);
-			i.setDisable(ability.info.ap > c.getAP() || ability.info.mp > c.getMP());
+			i.setDisable(
+				ability.info.ap > c.getAP() ||
+				ability.info.mp > c.getMP() ||
+				c.isAbilityBlocked(a));
 			i.setOnAction(event -> view.useAbility(ability));
 			abilitiesMenu.getItems().add(i);
 		}

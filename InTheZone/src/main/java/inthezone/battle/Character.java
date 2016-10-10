@@ -1,12 +1,17 @@
 package inthezone.battle;
 
 import inthezone.battle.commands.Command;
+import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.StatusEffectKind;
+import inthezone.battle.status.Debilitated;
+import inthezone.battle.status.Imprisoned;
+import inthezone.battle.status.Silenced;
 import inthezone.battle.status.StatusEffect;
+import inthezone.battle.status.Stunned;
 import inthezone.battle.status.Vampirism;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
@@ -139,6 +144,20 @@ public class Character implements Targetable {
 		return statusBuff.map(s -> s instanceof Vampirism).orElse(false);
 	}
 
+	public boolean isStunned() {
+		return statusBuff.map(s -> s instanceof Stunned).orElse(false);
+	}
+
+	public boolean isAbilityBlocked(Ability a) {
+		if (a.info.type == AbilityType.SKILL) {
+			return statusDebuff.map(s -> s instanceof Debilitated).orElse(false);
+		} else if (a.info.type == AbilityType.SPELL) {
+			return statusDebuff.map(s -> s instanceof Silenced).orElse(false);
+		} else {
+			return statusDebuff.map(s -> s instanceof Stunned).orElse(false);
+		}
+	}
+
 	public Optional<StatusEffect> getStatusBuff() {
 		return statusBuff;
 	}
@@ -160,7 +179,14 @@ public class Character implements Targetable {
 		if (this.hp < 0) hp = 0;
 	}
 
+	/**
+	 * Move the character spending movement points
+	 * */
 	public void moveTo(MapPoint p, boolean hasMana) {
+		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+			return;
+		}
+
 		this.hasMana = hasMana;
 		mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
 		if (mp < 0) mp = 0;
@@ -190,6 +216,10 @@ public class Character implements Targetable {
 	}
 
 	public void teleport(MapPoint p, boolean hasMana) {
+		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+			return;
+		}
+
 		this.hasMana = hasMana;
 		this.pos = p;
 	}

@@ -12,6 +12,9 @@ public interface Targetable extends Obstacle {
 	public double getAttackBuff();
 	public double getDefenceBuff();
 	public void dealDamage(int damage);
+	public void defuse();
+	public void cleanse();
+	public void purge();
 	public void applyStatus(StatusEffect status);
 	public boolean isPushable();
 	public boolean isEnemyOf(Character character);

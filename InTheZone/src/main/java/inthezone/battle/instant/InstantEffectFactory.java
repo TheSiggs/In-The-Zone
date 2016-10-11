@@ -22,7 +22,9 @@ public class InstantEffectFactory {
 		List<MapPoint> targets
 	) {
 		switch (info.type) {
-			case CLEANSE: return Cleanse.getEffect(targets);
+			case CLEANSE: /* fallthrough */
+			case DEFUSE: /* fallthrough */
+			case PURGE: return SimpleInstantEffect.getEffect(targets, info.type);
 			case PUSH: return Push.getEffect(battleState, info, castFrom, targets);
 			case PULL: return Pull.getEffect(battleState, info, castFrom, targets);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets);
@@ -34,23 +36,22 @@ public class InstantEffectFactory {
 	public static InstantEffect fromJSON(JSONObject o) throws ProtocolException {
 		Object okind = o.get("kind");
 		if (okind == null) throw new ProtocolException("Missing effect kind");
+
 		try {
 			InstantEffectType kind = InstantEffectType.fromString((String) okind);
 			switch (kind) {
-				case CLEANSE: return Cleanse.fromJSON(o);
+				case CLEANSE: /* fallthrough */
+				case DEFUSE: /* fallthrough */
+				case PURGE: return SimpleInstantEffect.fromJSON(o);
 				case PUSH: return Push.fromJSON(o);
 				case PULL: return Pull.fromJSON(o);
 				case TELEPORT: return Teleport.fromJSON(o);
 				case OBSTACLES: return Obstacles.fromJSON(o);
 				default: throw new ProtocolException("Unimplemented effect " + kind);
 			}
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing effect", e);
-		} catch (CorruptDataException e) {
+		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing effect", e);
 		}
-
-
 	}
 }
 

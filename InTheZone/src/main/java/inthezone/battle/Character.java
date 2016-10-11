@@ -253,11 +253,6 @@ public class Character implements Targetable {
 	/**
 	 * Remove all status effects
 	 * */
-	public void cleanse() {
-		statusBuff = Optional.empty();
-		statusDebuff = Optional.empty();
-	}
-
 	@Override public Stats getStats() {
 		return baseStats;
 	}
@@ -286,6 +281,15 @@ public class Character implements Targetable {
 		hp = Math.max(0, hp - damage);
 		System.err.println("HP: " + hp + " after damage " + damage);
 	}
+
+	@Override public void defuse() {return;}
+
+	@Override public void cleanse() {
+		statusBuff = Optional.empty();
+		statusDebuff = Optional.empty();
+	}
+
+	@Override public void purge() {return;}
 
 	@Override public void applyStatus(StatusEffect status) {
 		final StatusEffectInfo info = status.getInfo();

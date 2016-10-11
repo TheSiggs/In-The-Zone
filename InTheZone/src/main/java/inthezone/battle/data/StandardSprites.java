@@ -15,10 +15,12 @@ import java.util.Map;
  * */
 public class StandardSprites {
 	public final SpriteInfo roadBlock;
+	public final SpriteInfo trap;
 	public final Map<StatusEffectType, Image> statusEffects = new HashMap<>();
 
 	public StandardSprites(Library l, ResourceLocator loc) throws CorruptDataException {
 		this.roadBlock = l.getSprite("roadblock");
+		this.trap = null; /* TODO: fix this */
 		Arrays.stream(StatusEffectType.class.getEnumConstants()).forEach(t -> {
 			try {
 				statusEffects.put(t, new Image(loc.gfx(t.getIconName())));

@@ -134,11 +134,28 @@ public class Battle {
 		}).orElse(Stream.empty()).collect(Collectors.toList());
 	}
 
-	public List<Targetable> doCleanse(MapPoint target) {
-		return battleState.getCharacterAt(target).map(c -> {
-			c.cleanse();
-			return Stream.of(c);
-		}).orElse(Stream.empty()).collect(Collectors.toList());
+	public List<Targetable> doCleanse(Collection<MapPoint> targets) {
+		return targets.stream().flatMap(ot ->
+				battleState.getTargetableAt(ot).map(t -> {
+					t.cleanse(); return Stream.of(t);
+				}).orElse(Stream.empty())
+			).collect(Collectors.toList());
+	}
+
+	public List<Targetable> doDefuse(Collection<MapPoint> targets) {
+		return targets.stream().flatMap(ot ->
+				battleState.getTargetableAt(ot).map(t -> {
+					t.defuse(); return Stream.of(t);
+				}).orElse(Stream.empty())
+			).collect(Collectors.toList());
+	}
+
+	public List<Targetable> doPurge(Collection<MapPoint> targets) {
+		return targets.stream().flatMap(ot ->
+				battleState.getTargetableAt(ot).map(t -> {
+					t.purge(); return Stream.of(t);
+				}).orElse(Stream.empty())
+			).collect(Collectors.toList());
 	}
 
 	public List<Targetable> doObstacles(Collection<MapPoint> obstacles) {

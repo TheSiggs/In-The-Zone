@@ -17,24 +17,28 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Cleanse implements InstantEffect {
+public class SimpleInstantEffect implements InstantEffect {
 	private final Collection<MapPoint> targets;
+	private final InstantEffectType type;
 
-	private Cleanse(Collection<MapPoint> targets) {
+	private SimpleInstantEffect(
+		Collection<MapPoint> targets, InstantEffectType type
+	) {
 		this.targets = targets;
+		this.type = type;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
-		o.put("kind", InstantEffectType.CLEANSE.toString());
+		o.put("kind", type.toString());
 		for (MapPoint t : targets) a.add(t.getJSON());
 		o.put("targets", a);
 		return o;
 	}
 
-	public static Cleanse fromJSON(JSONObject json)
+	public static SimpleInstantEffect fromJSON(JSONObject json)
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
@@ -44,15 +48,18 @@ public class Cleanse implements InstantEffect {
 		if (otargets == null) throw new ProtocolException("Missing effect targets");
 
 		try {
-			if (InstantEffectType.fromString((String) okind) != InstantEffectType.CLEANSE)
-				throw new ProtocolException("Expected cleanse effect");
+			InstantEffectType type = InstantEffectType.fromString((String) okind);
+			if (!(type == InstantEffectType.CLEANSE ||
+				type == InstantEffectType.DEFUSE ||
+				type == InstantEffectType.PURGE)
+			) throw new ProtocolException("Expected cleanse, defuse or purge effect");
 
 			JSONArray rawTargets = (JSONArray) otargets;
 			List<MapPoint> targets = new ArrayList<>();
 			for (int i = 0; i < rawTargets.size(); i++) {
 				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
 			}
-			return new Cleanse(targets);
+			return new SimpleInstantEffect(targets, type);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing cleanse effect", e);
 		} catch (CorruptDataException e) {
@@ -60,23 +67,28 @@ public class Cleanse implements InstantEffect {
 		}
 	}
 
-	public static Cleanse getEffect(
-		Collection<MapPoint> targets
+	public static SimpleInstantEffect getEffect(
+		Collection<MapPoint> targets, InstantEffectType type
 	) {
-		return new Cleanse(targets);
+		return new SimpleInstantEffect(targets, type);
 	}
 
 	@Override public List<Targetable> apply(Battle battle) {
-		return targets.stream().flatMap(t ->
-			battle.doCleanse(t).stream()).collect(Collectors.toList());
+		switch (type) {
+			case CLEANSE: return battle.doCleanse(targets);
+			case PURGE: return battle.doPurge(targets);
+			case DEFUSE: return battle.doDefuse(targets);
+			default: throw new RuntimeException(
+				"Invalid simple effect, this cannot happen");
+		}
 	}
 
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget
 	) {
-		return new Cleanse(targets.stream()
+		return new SimpleInstantEffect(targets.stream()
 			.map(x -> retarget.getOrDefault(x, x))
-			.collect(Collectors.toList()));
+			.collect(Collectors.toList()), type);
 	}
 
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {return new HashMap<>();}

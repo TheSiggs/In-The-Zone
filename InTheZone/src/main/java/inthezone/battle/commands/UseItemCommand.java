@@ -27,6 +27,11 @@ public class UseItemCommand extends Command {
 		return new JSONObject();
 	}
 
+	public static UseItemCommand fromJSON(JSONObject json) {
+		// TODO: implement this
+		return null;
+	}
+
 	public static UseItemCommand fromJSON() throws ProtocolException {
 		throw new ProtocolException("Item command not implemented yet");
 	}

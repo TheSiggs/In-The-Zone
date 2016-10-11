@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class UseAbilityCommandRequest extends CommandRequest {
 	private final MapPoint agent;
 	private final MapPoint castFrom;
-	private final Collection<MapPoint> targets = new ArrayList<>();;
+	private final Collection<MapPoint> targets = new ArrayList<>();
 	private final Ability ability;
 
 	public UseAbilityCommandRequest(
@@ -31,15 +31,19 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
+		// get the targets
 		Collection<DamageToTarget> allTargets =
-			battleState.getCharacterAt(agent).map(a ->
-				targets.stream()
+			battleState.getCharacterAt(agent).map(a -> {
+				double revengeBonus = battleState.getRevengeBonus(a.player);
+
+				return targets.stream()
 					.flatMap(t ->
 						battleState.getAbilityTargets(agent, castFrom, ability, t).stream())
-					.map(t -> ability.computeDamageToTarget(a, t))
-					.collect(Collectors.toList())
-			).orElseThrow(() -> new CommandException("Invalid ability command request"));
+					.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
+					.collect(Collectors.toList());
+			}).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
+		// get the instant effect targets
 		List<MapPoint> preTargets = new ArrayList<>();
 		List<MapPoint> postTargets = new ArrayList<>();
 		for (DamageToTarget t : allTargets) {
@@ -55,6 +59,12 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		UseAbilityCommand mainEffect;
 		InstantEffectCommand postEffect = null;
 
+		// deal with vampirism
+		battleState.getCharacterAt(agent).ifPresent(a -> {
+			if (a.isVampiric()) allTargets.add(ability.computeVampirismEffect(
+				battleState, a, allTargets));
+		});
+		
 		// Main damage
 		mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
 			allTargets, ability.subsequentLevel, ability.recursionLevel);

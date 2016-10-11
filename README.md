@@ -1,20 +1,24 @@
 In The Zone
 ===========
 
-To make a Windows and Linux build:
+To make a Windows,MacOS and Linux build:
 
 ```bash
 cd InTheZone
-./gradlew clean distZip
+./gradlew clean packageNative
 ```
 
-The file to unzip on Linux or Windows is located under
-InTheZone/build/distributions/InTheZone.zip
+Note this only works on the respective OS.
 
-Note that currently, this file requires manual unzipping and 
-assumes that Java 8 RE is installed correctly.
+The files created are in the server/build/bundles and client/build/bundles
+folders.
 
-Bundled JRE to come.
+E.g. for MacOS, with version 0.1.0 they are
+server/build/bundles/InTheZoneServer-0.1.0.dmg
+client/build/bundles/InTheZone-0.1.0.dmg
+
+The bundles come bundled with the OS specific, correct JRE. This depends
+on the JDK that this was built with.
 
 With
 
@@ -22,7 +26,7 @@ With
 ./gradlew clean installDist
 ```
 
-you can unzip and test the distribution.
+you can unzip and test the distribution and test it before bundling.
 
 Starting The Game
 =================
@@ -30,10 +34,15 @@ Starting The Game
 To start the game and test it, you need to run
 
 ```bash
-./start_server_unix.sh # Linux, Mac OS and other Unix OS
-start_server # Windows
+# start the game client:
+./gradlew clean :client:run
 
-# start the game client
-./game.sh # Unix (Mac OS, Linux etc)
+# start the game server:
+./gradlew clean :server:run
 
 ```
+
+Installing the application on the target OS should be straight-forward, but
+on request we can make a video how to do this.
+Note that on MacOS, to test, you need to install the server and client DMGs.
+You can then copy the client application to run two versions of it.

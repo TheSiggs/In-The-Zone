@@ -1,12 +1,17 @@
 package inthezone.battle;
 
 import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.FatigueCommand;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.Stats;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,13 +27,37 @@ public class Battle {
 		this.sprites = sprites;
 	}
 
+	private static final double fatigueEff = 0.3;
+	private static final Stats fatigueStats =
+		new Stats(0, 0, 20 /* power */, 0, 16 /* attack */, 0);
+
+	private int round = -1;
+	private boolean flipRound = true;
+
 	/**
 	 * Perform operations at the start of a player's turn.
+	 * @param player The player who's turn is starting.
 	 * */
 	public List<Command> doTurnStart(Player player) {
-		return battleState.characters.stream()
+		if (flipRound) round += 1;
+		flipRound = !flipRound;
+
+		List<Command> r = battleState.characters.stream()
 			.flatMap(c -> c.turnReset(this, player).stream())
 			.collect(Collectors.toList());
+
+		if (round > 7) {
+			r.add(new FatigueCommand(
+				battleState.characters.stream()
+					.filter(c -> c.player == player)
+					.map(c -> new DamageToTarget(c.getPos(),
+						(int) Math.ceil(Ability.damageFormulaStatic(
+							(round - 7) * fatigueEff, 0, 0, 0, 0, fatigueStats, c.getStats())),
+						Optional.empty(), false, false))
+					.collect(Collectors.toList())));
+		}
+
+		return r;
 	}
 
 	/**
@@ -50,7 +79,7 @@ public class Battle {
 		MapPoint agent,
 		Ability ability,
 		Collection<DamageToTarget> targets
-	) {
+	) throws CommandException {
 		battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
 
 		for (DamageToTarget d : targets) {
@@ -59,7 +88,26 @@ public class Battle {
 					"Attempted to attack non-target, command verification code failed"));
 
 			t.dealDamage(d.damage);
+			if (d.statusEffect.isPresent()) {
+				try {
+					t.applyStatus(d.statusEffect.get().resolve(battleState));
+				} catch (ProtocolException e) {
+					throw new CommandException("Invalid status effect", e);
+				}
+			}
 			if (t.reap()) battleState.removeObstacle(t);
+		}
+	}
+
+	/**
+	 * Handle fatigue damage.
+	 * */
+	public void doFatigue(Collection<DamageToTarget> targets) {
+		for (DamageToTarget d : targets) {
+			Character t = battleState.getCharacterAt(d.target)
+				.orElseThrow(() -> new RuntimeException(
+					"Attempted to attack non-target, command verification code failed"));
+			t.dealDamage(d.damage);
 		}
 	}
 

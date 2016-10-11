@@ -133,7 +133,7 @@ public class BattleView
 		super();
 
 		this.player = player;
-		this.hud = new HUD(this);
+		this.hud = new HUD(this, gameData.getStandardSprites());
 
 		this.canvas = new MapView(this,
 			gameData.getStage(startBattle.stage), true, false, highlights);
@@ -678,6 +678,7 @@ public class BattleView
 							box.updateAP(c.getAP(), c.getStats().ap);
 							box.updateMP(c.getMP(), c.getStats().mp);
 							box.updateHP(c.getHP(), c.getMaxHP());
+							box.updateStatus(c.getStatusBuff(), c.getStatusDebuff());
 						}
 
 					}

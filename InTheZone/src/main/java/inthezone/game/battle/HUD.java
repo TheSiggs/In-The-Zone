@@ -2,6 +2,7 @@ package inthezone.game.battle;
 
 import inthezone.battle.Ability;
 import inthezone.battle.Character;
+import inthezone.battle.data.StandardSprites;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -35,8 +36,12 @@ public class HUD extends AnchorPane {
 
 	public final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 
-	public HUD(BattleView view) {
+	private StandardSprites sprites;
+
+	public HUD(BattleView view, StandardSprites sprites) {
 		super();
+
+		this.sprites = sprites;
 
 		this.view = view;
 		this.multiTargetAssistant = new MultiTargetAssistant(view);
@@ -105,11 +110,17 @@ public class HUD extends AnchorPane {
 
 		pushItem.setOnAction(event -> view.usePush());
 
+		attackItem.setDisable(c.isStunned() || c.getAP() < 1);
+		pushItem.setDisable(c.isStunned() || c.getAP() < 1);
+
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
 			MenuItem i = new MenuItem(ability.info.name);
-			i.setDisable(ability.info.ap > c.getAP() || ability.info.mp > c.getMP());
+			i.setDisable(
+				ability.info.ap > c.getAP() ||
+				ability.info.mp > c.getMP() ||
+				c.isAbilityBlocked(a));
 			i.setOnAction(event -> view.useAbility(ability));
 			abilitiesMenu.getItems().add(i);
 		}
@@ -117,7 +128,7 @@ public class HUD extends AnchorPane {
 
 	public void init(Collection<Character> characters) {
 		for (Character c : characters) {
-			CharacterInfoBox box = new CharacterInfoBox(c);
+			CharacterInfoBox box = new CharacterInfoBox(c, sprites);
 			box.setOnMouseClicked(event -> {
 				view.selectCharacterById(c.id);
 			});

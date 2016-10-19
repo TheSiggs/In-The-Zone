@@ -4,7 +4,7 @@ import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.Stats;
-import inthezone.battle.instant.Push;
+import inthezone.battle.instant.PullPush;
 import inthezone.battle.Targetable;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -41,7 +41,7 @@ public class PushCommandRequest extends CommandRequest {
 		Command r = battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {
 				boolean effective = t.isPushable();
-				return Optional.of(new PushCommand(agent, Push.getEffect(
+				return Optional.of(new PushCommand(agent, PullPush.getEffect(
 					battleState, pushEffect, agent, targets), effective));
 			}
 

@@ -22,8 +22,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.InstantEffect;
-import inthezone.battle.instant.Pull;
-import inthezone.battle.instant.Push;
+import inthezone.battle.instant.PullPush;
 import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleInProgress;
@@ -587,26 +586,15 @@ public class BattleView
 	) {
 		Stage stage = canvas.getStage();
 
-		if (effect instanceof Push) {
-			Push push = (Push) effect;
-			if (push.paths.size() != affectedCharacters.size()) {
-				throw new RuntimeException("Invalid push, this cannot happen");
+		if (effect instanceof PullPush) {
+			PullPush pullpush = (PullPush) effect;
+			if (pullpush.paths.size() != affectedCharacters.size()) {
+				throw new RuntimeException("Invalid pull or push, this cannot happen");
 			}
 
-			for (int i = 0; i < push.paths.size(); i++) {
+			for (int i = 0; i < pullpush.paths.size(); i++) {
 				scheduleMovement("idle", pushSpeed,
-					push.paths.get(i), (Character) affectedCharacters.get(i));
-			}
-
-		} else if (effect instanceof Pull) {
-			Pull pull = (Pull) effect;
-			if (pull.paths.size() != affectedCharacters.size()) {
-				throw new RuntimeException("Invalid pull, this cannot happen");
-			}
-
-			for (int i = 0; i < pull.paths.size(); i++) {
-				scheduleMovement("idle", pushSpeed,
-					pull.paths.get(i), (Character) affectedCharacters.get(i));
+					pullpush.paths.get(i), (Character) affectedCharacters.get(i));
 			}
 
 		} else if (effect instanceof Teleport) {

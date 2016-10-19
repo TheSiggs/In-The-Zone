@@ -1,1 +1,1 @@
-C:\Progra~1\Java\jdk1.8.0_20\bin\javapackager.exe -deploy -BappVersion=0.1.0 -native exe -name Bitsquare -title Bitsquare -vendor Bitsquare -outdir build -appclass io.bitsquare.BitSquare -srcfiles .\build\libs\bitsquare-0.1.0-SNAPSHOT-all.jar -outfile Bitsquare -Bruntime="c:\Program Files\Java\jdk1.8.0_20\jre"
+D:\jdk1.8.0_112\bin\javapackager.exe -deploy -BappVersion=0.0.1 -native exe -name InTheZone -title InTheZone -vendor InTheZone -outdir build -appclass inthezone.game.Game -srcfiles ./client/build/libs/client-0.1.0-all.jar -outfile InTheZone -Bruntime="D:\jre1.8.0_112"

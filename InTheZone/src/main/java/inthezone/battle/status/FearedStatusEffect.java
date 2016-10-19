@@ -8,7 +8,7 @@ import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.StatusEffectInfo;
-import inthezone.battle.instant.Push;
+import inthezone.battle.instant.PullPush;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -80,7 +80,7 @@ public class FearedStatusEffect extends StatusEffect {
 		Collection<MapPoint> targets = new ArrayList<>();
 		targets.add(c.getPos());
 
-		Push p = Push.getEffect(
+		PullPush p = PullPush.getEffect(
 			battle.battleState,
 			new InstantEffectInfo(InstantEffectType.PUSH, g),
 			agent.getPos(), targets);

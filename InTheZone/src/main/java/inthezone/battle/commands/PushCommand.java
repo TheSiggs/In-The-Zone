@@ -2,7 +2,7 @@ package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
-import inthezone.battle.instant.Push;
+import inthezone.battle.instant.PullPush;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
@@ -15,10 +15,10 @@ import org.json.simple.JSONObject;
 
 public class PushCommand extends Command {
 	private final MapPoint agent;
-	public final Push effect;
+	public final PullPush effect;
 	private final boolean effective; // determines if the push is effective
 
-	public PushCommand(MapPoint agent, Push effect, boolean effective) {
+	public PushCommand(MapPoint agent, PullPush effect, boolean effective) {
 		this.agent = agent;
 		this.effect = effect;
 		this.effective = effective;
@@ -53,7 +53,7 @@ public class PushCommand extends Command {
 
 		try {
 			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			Push effect = Push.fromJSON((JSONObject) oeffect);
+			PullPush effect = PullPush.fromJSON((JSONObject) oeffect);
 			boolean effective = (Boolean) oeffective;
 			return new PushCommand(agent, effect, effective);
 		} catch (ClassCastException e) {

@@ -13,6 +13,7 @@ import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -21,17 +22,19 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Pull implements InstantEffect {
+public class PullPush implements InstantEffect {
+	private final InstantEffectInfo type;
 	private final MapPoint castFrom;
 	public final List<List<MapPoint>> paths;
 	private final int param;
 
-	private Pull(
-		int param,
+	private PullPush(
+		InstantEffectInfo type,
 		MapPoint castFrom,
 		List<List<MapPoint>> paths
 	) {
-		this.param = param;
+		this.type = type;
+		this.param = type.param;
 		this.castFrom = castFrom;
 		this.paths = paths;
 	}
@@ -40,8 +43,7 @@ public class Pull implements InstantEffect {
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
-		o.put("kind", InstantEffectType.PULL.toString());
-		o.put("param", param);
+		o.put("kind", type.toString());
 		o.put("castFrom", castFrom.getJSON());
 		for (List<MapPoint> path : paths) {
 			JSONArray pp = new JSONArray();
@@ -52,25 +54,23 @@ public class Pull implements InstantEffect {
 		return o;
 	}
 
-	public static Pull fromJSON(JSONObject json)
+	public static PullPush fromJSON(JSONObject json)
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
-		Object oparam = json.get("param");
 		Object ocastFrom = json.get("castFrom");
 		Object opaths = json.get("paths");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (oparam == null) throw new ProtocolException("Missing effect parameter");
 		if (ocastFrom == null) throw new ProtocolException("Missing tile where effect acts from");
 		if (opaths == null) throw new ProtocolException("Missing effect paths");
 
 		try {
-			if (InstantEffectType.fromString((String) okind) != InstantEffectType.PULL)
-				throw new ProtocolException("Expected pull effect");
+			InstantEffectInfo type = new InstantEffectInfo((String) okind);
+			if (!(type.type == InstantEffectType.PULL | type.type == InstantEffectType.PUSH))
+				throw new ProtocolException("Expected push or pull effect");
 
 			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
-			Number param = (Number) oparam;
 			JSONArray rawPaths = (JSONArray) opaths;
 			List<List<MapPoint>> paths = new ArrayList<>();
 			for (int i = 0; i < rawPaths.size(); i++) {
@@ -82,15 +82,29 @@ public class Pull implements InstantEffect {
 
 				paths.add(path);
 			}
-			return new Pull(param.intValue(), castFrom, paths);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing pull effect", e);
-		} catch (CorruptDataException e) {
-			throw new ProtocolException("Error parsing pull effect", e);
+			return new PullPush(type, castFrom, paths);
+		} catch (ClassCastException|CorruptDataException  e) {
+			throw new ProtocolException("Error parsing push/pull effect", e);
 		}
 	}
 
-	public static Pull getEffect(
+	public static PullPush getEffect(
+		BattleState battle,
+		InstantEffectInfo info,
+		MapPoint castFrom,
+		Collection<MapPoint> targets
+	) {
+		if (info.type == InstantEffectType.PULL) {
+			return getPullEffect(battle, info, castFrom, targets);
+		} else if (info.type == InstantEffectType.PUSH) {
+			return getPushEffect(battle, info, castFrom, targets);
+		} else {
+			throw new RuntimeException(
+				"Attempted to build " + info.toString() + " effect with PullPush class");
+		}
+	}
+
+	public static PullPush getPullEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
@@ -109,7 +123,41 @@ public class Pull implements InstantEffect {
 			if (path.size() > 0) paths.add(path);
 		}
 
-		return new Pull(info.param, castFrom, paths);
+		return new PullPush(info, castFrom, paths);
+	}
+
+	public static PullPush getPushEffect(
+		BattleState battle,
+		InstantEffectInfo info,
+		MapPoint castFrom,
+		Collection<MapPoint> targets
+	) {
+		List<List<MapPoint>> paths = new ArrayList<>();
+
+		List<MapPoint> sortedTargets = new ArrayList<>(targets);
+		sortedTargets.sort(Collections.reverseOrder(
+			Comparator.comparingInt(x -> castFrom.distance(x))));
+
+		for (MapPoint t : sortedTargets) {
+			if (castFrom.x == t.x || castFrom.y == t.y) {
+				MapPoint dp = t.subtract(castFrom).normalise();
+				List<MapPoint> path = new ArrayList<>();
+
+				MapPoint x = t;
+				path.add(x);
+				for (int i = 0; i < info.param; i++) {
+					MapPoint z = x.add(dp);
+					if (!battle.isSpaceFree(z)) break; else {
+						x = z;
+						path.add(x);
+					}
+				}
+
+				if (path.size() >= 2) paths.add(path);
+			}
+		}
+
+		return new PullPush(info, castFrom, paths);
 	}
 
 	private static List<MapPoint> getPullPath(
@@ -158,9 +206,7 @@ public class Pull implements InstantEffect {
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
 			.collect(Collectors.toList());
 
-		return getEffect(battle,
-			new InstantEffectInfo(InstantEffectType.PULL, param),
-			castFrom, targets);
+		return getEffect(battle, type, castFrom, targets);
 	}
 
 	@Override public boolean isComplete() {return true;}

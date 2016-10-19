@@ -60,10 +60,8 @@ public class SimpleInstantEffect implements InstantEffect {
 				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
 			}
 			return new SimpleInstantEffect(targets, type);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing cleanse effect", e);
-		} catch (CorruptDataException e) {
-			throw new ProtocolException("Error parsing cleanse effect", e);
+		} catch (ClassCastException|CorruptDataException  e) {
+			throw new ProtocolException("Error parsing cleanse/purge/defuse effect", e);
 		}
 	}
 

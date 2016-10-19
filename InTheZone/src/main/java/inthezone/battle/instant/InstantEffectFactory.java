@@ -25,8 +25,8 @@ public class InstantEffectFactory {
 			case CLEANSE: /* fallthrough */
 			case DEFUSE: /* fallthrough */
 			case PURGE: return SimpleInstantEffect.getEffect(targets, info.type);
-			case PUSH: return Push.getEffect(battleState, info, castFrom, targets);
-			case PULL: return Pull.getEffect(battleState, info, castFrom, targets);
+			case PUSH: /* fallthrough */
+			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets);
 			case OBSTACLES: return Obstacles.getEffect(battleState, info, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
@@ -43,8 +43,8 @@ public class InstantEffectFactory {
 				case CLEANSE: /* fallthrough */
 				case DEFUSE: /* fallthrough */
 				case PURGE: return SimpleInstantEffect.fromJSON(o);
-				case PUSH: return Push.fromJSON(o);
-				case PULL: return Pull.fromJSON(o);
+				case PUSH: /* fallthrough */
+				case PULL: return PullPush.fromJSON(o);
 				case TELEPORT: return Teleport.fromJSON(o);
 				case OBSTACLES: return Obstacles.fromJSON(o);
 				default: throw new ProtocolException("Unimplemented effect " + kind);

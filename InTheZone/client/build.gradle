@@ -31,19 +31,36 @@ def serverClass = 'inthezone.server.Server'
 mainClassName = mainClass
 def baseName = 'InTheZone'
 version = '0.1.0'
+def postFix=""
+def packageName="$baseName$postFix"
+def shadowJarName = "${project.name}-$version-all.jar"
 
 task packageNative(type: Exec, dependsOn:shadowJar) {
+	def mainArgs = [project.version, shadowJar.archivePath, mainClassName, baseName, '']
 	if (Os.isFamily(Os.FAMILY_MAC))
 		executable "${project.rootDir}/package/mac.sh"
 	else if (Os.isFamily(Os.FAMILY_UNIX))
 		executable "${project.rootDir}/package/linux.sh"
-			//executable "echo"
-	else if (Os.isFamily(Os.FAMILY_WINDOWS))
-		executable "${project.rootDir}/package/windows.bat"
-	else
+	else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		environment PATH: "d:/Program Files (x86)/Inno Setup 5"
+		executable 'javapackager'
+		mainArgs = ['-deploy', 
+		    "-BappVersion=$version", 
+		    "-Bcategory=Games", 
+		    "-BlicenseType=GPLv3", 
+		    "-Bemail=info@inthezone.io", 
+		    "-native", "exe", 
+		    "-name", "$packageName", 
+		    "-title", "$packageName", 
+		    "-vendor", "$packageName", 
+		    "-outdir", "build", 
+		    "-srcfiles", "${project.rootDir}/client/build/libs/$shadowJarName", 
+		    "-appclass", "$mainClassName", 
+		    "-outfile", "$packageName"]
+	} else
 		throw new GradleException("Unsupported OS: " + System.properties['os.name'])
 
-			args project.version, shadowJar.archivePath, mainClassName, baseName, ''
+			args mainArgs
 }
 distributions {
 	main {

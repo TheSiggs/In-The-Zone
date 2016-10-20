@@ -1,10 +1,11 @@
+//apply from: '../common.gradle' // doesn't work!
 import org.apache.tools.ant.taskdefs.condition.Os
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
 	id 'com.github.johnrengelman.shadow' version '1.2.3'
-	id 'java'
-	id 'application'
+		id 'java'
+		id 'application'
 }
 repositories {
 	jcenter()
@@ -18,11 +19,11 @@ sourceSets {
 	main {
 		java {
 			srcDir '../src'
-			include '**'
+				include '**'
 		}
 		resources {
 			srcDir '../src/main/resources'
-			include '**'
+				include '**'
 		}
 	}
 }
@@ -31,18 +32,46 @@ def serverClass = 'inthezone.server.Server'
 def dataEditorClass = 'inthezone.dataEditor.DataEditor'
 mainClassName = dataEditorClass
 def baseName = 'InTheZone'
-version = '0.1.0'
+def vVersion = 'git describe --abbrev=0'.execute().text
+version = vVersion.substring(1, vVersion.length() - 1)
+def postFix=""
+def packageName="$baseName$postFix"
+def shadowJarName = "${project.name}-$version-all.jar"
 
+//def "ls".execute().text
 task packageNative(type: Exec, dependsOn:shadowJar) {
+	def mainArgs = [project.version, shadowJar.archivePath, mainClassName, baseName, '']
 	if (Os.isFamily(Os.FAMILY_MAC))
 		executable "${project.rootDir}/package/mac.sh"
 	else if (Os.isFamily(Os.FAMILY_UNIX))
 		executable "${project.rootDir}/package/linux.sh"
-		//executable "echo"
-	else if (Os.isFamily(Os.FAMILY_WINDOWS))
-		executable "${project.rootDir}/package/windows.bat"
-	else
+	else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		environment PATH: "d:/Program Files (x86)/Inno Setup 5"
+		executable 'javapackager'
+		mainArgs = ['-deploy', 
+		    "-BappVersion=$version", 
+		    "-Bcategory=Games", 
+		    "-BlicenseType=GPLv3", 
+		    "-Bemail=info@inthezone.io", 
+		    "-native", "exe", 
+		    "-name", "$packageName", 
+		    "-title", "$packageName", 
+		    "-vendor", "$packageName", 
+		    "-outdir", "build", 
+		    "-srcfiles", "${project.rootDir}/server/build/libs/$shadowJarName", 
+		    "-appclass", "$mainClassName", 
+		    "-outfile", "$packageName"]
+	} else
 		throw new GradleException("Unsupported OS: " + System.properties['os.name'])
 
-	args project.version, shadowJar.archivePath, mainClassName, baseName, 'Server'
+			args mainArgs
+}
+distributions {
+	main {
+		baseName = 'game'
+			contents {
+				from { 'src/main/resources' }
+				from { 'start_scripts' }
+			}
+	}
 }

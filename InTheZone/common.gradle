@@ -1,12 +1,3 @@
-//apply from: '../common.gradle' // doesn't work!
-import org.apache.tools.ant.taskdefs.condition.Os
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
-plugins {
-	id 'com.github.johnrengelman.shadow' version '1.2.3'
-		id 'java'
-		id 'application'
-}
 repositories {
 	jcenter()
 }
@@ -29,15 +20,15 @@ sourceSets {
 }
 def mainClass = 'inthezone.game.Game'
 def serverClass = 'inthezone.server.Server'
-mainClassName = serverClass
+mainClassName = mainClass
 def baseName = 'InTheZone'
+version = '0.1.0'
 def vVersion = 'git describe --abbrev=0'.execute().text
 version = vVersion.substring(1, vVersion.length() - 1)
 def postFix=""
 def packageName="$baseName$postFix"
 def shadowJarName = "${project.name}-$version-all.jar"
-//println "VERSION: $version"
-println "SH: $shadowJarName"
+println "VERSION: $version"
 
 //def "ls".execute().text
 task packageNative(type: Exec, dependsOn:shadowJar) {
@@ -59,7 +50,7 @@ task packageNative(type: Exec, dependsOn:shadowJar) {
 		    "-title", "$packageName", 
 		    "-vendor", "$packageName", 
 		    "-outdir", "build", 
-		    "-srcfiles", "${project.rootDir}/server/build/libs/$shadowJarName", 
+		    "-srcfiles", "${project.rootDir}/client/build/libs/$shadowJarName", 
 		    "-appclass", "$mainClassName", 
 		    "-outfile", "$packageName"]
 	} else

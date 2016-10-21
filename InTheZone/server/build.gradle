@@ -33,7 +33,7 @@ mainClassName = serverClass
 def baseName = 'InTheZone'
 def vVersion = 'git describe --abbrev=0'.execute().text
 version = vVersion.substring(1, vVersion.length() - 1)
-def postFix=""
+def postFix="-server"
 def packageName="$baseName$postFix"
 def shadowJarName = "${project.name}-$version-all.jar"
 //println "VERSION: $version"

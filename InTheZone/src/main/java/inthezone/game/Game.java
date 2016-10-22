@@ -27,6 +27,8 @@ public class Game extends Application {
 
 	private Network network = null;
 	private Thread networkThread = null;
+	private static final double MIN_WIDTH = 300.0;
+	private static final double MIN_HEIGHT = 200.0;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -71,6 +73,8 @@ public class Game extends Application {
 
 			primaryStage.setTitle("In the Zone!");
 			primaryStage.setScene(scene);
+			primaryStage.setMinWidth(MIN_WIDTH);
+			primaryStage.setMinHeight(MIN_HEIGHT);
 			primaryStage.show();
 		} catch (Exception e) {
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);

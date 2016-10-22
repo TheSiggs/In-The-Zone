@@ -12,13 +12,24 @@ packageName="$baseName$postFix"
 jdk=$(/usr/libexec/java_home)
 export JAVA_HOME=$jdk
 
-#
+echo $jdk/bin/javapackager \
+    -deploy \
+    -BappVersion=$version \
+    -Bmac.CFBundleIdentifier=$packageName \
+    -Bmac.CFBundleName=$packageName \
+    -native dmg \
+    -name $packageName \
+    -title $packageName \
+    -vendor $packageName \
+    -outdir build \
+    -srcfiles $jar \
+    -appclass $mainClass \
+    -outfile $packageName
 $jdk/bin/javapackager \
     -deploy \
     -BappVersion=$version \
     -Bmac.CFBundleIdentifier=$packageName \
     -Bmac.CFBundleName=$packageName \
-    -Bruntime="$JAVA_HOME/../../" \
     -native dmg \
     -name $packageName \
     -title $packageName \

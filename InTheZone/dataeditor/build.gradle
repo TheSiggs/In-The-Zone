@@ -40,7 +40,7 @@ def shadowJarName = "${project.name}-$version-all.jar"
 
 //def "ls".execute().text
 task packageNative(type: Exec, dependsOn:shadowJar) {
-	def mainArgs = [project.version, shadowJar.archivePath, mainClassName, baseName, '']
+	def mainArgs = [project.version, shadowJar.archivePath, mainClassName, baseName, postFix]
 	if (Os.isFamily(Os.FAMILY_MAC))
 		executable "${project.rootDir}/package/mac.sh"
 	else if (Os.isFamily(Os.FAMILY_UNIX))

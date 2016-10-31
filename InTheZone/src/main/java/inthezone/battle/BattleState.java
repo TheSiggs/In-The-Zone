@@ -104,14 +104,23 @@ public class BattleState {
 	}
 
 	/**
-	 * Get targetable objects at a particular point.
+	 * Get targetable objects at a particular point (if there is one).
 	 * */
 	public Optional<? extends Targetable> getTargetableAt(MapPoint x) {
-		return targetable.stream().filter(c -> c.getPos().equals(x)).findFirst();
+		return targetable.stream().filter(t -> t.getPos().equals(x)).findFirst();
 	}
 
 	/**
-	 * Get the character at a particular point.
+	 * Get the trap at a particular point (if there is one).
+	 * */
+	public Optional<Trap> getTrapAt(MapPoint x) {
+		return targetable.stream()
+			.filter(t -> t instanceof Trap && t.getPos().equals(x))
+			.findFirst().map(t -> (Trap) t);
+	}
+
+	/**
+	 * Get the character at a particular point (if there is one).
 	 * */
 	public Optional<Character> getCharacterAt(MapPoint x) {
 		return characters.stream().filter(c -> c.getPos().equals(x)).findFirst();

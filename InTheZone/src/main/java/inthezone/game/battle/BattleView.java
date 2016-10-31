@@ -4,6 +4,7 @@ import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
@@ -476,7 +477,8 @@ public class BattleView
 		if (targets.size() > 0) {
 			selectedCharacter.ifPresent(c ->
 				battle.requestCommand(new UseAbilityCommandRequest(
-					c.getPos(), c.getPos(), targets, targetingAbility.get())));
+					c.getPos(), AbilityAgentType.CHARACTER,
+					c.getPos(), targets, targetingAbility.get())));
 		}
 		targets.clear();
 

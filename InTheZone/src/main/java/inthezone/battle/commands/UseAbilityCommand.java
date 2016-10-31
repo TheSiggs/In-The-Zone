@@ -21,6 +21,7 @@ import org.json.simple.JSONObject;
 
 public class UseAbilityCommand extends Command {
 	private MapPoint agent;
+	private AbilityAgentType agentType;
 	private final MapPoint castFrom;
 	public final String ability;
 	private final Collection<MapPoint> targetSquares;
@@ -31,12 +32,14 @@ public class UseAbilityCommand extends Command {
 	public Collection<DamageToTarget> getTargets() {return targets;}
 
 	public UseAbilityCommand(
-		MapPoint agent, MapPoint castFrom, String ability,
+		MapPoint agent, AbilityAgentType agentType,
+		MapPoint castFrom, String ability,
 		Collection<MapPoint> targetSquares,
 		Collection<DamageToTarget> targets,
 		int subsequentLevel, int recursionLevel
 	) {
 		this.agent = agent;
+		this.agentType = agentType;
 		this.castFrom = castFrom;
 		this.ability = ability;
 		this.targetSquares = targetSquares;
@@ -51,6 +54,7 @@ public class UseAbilityCommand extends Command {
 		JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.ABILITY.toString());
 		r.put("agent", agent.getJSON());
+		r.put("agentType", agentType.toString());
 		r.put("castFrom", castFrom.getJSON());
 		r.put("ability", ability);
 		r.put("subsequentLevel", subsequentLevel);
@@ -70,6 +74,7 @@ public class UseAbilityCommand extends Command {
 	{
 		Object okind = json.get("kind");
 		Object oagent = json.get("agent");
+		Object oagentType = json.get("agentType");
 		Object ocastFrom = json.get("castFrom");
 		Object oability = json.get("ability");
 		Object otargets = json.get("targets");
@@ -79,6 +84,7 @@ public class UseAbilityCommand extends Command {
 
 		if (okind == null) throw new ProtocolException("Missing command type");
 		if (oagent == null) throw new ProtocolException("Missing ability agent");
+		if (oagentType == null) throw new ProtocolException("Missing ability agent type");
 		if (ocastFrom == null) throw new ProtocolException("Missing tile to cast ability from");
 		if (oability == null) throw new ProtocolException("Missing ability");
 		if (otargets == null) throw new ProtocolException("Missing ability targets");
@@ -91,6 +97,8 @@ public class UseAbilityCommand extends Command {
 
 		try {
 			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
+			AbilityAgentType agentType =
+				AbilityAgentType.fromString((String) oagentType);
 			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
 			String ability = (String) oability;
 			Number subsequentLevel = (Number) osubsequentLevel;
@@ -109,24 +117,29 @@ public class UseAbilityCommand extends Command {
 			}
 
 			return new UseAbilityCommand(
-				agent, castFrom, ability, targetSquares, targets,
+				agent, agentType, castFrom, ability, targetSquares, targets,
 				subsequentLevel.intValue(), recursionLevel.intValue());
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing ability command", e);
-		} catch (CorruptDataException e) {
+		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing ability command", e);
 		}
 	}
 
 	@Override
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
-		Ability abilityData = battle.battleState.getCharacterAt(agent)
-			.flatMap(c -> Stream.concat(Stream.of(c.basicAbility),
-				c.abilities.stream()
-					.filter(a -> a.info.name.equals(ability))).findFirst())
-			.flatMap(a -> a.getNext(
-				battle.battleState.hasMana(agent), subsequentLevel, recursionLevel))
-			.orElseThrow(() -> new CommandException("Invalid ability command"));
+		Ability abilityData;
+
+		if (agentType == AbilityAgentType.TRAP) {
+			abilityData = battle.battleState.getTrapAt(agent)
+				.map(t -> t.ability).orElseThrow(() ->
+					new CommandException("Invalid ability command"));
+		} else {
+			abilityData = battle.battleState.getCharacterAt(agent)
+				.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())
+					.filter(a -> a.info.name.equals(ability)).findFirst())
+				.flatMap(a -> a.getNext(
+					battle.battleState.hasMana(agent), subsequentLevel, recursionLevel))
+				.orElseThrow(() -> new CommandException("Invalid ability command"));
+		}
 
 		List<Targetable> r = new ArrayList<>();
 
@@ -134,7 +147,8 @@ public class UseAbilityCommand extends Command {
 			return battle.createTrap(abilityData, targetSquares);
 
 		} else {
-			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
+			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c.clone()));
+			battle.battleState.getTrapAt(agent).ifPresent(t -> r.add(t));
 			for (DamageToTarget d : targets) {
 				Optional<Character> oc = battle.battleState.getCharacterAt(d.target);
 				if (oc.isPresent()) {
@@ -144,7 +158,7 @@ public class UseAbilityCommand extends Command {
 				}
 			}
 
-			battle.doAbility(agent, abilityData, targets);
+			battle.doAbility(agent, agentType, abilityData, targets);
 		}
 
 		return r;

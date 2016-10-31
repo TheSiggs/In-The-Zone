@@ -8,8 +8,8 @@ import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
 public class Trap implements Targetable {
-	private final MapPoint pos;
-	private final Ability ability;
+	public final MapPoint pos;
+	public final Ability ability;
 	private final StandardSprites sprites;
 	private boolean defused = false;
 

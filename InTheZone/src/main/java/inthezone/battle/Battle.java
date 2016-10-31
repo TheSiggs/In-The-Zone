@@ -1,5 +1,6 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.FatigueCommand;
@@ -77,10 +78,17 @@ public class Battle {
 	 * */
 	public void doAbility(
 		MapPoint agent,
+		AbilityAgentType agentType,
 		Ability ability,
 		Collection<DamageToTarget> targets
 	) throws CommandException {
-		battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
+		if (agentType == AbilityAgentType.TRAP) {
+			battleState.getTrapAt(agent).ifPresent(t -> {
+				t.defuse(); battleState.removeObstacle(t);
+			});
+		} else if (agentType == AbilityAgentType.CHARACTER) {
+			battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
+		}
 
 		for (DamageToTarget d : targets) {
 			Targetable t = battleState.getTargetableAt(d.target)

@@ -15,15 +15,17 @@ import java.util.stream.Collectors;
 
 public class UseAbilityCommandRequest extends CommandRequest {
 	private final MapPoint agent;
+	private final AbilityAgentType agentType;
 	private final MapPoint castFrom;
 	private final Collection<MapPoint> targets = new ArrayList<>();
 	private final Ability ability;
 
 	public UseAbilityCommandRequest(
-		MapPoint agent, MapPoint castFrom,
+		MapPoint agent, AbilityAgentType agentType, MapPoint castFrom,
 		Collection<MapPoint> targets, Ability ability
 	) {
 		this.agent = agent;
+		this.agentType = agentType;
 		this.castFrom = castFrom;
 		this.targets.addAll(targets);
 		this.ability = ability;
@@ -34,7 +36,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		List<Command> commands = new ArrayList<>();
 
 		if (ability.info.trap) {
-			commands.add(new UseAbilityCommand(agent, castFrom,
+			commands.add(new UseAbilityCommand(agent, agentType, castFrom,
 				ability.rootName, targets, new ArrayList<>(), 0, 0));
 
 		} else {
@@ -67,14 +69,17 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			InstantEffectCommand postEffect = null;
 
 			// deal with vampirism
-			battleState.getCharacterAt(agent).ifPresent(a -> {
-				if (a.isVampiric()) allTargets.add(ability.computeVampirismEffect(
-					battleState, a, allTargets));
-			});
+			if (agentType == AbilityAgentType.CHARACTER) {
+				battleState.getCharacterAt(agent).ifPresent(a -> {
+					if (a.isVampiric()) allTargets.add(ability.computeVampirismEffect(
+						battleState, a, allTargets));
+				});
+			}
 			
 			// Main damage
-			mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
-				targets, allTargets, ability.subsequentLevel, ability.recursionLevel);
+			mainEffect = new UseAbilityCommand(agent, agentType,
+				castFrom, ability.rootName, targets, allTargets,
+				ability.subsequentLevel, ability.recursionLevel);
 				
 			// Post instant effect
 			if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {

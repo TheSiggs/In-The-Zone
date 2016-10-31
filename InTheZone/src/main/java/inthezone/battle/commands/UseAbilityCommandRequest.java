@@ -31,63 +31,71 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
-		// get the targets
-		Collection<DamageToTarget> allTargets =
-			battleState.getCharacterAt(agent).map(a -> {
-				double revengeBonus = battleState.getRevengeBonus(a.player);
+		List<Command> commands = new ArrayList<>();
 
-				return targets.stream()
-					.flatMap(t ->
-						battleState.getAbilityTargets(agent, castFrom, ability, t).stream())
-					.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
-					.collect(Collectors.toList());
-			}).orElseThrow(() -> new CommandException("Invalid ability command request"));
+		if (ability.info.trap) {
+			commands.add(new UseAbilityCommand(agent, castFrom,
+				ability.rootName, targets, new ArrayList<>(), 0, 0));
 
-		// get the instant effect targets
-		List<MapPoint> preTargets = new ArrayList<>();
-		List<MapPoint> postTargets = new ArrayList<>();
-		for (DamageToTarget t : allTargets) {
-			if (t.pre) preTargets.add(t.target);
-			if (t.post) postTargets.add(t.target);
-		}
-		ability.info.instantBefore.ifPresent(i -> {
-			if (i.isField()) preTargets.addAll(targets);});
-		ability.info.instantAfter.ifPresent(i -> {
-			if (i.isField()) postTargets.addAll(targets);});
+		} else {
+			// get the targets
+			Collection<DamageToTarget> allTargets =
+				battleState.getCharacterAt(agent).map(a -> {
+					double revengeBonus = battleState.getRevengeBonus(a.player);
 
-		InstantEffectCommand preEffect = null;
-		UseAbilityCommand mainEffect;
-		InstantEffectCommand postEffect = null;
+					return targets.stream()
+						.flatMap(t ->
+							battleState.getAbilityTargets(agent, castFrom, ability, t).stream())
+						.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
+						.collect(Collectors.toList());
+				}).orElseThrow(() -> new CommandException("Invalid ability command request"));
 
-		// deal with vampirism
-		battleState.getCharacterAt(agent).ifPresent(a -> {
-			if (a.isVampiric()) allTargets.add(ability.computeVampirismEffect(
-				battleState, a, allTargets));
-		});
-		
-		// Main damage
-		mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
-			allTargets, ability.subsequentLevel, ability.recursionLevel);
+			// get the instant effect targets
+			List<MapPoint> preTargets = new ArrayList<>();
+			List<MapPoint> postTargets = new ArrayList<>();
+			for (DamageToTarget t : allTargets) {
+				if (t.pre) preTargets.add(t.target);
+				if (t.post) postTargets.add(t.target);
+			}
+			ability.info.instantBefore.ifPresent(i -> {
+				if (i.isField()) preTargets.addAll(targets);});
+			ability.info.instantAfter.ifPresent(i -> {
+				if (i.isField()) postTargets.addAll(targets);});
+
+			InstantEffectCommand preEffect = null;
+			UseAbilityCommand mainEffect;
+			InstantEffectCommand postEffect = null;
+
+			// deal with vampirism
+			battleState.getCharacterAt(agent).ifPresent(a -> {
+				if (a.isVampiric()) allTargets.add(ability.computeVampirismEffect(
+					battleState, a, allTargets));
+			});
 			
-		// Post instant effect
-		if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {
-			postEffect = makeInstantEffect(
-				battleState, postTargets, ability.info.instantAfter.get(),
-				Optional.empty(), Optional.empty());
+			// Main damage
+			mainEffect = new UseAbilityCommand(agent, castFrom, ability.rootName,
+				targets, allTargets, ability.subsequentLevel, ability.recursionLevel);
+				
+			// Post instant effect
+			if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {
+				postEffect = makeInstantEffect(
+					battleState, postTargets, ability.info.instantAfter.get(),
+					Optional.empty(), Optional.empty());
+			}
+
+			// pre instant effect
+			if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
+				preEffect = makeInstantEffect(
+					battleState, preTargets, ability.info.instantBefore.get(),
+					Optional.of(mainEffect), Optional.ofNullable(postEffect));
+			}
+
+			if (preEffect != null) commands.add(preEffect);
+			commands.add(mainEffect);
+			if (postEffect != null) commands.add(postEffect);
 		}
 
-		// pre instant effect
-		if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
-			preEffect = makeInstantEffect(
-				battleState, preTargets, ability.info.instantBefore.get(),
-				Optional.of(mainEffect), Optional.ofNullable(postEffect));
-		}
-
-		List<Command> r = new ArrayList<>();
-		if (preEffect != null) r.add(preEffect);
-		r.add(mainEffect);
-		if (postEffect != null) r.add(postEffect);
-		return r;
+		return commands;
 	}
 
 	private InstantEffectCommand makeInstantEffect(

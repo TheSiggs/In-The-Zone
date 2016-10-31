@@ -100,6 +100,17 @@ public class Battle {
 	}
 
 	/**
+	 * Create traps
+	 * */
+	public List<Targetable> createTrap(Ability ability, Collection<MapPoint> ps) {
+		List<Targetable> r = new ArrayList<>();
+		for (MapPoint p : ps) {
+			r.add(battleState.placeTrap(p, ability, sprites));
+		}
+		return r;
+	}
+
+	/**
 	 * Handle fatigue damage.
 	 * */
 	public void doFatigue(Collection<DamageToTarget> targets) {

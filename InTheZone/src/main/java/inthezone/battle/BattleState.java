@@ -65,6 +65,15 @@ public class BattleState {
 	}
 
 	/**
+	 * Place a new trap
+	 * */
+	public Trap placeTrap(MapPoint p, Ability a, StandardSprites sprites) {
+		Trap t = new Trap(p, a, sprites);
+		targetable.add(t);
+		return t;
+	}
+
+	/**
 	 * Remove a targetable object.
 	 * */
 	public void removeObstacle(Targetable t) {

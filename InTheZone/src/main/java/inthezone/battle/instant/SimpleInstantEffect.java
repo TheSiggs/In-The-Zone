@@ -21,10 +21,14 @@ public class SimpleInstantEffect implements InstantEffect {
 	private final Collection<MapPoint> targets;
 	private final InstantEffectType type;
 
+	private final MapPoint agent;
+	@Override public MapPoint getAgent() {return agent;}
+
 	private SimpleInstantEffect(
-		Collection<MapPoint> targets, InstantEffectType type
+		Collection<MapPoint> targets, MapPoint agent, InstantEffectType type
 	) {
 		this.targets = targets;
+		this.agent = agent;
 		this.type = type;
 	}
 
@@ -33,6 +37,7 @@ public class SimpleInstantEffect implements InstantEffect {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
 		o.put("kind", type.toString());
+		o.put("agent", agent.getJSON()); 
 		for (MapPoint t : targets) a.add(t.getJSON());
 		o.put("targets", a);
 		return o;
@@ -42,13 +47,16 @@ public class SimpleInstantEffect implements InstantEffect {
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
+		Object oagent = json.get("agent");
 		Object otargets = json.get("targets");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
+		if (oagent == null) throw new ProtocolException("Missing effect agent");
 		if (otargets == null) throw new ProtocolException("Missing effect targets");
 
 		try {
 			InstantEffectType type = InstantEffectType.fromString((String) okind);
+			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
 			if (!(type == InstantEffectType.CLEANSE ||
 				type == InstantEffectType.DEFUSE ||
 				type == InstantEffectType.PURGE)
@@ -59,16 +67,16 @@ public class SimpleInstantEffect implements InstantEffect {
 			for (int i = 0; i < rawTargets.size(); i++) {
 				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
 			}
-			return new SimpleInstantEffect(targets, type);
+			return new SimpleInstantEffect(targets, agent, type);
 		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing cleanse/purge/defuse effect", e);
 		}
 	}
 
 	public static SimpleInstantEffect getEffect(
-		Collection<MapPoint> targets, InstantEffectType type
+		Collection<MapPoint> targets, MapPoint agent, InstantEffectType type
 	) {
-		return new SimpleInstantEffect(targets, type);
+		return new SimpleInstantEffect(targets, agent, type);
 	}
 
 	@Override public List<Targetable> apply(Battle battle) {
@@ -84,9 +92,11 @@ public class SimpleInstantEffect implements InstantEffect {
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget
 	) {
-		return new SimpleInstantEffect(targets.stream()
-			.map(x -> retarget.getOrDefault(x, x))
-			.collect(Collectors.toList()), type);
+		return new SimpleInstantEffect(
+			targets.stream()
+				.map(x -> retarget.getOrDefault(x, x))
+				.collect(Collectors.toList()),
+			retarget.getOrDefault(agent, agent), type);
 	}
 
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {return new HashMap<>();}

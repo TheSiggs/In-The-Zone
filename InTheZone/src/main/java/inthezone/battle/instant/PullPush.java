@@ -28,6 +28,8 @@ public class PullPush implements InstantEffect {
 	public final List<List<MapPoint>> paths;
 	private final int param;
 
+	@Override public MapPoint getAgent() {return castFrom;}
+
 	private PullPush(
 		InstantEffectInfo type,
 		MapPoint castFrom,
@@ -206,7 +208,8 @@ public class PullPush implements InstantEffect {
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
 			.collect(Collectors.toList());
 
-		return getEffect(battle, type, castFrom, targets);
+		return getEffect(battle, type,
+			retarget.getOrDefault(castFrom, castFrom), targets);
 	}
 
 	@Override public boolean isComplete() {return true;}

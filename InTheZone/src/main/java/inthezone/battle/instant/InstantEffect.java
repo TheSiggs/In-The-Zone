@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface InstantEffect extends HasJSONRepresentation {
+	public MapPoint getAgent();
+
 	public List<Targetable> apply(Battle battle) throws CommandException;
 
 	/**

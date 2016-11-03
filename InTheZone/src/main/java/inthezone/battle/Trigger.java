@@ -40,17 +40,12 @@ public class Trigger {
 	}
 
 	/**
-	 * Get the results of triggering all traps and zones at point p on character c.
-	 * @param c The character that triggers the traps.
-	 * @param p The position where the character will be when the traps/zones trigger
+	 * Get the results of triggering all traps and zones at point p
+	 * @param p The location of the trap or zone tor trigger
 	 * */
-	public List<Command> doTriggers(Character c, MapPoint p) {
+	public List<Command> getAllTriggers(MapPoint p) {
 		List<Command> r = new ArrayList<>();
 		battle.getTrapAt(p).ifPresent(trap -> {
-			// temporarily move the character
-			MapPoint p0 = c.getPos();
-			c.teleport(p, battle.hasMana(p));
-
 			try {
 				List<MapPoint> targets = new ArrayList<>(); targets.add(p);
 
@@ -59,9 +54,6 @@ public class Trigger {
 			} catch (CommandException e) {
 				throw new RuntimeException("Internal logic error triggering trap", e);
 			}
-
-			// restore the character to its original place
-			c.teleport(p0, battle.hasMana(p0));
 		});
 
 		return r;

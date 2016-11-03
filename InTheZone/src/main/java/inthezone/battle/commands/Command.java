@@ -5,6 +5,7 @@ import inthezone.battle.BattleState;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
+import java.util.ArrayList;
 import java.util.List;
 import org.json.simple.JSONObject;
 
@@ -14,6 +15,24 @@ public abstract class Command implements HasJSONRepresentation {
 	 * @return All the characters that were affected by the command
 	 * */
 	public abstract List<Targetable> doCmd(Battle turn) throws CommandException;
+
+	/**
+	 * Do a command, computing trap and zone triggers
+	 * @param turn The state of the battle
+	 * @param commands [out] A list which will contain all the characters that
+	 * were affected by the command
+	 * @return A new set of commands, including all the trap and zone effects.
+	 * */
+	public List<Command> doCmdComputingTriggers(
+		Battle turn, List<Targetable> targeted) throws CommandException
+	{
+		targeted.clear();
+		targeted.addAll(doCmd(turn));
+
+		List<Command> r = new ArrayList<>();
+		r.add(this);
+		return r;
+	}
 
 	/**
 	 * Parse a command.

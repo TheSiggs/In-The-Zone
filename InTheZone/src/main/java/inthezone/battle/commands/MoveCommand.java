@@ -50,11 +50,7 @@ public class MoveCommand extends Command {
 				path.add(MapPoint.fromJSON((JSONObject) rawPath.get(i)));
 			}
 			return new MoveCommand(path);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing move command", e);
-		} catch (CorruptDataException e) {
-			throw new ProtocolException("Error parsing move command", e);
-		} catch (CommandException e) {
+		} catch (ClassCastException|CorruptDataException|CommandException e) {
 			throw new ProtocolException("Error parsing move command", e);
 		}
 	}
@@ -68,6 +64,27 @@ public class MoveCommand extends Command {
 
 		List<Targetable> r = new ArrayList<>();
 		oc.ifPresent(c -> r.add(c.clone()));
+		return r;
+	}
+
+	@Override
+	public List<Command> doCmdComputingTriggers(
+		Battle turn, List<Targetable> targeted) throws CommandException
+	{
+		targeted.clear();
+		List<Command> r = new ArrayList<>();
+
+		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(path);
+		Command move1 = new MoveCommand(path1);
+
+		r.add(move1);
+		targeted.addAll(move1.doCmd(turn));
+
+		List<Command> triggers = turn.battleState.trigger.getAllTriggers(
+			path1.get(path1.size() - 1));
+		for (Command c : triggers)
+			r.addAll(c.doCmdComputingTriggers(turn, targeted));
+
 		return r;
 	}
 }

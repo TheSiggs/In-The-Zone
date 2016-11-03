@@ -19,6 +19,8 @@ import nz.dcoder.ai.astar.AStarSearch;
  * perform high level battle operations.
  * */
 public class BattleState {
+	public final Trigger trigger;
+
 	public final Stage terrain;
 	public final Collection<Character> characters;
 
@@ -30,6 +32,7 @@ public class BattleState {
 	private final Set<MapPoint> terrainObstacles;
 
 	public BattleState(Stage terrain, Collection<Character> characters) {
+		this.trigger = new Trigger(this);
 		this.terrain = terrain;
 		this.characters = characters;
 		this.targetable = new ArrayList<>();

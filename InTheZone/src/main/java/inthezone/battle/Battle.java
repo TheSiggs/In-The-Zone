@@ -20,8 +20,8 @@ import java.util.stream.Stream;
  * This class processes battle commands.
  * */
 public class Battle {
-	public BattleState battleState;
-	private StandardSprites sprites;
+	public final BattleState battleState;
+	private final StandardSprites sprites;
 
 	public Battle(BattleState battleState, StandardSprites sprites) {
 		this.battleState = battleState;

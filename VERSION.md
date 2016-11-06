@@ -26,7 +26,5 @@ for example.
 That has to be done after a 
 ```git pull```
 
+Do the following to push the tags additionally:
 ```git push --tags```
-pushes the tags, although a simple
-```git push```
-may be sufficient.

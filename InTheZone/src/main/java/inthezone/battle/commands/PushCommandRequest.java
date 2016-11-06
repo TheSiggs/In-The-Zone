@@ -42,7 +42,7 @@ public class PushCommandRequest extends CommandRequest {
 			if (a != null && t != null) {
 				boolean effective = t.isPushable();
 				return Optional.of(new PushCommand(agent, PullPush.getEffect(
-					battleState, pushEffect, agent, targets), effective));
+					battleState, pushEffect, agent, targets, false), effective));
 			}
 
 			return Optional.empty();

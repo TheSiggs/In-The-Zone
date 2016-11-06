@@ -15,9 +15,18 @@ import org.json.simple.JSONObject;
 public class MoveCommand extends Command {
 	public final List<MapPoint> path;
 
-	public MoveCommand(List<MapPoint> path) throws CommandException {
+	private final boolean isPanic;
+
+	/**
+	 * @param isPanic Set to true if this move command was created by the panic
+	 * status effect, and the traps and zones have not been triggered yet.
+	 * */
+	public MoveCommand(List<MapPoint> path, boolean isPanic)
+		throws CommandException
+	{
 		if (path.size() < 2) throw new CommandException("Bad path in move command");
 		this.path = path;
+		this.isPanic = isPanic;
 	}
 
 	@Override 
@@ -49,7 +58,10 @@ public class MoveCommand extends Command {
 			for (int i = 0; i < rawPath.size(); i++) {
 				path.add(MapPoint.fromJSON((JSONObject) rawPath.get(i)));
 			}
-			return new MoveCommand(path);
+
+			// isPanic is always false here, because at this point the triggers have
+			// been resolved
+			return new MoveCommand(path, false);
 		} catch (ClassCastException|CorruptDataException|CommandException e) {
 			throw new ProtocolException("Error parsing move command", e);
 		}
@@ -77,16 +89,21 @@ public class MoveCommand extends Command {
 		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(path);
 		
 		if (path1.size() >= 2) {
-			Command move1 = new MoveCommand(path1);
+			Command move1 = new MoveCommand(path1, false);
 
 			r.add(move1);
 			targeted.addAll(move1.doCmd(turn));
 		}
 
-		List<Command> triggers = turn.battleState.trigger.getAllTriggers(
-			path1.get(path1.size() - 1));
+		MapPoint loc = path1.get(path1.size() - 1);
+		List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
 		for (Command c : triggers)
 			r.addAll(c.doCmdComputingTriggers(turn, targeted));
+
+		if (isPanic && !triggers.isEmpty()) {
+			turn.battleState.getCharacterAt(loc)
+				.ifPresent(c -> r.addAll(c.continueTurnReset(turn)));
+		}
 
 		return r;
 	}

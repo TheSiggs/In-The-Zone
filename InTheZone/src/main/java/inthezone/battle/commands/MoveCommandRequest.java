@@ -24,7 +24,7 @@ public class MoveCommandRequest extends CommandRequest {
 		List<MapPoint> path = battleState.findPath(start, target, player);
 		if (battleState.canMove(path)) {
 			List<Command> r = new ArrayList<>();
-			r.add(new MoveCommand(path));
+			r.add(new MoveCommand(path, false));
 			return r;
 		} else {
 			throw new CommandException("Bad path command request");

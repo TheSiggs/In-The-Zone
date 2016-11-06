@@ -244,9 +244,30 @@ public class Character implements Targetable {
 			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
 		});
 		statusDebuff.ifPresent(s -> {
+			lastDebuff = s;
 			if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
 		});
 
+		return r;
+	}
+
+	// need to hold on to the last debuff, because we might need to know what it
+	// was even after it's removed.
+	private StatusEffect lastDebuff = null;
+
+	/**
+	 * Continue the turn reset, after it was interrupted by a trigger.
+	 * */
+	public List<Command> continueTurnReset(Battle battle) {
+		List<Command> r = new ArrayList<>();
+		statusDebuff.ifPresent(s -> {
+			if (s.isBeforeTurnExhaustive()) r.addAll(s.doBeforeTurn(battle, this));
+		});
+
+		if (!statusDebuff.isPresent()) {
+			if (lastDebuff != null && lastDebuff.isBeforeTurnExhaustive())
+			 r.addAll(lastDebuff.doBeforeTurn(battle, this));
+		}
 		return r;
 	}
 

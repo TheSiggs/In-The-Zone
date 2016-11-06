@@ -37,6 +37,8 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 		return new ArrayList<>();
 	}
 
+	public boolean isBeforeTurnExhaustive() {return false;}
+
 	/**
 	 * Some status effects require extra information not available at parsing
 	 * time.  This command supplies the extra information.  It should be called

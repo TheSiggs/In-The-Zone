@@ -31,16 +31,24 @@ public class PullPush extends InstantEffect {
 	public final List<List<MapPoint>> paths;
 	private final int param;
 
+	private final boolean isFear;
+
+	/**
+	 * @param isFear Set to true if this effect was created by the feared status
+	 * effect, and the triggers have not been resolved yet.
+	 * */
 	private PullPush(
 		InstantEffectInfo type,
 		MapPoint castFrom,
-		List<List<MapPoint>> paths
+		List<List<MapPoint>> paths,
+		boolean isFear
 	) {
 		super(castFrom);
 		this.type = type;
 		this.param = type.param;
 		this.castFrom = castFrom;
 		this.paths = paths;
+		this.isFear = isFear;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,33 +94,44 @@ public class PullPush extends InstantEffect {
 
 				paths.add(path);
 			}
-			return new PullPush(type, castFrom, paths);
+
+			// isFear is always false here because the triggers have been resolved at
+			// this point
+			return new PullPush(type, castFrom, paths, false);
 		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing push/pull effect", e);
 		}
 	}
 
+	/**
+	 * @param isFear Same as for the constructor
+	 * */
 	public static PullPush getEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
-		Collection<MapPoint> targets
+		Collection<MapPoint> targets,
+		boolean isFear
 	) {
 		if (info.type == InstantEffectType.PULL) {
-			return getPullEffect(battle, info, castFrom, targets);
+			return getPullEffect(battle, info, castFrom, targets, isFear);
 		} else if (info.type == InstantEffectType.PUSH) {
-			return getPushEffect(battle, info, castFrom, targets);
+			return getPushEffect(battle, info, castFrom, targets, isFear);
 		} else {
 			throw new RuntimeException(
 				"Attempted to build " + info.toString() + " effect with PullPush class");
 		}
 	}
 
+	/**
+	 * @param isFear Same as for the constructor
+	 * */
 	public static PullPush getPullEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
-		Collection<MapPoint> targets
+		Collection<MapPoint> targets,
+		boolean isFear
 	) {
 		List<List<MapPoint>> paths = new ArrayList<>();
 
@@ -127,14 +146,18 @@ public class PullPush extends InstantEffect {
 			if (path.size() > 0) paths.add(path);
 		}
 
-		return new PullPush(info, castFrom, paths);
+		return new PullPush(info, castFrom, paths, isFear);
 	}
 
+	/**
+	 * @param isFear Same as for the constructor
+	 * */
 	public static PullPush getPushEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
-		Collection<MapPoint> targets
+		Collection<MapPoint> targets,
+		boolean isFear
 	) {
 		List<List<MapPoint>> paths = new ArrayList<>();
 
@@ -161,7 +184,7 @@ public class PullPush extends InstantEffect {
 			}
 		}
 
-		return new PullPush(info, castFrom, paths);
+		return new PullPush(info, castFrom, paths, isFear);
 	}
 
 	private static List<MapPoint> getPullPath(
@@ -218,18 +241,28 @@ public class PullPush extends InstantEffect {
 
 			// do the push/pull
 			if (!validPathSections.isEmpty()) {
-				InstantEffect eff = new PullPush(this.type, this.castFrom, validPathSections);
+				InstantEffect eff = new PullPush(
+					this.type, this.castFrom, validPathSections, false);
 				affected.addAll(eff.apply(battle));
 				r.add(cmd.apply(eff));
 			}
 
 			// do the triggers
+			boolean doneContinueTurn = false;
 			for (List<MapPoint> path : pathSections) {
-				List<Command> triggers = battle.battleState.trigger.getAllTriggers(
-					path.get(path.size() - 1));
+				MapPoint loc = path.get(path.size() - 1);
+				List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
 				for (Command c : triggers)
 					r.addAll(c.doCmdComputingTriggers(battle, affected));
+
+				if (isFear && !triggers.isEmpty()) {
+					battle.battleState.getCharacterAt(loc)
+						.ifPresent(c -> r.addAll(c.continueTurnReset(battle)));
+					doneContinueTurn = true;
+				}
 			}
+
+			if (doneContinueTurn) break;
 		}
 
 		return r;
@@ -252,7 +285,7 @@ public class PullPush extends InstantEffect {
 			.collect(Collectors.toList());
 
 		return getEffect(battle, type,
-			retarget.getOrDefault(castFrom, castFrom), targets);
+			retarget.getOrDefault(castFrom, castFrom), targets, false);
 	}
 }
 

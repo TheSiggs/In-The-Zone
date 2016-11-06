@@ -26,7 +26,7 @@ public class InstantEffectFactory {
 			case DEFUSE: /* fallthrough */
 			case PURGE: return SimpleInstantEffect.getEffect(targets, castFrom, info.type);
 			case PUSH: /* fallthrough */
-			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets);
+			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets, false);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets, castFrom);
 			case OBSTACLES: return Obstacles.getEffect(castFrom, battleState, info, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);

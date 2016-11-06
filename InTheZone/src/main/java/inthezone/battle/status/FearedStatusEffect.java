@@ -83,11 +83,13 @@ public class FearedStatusEffect extends StatusEffect {
 		PullPush p = PullPush.getEffect(
 			battle.battleState,
 			new InstantEffectInfo(InstantEffectType.PUSH, g),
-			agent.getPos(), targets);
+			agent.getPos(), targets, true);
 
 		List<Command> r = new ArrayList<>();
 		r.add(new InstantEffectCommand(p, Optional.empty(), Optional.empty()));
 		return r;
 	}
+
+	@Override public boolean isBeforeTurnExhaustive() {return true;}
 }
 

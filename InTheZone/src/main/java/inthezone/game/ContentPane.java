@@ -123,6 +123,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	@Override
 	public void serverError(Exception e) {
 		Platform.runLater(() -> {
+			e.printStackTrace();
 			isConnected = false;
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Server error");

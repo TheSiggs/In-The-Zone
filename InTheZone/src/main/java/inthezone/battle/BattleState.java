@@ -70,8 +70,10 @@ public class BattleState {
 	/**
 	 * Place a new trap
 	 * */
-	public Trap placeTrap(MapPoint p, Ability a, StandardSprites sprites) {
-		Trap t = new Trap(p, a, sprites);
+	public Trap placeTrap(
+		MapPoint p, Ability a, Character agent, StandardSprites sprites
+	) {
+		Trap t = new Trap(p, a, agent, sprites);
 		targetable.add(t);
 		return t;
 	}

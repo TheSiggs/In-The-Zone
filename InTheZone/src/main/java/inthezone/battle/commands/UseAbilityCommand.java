@@ -129,7 +129,7 @@ public class UseAbilityCommand extends Command {
 		Ability abilityData;
 
 		if (agentType == AbilityAgentType.TRAP) {
-			abilityData = battle.battleState.getTrapAt(agent)
+			abilityData = battle.battleState.getTrapAt(castFrom)
 				.map(t -> t.ability).orElseThrow(() ->
 					new CommandException("Invalid ability command"));
 		} else {
@@ -144,7 +144,9 @@ public class UseAbilityCommand extends Command {
 		List<Targetable> r = new ArrayList<>();
 
 		if (abilityData.info.trap) {
-			return battle.createTrap(abilityData, targetSquares);
+			return battle.battleState.getCharacterAt(agent)
+				.map(c -> battle.createTrap(abilityData, c, targetSquares))
+				.orElseThrow(() -> new CommandException("Invalid ability command"));
 
 		} else {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c.clone()));
@@ -158,7 +160,9 @@ public class UseAbilityCommand extends Command {
 				}
 			}
 
-			battle.doAbility(agent, agentType, abilityData, targets);
+			battle.doAbility(
+				(agentType == AbilityAgentType.CHARACTER) ? agent : castFrom,
+				agentType, abilityData, targets);
 		}
 
 		return r;

@@ -43,7 +43,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			// get the targets
 			Collection<DamageToTarget> allTargets =
 				battleState.getCharacterAt(agent).map(a -> {
-					double revengeBonus = battleState.getRevengeBonus(a.player);
+					double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
+						battleState.getRevengeBonus(a.player);
 
 					return targets.stream()
 						.flatMap(t ->

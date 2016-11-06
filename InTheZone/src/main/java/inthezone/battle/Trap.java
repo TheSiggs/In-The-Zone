@@ -10,12 +10,16 @@ import isogame.engine.SpriteInfo;
 public class Trap implements Targetable {
 	public final MapPoint pos;
 	public final Ability ability;
+	public final Character agent;
 	private final StandardSprites sprites;
 	private boolean defused = false;
 
-	public Trap(MapPoint pos, Ability ability, StandardSprites sprites) {
+	public Trap(
+		MapPoint pos, Ability ability, Character agent, StandardSprites sprites
+	) {
 		this.pos = pos;
 		this.ability = ability;
+		this.agent = agent;
 		this.sprites = sprites;
 	}
 

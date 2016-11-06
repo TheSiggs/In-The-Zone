@@ -75,6 +75,9 @@ public class Battle {
 	/**
 	 * Perform an ability and update the game state accordingly.  Instant effects
 	 * are handled separately.
+	 * @param agent The location of the agent.  For traps and zones this is the
+	 * actual location of the trap / zone, not the location of the character that
+	 * cast the trap.
 	 * */
 	public void doAbility(
 		MapPoint agent,
@@ -110,10 +113,12 @@ public class Battle {
 	/**
 	 * Create traps
 	 * */
-	public List<Targetable> createTrap(Ability ability, Collection<MapPoint> ps) {
+	public List<Targetable> createTrap(
+		Ability ability, Character agent, Collection<MapPoint> ps
+	) {
 		List<Targetable> r = new ArrayList<>();
 		for (MapPoint p : ps) {
-			r.add(battleState.placeTrap(p, ability, sprites));
+			r.add(battleState.placeTrap(p, ability, agent, sprites));
 		}
 		return r;
 	}

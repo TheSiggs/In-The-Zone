@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Command line options
-# --dev
+# --dev=true
 #     Bring up a dialog when the game starts to choose the game data directory
 # --basedir=[dir]
 #     Use [dir] as the game data directory, supersedes --dev

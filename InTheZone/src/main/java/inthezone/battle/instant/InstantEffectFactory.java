@@ -38,7 +38,7 @@ public class InstantEffectFactory {
 		if (okind == null) throw new ProtocolException("Missing effect kind");
 
 		try {
-			InstantEffectType kind = InstantEffectType.fromString((String) okind);
+			InstantEffectType kind = (new InstantEffectInfo((String) okind)).type;
 			switch (kind) {
 				case CLEANSE: /* fallthrough */
 				case DEFUSE: /* fallthrough */

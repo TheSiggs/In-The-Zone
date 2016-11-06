@@ -3,6 +3,7 @@ package inthezone.battle.instant;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
+import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
@@ -13,6 +14,7 @@ import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +23,12 @@ import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Teleport implements InstantEffect {
+public class Teleport extends InstantEffect {
 	public final int range;
 	public final List<Character> affectedCharacters;
 
 	private final List<MapPoint> targets;
 	private List<MapPoint> destinations;
-
-	private final MapPoint agent;
-	@Override public MapPoint getAgent() {return agent;}
 
 	private Teleport(
 		List<Character> affectedCharacters,
@@ -38,11 +37,11 @@ public class Teleport implements InstantEffect {
 		List<MapPoint> destinations,
 		MapPoint agent
 	) {
+		super(agent);
 		this.affectedCharacters = affectedCharacters;
 		this.range = range;
 		this.targets = targets;
 		this.destinations = destinations;
-		this.agent = agent;
 	}
 
 	public List<MapPoint> getDestinations() {
@@ -125,6 +124,25 @@ public class Teleport implements InstantEffect {
 		List<Targetable> r = new ArrayList<>();
 		for (int i = 0; i < targets.size(); i++) {
 			r.addAll(battle.doTeleport(targets.get(i), destinations.get(i)));
+		}
+
+		return r;
+	}
+
+	@Override public List<Command> applyComputingTriggers(
+		Battle battle, Function<InstantEffect, Command> cmd, List<Targetable> affected
+	) throws CommandException
+	{
+		affected.clear();
+		List<Command> r = new ArrayList<>();
+
+		affected.addAll(apply(battle));
+		r.add(cmd.apply(this));
+
+		for (MapPoint p : destinations) {
+			List<Command> triggers = battle.battleState.trigger.getAllTriggers(p);
+			for (Command c : triggers)
+				r.addAll(c.doCmdComputingTriggers(battle, affected));
 		}
 
 		return r;

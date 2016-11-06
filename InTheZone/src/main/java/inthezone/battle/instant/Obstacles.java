@@ -20,15 +20,12 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Obstacles implements InstantEffect {
-	private final MapPoint agent;
-	@Override public MapPoint getAgent() {return agent;}
-
+public class Obstacles extends InstantEffect {
 	private final Collection<MapPoint> placements;
 
 	private Obstacles(Collection<MapPoint> placements, MapPoint agent) {
+		super(agent);
 		this.placements = placements;
-		this.agent = agent;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,17 +84,10 @@ public class Obstacles implements InstantEffect {
 			.collect(Collectors.toList()));
 	}
 
-	@Override public Map<MapPoint, MapPoint> getRetargeting() {
-		return new HashMap<>();
-	}
-
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget
 	) {
 		return new Obstacles(placements, retarget.getOrDefault(agent, agent));
 	}
-
-	@Override public boolean isComplete() {return true;}
-	@Override public boolean complete(List<MapPoint> p) {return true;}
 }
 

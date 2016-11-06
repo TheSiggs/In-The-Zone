@@ -17,18 +17,15 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class SimpleInstantEffect implements InstantEffect {
+public class SimpleInstantEffect extends InstantEffect {
 	private final Collection<MapPoint> targets;
 	private final InstantEffectType type;
-
-	private final MapPoint agent;
-	@Override public MapPoint getAgent() {return agent;}
 
 	private SimpleInstantEffect(
 		Collection<MapPoint> targets, MapPoint agent, InstantEffectType type
 	) {
+		super(agent);
 		this.targets = targets;
-		this.agent = agent;
 		this.type = type;
 	}
 
@@ -98,9 +95,5 @@ public class SimpleInstantEffect implements InstantEffect {
 				.collect(Collectors.toList()),
 			retarget.getOrDefault(agent, agent), type);
 	}
-
-	@Override public Map<MapPoint, MapPoint> getRetargeting() {return new HashMap<>();}
-	@Override public boolean isComplete() {return true;}
-	@Override public boolean complete(List<MapPoint> p) {return true;}
 }
 

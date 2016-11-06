@@ -23,12 +23,13 @@ public class Trigger {
 	/**
 	 * Shrink a path to stop at the first trigger point
 	 * @param path A non-empty path
+	 * @return A path.  The return value may be of length 1, which indicates that
+	 * the start point of the original path was a trigger point.  The return
+	 * value is never length 0.
 	 * */
 	public List<MapPoint> shrinkPath(List<MapPoint> path) {
 		List<MapPoint> r = new ArrayList<>();
-		Iterator<MapPoint> ps = path.iterator();
-		r.add(ps.next());
-		for (MapPoint p = ps.next(); ps.hasNext(); p = ps.next()) {
+		for (MapPoint p : path) {
 			r.add(p);
 			Optional<Trap> t = battle.getTrapAt(p);
 			if (t.isPresent()) {
@@ -36,6 +37,35 @@ public class Trigger {
 			}
 		}
 
+		return r;
+	}
+
+	/**
+	 * Split a path into multiple segments, such that each segment is a valid
+	 * path, and triggers only occur on the ends of paths.
+	 * @param path a non-empty path
+	 * @return A list of path segments, each a valid path in its own right.  The
+	 * first element in the return list may have length 1, which indicates that
+	 * the original path started on a trigger point.
+	 * */
+	public List<List<MapPoint>> splitPath(List<MapPoint> path) {
+		List<List<MapPoint>> r = new ArrayList<>();
+
+		boolean pathAdded = false;
+		List<MapPoint> currentPath = new ArrayList<>();
+		for (MapPoint p : path) {
+			currentPath.add(p);
+			pathAdded = false;
+			Optional<Trap> t = battle.getTrapAt(p);
+			if (t.isPresent()) {
+				r.add(currentPath);
+				pathAdded = true;
+				currentPath = new ArrayList<>();
+				currentPath.add(p);
+			}
+		}
+
+		if (!pathAdded) r.add(currentPath);
 		return r;
 	}
 

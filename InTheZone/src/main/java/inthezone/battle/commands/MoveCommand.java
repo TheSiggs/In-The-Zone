@@ -75,10 +75,13 @@ public class MoveCommand extends Command {
 		List<Command> r = new ArrayList<>();
 
 		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(path);
-		Command move1 = new MoveCommand(path1);
+		
+		if (path1.size() >= 2) {
+			Command move1 = new MoveCommand(path1);
 
-		r.add(move1);
-		targeted.addAll(move1.doCmd(turn));
+			r.add(move1);
+			targeted.addAll(move1.doCmd(turn));
+		}
 
 		List<Command> triggers = turn.battleState.trigger.getAllTriggers(
 			path1.get(path1.size() - 1));

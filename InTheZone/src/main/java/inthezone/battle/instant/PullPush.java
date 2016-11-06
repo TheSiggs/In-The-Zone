@@ -2,6 +2,8 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.LineOfSight;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,19 +25,18 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class PullPush implements InstantEffect {
+public class PullPush extends InstantEffect {
 	private final InstantEffectInfo type;
 	private final MapPoint castFrom;
 	public final List<List<MapPoint>> paths;
 	private final int param;
-
-	@Override public MapPoint getAgent() {return castFrom;}
 
 	private PullPush(
 		InstantEffectInfo type,
 		MapPoint castFrom,
 		List<List<MapPoint>> paths
 	) {
+		super(castFrom);
 		this.type = type;
 		this.param = type.param;
 		this.castFrom = castFrom;
@@ -192,6 +194,47 @@ public class PullPush implements InstantEffect {
 			.collect(Collectors.toList());
 	}
 
+	@Override public List<Command> applyComputingTriggers(
+		Battle battle, Function<InstantEffect, Command> cmd, List<Targetable> affected
+	) throws CommandException
+	{
+		affected.clear();
+		List<Command> r = new ArrayList<>();
+
+		List<List<List<MapPoint>>> splitPaths = paths.stream()
+			.map(path -> battle.battleState.trigger.splitPath(path))
+			.collect(Collectors.toList());
+
+		while (!splitPaths.isEmpty()) {
+			List<List<MapPoint>> pathSections = new ArrayList<>();
+			for (List<List<MapPoint>> sections : splitPaths) {
+				if (!sections.isEmpty()) pathSections.add(sections.remove(0));
+			}
+			splitPaths = splitPaths.stream()
+				.filter(x -> !x.isEmpty()).collect(Collectors.toList());
+
+			List<List<MapPoint>> validPathSections = pathSections.stream()
+				.filter(x -> x.size() >= 2).collect(Collectors.toList());
+
+			// do the push/pull
+			if (!validPathSections.isEmpty()) {
+				InstantEffect eff = new PullPush(this.type, this.castFrom, validPathSections);
+				affected.addAll(eff.apply(battle));
+				r.add(cmd.apply(eff));
+			}
+
+			// do the triggers
+			for (List<MapPoint> path : pathSections) {
+				List<Command> triggers = battle.battleState.trigger.getAllTriggers(
+					path.get(path.size() - 1));
+				for (Command c : triggers)
+					r.addAll(c.doCmdComputingTriggers(battle, affected));
+			}
+		}
+
+		return r;
+	}
+
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {
 		Map<MapPoint, MapPoint> r = new HashMap<>();
 
@@ -211,8 +254,5 @@ public class PullPush implements InstantEffect {
 		return getEffect(battle, type,
 			retarget.getOrDefault(castFrom, castFrom), targets);
 	}
-
-	@Override public boolean isComplete() {return true;}
-	@Override public boolean complete(List<MapPoint> p) {return true;}
 }
 

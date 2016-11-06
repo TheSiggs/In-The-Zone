@@ -195,7 +195,7 @@ public class PullPush extends InstantEffect {
 	}
 
 	@Override public List<Command> applyComputingTriggers(
-		Battle battle, Function<InstantEffect, Command> cmd, List<Targetable> affected
+		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
 		affected.clear();

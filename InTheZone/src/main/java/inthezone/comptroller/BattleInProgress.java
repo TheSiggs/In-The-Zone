@@ -194,13 +194,19 @@ public class BattleInProgress implements Runnable {
 
 			commandQueue.poll();
 
-			List<Targetable> affectedCharacters = cmd.doCmd(battle);
-			Platform.runLater(() -> listener.command(cmd, affectedCharacters));
+			// A single command could get expanded into multiple commands if we
+			// trigger any traps or zones
+			List<Targetable> affectedCharacters = new ArrayList<>();
+			List<Command> allCmds = cmd.doCmdComputingTriggers(battle, affectedCharacters);
+			for (Command cmd0 : allCmds) {
+				Platform.runLater(() -> listener.command(cmd0, affectedCharacters));
 
-			// don't send the command to the network until it's been completed
-			// locally.  This allows the commands to update themselves when we have
-			// instant effects that mess with the game state.
-			if (network != null) network.sendCommand(cmd);
+				// don't send the command to the network until it's been completed
+				// locally.  This allows the commands to update themselves when we have
+				// instant effects that mess with the game state.  Also important for
+				// dealing with triggers.
+				if (network != null) network.sendCommand(cmd0);
+			}
 
 			if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
 				return true;

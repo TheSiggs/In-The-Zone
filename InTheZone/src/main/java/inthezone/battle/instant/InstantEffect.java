@@ -33,7 +33,7 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 	 * @return The actual commands that were executed, including triggers
 	 * */
 	public List<Command> applyComputingTriggers(
-		Battle battle, Function<InstantEffect, Command> cmd, List<Targetable> affected
+		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
 		affected.clear();

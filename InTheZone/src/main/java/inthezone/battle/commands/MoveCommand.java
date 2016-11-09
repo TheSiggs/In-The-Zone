@@ -83,7 +83,6 @@ public class MoveCommand extends Command {
 	public List<Command> doCmdComputingTriggers(
 		Battle turn, List<Targetable> targeted) throws CommandException
 	{
-		targeted.clear();
 		List<Command> r = new ArrayList<>();
 
 		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(path);

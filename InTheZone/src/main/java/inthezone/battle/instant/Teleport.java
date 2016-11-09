@@ -133,7 +133,6 @@ public class Teleport extends InstantEffect {
 		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		affected.clear();
 		List<Command> r = new ArrayList<>();
 
 		affected.addAll(apply(battle));

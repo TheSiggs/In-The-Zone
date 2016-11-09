@@ -26,9 +26,7 @@ public abstract class Command implements HasJSONRepresentation {
 	public List<Command> doCmdComputingTriggers(
 		Battle turn, List<Targetable> targeted) throws CommandException
 	{
-		targeted.clear();
 		targeted.addAll(doCmd(turn));
-
 		List<Command> r = new ArrayList<>();
 		r.add(this);
 		return r;

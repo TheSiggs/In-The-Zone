@@ -221,7 +221,6 @@ public class PullPush extends InstantEffect {
 		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		affected.clear();
 		List<Command> r = new ArrayList<>();
 
 		List<List<List<MapPoint>>> splitPaths = paths.stream()

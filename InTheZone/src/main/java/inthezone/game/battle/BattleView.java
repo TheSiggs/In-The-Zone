@@ -535,23 +535,24 @@ public class BattleView
 		a.showAndWait();
 	}
 
-	private static Character getAgent(List<Targetable> ts) {
-		return (Character) ts.get(0);
-	}
-
 	@Override
 	public void command(Command cmd, List<Targetable> affectedCharacters) {
 		if (cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
 			UseAbilityCommand ua = (UseAbilityCommand) cmd;
-			hud.writeMessage(
-				getAgent(affectedCharacters).name + " uses " + ua.ability + "!");
+			Targetable agent = affectedCharacters.get(0);
+			if (agent instanceof Character) {
+				hud.writeMessage(((Character) agent).name + " uses " + ua.ability + "!");
+			} else {
+				hud.writeMessage("It's a trap!");
+			}
 		}
 
 		if (cmd instanceof MoveCommand) {
 			List<MapPoint> path = ((MoveCommand) cmd).path;
 			if (path.size() < 2) return;
 
-			scheduleMovement("walk", walkSpeed, path, getAgent(affectedCharacters));
+			Character agent = (Character) affectedCharacters.get(0);
+			scheduleMovement("walk", walkSpeed, path, agent);
 
 		} else if (cmd instanceof PushCommand) {
 			// The first element in the affected characters list for a push command

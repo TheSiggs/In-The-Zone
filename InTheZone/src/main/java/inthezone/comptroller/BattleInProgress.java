@@ -5,6 +5,7 @@ import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
@@ -152,7 +153,7 @@ public class BattleInProgress implements Runnable {
 					});
 				a.attackArea.ifPresent(attackArea ->
 					attackArea.complete(battle.battleState.getAffectedArea(
-						a.subject.getPos(), a.castFrom, a.ability, a.target)));
+						a.subject.getPos(), AbilityAgentType.CHARACTER, a.castFrom, a.ability, a.target)));
 
 				// handle command completion
 				if (a.completion.isPresent()) {

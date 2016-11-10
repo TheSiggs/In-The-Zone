@@ -82,11 +82,15 @@ public class Ability {
 	/**
 	 * Determine if this ability can be applied to a particular target.
 	 * */
-	public boolean canTarget(Character agent, Targetable target) {
-		return
-			(info.range.targetMode.self && target.getPos().equals(agent.getPos())) ||
-			(info.range.targetMode.enemies && target.isEnemyOf(agent)) ||
-			(info.range.targetMode.allies && !target.isEnemyOf(agent));
+	public boolean canTarget(Targetable agent, Targetable target) {
+		if (agent instanceof Character) {
+			return
+				(info.range.targetMode.self && target.getPos().equals(agent.getPos())) ||
+				(info.range.targetMode.enemies && target.isEnemyOf((Character) agent)) ||
+				(info.range.targetMode.allies && !target.isEnemyOf((Character) agent));
+		} else {
+			return true;
+		}
 	}
 
 	private static final double const_a = 3;
@@ -134,7 +138,7 @@ public class Ability {
 	}
 
 	public DamageToTarget computeDamageToTarget(
-		Character a, Targetable t, double r
+		Targetable a, Targetable t, double r
 	) {
 		Stats aStats = a.getStats();
 		Stats tStats = t.getStats();
@@ -146,9 +150,12 @@ public class Ability {
 
 		double chance = info.chance + a.getChanceBuff();
 
+		Optional<Character> characterAgent =
+			Optional.ofNullable(a instanceof Character? (Character) a : null);
+
 		return new DamageToTarget(t.getPos(), rdamage,
 			imposeEffect(chance, info.statusEffect
-				.map(i -> StatusEffectFactory.getEffect(i, rdamage, a))
+				.map(i -> StatusEffectFactory.getEffect(i, rdamage, characterAgent))
 				.orElse(null)),
 			Math.random() < chance, Math.random() < chance);
 	}

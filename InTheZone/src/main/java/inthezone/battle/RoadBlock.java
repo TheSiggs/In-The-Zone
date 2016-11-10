@@ -39,6 +39,9 @@ public class RoadBlock implements Targetable {
 	@Override public boolean isDead() {return hits == 0;}
 	@Override public boolean reap() {return isDead();}
 
+	@Override public boolean hasMana() {return false;}
+	@Override public double getChanceBuff() {return 0;}
+
 	@Override public SpriteInfo getSprite() {return sprite;}
 }
 

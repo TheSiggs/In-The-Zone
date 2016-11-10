@@ -1,5 +1,6 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
@@ -73,7 +74,7 @@ public class BattleState {
 	public Trap placeTrap(
 		MapPoint p, Ability a, Character agent, StandardSprites sprites
 	) {
-		Trap t = new Trap(p, a, agent, sprites);
+		Trap t = new Trap(p, hasMana(p), a, agent, sprites);
 		targetable.add(t);
 		return t;
 	}
@@ -122,6 +123,17 @@ public class BattleState {
 		return targetable.stream()
 			.filter(t -> t instanceof Trap && t.getPos().equals(x))
 			.findFirst().map(t -> (Trap) t);
+	}
+
+	/**
+	 * Get the agent of an ability
+	 * */
+	public Optional<? extends Targetable> getAgentAt(MapPoint x, AbilityAgentType agentType) {
+		switch (agentType) {
+			case CHARACTER: return getCharacterAt(x);
+			case TRAP: return getTrapAt(x);
+			default: return Optional.empty();
+		}
 	}
 
 	/**
@@ -269,14 +281,15 @@ public class BattleState {
 	 * Get all the tiles that will be affected by an ability.
 	 * */
 	public Collection<MapPoint> getAffectedArea(
-		MapPoint agent, MapPoint castFrom, Ability ability, MapPoint target
+		MapPoint agent, AbilityAgentType agentType,
+		MapPoint castFrom, Ability ability, MapPoint target
 	) {
 		Collection<MapPoint> r =
 			LineOfSight.getDiamond(target, ability.info.range.radius).stream()
 				.filter(p -> terrain.terrain.hasTile(p))
 				.collect(Collectors.toList());
 
-		if (ability.info.range.piercing) {
+		if (agentType == AbilityAgentType.CHARACTER && ability.info.range.piercing) {
 			Player player = getCharacterAt(agent).map(c -> c.player)
 				.orElseThrow(() -> new RuntimeException(
 					"Attempted to get targeting information for a non-existent character"));
@@ -291,13 +304,14 @@ public class BattleState {
 	}
 
 	public Collection<Targetable> getAbilityTargets(
-		MapPoint agent, MapPoint castFrom, Ability ability, MapPoint target
+		MapPoint agent, AbilityAgentType agentType,
+		MapPoint castFrom, Ability ability, MapPoint target
 	) {
-		return getCharacterAt(agent).map(c ->
-			getAffectedArea(agent, castFrom, ability, target).stream()
+		return getAgentAt(agent, agentType).map(a ->
+			getAffectedArea(agent, agentType, castFrom, ability, target).stream()
 				.flatMap(p -> getTargetableAt(p)
 					.map(x -> Stream.of(x)).orElse(Stream.empty()))
-				.filter(t -> ability.canTarget(c, t))
+				.filter(t -> ability.canTarget(a, t))
 				.collect(Collectors.toList())
 		).orElse(new ArrayList<>());
 	}

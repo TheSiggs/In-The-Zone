@@ -79,9 +79,8 @@ public class Trigger {
 			try {
 				List<MapPoint> targets = new ArrayList<>(); targets.add(p);
 
-				r.addAll((new UseAbilityCommandRequest(trap.agent.getPos(),
-					AbilityAgentType.TRAP, p, targets,
-					trap.ability)).makeCommand(battle));
+				r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP, p,
+					targets, trap.ability)).makeCommand(battle));
 			} catch (CommandException e) {
 				throw new RuntimeException("Internal logic error triggering trap", e);
 			}

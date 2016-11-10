@@ -20,6 +20,9 @@ public interface Targetable extends Obstacle {
 	public boolean isEnemyOf(Character character);
 	public boolean isDead();
 
+	public boolean hasMana();
+	public double getChanceBuff();
+
 	// get the sprite that represents this object
 	public SpriteInfo getSprite();
 

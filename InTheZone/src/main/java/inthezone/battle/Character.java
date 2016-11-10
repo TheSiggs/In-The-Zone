@@ -136,7 +136,7 @@ public class Character implements Targetable {
 		return maxHP;
 	}
 
-	public boolean hasMana() {
+	@Override public boolean hasMana() {
 		return hasMana;
 	}
 
@@ -294,7 +294,7 @@ public class Character implements Targetable {
 		return buff - debuff;
 	}
 
-	public double getChanceBuff() {
+	@Override public double getChanceBuff() {
 		return statusBuff.map(s -> s.getChanceBuff()).orElse(0.0);
 	}
 

@@ -112,8 +112,9 @@ public class BattleState {
 	/**
 	 * Get targetable objects at a particular point (if there is one).
 	 * */
-	public Optional<? extends Targetable> getTargetableAt(MapPoint x) {
-		return targetable.stream().filter(t -> t.getPos().equals(x)).findFirst();
+	public List<? extends Targetable> getTargetableAt(MapPoint x) {
+		return targetable.stream()
+			.filter(t -> t.getPos().equals(x)).collect(Collectors.toList());
 	}
 
 	/**
@@ -309,8 +310,7 @@ public class BattleState {
 	) {
 		return getAgentAt(agent, agentType).map(a ->
 			getAffectedArea(agent, agentType, castFrom, ability, target).stream()
-				.flatMap(p -> getTargetableAt(p)
-					.map(x -> Stream.of(x)).orElse(Stream.empty()))
+				.flatMap(p -> getTargetableAt(p).stream())
 				.filter(t -> ability.canTarget(a, t))
 				.collect(Collectors.toList())
 		).orElse(new ArrayList<>());

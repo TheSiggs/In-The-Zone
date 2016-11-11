@@ -69,7 +69,7 @@ public class FatigueCommand extends Command {
 			if (oc.isPresent()) {
 				oc.ifPresent(c -> r.add(c.clone()));
 			} else {
-				battle.battleState.getTargetableAt(d.target).ifPresent(t -> r.add(t));
+				battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
 			}
 		}
 

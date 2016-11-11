@@ -51,7 +51,7 @@ public class Battle {
 			r.add(new FatigueCommand(
 				battleState.characters.stream()
 					.filter(c -> c.player == player)
-					.map(c -> new DamageToTarget(c.getPos(),
+					.map(c -> new DamageToTarget(c.getPos(), false,
 						(int) Math.ceil(Ability.damageFormulaStatic(
 							(round - 7) * fatigueEff, 0, 0, 0, 0, fatigueStats, c.getStats())),
 						Optional.empty(), false, false))
@@ -94,10 +94,18 @@ public class Battle {
 		}
 
 		for (DamageToTarget d : targets) {
-			Targetable t = battleState.getTargetableAt(d.target)
-				.orElseThrow(() -> new RuntimeException(
-					"Attempted to attack non-target, command verification code failed"));
-
+			final Targetable t;
+			if (d.isTargetATrap) {
+				t = battleState.getTrapAt(d.target).orElseThrow(() ->
+					new CommandException("Expected trap at " +
+						d.target.toString() + " but there was none"));
+			} else {
+				t = battleState.getTargetableAt(d.target).stream()
+					.filter(x -> !(x instanceof Trap)).findFirst().orElseThrow(() ->
+						new CommandException("Expected targetable at " +
+							d.target.toString() + " but there was none"));
+			}
+			
 			t.dealDamage(d.damage);
 			if (d.statusEffect.isPresent()) {
 				try {
@@ -106,6 +114,7 @@ public class Battle {
 					throw new CommandException("Invalid status effect", e);
 				}
 			}
+
 			if (t.reap()) battleState.removeObstacle(t);
 		}
 	}
@@ -160,25 +169,25 @@ public class Battle {
 
 	public List<Targetable> doCleanse(Collection<MapPoint> targets) {
 		return targets.stream().flatMap(ot ->
-				battleState.getTargetableAt(ot).map(t -> {
-					t.cleanse(); return Stream.of(t);
-				}).orElse(Stream.empty())
+				battleState.getTargetableAt(ot).stream()
+					.map(t -> {t.cleanse(); return t;})
 			).collect(Collectors.toList());
 	}
 
 	public List<Targetable> doDefuse(Collection<MapPoint> targets) {
-		return targets.stream().flatMap(ot ->
-				battleState.getTargetableAt(ot).map(t -> {
-					t.defuse(); return Stream.of(t);
-				}).orElse(Stream.empty())
+		List<Targetable> r = targets.stream().flatMap(ot ->
+				battleState.getTargetableAt(ot).stream()
+					.map(t -> {t.defuse(); return t;})
 			).collect(Collectors.toList());
+
+		r.stream().forEach(t -> {if (t.reap()) battleState.removeObstacle(t);});
+		return r;
 	}
 
 	public List<Targetable> doPurge(Collection<MapPoint> targets) {
 		return targets.stream().flatMap(ot ->
-				battleState.getTargetableAt(ot).map(t -> {
-					t.purge(); return Stream.of(t);
-				}).orElse(Stream.empty())
+				battleState.getTargetableAt(ot).stream()
+					.map(t -> {t.purge(); return t;})
 			).collect(Collectors.toList());
 	}
 

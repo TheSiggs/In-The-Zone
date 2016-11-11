@@ -153,7 +153,7 @@ public class Ability {
 		Optional<Character> characterAgent =
 			Optional.ofNullable(a instanceof Character? (Character) a : null);
 
-		return new DamageToTarget(t.getPos(), rdamage,
+		return new DamageToTarget(t.getPos(), t instanceof Trap, rdamage,
 			imposeEffect(chance, info.statusEffect
 				.map(i -> StatusEffectFactory.getEffect(i, rdamage, characterAgent))
 				.orElse(null)),
@@ -170,7 +170,7 @@ public class Ability {
 		int damage =
 			(int) (-1d * Math.ceil(healingFormula(a.hasMana(), qh, a.getStats())));
 
-		return new DamageToTarget(a.getPos(), damage,
+		return new DamageToTarget(a.getPos(), false, damage,
 			Optional.empty(), false, false);
 	}
 

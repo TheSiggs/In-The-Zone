@@ -35,7 +35,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		List<Command> commands = new ArrayList<>();
 
-		if (ability.info.trap) {
+		if (ability.info.trap && agentType == AbilityAgentType.CHARACTER) {
 			commands.add(new UseAbilityCommand(agent, agentType, castFrom,
 				ability.rootName, targets, new ArrayList<>(), 0, 0));
 

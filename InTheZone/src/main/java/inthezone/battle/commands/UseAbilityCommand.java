@@ -143,26 +143,19 @@ public class UseAbilityCommand extends Command {
 
 		List<Targetable> r = new ArrayList<>();
 
-		if (abilityData.info.trap) {
+		if (abilityData.info.trap && agentType == AbilityAgentType.CHARACTER) {
 			return battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
 				.orElseThrow(() -> new CommandException("Invalid ability command"));
 
 		} else {
-			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c.clone()));
+			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			battle.battleState.getTrapAt(agent).ifPresent(t -> r.add(t));
 			for (DamageToTarget d : targets) {
-				Optional<Character> oc = battle.battleState.getCharacterAt(d.target);
-				if (oc.isPresent()) {
-					oc.ifPresent(c -> r.add(c.clone()));
-				} else {
-					battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
-				}
+				battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
 			}
 
-			battle.doAbility(
-				(agentType == AbilityAgentType.CHARACTER) ? agent : castFrom,
-				agentType, abilityData, targets);
+			battle.doAbility(agent, agentType, abilityData, targets);
 		}
 
 		return r;

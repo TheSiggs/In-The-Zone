@@ -197,10 +197,13 @@ public class BattleInProgress implements Runnable {
 
 			// A single command could get expanded into multiple commands if we
 			// trigger any traps or zones
-			List<Targetable> affectedCharacters = new ArrayList<>();
-			List<Command> allCmds = cmd.doCmdComputingTriggers(battle, affectedCharacters);
+			List<Targetable> affected = new ArrayList<>();
+			List<Command> allCmds = cmd.doCmdComputingTriggers(battle, affected);
+
+			List<Targetable> clonedAffected = affected.stream()
+				.map(t -> t.clone()).collect(Collectors.toList());
 			for (Command cmd0 : allCmds) {
-				Platform.runLater(() -> listener.command(cmd0, affectedCharacters));
+				Platform.runLater(() -> listener.command(cmd0, clonedAffected));
 
 				// don't send the command to the network until it's been completed
 				// locally.  This allows the commands to update themselves when we have

@@ -630,7 +630,7 @@ public class BattleView
 
 		int id = affected.id;
 		Sprite s = stage.getSpritesByTile(start).stream()
-			.filter(x -> x.userData.equals(id)).findFirst().get();
+			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
 
 		for (MapPoint p : path.subList(2, path.size())) {
 			if (!end.add(v).equals(p)) {
@@ -676,7 +676,7 @@ public class BattleView
 
 					if (c.isDead()) {
 						Sprite s = canvas.getStage().getSpritesByTile(c.getPos()).stream()
-							.filter(x -> x.userData.equals(c.id)).findFirst().get();
+							.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
 						s.setAnimation("dead");
 					}
 
@@ -691,15 +691,14 @@ public class BattleView
 	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
 		for (Targetable t : tios) {
 			if (t instanceof Character) continue;
-			if (!temporaryImmobileObjects.containsKey(t.getPos())) {
+			if (t.reap()) {
+				Sprite s = temporaryImmobileObjects.remove(t.getPos());
+				if (s != null) canvas.getStage().removeSprite(s);
+			} else if (!temporaryImmobileObjects.containsKey(t.getPos())) {
 				Sprite s = new Sprite(t.getSprite());
 				s.pos = t.getPos();
 				canvas.getStage().addSprite(s);
 				temporaryImmobileObjects.put(t.getPos(), s);
-			} else if (t.reap()) {
-				Sprite s = temporaryImmobileObjects.get(t.getPos());
-				canvas.getStage().removeSprite(s);
-				temporaryImmobileObjects.remove(t.getPos());
 			}
 		}
 	}

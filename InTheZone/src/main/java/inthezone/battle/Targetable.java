@@ -23,6 +23,8 @@ public interface Targetable extends Obstacle {
 	public boolean hasMana();
 	public double getChanceBuff();
 
+	public Targetable clone();
+
 	// get the sprite that represents this object
 	public SpriteInfo getSprite();
 

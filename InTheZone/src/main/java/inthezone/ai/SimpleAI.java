@@ -11,6 +11,7 @@ import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleListener;
 import javafx.application.Platform;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SimpleAI implements CommandGenerator {
 	public SimpleAI() {
@@ -22,7 +23,8 @@ public class SimpleAI implements CommandGenerator {
 	) {
 		for (Command cmd : battle.doTurnStart(forPlayer)) {
 			try {
-				List<Targetable> affectedCharacters = cmd.doCmd(battle);
+				List<Targetable> affectedCharacters = cmd.doCmd(battle).stream()
+					.map(t -> t.clone()).collect(Collectors.toList());
 				Platform.runLater(() -> {
 					listener.command(cmd, affectedCharacters);
 				});
@@ -39,7 +41,8 @@ public class SimpleAI implements CommandGenerator {
 
 		try {
 			Command cmd = new EndTurnCommand();
-			List<Targetable> affectedCharacters = cmd.doCmd(battle);
+			List<Targetable> affectedCharacters = cmd.doCmd(battle).stream()
+				.map(t -> t.clone()).collect(Collectors.toList());
 			Platform.runLater(() -> {
 				listener.command(cmd, affectedCharacters);
 			});

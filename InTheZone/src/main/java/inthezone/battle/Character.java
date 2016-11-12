@@ -77,7 +77,7 @@ public class Character implements Targetable {
 	/**
 	 * Create a copy of this character.
 	 * */
-	public Character clone() {
+	@Override public Character clone() {
 		return new Character(
 			id,
 			name,

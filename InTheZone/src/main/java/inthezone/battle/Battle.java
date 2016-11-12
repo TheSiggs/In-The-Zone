@@ -86,9 +86,7 @@ public class Battle {
 		Collection<DamageToTarget> targets
 	) throws CommandException {
 		if (agentType == AbilityAgentType.TRAP) {
-			battleState.getTrapAt(agent).ifPresent(t -> {
-				t.defuse(); battleState.removeObstacle(t);
-			});
+			battleState.getTrapAt(agent).ifPresent(t -> t.defuse());
 		} else if (agentType == AbilityAgentType.CHARACTER) {
 			battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
 		}

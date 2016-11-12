@@ -17,7 +17,7 @@ public class Trap implements Targetable {
 	private final double defenceBuff;
 	private final Stats stats;
 
-	private final StandardSprites sprites;
+	private final SpriteInfo sprite;
 	private boolean defused = false;
 
 	public Trap(
@@ -30,12 +30,34 @@ public class Trap implements Targetable {
 		this.pos = pos;
 		this.hasMana = hasMana;
 		this.ability = ability;
-		this.sprites = sprites;
+		this.sprite = sprites.trap;
 
 		this.chanceBuff = agent.getChanceBuff();
 		this.attackBuff = agent.getAttackBuff();
 		this.defenceBuff = agent.getDefenceBuff();
 		this.stats = agent.getStats();
+	}
+
+	public Trap(
+		MapPoint pos,
+		Ability ability,
+		boolean hasMana,
+		double chanceBuff,
+		double attackBuff,
+		double defenceBuff,
+		Stats stats,
+		SpriteInfo sprite,
+		boolean defused
+	) {
+		this.pos = pos;
+		this.ability = ability;
+		this.hasMana = hasMana;
+		this.chanceBuff = chanceBuff;
+		this.attackBuff = attackBuff;
+		this.defenceBuff = defenceBuff;
+		this.stats = stats;
+		this.sprite = sprite;
+		this.defused = defused;
 	}
 
 	@Override public boolean blocksSpace(Player player) {return false;}
@@ -53,10 +75,17 @@ public class Trap implements Targetable {
 	@Override public boolean isPushable() {return false;}
 	@Override public boolean isEnemyOf(Character character) {return true;}
 	@Override public boolean isDead() {return defused;}
-	@Override public SpriteInfo getSprite() {return sprites.trap;}
+	@Override public SpriteInfo getSprite() {return sprite;}
 	@Override public boolean reap() {return defused;}
 
 	@Override public boolean hasMana() {return hasMana;}
 	@Override public double getChanceBuff() {return chanceBuff;}
+
+	@Override public Trap clone() {
+		return new Trap(
+			pos, ability, hasMana,
+			chanceBuff, attackBuff, defenceBuff,
+			stats, sprite, defused);
+	}
 }
 

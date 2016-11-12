@@ -19,6 +19,12 @@ public class RoadBlock implements Targetable {
 		this.sprite = sprites.roadBlock;
 	}
 
+	private RoadBlock(MapPoint pos, int hits, SpriteInfo sprite) {
+		this.pos = pos;
+		this.hits = hits;
+		this.sprite = sprite;
+	}
+
 	@Override public boolean blocksSpace(Player player) {return true;}
 	@Override public boolean blocksPath(Player player) {return true;}
 
@@ -43,5 +49,7 @@ public class RoadBlock implements Targetable {
 	@Override public double getChanceBuff() {return 0;}
 
 	@Override public SpriteInfo getSprite() {return sprite;}
+
+	@Override public RoadBlock clone() {return new RoadBlock(pos, hits, sprite);}
 }
 

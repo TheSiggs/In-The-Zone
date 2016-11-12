@@ -75,7 +75,7 @@ public class MoveCommand extends Command {
 		battle.doMove(path);
 
 		List<Targetable> r = new ArrayList<>();
-		oc.ifPresent(c -> r.add(c.clone()));
+		oc.ifPresent(c -> r.add(c));
 		return r;
 	}
 
@@ -96,8 +96,9 @@ public class MoveCommand extends Command {
 
 		MapPoint loc = path1.get(path1.size() - 1);
 		List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
-		for (Command c : triggers)
+		for (Command c : triggers) {
 			r.addAll(c.doCmdComputingTriggers(turn, targeted));
+		}
 
 		if (isPanic && !triggers.isEmpty()) {
 			turn.battleState.getCharacterAt(loc)

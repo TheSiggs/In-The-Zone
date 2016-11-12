@@ -11,6 +11,7 @@ import inthezone.battle.Targetable;
 import javafx.application.Platform;
 import java.util.concurrent.BlockingQueue;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A bridge between the battle controller and the network code.
@@ -33,9 +34,11 @@ public class NetworkCommandGenerator implements CommandGenerator {
 				Command cmd = commandQueue.take();
 
 				try {
-					List<Targetable> affectedCharacters = cmd.doCmd(battle);
+					List<Targetable> affected = cmd.doCmd(battle);
+					List<Targetable> clonedAffected = affected.stream()
+						.map(t -> t.clone()).collect(Collectors.toList());
 					Platform.runLater(() -> {
-						listener.command(cmd, affectedCharacters);
+						listener.command(cmd, clonedAffected);
 					});
 
 					if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {

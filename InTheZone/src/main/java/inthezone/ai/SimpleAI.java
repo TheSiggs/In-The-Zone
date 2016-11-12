@@ -6,6 +6,7 @@ import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.EndTurnCommandRequest;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.Player;
 import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleListener;
@@ -23,12 +24,8 @@ public class SimpleAI implements CommandGenerator {
 	) {
 		for (Command cmd : battle.doTurnStart(forPlayer)) {
 			try {
-				List<Targetable> affectedCharacters = cmd.doCmd(battle).stream()
-					.map(t -> t.clone()).collect(Collectors.toList());
-				Platform.runLater(() -> {
-					listener.command(cmd, affectedCharacters);
-				});
-
+				ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+				Platform.runLater(() -> listener.command(ec)); 
 				if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
 					return;
 				}
@@ -41,11 +38,8 @@ public class SimpleAI implements CommandGenerator {
 
 		try {
 			Command cmd = new EndTurnCommand();
-			List<Targetable> affectedCharacters = cmd.doCmd(battle).stream()
-				.map(t -> t.clone()).collect(Collectors.toList());
-			Platform.runLater(() -> {
-				listener.command(cmd, affectedCharacters);
-			});
+			ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+			Platform.runLater(() -> listener.command(ec));
 		} catch (CommandException e) {
 			Platform.runLater(() -> listener.badCommand(e));
 		}

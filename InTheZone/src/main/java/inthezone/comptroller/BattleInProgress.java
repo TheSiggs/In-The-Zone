@@ -200,8 +200,7 @@ public class BattleInProgress implements Runnable {
 			// trigger any traps or zones
 			List<ExecutedCommand> allCmds = cmd.doCmdComputingTriggers(battle);
 			for (ExecutedCommand ec : allCmds) {
-				Platform.runLater(() -> listener.command(ec.cmd,
-					ec.affected.stream().map(t -> t.clone()).collect(Collectors.toList())));
+				Platform.runLater(() -> listener.command(ec));
 
 				// don't send the command to the network until it's been completed
 				// locally.  This allows the commands to update themselves when we have

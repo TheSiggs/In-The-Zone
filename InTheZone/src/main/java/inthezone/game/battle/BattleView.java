@@ -540,8 +540,8 @@ public class BattleView
 	private Queue<ExecutedCommand> commandQueue = new LinkedList<>();
 
 	@Override
-	public void command(Command cmd, List<Targetable> affected) {
-		commandQueue.add(new ExecutedCommand(cmd, affected));
+	public void command(ExecutedCommand ec) {
+		commandQueue.add(ec);
 		if (mode != ANIMATING) doNextCommand();
 	}
 

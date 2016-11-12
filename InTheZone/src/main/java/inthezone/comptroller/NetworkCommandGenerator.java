@@ -5,6 +5,8 @@ import inthezone.battle.Battle;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.data.Player;
 import inthezone.battle.Targetable;
@@ -34,13 +36,8 @@ public class NetworkCommandGenerator implements CommandGenerator {
 				Command cmd = commandQueue.take();
 
 				try {
-					List<Targetable> affected = cmd.doCmd(battle);
-					List<Targetable> clonedAffected = affected.stream()
-						.map(t -> t.clone()).collect(Collectors.toList());
-					Platform.runLater(() -> {
-						listener.command(cmd, clonedAffected);
-					});
-
+					ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+					Platform.runLater(() -> listener.command(ec)); 
 					if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
 						return;
 					}

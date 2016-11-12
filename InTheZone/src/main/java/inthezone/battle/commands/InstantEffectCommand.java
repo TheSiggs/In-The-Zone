@@ -101,10 +101,10 @@ public class InstantEffectCommand extends Command {
 		return effect.apply(battle);
 	}
 
-	@Override public List<Command> doCmdComputingTriggers(
-		Battle turn, List<Targetable> targeted) throws CommandException
+	@Override public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
+		throws CommandException
 	{
-		List<Command> r = effect.applyComputingTriggers(turn, targeted,
+		List<ExecutedCommand> r = effect.applyComputingTriggers(turn,
 			eff -> new InstantEffectCommand(eff, Optional.empty(), Optional.empty()));
 
 		if (postAbility.isPresent() || postEffect.isPresent()) {

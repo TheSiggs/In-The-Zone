@@ -80,29 +80,28 @@ public class MoveCommand extends Command {
 	}
 
 	@Override
-	public List<Command> doCmdComputingTriggers(
-		Battle turn, List<Targetable> targeted) throws CommandException
+	public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
+		throws CommandException
 	{
-		List<Command> r = new ArrayList<>();
+		List<ExecutedCommand> r = new ArrayList<>();
 
 		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(path);
 		
 		if (path1.size() >= 2) {
 			Command move1 = new MoveCommand(path1, false);
-
-			r.add(move1);
-			targeted.addAll(move1.doCmd(turn));
+			r.add(new ExecutedCommand(move1, move1.doCmd(turn)));
 		}
 
 		MapPoint loc = path1.get(path1.size() - 1);
 		List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
-		for (Command c : triggers) {
-			r.addAll(c.doCmdComputingTriggers(turn, targeted));
-		}
+		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
 
 		if (isPanic && !triggers.isEmpty()) {
-			turn.battleState.getCharacterAt(loc)
-				.ifPresent(c -> r.addAll(c.continueTurnReset(turn)));
+			Optional<Character> oc = turn.battleState.getCharacterAt(loc);
+			if (oc.isPresent()) {
+				List<Command> cont = oc.get().continueTurnReset(turn);
+				for (Command c : cont) r.addAll(c.doCmdComputingTriggers(turn));
+			}
 		}
 
 		return r;

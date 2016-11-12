@@ -4,6 +4,7 @@ import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.Targetable;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
@@ -32,13 +33,12 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 	 * @param affected [out] A list that will contain the affected characters
 	 * @return The actual commands that were executed, including triggers
 	 * */
-	public List<Command> applyComputingTriggers(
-		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
+	public List<ExecutedCommand> applyComputingTriggers(
+		Battle battle, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<Command> r = new ArrayList<>();
-		affected.addAll(apply(battle));
-		r.add(cmd.apply(this));
+		List<ExecutedCommand> r = new ArrayList<>();
+		r.add(new ExecutedCommand(cmd.apply(this), apply(battle)));
 		return r;
 	}
 

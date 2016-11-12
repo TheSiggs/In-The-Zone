@@ -5,6 +5,7 @@ import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.Targetable;
@@ -129,19 +130,17 @@ public class Teleport extends InstantEffect {
 		return r;
 	}
 
-	@Override public List<Command> applyComputingTriggers(
-		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
+	@Override public List<ExecutedCommand> applyComputingTriggers(
+		Battle battle, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<Command> r = new ArrayList<>();
+		List<ExecutedCommand> r = new ArrayList<>();
 
-		affected.addAll(apply(battle));
-		r.add(cmd.apply(this));
+		r.add(new ExecutedCommand(cmd.apply(this), apply(battle)));
 
 		for (MapPoint p : destinations) {
 			List<Command> triggers = battle.battleState.trigger.getAllTriggers(p);
-			for (Command c : triggers)
-				r.addAll(c.doCmdComputingTriggers(battle, affected));
+			for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
 		}
 
 		return r;

@@ -10,6 +10,7 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
@@ -197,19 +198,16 @@ public class BattleInProgress implements Runnable {
 
 			// A single command could get expanded into multiple commands if we
 			// trigger any traps or zones
-			List<Targetable> affected = new ArrayList<>();
-			List<Command> allCmds = cmd.doCmdComputingTriggers(battle, affected);
-
-			List<Targetable> clonedAffected = affected.stream()
-				.map(t -> t.clone()).collect(Collectors.toList());
-			for (Command cmd0 : allCmds) {
-				Platform.runLater(() -> listener.command(cmd0, clonedAffected));
+			List<ExecutedCommand> allCmds = cmd.doCmdComputingTriggers(battle);
+			for (ExecutedCommand ec : allCmds) {
+				Platform.runLater(() -> listener.command(ec.cmd,
+					ec.affected.stream().map(t -> t.clone()).collect(Collectors.toList())));
 
 				// don't send the command to the network until it's been completed
 				// locally.  This allows the commands to update themselves when we have
 				// instant effects that mess with the game state.  Also important for
 				// dealing with triggers.
-				if (network != null) network.sendCommand(cmd0);
+				if (network != null) network.sendCommand(ec.cmd);
 			}
 
 			if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {

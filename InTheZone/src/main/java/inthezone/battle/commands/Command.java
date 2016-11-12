@@ -19,16 +19,13 @@ public abstract class Command implements HasJSONRepresentation {
 	/**
 	 * Do a command, computing trap and zone triggers
 	 * @param turn The state of the battle
-	 * @param commands [out] A list which will contain all the characters that
-	 * were affected by the command
 	 * @return A new set of commands, including all the trap and zone effects.
 	 * */
-	public List<Command> doCmdComputingTriggers(
-		Battle turn, List<Targetable> targeted) throws CommandException
+	public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
+		throws CommandException
 	{
-		targeted.addAll(doCmd(turn));
-		List<Command> r = new ArrayList<>();
-		r.add(this);
+		List<ExecutedCommand> r = new ArrayList<>();
+		r.add(new ExecutedCommand(this, doCmd(turn)));
 		return r;
 	}
 

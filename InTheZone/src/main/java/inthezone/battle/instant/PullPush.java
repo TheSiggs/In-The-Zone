@@ -2,8 +2,10 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
+import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.LineOfSight;
@@ -21,6 +23,7 @@ import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -217,11 +220,11 @@ public class PullPush extends InstantEffect {
 			.collect(Collectors.toList());
 	}
 
-	@Override public List<Command> applyComputingTriggers(
-		Battle battle, List<Targetable> affected, Function<InstantEffect, Command> cmd
+	@Override public List<ExecutedCommand> applyComputingTriggers(
+		Battle battle, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<Command> r = new ArrayList<>();
+		List<ExecutedCommand> r = new ArrayList<>();
 
 		List<List<List<MapPoint>>> splitPaths = paths.stream()
 			.map(path -> battle.battleState.trigger.splitPath(path))
@@ -242,8 +245,7 @@ public class PullPush extends InstantEffect {
 			if (!validPathSections.isEmpty()) {
 				InstantEffect eff = new PullPush(
 					this.type, this.castFrom, validPathSections, false);
-				affected.addAll(eff.apply(battle));
-				r.add(cmd.apply(eff));
+				r.add(new ExecutedCommand(cmd.apply(eff), eff.apply(battle)));
 			}
 
 			// do the triggers
@@ -251,13 +253,14 @@ public class PullPush extends InstantEffect {
 			for (List<MapPoint> path : pathSections) {
 				MapPoint loc = path.get(path.size() - 1);
 				List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
-				for (Command c : triggers)
-					r.addAll(c.doCmdComputingTriggers(battle, affected));
+				for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
 
 				if (isFear && !triggers.isEmpty()) {
-					battle.battleState.getCharacterAt(loc)
-						.ifPresent(c -> r.addAll(c.continueTurnReset(battle)));
-					doneContinueTurn = true;
+					Optional<Character> oc = battle.battleState.getCharacterAt(loc);
+					if (oc.isPresent()) {
+						List<Command> cont = oc.get().continueTurnReset(battle);
+						for (Command c : cont) r.addAll(c.doCmdComputingTriggers(battle));
+					}
 				}
 			}
 

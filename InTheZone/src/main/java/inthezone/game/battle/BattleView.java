@@ -8,6 +8,7 @@ import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
@@ -159,6 +160,7 @@ public class BattleView
 					if (teleportQueue.size() > 0) setMode(TELEPORT);
 					else if (selectedCharacter.isPresent()) setMode(MOVE);
 					else setMode(SELECT);
+					doNextCommand();
 				} else {
 					setMode(OTHER_TURN);
 				}
@@ -535,11 +537,21 @@ public class BattleView
 		a.showAndWait();
 	}
 
+	private Queue<ExecutedCommand> commandQueue = new LinkedList<>();
+
 	@Override
-	public void command(Command cmd, List<Targetable> affectedCharacters) {
-		if (cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
-			UseAbilityCommand ua = (UseAbilityCommand) cmd;
-			Targetable agent = affectedCharacters.get(0);
+	public void command(Command cmd, List<Targetable> affected) {
+		commandQueue.add(new ExecutedCommand(cmd, affected));
+		if (mode != ANIMATING) doNextCommand();
+	}
+
+	private void doNextCommand() {
+		ExecutedCommand ec = commandQueue.poll();
+		if (ec == null) return;
+
+		if (ec.cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
+			UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
+			Targetable agent = ec.affected.get(0);
 			if (agent instanceof Character) {
 				hud.writeMessage(((Character) agent).name + " uses " + ua.ability + "!");
 			} else {
@@ -547,41 +559,42 @@ public class BattleView
 			}
 		}
 
-		if (cmd instanceof MoveCommand) {
-			List<MapPoint> path = ((MoveCommand) cmd).path;
+		if (ec.cmd instanceof MoveCommand) {
+			List<MapPoint> path = ((MoveCommand) ec.cmd).path;
 			if (path.size() < 2) return;
 
-			Character agent = (Character) affectedCharacters.get(0);
+			Character agent = (Character) ec.affected.get(0);
 			scheduleMovement("walk", walkSpeed, path, agent);
 
-		} else if (cmd instanceof PushCommand) {
+		} else if (ec.cmd instanceof PushCommand) {
 			// The first element in the affected characters list for a push command
 			// is the agent of the push.  This element must be removed before
 			// proceeding to the processing of the push effect.
-			instantEffect(((PushCommand) cmd).effect,
-				affectedCharacters.subList(1, affectedCharacters.size()));
+			instantEffect(((PushCommand) ec.cmd).effect,
+				ec.affected.subList(1, ec.affected.size()));
 
-		} else if (cmd instanceof InstantEffectCommand) {
-			instantEffect(((InstantEffectCommand) cmd).getEffect(), affectedCharacters);
+		} else if (ec.cmd instanceof InstantEffectCommand) {
+			instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
 
-		} else if (cmd instanceof ResignCommand) {
-			if (((ResignCommand) cmd).player != player) {
+		} else if (ec.cmd instanceof ResignCommand) {
+			if (((ResignCommand) ec.cmd).player != player) {
 				Alert a = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
 				a.setHeaderText("Opponent resigns");
 				a.showAndWait();
 			}
 
-		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
+		} else if (ec.cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
 			targetingAbility.map(a -> a.recursionLevel > 0).orElse(false)
 		) {
 			// add all of the targets of this ability to the recast from list
-			for (DamageToTarget d: ((UseAbilityCommand) cmd).getTargets()) {
+			for (DamageToTarget d: ((UseAbilityCommand) ec.cmd).getTargets()) {
 				recastFrom.add(d.target);
 			}
 			setMode(TARGET);
 		}
 
-		updateCharacters(affectedCharacters);
+		updateCharacters(ec.affected);
+		if (mode != ANIMATING) doNextCommand();
 	}
 
 	private void instantEffect(

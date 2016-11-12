@@ -229,14 +229,14 @@ public class Character implements Targetable {
 	 * @param player The player who's turn is starting
 	 * */
 	public List<Command> turnReset(Battle battle, Player player) {
-		if (this.player == player) {
-			Stats stats = getStats();
-			ap = stats.ap;
-			mp = stats.mp;
-		}
+		List<Command> r = new ArrayList<>();
+		if (this.player != player) return r;
+
+		Stats stats = getStats();
+		ap = stats.ap;
+		mp = stats.mp;
 
 		// handle status effects
-		List<Command> r = new ArrayList<>();
 		statusBuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 

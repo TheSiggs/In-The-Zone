@@ -22,7 +22,7 @@ public class SimpleAI implements CommandGenerator {
 	public void generateCommands(
 		Battle battle, BattleListener listener, Player forPlayer
 	) {
-		for (Command cmd : battle.doTurnStart(forPlayer)) {
+		for (Command cmd : battle.getTurnStart(forPlayer)) {
 			try {
 				ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
 				Platform.runLater(() -> listener.command(ec)); 

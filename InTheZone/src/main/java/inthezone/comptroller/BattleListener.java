@@ -17,13 +17,13 @@ public interface BattleListener {
 	 * Start the player's turn.
 	 * @param characters Data for all the characters to update the HUD.
 	 * */
-	public void startTurn(List<Character> characters);
+	public void startTurn(List<Targetable> characters);
 
 	/**
 	 * Start the other player's turn.
 	 * @param characters Data for all the characters to update the HUD.
 	 * */
-	public void endTurn(List<Character> characters);
+	public void endTurn(List<Targetable> characters);
 
 	/**
 	 * Deal with the battle end condition.

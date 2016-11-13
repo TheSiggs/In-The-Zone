@@ -522,14 +522,14 @@ public class BattleView
 	}
 
 	@Override
-	public void startTurn(List<Character> characters) {
+	public void startTurn(List<Targetable> characters) {
 		isMyTurn.setValue(true);
 		updateCharacters(characters);
 		setMode(SELECT);
 	}
 
 	@Override
-	public void endTurn(List<Character> characters) {
+	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
 		updateCharacters(characters);
 		setMode(OTHER_TURN);

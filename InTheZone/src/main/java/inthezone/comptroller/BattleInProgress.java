@@ -11,6 +11,7 @@ import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.commands.FatigueCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
@@ -18,6 +19,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.LineOfSight;
 import inthezone.battle.Targetable;
+import inthezone.battle.Zone;
 import isogame.engine.MapPoint;
 import javafx.application.Platform;
 import java.util.ArrayList;
@@ -114,15 +116,21 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void turn() {
+		List<Zone> zones = battle.doTurnStart(thisPlayer);
+
+		Platform.runLater(() -> {
+			List<Targetable> affected = new ArrayList<>();
+			affected.addAll(battle.battleState.cloneCharacters());
+			affected.addAll(zones);
+			listener.startTurn(affected);
+		});
+
 		try {
-			commandQueue.addAll(battle.doTurnStart(thisPlayer));
+			commandQueue.addAll(battle.getTurnStart(thisPlayer));
 			if (doCommands()) return;
 		} catch (CommandException e) {
 			Platform.runLater(() -> listener.badCommand(e));
 		}
-
-		Platform.runLater(() ->
-			listener.startTurn(battle.battleState.cloneCharacters()));
 
 		while(true) {
 			try {
@@ -220,9 +228,13 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void otherTurn() {
-		battle.doTurnStart(thisPlayer.otherPlayer());
-		Platform.runLater(() ->
-			listener.endTurn(battle.battleState.cloneCharacters()));
+		List<Zone> zones = battle.doTurnStart(thisPlayer.otherPlayer());
+		Platform.runLater(() -> {
+			List<Targetable> affected = new ArrayList<>();
+			affected.addAll(battle.battleState.cloneCharacters());
+			affected.addAll(zones);
+			listener.endTurn(affected);
+		});
 
 		otherPlayer.generateCommands(battle, listener, thisPlayer.otherPlayer());
 	}

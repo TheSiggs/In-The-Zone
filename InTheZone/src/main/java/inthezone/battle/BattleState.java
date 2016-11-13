@@ -32,8 +32,9 @@ public class BattleState {
 	// superlist of all targetables (including characters and obstacles)
 	public final Collection<Targetable> targetable;
 
+	// zone mapping
 	private final Map<MapPoint, Zone> zoneMap = new HashMap<>();
-	private Collection<Zone> zones = new ArrayList<>();
+	private final Collection<Zone> zones = new ArrayList<>();
 
 	private final Set<MapPoint> terrainObstacles;
 
@@ -103,11 +104,18 @@ public class BattleState {
 	/**
 	 * To be called once at the start of each turn to remove expired zones.
 	 * */
-	public void removeExpiredZones() {
+	public List<Zone> removeExpiredZones() {
+		List<Zone> r = new ArrayList<>();
+
 		for (Zone z : zones) {
-			if (z.canRemoveNow()) for (MapPoint p : z.range) zoneMap.remove(p);
+			if (z.canRemoveNow()) {
+				r.add(z);
+				for (MapPoint p : z.range) zoneMap.remove(p);
+			}
 		}
-		zones = zones.stream().filter(z -> !z.reap()).collect(Collectors.toList());
+
+		zones.removeAll(r);
+		return r;
 	}
 
 	/**

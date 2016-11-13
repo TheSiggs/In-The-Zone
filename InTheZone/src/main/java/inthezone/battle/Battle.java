@@ -40,13 +40,20 @@ public class Battle {
 	/**
 	 * Perform operations at the start of a player's turn.
 	 * @param player The player who's turn is starting.
+	 * @return A list of affected zones
 	 * */
-	public List<Command> doTurnStart(Player player) {
+	public List<Zone> doTurnStart(Player player) {
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
-		battleState.removeExpiredZones();
-
+		return battleState.removeExpiredZones();
+	}
+	
+	/**
+	 * Get the commands that happen on turn start
+	 * @param player The player who's turn is starting
+	 * */
+	public List<Command> getTurnStart(Player player) {
 		List<Command> r = battleState.characters.stream()
 			.flatMap(c -> c.turnReset(this, player).stream())
 			.collect(Collectors.toList());

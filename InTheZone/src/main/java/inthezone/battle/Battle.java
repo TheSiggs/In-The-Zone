@@ -43,6 +43,8 @@ public class Battle {
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
+		battleState.removeExpiredZones();
+
 		List<Command> r = battleState.characters.stream()
 			.flatMap(c -> c.turnReset(this, player).stream())
 			.collect(Collectors.toList());

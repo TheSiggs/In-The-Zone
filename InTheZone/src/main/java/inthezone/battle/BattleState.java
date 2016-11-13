@@ -7,8 +7,10 @@ import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +31,9 @@ public class BattleState {
 
 	// superlist of all targetables (including characters and obstacles)
 	public final Collection<Targetable> targetable;
+
+	private final Map<MapPoint, Zone> zoneMap = new HashMap<>();
+	private Collection<Zone> zones = new ArrayList<>();
 
 	private final Set<MapPoint> terrainObstacles;
 
@@ -74,9 +79,37 @@ public class BattleState {
 	public Trap placeTrap(
 		MapPoint p, Ability a, Character agent, StandardSprites sprites
 	) {
-		Trap t = new Trap(p, hasMana(p), a, agent, sprites);
+		Trap t = new Trap(p, agent.hasMana(), a, agent, sprites);
 		targetable.add(t);
 		return t;
+	}
+
+	/**
+	 * Place a new zone
+	 * */
+	public Optional<Zone> placeZone(
+		MapPoint centre, Ability a, int turns, Character agent
+	) {
+		Collection<MapPoint> range = getAffectedArea(
+			centre, AbilityAgentType.ZONE, centre, a, centre);
+
+		// make sure that this zone doesn't overlap an existing zone
+		if (range.stream().anyMatch(p -> zoneMap.containsKey(p))) return Optional.empty();
+
+		Zone z = new Zone(centre, range, turns, agent.hasMana(), a, agent);
+		zones.add(z);
+		for (MapPoint p : range) zoneMap.put(p, z);
+		return Optional.of(z);
+	}
+
+	/**
+	 * To be called once at the start of each turn to remove expired zones.
+	 * */
+	public void removeExpiredZones() {
+		for (Zone z : zones) {
+			if (z.canRemoveNow()) for (MapPoint p : z.range) zoneMap.remove(p);
+		}
+		zones = zones.stream().filter(z -> !z.reap()).collect(Collectors.toList());
 	}
 
 	/**
@@ -113,8 +146,10 @@ public class BattleState {
 	 * Get targetable objects at a particular point (if there is one).
 	 * */
 	public List<? extends Targetable> getTargetableAt(MapPoint x) {
-		return targetable.stream()
+		List<Targetable> r = targetable.stream()
 			.filter(t -> t.getPos().equals(x)).collect(Collectors.toList());
+		if (zoneMap.containsKey(x)) r.add(zoneMap.get(x));
+		return r;
 	}
 
 	/**
@@ -127,12 +162,20 @@ public class BattleState {
 	}
 
 	/**
+	 * Get the zone at a particular point (if there is one).
+	 * */
+	public Optional<Zone> getZoneAt(MapPoint x) {
+		return Optional.ofNullable(zoneMap.get(x));
+	}
+
+	/**
 	 * Get the agent of an ability
 	 * */
 	public Optional<? extends Targetable> getAgentAt(MapPoint x, AbilityAgentType agentType) {
 		switch (agentType) {
 			case CHARACTER: return getCharacterAt(x);
 			case TRAP: return getTrapAt(x);
+			case ZONE: return getZoneAt(x);
 			default: return Optional.empty();
 		}
 	}
@@ -192,6 +235,13 @@ public class BattleState {
 	public Set<MapPoint> spaceObstacles(Player player) {
 		Set<MapPoint> r = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksSpace(player))
+			.map(c -> c.getPos()).collect(Collectors.toList()));
+		r.addAll(terrainObstacles);
+		return r;
+	}
+
+	public Set<MapPoint> allObstacles() {
+		Set<MapPoint> r = new HashSet<>(targetable.stream()
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		r.addAll(terrainObstacles);
 		return r;
@@ -266,12 +316,10 @@ public class BattleState {
 		if (!ability.info.range.los) {
 			return diamond;
 		} else {
-			Player player = getCharacterAt(agent).map(c -> c.player)
-				.orElseThrow(() -> new RuntimeException(
-					"Attempted to get targeting information for a non-existent character"));
-
-			Set<MapPoint> obstacles = movementObstacles(player);
-
+			Set<MapPoint> obstacles = getCharacterAt(agent)
+				.map(c -> movementObstacles(c.player))
+				.orElse(allObstacles());
+			
 			// check line of sight
 			return diamond.stream().filter(p ->
 				getLOS(castFrom, p, obstacles) != null).collect(Collectors.toList());

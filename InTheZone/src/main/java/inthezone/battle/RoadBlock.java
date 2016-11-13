@@ -7,7 +7,7 @@ import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
-public class RoadBlock implements Targetable {
+public class RoadBlock extends Targetable {
 	private final static int HITS_TO_DESTROY = 2;
 	private final MapPoint pos;
 	private int hits;

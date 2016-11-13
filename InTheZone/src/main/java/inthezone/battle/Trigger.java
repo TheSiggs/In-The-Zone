@@ -28,13 +28,17 @@ public class Trigger {
 	 * value is never length 0.
 	 * */
 	public List<MapPoint> shrinkPath(List<MapPoint> path) {
+		Optional<Zone> currentZone = null;
 		List<MapPoint> r = new ArrayList<>();
 		for (MapPoint p : path) {
 			r.add(p);
+
+			Optional<Zone> newZone = battle.getZoneAt(p);
+			if (currentZone == null) currentZone = newZone;
+			if (!currentZone.equals(newZone)) return r;
+
 			Optional<Trap> t = battle.getTrapAt(p);
-			if (t.isPresent()) {
-				return r;
-			}
+			if (t.isPresent()) return r;
 		}
 
 		return r;
@@ -52,12 +56,19 @@ public class Trigger {
 		List<List<MapPoint>> r = new ArrayList<>();
 
 		boolean pathAdded = false;
+
+		Optional<Zone> currentZone = null;
 		List<MapPoint> currentPath = new ArrayList<>();
 		for (MapPoint p : path) {
 			currentPath.add(p);
 			pathAdded = false;
+
+			Optional<Zone> newZone = battle.getZoneAt(p);
+			if (currentZone == null) currentZone = newZone;
+
 			Optional<Trap> t = battle.getTrapAt(p);
-			if (t.isPresent()) {
+			if (t.isPresent() || !currentZone.equals(newZone)) {
+				currentZone = newZone;
 				r.add(currentPath);
 				pathAdded = true;
 				currentPath = new ArrayList<>();
@@ -75,6 +86,12 @@ public class Trigger {
 	 * */
 	public List<Command> getAllTriggers(MapPoint p) {
 		List<Command> r = new ArrayList<>();
+
+		battle.getZoneAt(p).ifPresent(zone -> {
+			for (Targetable t : battle.getTargetableAt(p))
+				r.addAll(t.triggerZone(battle));
+		});
+
 		battle.getTrapAt(p).ifPresent(trap -> {
 			try {
 				List<MapPoint> targets = new ArrayList<>(); targets.add(p);

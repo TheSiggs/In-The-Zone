@@ -7,7 +7,7 @@ import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
-public class Trap implements Targetable {
+public class Trap extends Targetable {
 	public final MapPoint pos;
 	public final Ability ability;
 

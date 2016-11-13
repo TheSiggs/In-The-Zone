@@ -7,7 +7,7 @@ import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 import java.util.Collection;
 
-public class Zone implements Targetable {
+public class Zone extends Targetable {
 	public final MapPoint centre;
 	public final Collection<MapPoint> range;
 	public final Ability ability;

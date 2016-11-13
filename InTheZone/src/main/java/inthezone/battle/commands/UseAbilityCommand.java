@@ -133,6 +133,11 @@ public class UseAbilityCommand extends Command {
 				.map(t -> t.ability).orElseThrow(() ->
 					new CommandException("Invalid ability command"));
 
+		} else if (agentType == AbilityAgentType.ZONE) {
+			abilityData = battle.battleState.getZoneAt(castFrom)
+				.map(z -> z.ability).orElseThrow(() ->
+					new CommandException("Invalid ability command"));
+
 		} else {
 			abilityData = battle.battleState.getCharacterAt(agent)
 				.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())

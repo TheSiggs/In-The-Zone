@@ -157,7 +157,7 @@ public class Battle {
 	) {
 		Set<MapPoint> range = new HashSet<>();
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
-			p, AbilityAgentType.ZONE, p, ability, p));
+			p, AbilityAgentType.CHARACTER, p, ability, p));
 
 		return battleState.placeZone(
 				ps.iterator().next(), range, ability, ability.info.zoneTurns, agent)

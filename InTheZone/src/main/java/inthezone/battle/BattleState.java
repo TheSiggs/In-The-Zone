@@ -339,8 +339,10 @@ public class BattleState {
 		MapPoint agent, AbilityAgentType agentType,
 		MapPoint castFrom, Ability ability, MapPoint target
 	) {
+		int radius = agentType == AbilityAgentType.ZONE? 0 : ability.info.range.radius;
+
 		Collection<MapPoint> r =
-			LineOfSight.getDiamond(target, ability.info.range.radius).stream()
+			LineOfSight.getDiamond(target, radius).stream()
 				.filter(p -> terrain.terrain.hasTile(p))
 				.collect(Collectors.toList());
 

@@ -88,11 +88,9 @@ public class BattleState {
 	 * Place a new zone
 	 * */
 	public Optional<Zone> placeZone(
-		MapPoint centre, Ability a, int turns, Character agent
+		MapPoint centre, Collection<MapPoint> range,
+		Ability a, int turns, Character agent
 	) {
-		Collection<MapPoint> range = getAffectedArea(
-			centre, AbilityAgentType.ZONE, centre, a, centre);
-
 		// make sure that this zone doesn't overlap an existing zone
 		if (range.stream().anyMatch(p -> zoneMap.containsKey(p))) return Optional.empty();
 

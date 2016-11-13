@@ -11,8 +11,10 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -122,14 +124,32 @@ public class Battle {
 	/**
 	 * Create traps
 	 * */
-	public List<Targetable> createTrap(
+	public List<Trap> createTrap(
 		Ability ability, Character agent, Collection<MapPoint> ps
 	) {
-		List<Targetable> r = new ArrayList<>();
+		List<Trap> r = new ArrayList<>();
 		for (MapPoint p : ps) {
 			r.add(battleState.placeTrap(p, ability, agent, sprites));
 		}
 		return r;
+	}
+
+	/**
+	 * Create a zone.
+	 * @param ps Assume there is at least one
+	 * @return at most one zone.
+	 * */
+	public List<Zone> createZone(
+		Ability ability, Character agent, Collection<MapPoint> ps
+	) {
+		Set<MapPoint> range = new HashSet<>();
+		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
+			p, AbilityAgentType.ZONE, p, ability, p));
+
+		return battleState.placeZone(
+				ps.iterator().next(), range, ability, ability.info.zoneTurns, agent)
+			.map(x -> Stream.of(x))
+			.orElse(Stream.empty()).collect(Collectors.toList());
 	}
 
 	/**

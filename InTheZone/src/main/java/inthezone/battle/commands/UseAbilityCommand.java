@@ -125,13 +125,14 @@ public class UseAbilityCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
+	public List<? extends Targetable> doCmd(Battle battle) throws CommandException {
 		Ability abilityData;
 
 		if (agentType == AbilityAgentType.TRAP) {
 			abilityData = battle.battleState.getTrapAt(castFrom)
 				.map(t -> t.ability).orElseThrow(() ->
 					new CommandException("Invalid ability command"));
+
 		} else {
 			abilityData = battle.battleState.getCharacterAt(agent)
 				.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())
@@ -146,6 +147,11 @@ public class UseAbilityCommand extends Command {
 		if (abilityData.info.trap && agentType == AbilityAgentType.CHARACTER) {
 			return battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
+				.orElseThrow(() -> new CommandException("Invalid ability command"));
+
+		} else if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
+			return battle.battleState.getCharacterAt(agent)
+				.map(c -> battle.createZone(abilityData, c, targetSquares))
 				.orElseThrow(() -> new CommandException("Invalid ability command"));
 
 		} else {

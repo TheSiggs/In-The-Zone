@@ -27,6 +27,7 @@ import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.PullPush;
 import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
+import inthezone.battle.Zone;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
@@ -53,6 +54,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,11 +73,13 @@ public class BattleView
 	private final Player player;
 	private final BattleInProgress battle;
 
-	private final static int HIGHLIGHT_TARGET = 0;
-	private final static int HIGHLIGHT_MOVE = 1;
-	private final static int HIGHLIGHT_PATH = 2;
-	private final static int HIGHLIGHT_ATTACKAREA = 3;
+	private final static int HIGHLIGHT_ZONE       = 0;
+	private final static int HIGHLIGHT_TARGET     = 1;
+	private final static int HIGHLIGHT_MOVE       = 2;
+	private final static int HIGHLIGHT_PATH       = 3;
+	private final static int HIGHLIGHT_ATTACKAREA = 4;
 	private final Paint[] highlights = new Paint[] {
+		Color.rgb(0xFF, 0x88, 0x00, 0.2),
 		Color.rgb(0xFF, 0xFF, 0x00, 0.2),
 		Color.rgb(0x00, 0xFF, 0x00, 0.2),
 		Color.rgb(0x00, 0x00, 0xFF, 0.2),
@@ -89,6 +93,9 @@ public class BattleView
 
 	// Temporary objects that are immobile, such as roadblocks
 	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
+
+	// Keep track of which squares contain zones
+	private final Collection<MapPoint> zones = new HashSet<>();
 
 	// the selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
@@ -364,6 +371,9 @@ public class BattleView
 					});
 				break;
 		}
+
+		for (MapPoint p : zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
+
 		this.mode = mode;
 	}
 
@@ -703,10 +713,23 @@ public class BattleView
 
 	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
 		for (Targetable t : tios) {
-			if (t instanceof Character) continue;
-			if (t.reap()) {
+			if (t instanceof Character) {
+				continue;
+
+			} else if (t instanceof Zone) {
+				if (t.reap()) {
+					zones.removeAll(((Zone) t).range);
+					setMode(mode); // reset the highlighting
+
+				} else {
+					zones.addAll(((Zone) t).range);
+					setMode(mode); // reset the highlighting
+				}
+				
+			} else if (t.reap()) {
 				Sprite s = temporaryImmobileObjects.remove(t.getPos());
 				if (s != null) canvas.getStage().removeSprite(s);
+
 			} else if (!temporaryImmobileObjects.containsKey(t.getPos())) {
 				Sprite s = new Sprite(t.getSprite());
 				s.pos = t.getPos();

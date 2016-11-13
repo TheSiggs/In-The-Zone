@@ -14,7 +14,7 @@ public abstract class Command implements HasJSONRepresentation {
 	 * Do a command.
 	 * @return All the characters that were affected by the command
 	 * */
-	public abstract List<Targetable> doCmd(Battle turn) throws CommandException;
+	public abstract List<? extends Targetable> doCmd(Battle turn) throws CommandException;
 
 	/**
 	 * Do a command, computing trap and zone triggers

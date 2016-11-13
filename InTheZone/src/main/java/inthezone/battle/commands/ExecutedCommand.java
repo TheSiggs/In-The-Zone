@@ -11,7 +11,7 @@ public class ExecutedCommand {
 	public final Command cmd;
 	public final List<Targetable> affected;
 
-	public ExecutedCommand(Command cmd, List<Targetable> affected) {
+	public ExecutedCommand(Command cmd, List<? extends Targetable> affected) {
 		this.cmd = cmd;
 		this.affected = affected.stream().map(t -> t.clone()).collect(Collectors.toList());
 	}

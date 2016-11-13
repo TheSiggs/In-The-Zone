@@ -62,7 +62,7 @@ public class Battle {
 			r.add(new FatigueCommand(
 				battleState.characters.stream()
 					.filter(c -> c.player == player)
-					.map(c -> new DamageToTarget(c.getPos(), false,
+					.map(c -> new DamageToTarget(c.getPos(), false, false,
 						(int) Math.ceil(Ability.damageFormulaStatic(
 							(round - 7) * fatigueEff, 0, 0, 0, 0, fatigueStats, c.getStats())),
 						Optional.empty(), false, false))
@@ -108,6 +108,12 @@ public class Battle {
 				t = battleState.getTrapAt(d.target).orElseThrow(() ->
 					new CommandException("Expected trap at " +
 						d.target.toString() + " but there was none"));
+
+			} else if (d.isTargetAZone) {
+				t = battleState.getZoneAt(d.target).orElseThrow(() ->
+					new CommandException("Expected zone at " +
+						d.target.toString() + " but there was none"));
+
 			} else {
 				t = battleState.getTargetableAt(d.target).stream()
 					.filter(x -> !(x instanceof Trap)).findFirst().orElseThrow(() ->

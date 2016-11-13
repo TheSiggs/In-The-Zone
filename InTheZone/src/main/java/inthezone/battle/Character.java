@@ -1,6 +1,9 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
@@ -39,6 +42,8 @@ public class Character implements Targetable {
 	private int ap = 0;
 	private int mp = 0;
 	private int hp = 0;
+
+	private Optional<Zone> currentZone = Optional.empty();
 
 	public Character(
 		int id,
@@ -236,6 +241,10 @@ public class Character implements Targetable {
 		ap = stats.ap;
 		mp = stats.mp;
 
+		// trigger the current zone (if there is one)
+		currentZone = Optional.empty();
+		r.addAll(triggerZone(battle));
+
 		// handle status effects
 		statusBuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
@@ -268,6 +277,30 @@ public class Character implements Targetable {
 			if (lastDebuff != null && lastDebuff.isBeforeTurnExhaustive())
 			 r.addAll(lastDebuff.doBeforeTurn(battle, this));
 		}
+		return r;
+	}
+
+	/**
+	 * Generate a zone effect, if the triggering conditions are met.
+	 * */
+	public List<Command> triggerZone(Battle battle) {
+		List<Command> r = new ArrayList<>();
+
+		Optional<Zone> newZone = battle.battleState.getZoneAt(pos);
+		if (!newZone.equals(currentZone)) {
+			currentZone = newZone;
+			newZone.ifPresent(zone -> {
+				try {
+					List<MapPoint> targets = new ArrayList<>(); targets.add(pos);
+
+					r.addAll((new UseAbilityCommandRequest(pos, AbilityAgentType.ZONE, pos,
+						targets, zone.ability)).makeCommand(battle.battleState));
+				} catch (CommandException e) {
+					throw new RuntimeException("Internal logic error triggering trap", e);
+				}
+			});
+		}
+
 		return r;
 	}
 

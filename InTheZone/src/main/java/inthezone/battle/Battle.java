@@ -212,10 +212,13 @@ public class Battle {
 	}
 
 	public List<Targetable> doPurge(Collection<MapPoint> targets) {
-		return targets.stream().flatMap(ot ->
+		List<Targetable> r = targets.stream().flatMap(ot ->
 				battleState.getTargetableAt(ot).stream()
 					.map(t -> {t.purge(); return t;})
 			).collect(Collectors.toList());
+
+		r.stream().forEach(t -> {if (t.reap()) battleState.removeObstacle(t);});
+		return r;
 	}
 
 	public List<Targetable> doObstacles(Collection<MapPoint> obstacles) {

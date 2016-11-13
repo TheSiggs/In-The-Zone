@@ -154,11 +154,6 @@ public class UseAbilityCommand extends Command {
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
 				.orElseThrow(() -> new CommandException("Invalid ability command"));
 
-		} else if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
-			return battle.battleState.getCharacterAt(agent)
-				.map(c -> battle.createZone(abilityData, c, targetSquares))
-				.orElseThrow(() -> new CommandException("Invalid ability command"));
-
 		} else {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			battle.battleState.getTrapAt(agent).ifPresent(t -> r.add(t));
@@ -166,7 +161,15 @@ public class UseAbilityCommand extends Command {
 				battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
 			}
 
+			// do the ability now
 			battle.doAbility(agent, agentType, abilityData, targets);
+
+			// if it's a zone ability, also create the zone
+			if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
+				r.addAll(battle.battleState.getCharacterAt(agent)
+					.map(c -> battle.createZone(abilityData, c, targetSquares))
+					.orElseThrow(() -> new CommandException("Invalid ability command")));
+			}
 		}
 
 		return r;

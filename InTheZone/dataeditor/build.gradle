@@ -58,7 +58,7 @@ task packageNative(type: Exec, dependsOn:shadowJar) {
 		    "-title", "$packageName", 
 		    "-vendor", "$packageName", 
 		    "-outdir", "build", 
-		    "-srcfiles", "${project.rootDir}/server/build/libs/$shadowJarName", 
+		    "-srcfiles", "${project.rootDir}/dataeditor/build/libs/$shadowJarName", 
 		    "-appclass", "$mainClassName", 
 		    "-outfile", "$packageName"]
 	} else

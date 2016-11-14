@@ -6,6 +6,7 @@ import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.Stats;
 import inthezone.battle.instant.PullPush;
 import inthezone.battle.Targetable;
+import inthezone.battle.Trap;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
@@ -32,7 +33,8 @@ public class PushCommandRequest extends CommandRequest {
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
-		Targetable t = battleState.getTargetableAt(target)
+		Targetable t = battleState.getTargetableAt(target).stream()
+			.filter(x -> !(x instanceof Trap)).findFirst()
 			.orElseThrow(() -> new CommandException("Invalid push command"));
 
 		Collection<MapPoint> targets = new ArrayList<>();
@@ -42,7 +44,7 @@ public class PushCommandRequest extends CommandRequest {
 			if (a != null && t != null) {
 				boolean effective = t.isPushable();
 				return Optional.of(new PushCommand(agent, PullPush.getEffect(
-					battleState, pushEffect, agent, targets), effective));
+					battleState, pushEffect, agent, targets, false), effective));
 			}
 
 			return Optional.empty();

@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Obstacles implements InstantEffect {
+public class Obstacles extends InstantEffect {
 	private final Collection<MapPoint> placements;
 
-	private Obstacles(Collection<MapPoint> placements) {
+	private Obstacles(Collection<MapPoint> placements, MapPoint agent) {
+		super(agent);
 		this.placements = placements;
 	}
 
@@ -31,6 +32,7 @@ public class Obstacles implements InstantEffect {
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		o.put("kind", InstantEffectType.OBSTACLES.toString());
+		o.put("agent", agent.getJSON());
 
 		JSONArray a = new JSONArray();
 		for (MapPoint p : placements) a.add(p.getJSON());
@@ -42,9 +44,11 @@ public class Obstacles implements InstantEffect {
 		throws ProtocolException
 	{
 		Object okind = json.get("kind");
+		Object oagent = json.get("agent");
 		Object oplacements = json.get("paths");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
+		if (oagent == null) throw new ProtocolException("Missing effect agent");
 		if (oplacements == null) throw new ProtocolException("Missing effect placements");
 
 		try {
@@ -52,11 +56,12 @@ public class Obstacles implements InstantEffect {
 				throw new ProtocolException("Expected obstacles effect");
 
 			Collection<MapPoint> placements = new ArrayList<>();
+			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
 			JSONArray rawPlacements = (JSONArray) oplacements;
 			for (int i = 0; i < rawPlacements.size(); i++) {
 				placements.add(MapPoint.fromJSON((JSONObject) rawPlacements.get(i)));
 			}
-			return new Obstacles(placements);
+			return new Obstacles(placements, agent);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing obstacles effect", e);
 		} catch (CorruptDataException e) {
@@ -65,11 +70,12 @@ public class Obstacles implements InstantEffect {
 	}
 
 	public static Obstacles getEffect(
+		MapPoint agent,
 		BattleState battle,
 		InstantEffectInfo info,
 		Collection<MapPoint> targets
 	) {
-		return new Obstacles(targets);
+		return new Obstacles(targets, agent);
 	}
 
 	@Override public List<Targetable> apply(Battle battle) throws CommandException {
@@ -78,17 +84,10 @@ public class Obstacles implements InstantEffect {
 			.collect(Collectors.toList()));
 	}
 
-	@Override public Map<MapPoint, MapPoint> getRetargeting() {
-		return new HashMap<>();
-	}
-
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget
 	) {
-		return this;
+		return new Obstacles(placements, retarget.getOrDefault(agent, agent));
 	}
-
-	@Override public boolean isComplete() {return true;}
-	@Override public boolean complete(List<MapPoint> p) {return true;}
 }
 

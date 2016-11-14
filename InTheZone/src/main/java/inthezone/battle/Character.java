@@ -1,6 +1,9 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
@@ -21,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Character implements Targetable {
+public class Character extends Targetable {
 	public final int id; // a unique identifier that can be used to track this character
 	public final String name;
  	public final Player player;
@@ -77,7 +80,7 @@ public class Character implements Targetable {
 	/**
 	 * Create a copy of this character.
 	 * */
-	public Character clone() {
+	@Override public Character clone() {
 		return new Character(
 			id,
 			name,
@@ -136,7 +139,7 @@ public class Character implements Targetable {
 		return maxHP;
 	}
 
-	public boolean hasMana() {
+	@Override public boolean hasMana() {
 		return hasMana;
 	}
 
@@ -229,14 +232,18 @@ public class Character implements Targetable {
 	 * @param player The player who's turn is starting
 	 * */
 	public List<Command> turnReset(Battle battle, Player player) {
-		if (this.player == player) {
-			Stats stats = getStats();
-			ap = stats.ap;
-			mp = stats.mp;
-		}
+		List<Command> r = new ArrayList<>();
+		if (this.player != player) return r;
+
+		Stats stats = getStats();
+		ap = stats.ap;
+		mp = stats.mp;
+
+		// trigger the current zone (if there is one)
+		currentZone = Optional.empty();
+		r.addAll(triggerZone(battle.battleState));
 
 		// handle status effects
-		List<Command> r = new ArrayList<>();
 		statusBuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 
@@ -244,9 +251,30 @@ public class Character implements Targetable {
 			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
 		});
 		statusDebuff.ifPresent(s -> {
+			lastDebuff = s;
 			if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
 		});
 
+		return r;
+	}
+
+	// need to hold on to the last debuff, because we might need to know what it
+	// was even after it's removed.
+	private StatusEffect lastDebuff = null;
+
+	/**
+	 * Continue the turn reset, after it was interrupted by a trigger.
+	 * */
+	public List<Command> continueTurnReset(Battle battle) {
+		List<Command> r = new ArrayList<>();
+		statusDebuff.ifPresent(s -> {
+			if (s.isBeforeTurnExhaustive()) r.addAll(s.doBeforeTurn(battle, this));
+		});
+
+		if (!statusDebuff.isPresent()) {
+			if (lastDebuff != null && lastDebuff.isBeforeTurnExhaustive())
+			 r.addAll(lastDebuff.doBeforeTurn(battle, this));
+		}
 		return r;
 	}
 
@@ -273,7 +301,7 @@ public class Character implements Targetable {
 		return buff - debuff;
 	}
 
-	public double getChanceBuff() {
+	@Override public double getChanceBuff() {
 		return statusBuff.map(s -> s.getChanceBuff()).orElse(0.0);
 	}
 

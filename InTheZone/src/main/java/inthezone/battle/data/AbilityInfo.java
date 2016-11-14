@@ -9,6 +9,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final String name;
 	public final AbilityType type;
 	public final boolean trap;
+	public final int zoneTurns;
 	public final int ap;
 	public final int mp;
 	public final int pp;
@@ -32,6 +33,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		String name,
 		AbilityType type,
 		boolean trap,
+		int zoneTurns,
 		int ap,
 		int mp,
 		int pp,
@@ -49,6 +51,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.name = name;
 		this.type = type;
 		this.trap = trap;
+		this.zoneTurns = zoneTurns;
 		this.ap = ap;
 		this.mp = mp;
 		this.pp = pp;
@@ -71,6 +74,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		r.put("name", name);
 		r.put("type", type.toString());
 		r.put("trap", trap);
+		r.put("zoneTurns", zoneTurns);
 		r.put("ap", ap);
 		r.put("mp", mp);
 		r.put("pp", pp);
@@ -93,6 +97,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		Object rname = json.get("name");
 		Object rtype = json.get("type");
 		Object rtrap = json.get("trap");
+		Object rzoneTurns = json.get("zoneTurns");
 		Object rap = json.get("ap");
 		Object rmp = json.get("mp");
 		Object rpp = json.get("pp");
@@ -123,6 +128,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 
 			AbilityType type = AbilityType.parse((String) rtype);
 			boolean trap = rtrap == null? false : (Boolean) rtrap;
+			Number zoneTurns = rzoneTurns == null? 0 : (Number) rzoneTurns;
 			Number ap = (Number) rap;
 			Number mp = (Number) rmp;
 			Number pp = (Number) rpp;
@@ -154,7 +160,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 			}
 
 			return new AbilityInfo(
-				name, type, trap,
+				name, type, trap, zoneTurns.intValue(),
 				ap.intValue(), mp.intValue(),
 				pp.intValue(), eff.doubleValue(),
 				chance.doubleValue(), heal, range,

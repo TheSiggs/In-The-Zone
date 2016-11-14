@@ -40,12 +40,14 @@ public class PanickedStatusEffect extends StatusEffect {
 
 		List<Command> cmds = new LinkedList<>();
 		try {
-			if (r.size() >= 2) cmds.add(new MoveCommand(r));
+			if (r.size() >= 2) cmds.add(new MoveCommand(r, true));
 		} catch (CommandException e) {
 			throw new RuntimeException("Panicked status generated an invalid move path");
 		}
 
 		return cmds;
 	}
+
+	@Override public boolean isBeforeTurnExhaustive() {return true;}
 }
 

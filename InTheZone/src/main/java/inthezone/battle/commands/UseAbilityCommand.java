@@ -125,13 +125,19 @@ public class UseAbilityCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
+	public List<? extends Targetable> doCmd(Battle battle) throws CommandException {
 		Ability abilityData;
 
 		if (agentType == AbilityAgentType.TRAP) {
-			abilityData = battle.battleState.getTrapAt(agent)
+			abilityData = battle.battleState.getTrapAt(castFrom)
 				.map(t -> t.ability).orElseThrow(() ->
 					new CommandException("Invalid ability command"));
+
+		} else if (agentType == AbilityAgentType.ZONE) {
+			abilityData = battle.battleState.getZoneAt(castFrom)
+				.map(z -> z.ability).orElseThrow(() ->
+					new CommandException("Invalid ability command"));
+
 		} else {
 			abilityData = battle.battleState.getCharacterAt(agent)
 				.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())
@@ -143,22 +149,27 @@ public class UseAbilityCommand extends Command {
 
 		List<Targetable> r = new ArrayList<>();
 
-		if (abilityData.info.trap) {
-			return battle.createTrap(abilityData, targetSquares);
+		if (abilityData.info.trap && agentType == AbilityAgentType.CHARACTER) {
+			return battle.battleState.getCharacterAt(agent)
+				.map(c -> battle.createTrap(abilityData, c, targetSquares))
+				.orElseThrow(() -> new CommandException("Invalid ability command"));
 
 		} else {
-			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c.clone()));
+			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			battle.battleState.getTrapAt(agent).ifPresent(t -> r.add(t));
 			for (DamageToTarget d : targets) {
-				Optional<Character> oc = battle.battleState.getCharacterAt(d.target);
-				if (oc.isPresent()) {
-					oc.ifPresent(c -> r.add(c.clone()));
-				} else {
-					battle.battleState.getTargetableAt(d.target).ifPresent(t -> r.add(t));
-				}
+				battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
 			}
 
+			// do the ability now
 			battle.doAbility(agent, agentType, abilityData, targets);
+
+			// if it's a zone ability, also create the zone
+			if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
+				r.addAll(battle.battleState.getCharacterAt(agent)
+					.map(c -> battle.createZone(abilityData, c, targetSquares))
+					.orElseThrow(() -> new CommandException("Invalid ability command")));
+			}
 		}
 
 		return r;

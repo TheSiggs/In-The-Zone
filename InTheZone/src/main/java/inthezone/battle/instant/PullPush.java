@@ -2,6 +2,10 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
+import inthezone.battle.Character;
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.LineOfSight;
@@ -15,28 +19,39 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class PullPush implements InstantEffect {
+public class PullPush extends InstantEffect {
 	private final InstantEffectInfo type;
 	private final MapPoint castFrom;
 	public final List<List<MapPoint>> paths;
 	private final int param;
 
+	private final boolean isFear;
+
+	/**
+	 * @param isFear Set to true if this effect was created by the feared status
+	 * effect, and the triggers have not been resolved yet.
+	 * */
 	private PullPush(
 		InstantEffectInfo type,
 		MapPoint castFrom,
-		List<List<MapPoint>> paths
+		List<List<MapPoint>> paths,
+		boolean isFear
 	) {
+		super(castFrom);
 		this.type = type;
 		this.param = type.param;
 		this.castFrom = castFrom;
 		this.paths = paths;
+		this.isFear = isFear;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -82,33 +97,44 @@ public class PullPush implements InstantEffect {
 
 				paths.add(path);
 			}
-			return new PullPush(type, castFrom, paths);
+
+			// isFear is always false here because the triggers have been resolved at
+			// this point
+			return new PullPush(type, castFrom, paths, false);
 		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing push/pull effect", e);
 		}
 	}
 
+	/**
+	 * @param isFear Same as for the constructor
+	 * */
 	public static PullPush getEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
-		Collection<MapPoint> targets
+		Collection<MapPoint> targets,
+		boolean isFear
 	) {
 		if (info.type == InstantEffectType.PULL) {
-			return getPullEffect(battle, info, castFrom, targets);
+			return getPullEffect(battle, info, castFrom, targets, isFear);
 		} else if (info.type == InstantEffectType.PUSH) {
-			return getPushEffect(battle, info, castFrom, targets);
+			return getPushEffect(battle, info, castFrom, targets, isFear);
 		} else {
 			throw new RuntimeException(
 				"Attempted to build " + info.toString() + " effect with PullPush class");
 		}
 	}
 
+	/**
+	 * @param isFear Same as for the constructor
+	 * */
 	public static PullPush getPullEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
-		Collection<MapPoint> targets
+		Collection<MapPoint> targets,
+		boolean isFear
 	) {
 		List<List<MapPoint>> paths = new ArrayList<>();
 
@@ -123,14 +149,18 @@ public class PullPush implements InstantEffect {
 			if (path.size() > 0) paths.add(path);
 		}
 
-		return new PullPush(info, castFrom, paths);
+		return new PullPush(info, castFrom, paths, isFear);
 	}
 
+	/**
+	 * @param isFear Same as for the constructor
+	 * */
 	public static PullPush getPushEffect(
 		BattleState battle,
 		InstantEffectInfo info,
 		MapPoint castFrom,
-		Collection<MapPoint> targets
+		Collection<MapPoint> targets,
+		boolean isFear
 	) {
 		List<List<MapPoint>> paths = new ArrayList<>();
 
@@ -157,7 +187,7 @@ public class PullPush implements InstantEffect {
 			}
 		}
 
-		return new PullPush(info, castFrom, paths);
+		return new PullPush(info, castFrom, paths, isFear);
 	}
 
 	private static List<MapPoint> getPullPath(
@@ -190,6 +220,56 @@ public class PullPush implements InstantEffect {
 			.collect(Collectors.toList());
 	}
 
+	@Override public List<ExecutedCommand> applyComputingTriggers(
+		Battle battle, Function<InstantEffect, Command> cmd
+	) throws CommandException
+	{
+		List<ExecutedCommand> r = new ArrayList<>();
+
+		List<List<List<MapPoint>>> splitPaths = paths.stream()
+			.map(path -> battle.battleState.trigger.splitPath(path))
+			.collect(Collectors.toList());
+
+		while (!splitPaths.isEmpty()) {
+			List<List<MapPoint>> pathSections = new ArrayList<>();
+			for (List<List<MapPoint>> sections : splitPaths) {
+				if (!sections.isEmpty()) pathSections.add(sections.remove(0));
+			}
+			splitPaths = splitPaths.stream()
+				.filter(x -> !x.isEmpty()).collect(Collectors.toList());
+
+			List<List<MapPoint>> validPathSections = pathSections.stream()
+				.filter(x -> x.size() >= 2).collect(Collectors.toList());
+
+			// do the push/pull
+			if (!validPathSections.isEmpty()) {
+				InstantEffect eff = new PullPush(
+					this.type, this.castFrom, validPathSections, false);
+				r.add(new ExecutedCommand(cmd.apply(eff), eff.apply(battle)));
+			}
+
+			// do the triggers
+			boolean doneContinueTurn = false;
+			for (List<MapPoint> path : pathSections) {
+				MapPoint loc = path.get(path.size() - 1);
+				List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
+				for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
+
+				if (isFear && !triggers.isEmpty()) {
+					Optional<Character> oc = battle.battleState.getCharacterAt(loc);
+					if (oc.isPresent()) {
+						List<Command> cont = oc.get().continueTurnReset(battle);
+						for (Command c : cont) r.addAll(c.doCmdComputingTriggers(battle));
+					}
+				}
+			}
+
+			if (doneContinueTurn) break;
+		}
+
+		return r;
+	}
+
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {
 		Map<MapPoint, MapPoint> r = new HashMap<>();
 
@@ -206,10 +286,8 @@ public class PullPush implements InstantEffect {
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
 			.collect(Collectors.toList());
 
-		return getEffect(battle, type, castFrom, targets);
+		return getEffect(battle, type,
+			retarget.getOrDefault(castFrom, castFrom), targets, false);
 	}
-
-	@Override public boolean isComplete() {return true;}
-	@Override public boolean complete(List<MapPoint> p) {return true;}
 }
 

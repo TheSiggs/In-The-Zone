@@ -35,19 +35,20 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		List<Command> commands = new ArrayList<>();
 
-		if (ability.info.trap) {
+		if ((ability.info.trap) && agentType == AbilityAgentType.CHARACTER) {
 			commands.add(new UseAbilityCommand(agent, agentType, castFrom,
 				ability.rootName, targets, new ArrayList<>(), 0, 0));
 
 		} else {
 			// get the targets
 			Collection<DamageToTarget> allTargets =
-				battleState.getCharacterAt(agent).map(a -> {
-					double revengeBonus = battleState.getRevengeBonus(a.player);
+				battleState.getAgentAt(agent, agentType).map(a -> {
+					double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
+						battleState.getRevengeBonus(((Character) a).player);
 
 					return targets.stream()
 						.flatMap(t ->
-							battleState.getAbilityTargets(agent, castFrom, ability, t).stream())
+							battleState.getAbilityTargets(agent, agentType, castFrom, ability, t).stream())
 						.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
 						.collect(Collectors.toList());
 				}).orElseThrow(() -> new CommandException("Invalid ability command request"));
@@ -112,7 +113,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	) {
 		Collection<MapPoint> targetArea = targets.stream()
 			.flatMap(t -> battleState.getAffectedArea(
-				agent, castFrom, ability, t).stream())
+				agent, agentType, castFrom, ability, t).stream())
 			.collect(Collectors.toList());
 
 		return new InstantEffectCommand(InstantEffectFactory.getEffect(

@@ -5,11 +5,12 @@ import inthezone.battle.Character;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
+import java.util.Optional;
 import org.json.simple.JSONObject;
 
 public class StatusEffectFactory {
 	public static StatusEffect getEffect(
-		StatusEffectInfo info, int initialDamage, Character agent
+		StatusEffectInfo info, int initialDamage, Optional<Character> agent
 	) {
 		switch (info.type) {
 			case RESISTANT: return new BasicStatusEffect(info, 0.0, 0.20, 0.0);
@@ -27,7 +28,10 @@ public class StatusEffectFactory {
 			case SILENCED: return new Silenced(info);
 			case STUNNED: return new Stunned(info);
 			case IMPRISONED: return new Imprisoned(info);
-			case FEARED: return new FearedStatusEffect(info, agent);
+			case FEARED:
+				Character c = agent.orElseThrow(() -> new RuntimeException(
+					"Attempted to create feared status without a character agent"));
+				return new FearedStatusEffect(info, c);
 			case PANICKED: return new PanickedStatusEffect(info);
 			case VAMPIRISM: return new Vampirism(info);
 			default: throw new RuntimeException("This cannot happen");

@@ -43,7 +43,7 @@ public class UseItemCommand extends Command {
 		battle.doUseItem(agent, item);
 
 		List<Targetable> r = new ArrayList<>();
-		oc.ifPresent(c -> r.add(c.clone()));
+		oc.ifPresent(c -> r.add(c));
 		return r;
 	}
 }

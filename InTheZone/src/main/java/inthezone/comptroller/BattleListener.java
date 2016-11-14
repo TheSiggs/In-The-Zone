@@ -2,8 +2,8 @@ package inthezone.comptroller;
 
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
-import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.Targetable;
 import java.util.List;
@@ -17,13 +17,13 @@ public interface BattleListener {
 	 * Start the player's turn.
 	 * @param characters Data for all the characters to update the HUD.
 	 * */
-	public void startTurn(List<Character> characters);
+	public void startTurn(List<Targetable> characters);
 
 	/**
 	 * Start the other player's turn.
 	 * @param characters Data for all the characters to update the HUD.
 	 * */
-	public void endTurn(List<Character> characters);
+	public void endTurn(List<Targetable> characters);
 
 	/**
 	 * Deal with the battle end condition.
@@ -39,7 +39,7 @@ public interface BattleListener {
 	/**
 	 * Execute a validated and not null command.
 	 * */
-	public void command(Command cmd, List<Targetable> affectedCharacters);
+	public void command(ExecutedCommand ec);
 
 	/**
 	 * Complete an instant effect with extra targeting information

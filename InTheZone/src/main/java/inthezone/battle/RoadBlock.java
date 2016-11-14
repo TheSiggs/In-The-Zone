@@ -7,7 +7,7 @@ import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
-public class RoadBlock implements Targetable {
+public class RoadBlock extends Targetable {
 	private final static int HITS_TO_DESTROY = 2;
 	private final MapPoint pos;
 	private int hits;
@@ -17,6 +17,12 @@ public class RoadBlock implements Targetable {
 		this.pos = pos;
 		hits = HITS_TO_DESTROY;
 		this.sprite = sprites.roadBlock;
+	}
+
+	private RoadBlock(MapPoint pos, int hits, SpriteInfo sprite) {
+		this.pos = pos;
+		this.hits = hits;
+		this.sprite = sprite;
 	}
 
 	@Override public boolean blocksSpace(Player player) {return true;}
@@ -39,6 +45,11 @@ public class RoadBlock implements Targetable {
 	@Override public boolean isDead() {return hits == 0;}
 	@Override public boolean reap() {return isDead();}
 
+	@Override public boolean hasMana() {return false;}
+	@Override public double getChanceBuff() {return 0;}
+
 	@Override public SpriteInfo getSprite() {return sprite;}
+
+	@Override public RoadBlock clone() {return new RoadBlock(pos, hits, sprite);}
 }
 

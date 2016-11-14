@@ -13,11 +13,10 @@ import org.json.simple.JSONObject;
 
 public abstract class StatusEffect implements HasJSONRepresentation {
 	private static final int TOTAL_ROUNDS = 2;
-	private int remainingTurns = 0;
+	private int remainingTurns = TOTAL_ROUNDS;
 	protected StatusEffectInfo info;
 
 	public StatusEffect(StatusEffectInfo info) {
-		remainingTurns = TOTAL_ROUNDS;
 		this.info = info;
 	}
 
@@ -36,6 +35,8 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	public List<Command> doBeforeTurn(Battle battle, Character c) {
 		return new ArrayList<>();
 	}
+
+	public boolean isBeforeTurnExhaustive() {return false;}
 
 	/**
 	 * Some status effects require extra information not available at parsing

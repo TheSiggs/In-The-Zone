@@ -8,6 +8,7 @@ import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.MoveCommandRequest;
@@ -26,6 +27,7 @@ import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.PullPush;
 import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
+import inthezone.battle.Zone;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
@@ -52,6 +54,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -70,11 +73,13 @@ public class BattleView
 	private final Player player;
 	private final BattleInProgress battle;
 
-	private final static int HIGHLIGHT_TARGET = 0;
-	private final static int HIGHLIGHT_MOVE = 1;
-	private final static int HIGHLIGHT_PATH = 2;
-	private final static int HIGHLIGHT_ATTACKAREA = 3;
+	private final static int HIGHLIGHT_ZONE       = 0;
+	private final static int HIGHLIGHT_TARGET     = 1;
+	private final static int HIGHLIGHT_MOVE       = 2;
+	private final static int HIGHLIGHT_PATH       = 3;
+	private final static int HIGHLIGHT_ATTACKAREA = 4;
 	private final Paint[] highlights = new Paint[] {
+		Color.rgb(0xFF, 0x88, 0x00, 0.2),
 		Color.rgb(0xFF, 0xFF, 0x00, 0.2),
 		Color.rgb(0x00, 0xFF, 0x00, 0.2),
 		Color.rgb(0x00, 0x00, 0xFF, 0.2),
@@ -88,6 +93,9 @@ public class BattleView
 
 	// Temporary objects that are immobile, such as roadblocks
 	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
+
+	// Keep track of which squares contain zones
+	private final Collection<MapPoint> zones = new HashSet<>();
 
 	// the selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
@@ -159,6 +167,7 @@ public class BattleView
 					if (teleportQueue.size() > 0) setMode(TELEPORT);
 					else if (selectedCharacter.isPresent()) setMode(MOVE);
 					else setMode(SELECT);
+					doNextCommand();
 				} else {
 					setMode(OTHER_TURN);
 				}
@@ -362,6 +371,9 @@ public class BattleView
 					});
 				break;
 		}
+
+		for (MapPoint p : zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
+
 		this.mode = mode;
 	}
 
@@ -510,14 +522,14 @@ public class BattleView
 	}
 
 	@Override
-	public void startTurn(List<Character> characters) {
+	public void startTurn(List<Targetable> characters) {
 		isMyTurn.setValue(true);
 		updateCharacters(characters);
 		setMode(SELECT);
 	}
 
 	@Override
-	public void endTurn(List<Character> characters) {
+	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
 		updateCharacters(characters);
 		setMode(OTHER_TURN);
@@ -535,52 +547,64 @@ public class BattleView
 		a.showAndWait();
 	}
 
-	private static Character getAgent(List<Targetable> ts) {
-		return (Character) ts.get(0);
-	}
+	private Queue<ExecutedCommand> commandQueue = new LinkedList<>();
 
 	@Override
-	public void command(Command cmd, List<Targetable> affectedCharacters) {
-		if (cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
-			UseAbilityCommand ua = (UseAbilityCommand) cmd;
-			hud.writeMessage(
-				getAgent(affectedCharacters).name + " uses " + ua.ability + "!");
+	public void command(ExecutedCommand ec) {
+		commandQueue.add(ec);
+		if (mode != ANIMATING) doNextCommand();
+	}
+
+	private void doNextCommand() {
+		ExecutedCommand ec = commandQueue.poll();
+		if (ec == null) return;
+
+		if (ec.cmd instanceof UseAbilityCommand && !isMyTurn.getValue()) {
+			UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
+			Targetable agent = ec.affected.get(0);
+			if (agent instanceof Character) {
+				hud.writeMessage(((Character) agent).name + " uses " + ua.ability + "!");
+			} else {
+				hud.writeMessage("It's a trap!");
+			}
 		}
 
-		if (cmd instanceof MoveCommand) {
-			List<MapPoint> path = ((MoveCommand) cmd).path;
+		if (ec.cmd instanceof MoveCommand) {
+			List<MapPoint> path = ((MoveCommand) ec.cmd).path;
 			if (path.size() < 2) return;
 
-			scheduleMovement("walk", walkSpeed, path, getAgent(affectedCharacters));
+			Character agent = (Character) ec.affected.get(0);
+			scheduleMovement("walk", walkSpeed, path, agent);
 
-		} else if (cmd instanceof PushCommand) {
+		} else if (ec.cmd instanceof PushCommand) {
 			// The first element in the affected characters list for a push command
 			// is the agent of the push.  This element must be removed before
 			// proceeding to the processing of the push effect.
-			instantEffect(((PushCommand) cmd).effect,
-				affectedCharacters.subList(1, affectedCharacters.size()));
+			instantEffect(((PushCommand) ec.cmd).effect,
+				ec.affected.subList(1, ec.affected.size()));
 
-		} else if (cmd instanceof InstantEffectCommand) {
-			instantEffect(((InstantEffectCommand) cmd).getEffect(), affectedCharacters);
+		} else if (ec.cmd instanceof InstantEffectCommand) {
+			instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
 
-		} else if (cmd instanceof ResignCommand) {
-			if (((ResignCommand) cmd).player != player) {
+		} else if (ec.cmd instanceof ResignCommand) {
+			if (((ResignCommand) ec.cmd).player != player) {
 				Alert a = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
 				a.setHeaderText("Opponent resigns");
 				a.showAndWait();
 			}
 
-		} else if (cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
+		} else if (ec.cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
 			targetingAbility.map(a -> a.recursionLevel > 0).orElse(false)
 		) {
 			// add all of the targets of this ability to the recast from list
-			for (DamageToTarget d: ((UseAbilityCommand) cmd).getTargets()) {
+			for (DamageToTarget d: ((UseAbilityCommand) ec.cmd).getTargets()) {
 				recastFrom.add(d.target);
 			}
 			setMode(TARGET);
 		}
 
-		updateCharacters(affectedCharacters);
+		updateCharacters(ec.affected);
+		if (mode != ANIMATING) doNextCommand();
 	}
 
 	private void instantEffect(
@@ -629,7 +653,7 @@ public class BattleView
 
 		int id = affected.id;
 		Sprite s = stage.getSpritesByTile(start).stream()
-			.filter(x -> x.userData.equals(id)).findFirst().get();
+			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
 
 		for (MapPoint p : path.subList(2, path.size())) {
 			if (!end.add(v).equals(p)) {
@@ -675,7 +699,7 @@ public class BattleView
 
 					if (c.isDead()) {
 						Sprite s = canvas.getStage().getSpritesByTile(c.getPos()).stream()
-							.filter(x -> x.userData.equals(c.id)).findFirst().get();
+							.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
 						s.setAnimation("dead");
 					}
 
@@ -689,16 +713,28 @@ public class BattleView
 
 	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
 		for (Targetable t : tios) {
-			if (t instanceof Character) continue;
-			if (!temporaryImmobileObjects.containsKey(t.getPos())) {
+			if (t instanceof Character) {
+				continue;
+
+			} else if (t instanceof Zone) {
+				if (t.reap()) {
+					zones.removeAll(((Zone) t).range);
+					setMode(mode); // reset the highlighting
+
+				} else {
+					zones.addAll(((Zone) t).range);
+					setMode(mode); // reset the highlighting
+				}
+				
+			} else if (t.reap()) {
+				Sprite s = temporaryImmobileObjects.remove(t.getPos());
+				if (s != null) canvas.getStage().removeSprite(s);
+
+			} else if (!temporaryImmobileObjects.containsKey(t.getPos())) {
 				Sprite s = new Sprite(t.getSprite());
 				s.pos = t.getPos();
 				canvas.getStage().addSprite(s);
 				temporaryImmobileObjects.put(t.getPos(), s);
-			} else if (t.reap()) {
-				Sprite s = temporaryImmobileObjects.get(t.getPos());
-				canvas.getStage().removeSprite(s);
-				temporaryImmobileObjects.remove(t.getPos());
 			}
 		}
 	}

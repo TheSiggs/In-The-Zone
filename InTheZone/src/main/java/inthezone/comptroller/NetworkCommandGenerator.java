@@ -5,12 +5,15 @@ import inthezone.battle.Battle;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.data.Player;
 import inthezone.battle.Targetable;
 import javafx.application.Platform;
 import java.util.concurrent.BlockingQueue;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A bridge between the battle controller and the network code.
@@ -26,18 +29,13 @@ public class NetworkCommandGenerator implements CommandGenerator {
 	public void generateCommands(
 		Battle battle, BattleListener listener, Player forPlayer
 	) {
-		battle.doTurnStart(forPlayer);
-
 		while (true) {
 			try {
 				Command cmd = commandQueue.take();
 
 				try {
-					List<Targetable> affectedCharacters = cmd.doCmd(battle);
-					Platform.runLater(() -> {
-						listener.command(cmd, affectedCharacters);
-					});
-
+					ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+					Platform.runLater(() -> listener.command(ec)); 
 					if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
 						return;
 					}

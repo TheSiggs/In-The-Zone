@@ -24,11 +24,11 @@ public class InstantEffectFactory {
 		switch (info.type) {
 			case CLEANSE: /* fallthrough */
 			case DEFUSE: /* fallthrough */
-			case PURGE: return SimpleInstantEffect.getEffect(targets, info.type);
+			case PURGE: return SimpleInstantEffect.getEffect(targets, castFrom, info.type);
 			case PUSH: /* fallthrough */
-			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets);
-			case TELEPORT: return Teleport.getEffect(battleState, info, targets);
-			case OBSTACLES: return Obstacles.getEffect(battleState, info, targets);
+			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets, false);
+			case TELEPORT: return Teleport.getEffect(battleState, info, targets, castFrom);
+			case OBSTACLES: return Obstacles.getEffect(castFrom, battleState, info, targets);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}
 	}
@@ -38,7 +38,7 @@ public class InstantEffectFactory {
 		if (okind == null) throw new ProtocolException("Missing effect kind");
 
 		try {
-			InstantEffectType kind = InstantEffectType.fromString((String) okind);
+			InstantEffectType kind = (new InstantEffectInfo((String) okind)).type;
 			switch (kind) {
 				case CLEANSE: /* fallthrough */
 				case DEFUSE: /* fallthrough */

@@ -97,15 +97,23 @@ public class InstantEffectCommand extends Command {
 
 	@Override
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
-		List<Targetable> affected = effect.apply(battle);
+		// assume the retargeting was already done by doCmdComputingTriggers
+		return effect.apply(battle);
+	}
+
+	@Override public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
+		throws CommandException
+	{
+		List<ExecutedCommand> r = effect.applyComputingTriggers(turn,
+			eff -> new InstantEffectCommand(eff, Optional.empty(), Optional.empty()));
 
 		if (postAbility.isPresent() || postEffect.isPresent()) {
 			Map<MapPoint, MapPoint> retarget = effect.getRetargeting();
 			postAbility.ifPresent(a -> a.retarget(retarget));
-			postEffect.ifPresent(a -> a.retarget(battle.battleState, retarget));
+			postEffect.ifPresent(a -> a.retarget(turn.battleState, retarget));
 		}
 
-		return affected;
+		return r;
 	}
 }
 

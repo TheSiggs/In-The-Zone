@@ -7,9 +7,10 @@ import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
-public class Trap extends Targetable {
+public class Trap extends Targetable implements HasParentAgent {
 	public final MapPoint pos;
 	public final Ability ability;
+	public final Character parent;
 
 	private final boolean hasMana;
 	private final double chanceBuff;
@@ -19,6 +20,8 @@ public class Trap extends Targetable {
 
 	private final SpriteInfo sprite;
 	private boolean defused = false;
+
+	@Override public Character getParent() {return parent;}
 
 	public Trap(
 		MapPoint pos,
@@ -30,6 +33,7 @@ public class Trap extends Targetable {
 		this.pos = pos;
 		this.hasMana = hasMana;
 		this.ability = ability;
+		this.parent = agent;
 		this.sprite = sprites.trap;
 
 		this.chanceBuff = agent.getChanceBuff();
@@ -41,6 +45,7 @@ public class Trap extends Targetable {
 	public Trap(
 		MapPoint pos,
 		Ability ability,
+		Character parent,
 		boolean hasMana,
 		double chanceBuff,
 		double attackBuff,
@@ -51,6 +56,7 @@ public class Trap extends Targetable {
 	) {
 		this.pos = pos;
 		this.ability = ability;
+		this.parent = parent;
 		this.hasMana = hasMana;
 		this.chanceBuff = chanceBuff;
 		this.attackBuff = attackBuff;
@@ -83,7 +89,7 @@ public class Trap extends Targetable {
 
 	@Override public Trap clone() {
 		return new Trap(
-			pos, ability, hasMana,
+			pos, ability, parent, hasMana,
 			chanceBuff, attackBuff, defenceBuff,
 			stats, sprite, defused);
 	}

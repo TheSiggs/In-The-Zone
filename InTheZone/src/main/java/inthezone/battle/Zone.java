@@ -7,10 +7,11 @@ import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 import java.util.Collection;
 
-public class Zone extends Targetable {
+public class Zone extends Targetable implements HasParentAgent {
 	public final MapPoint centre;
 	public final Collection<MapPoint> range;
 	public final Ability ability;
+	public final Character parent;
 
 	private final boolean hasMana;
 	private final double chanceBuff;
@@ -20,6 +21,8 @@ public class Zone extends Targetable {
 
 	private boolean purged = false;
 	private int turnsRemaining;
+
+	@Override public Character getParent() {return parent;}
 
 	public Zone(
 		MapPoint centre,
@@ -33,6 +36,7 @@ public class Zone extends Targetable {
 		this.range = range;
 		this.hasMana = hasMana;
 		this.ability = ability;
+		this.parent = agent;
 
 		this.turnsRemaining = turns;
 
@@ -47,6 +51,7 @@ public class Zone extends Targetable {
 		Collection<MapPoint> range,
 		int turns,
 		Ability ability,
+		Character parent,
 		boolean hasMana,
 		double chanceBuff,
 		double attackBuff,
@@ -57,6 +62,7 @@ public class Zone extends Targetable {
 		this.centre = centre;
 		this.range = range;
 		this.ability = ability;
+		this.parent = parent;
 		this.turnsRemaining = turns;
 		this.hasMana = hasMana;
 		this.chanceBuff = chanceBuff;
@@ -97,8 +103,8 @@ public class Zone extends Targetable {
 
 	@Override public Zone clone() {
 		return new Zone(
-			centre, range, turnsRemaining, ability, hasMana,
-			chanceBuff, attackBuff, defenceBuff,
+			centre, range, turnsRemaining, ability, parent,
+			hasMana, chanceBuff, attackBuff, defenceBuff,
 			stats, purged);
 	}
 }

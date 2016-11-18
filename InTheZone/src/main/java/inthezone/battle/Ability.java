@@ -88,6 +88,8 @@ public class Ability {
 				(info.range.targetMode.self && target.getPos().equals(agent.getPos())) ||
 				(info.range.targetMode.enemies && target.isEnemyOf((Character) agent)) ||
 				(info.range.targetMode.allies && !target.isEnemyOf((Character) agent));
+		} else if (agent instanceof HasParentAgent) {
+			return canTarget(((HasParentAgent) agent).getParent(), target);
 		} else {
 			return true;
 		}

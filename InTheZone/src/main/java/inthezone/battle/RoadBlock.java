@@ -6,6 +6,7 @@ import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
+import java.util.Optional;
 
 public class RoadBlock extends Targetable {
 	private final static int HITS_TO_DESTROY = 2;
@@ -13,14 +14,22 @@ public class RoadBlock extends Targetable {
 	private int hits;
 	private final SpriteInfo sprite;
 
-	public RoadBlock(MapPoint pos, StandardSprites sprites) {
+	private final Optional<Zone> boundZone;
+
+	public RoadBlock(
+		MapPoint pos, Optional<Zone> boundZone, StandardSprites sprites
+	) {
 		this.pos = pos;
+		this.boundZone = boundZone;
 		hits = HITS_TO_DESTROY;
 		this.sprite = sprites.roadBlock;
 	}
 
-	private RoadBlock(MapPoint pos, int hits, SpriteInfo sprite) {
+	private RoadBlock(
+		MapPoint pos, Optional<Zone> boundZone, int hits, SpriteInfo sprite
+	) {
 		this.pos = pos;
+		this.boundZone = boundZone;
 		this.hits = hits;
 		this.sprite = sprite;
 	}
@@ -35,6 +44,7 @@ public class RoadBlock extends Targetable {
 	@Override public void dealDamage(int damage) {
 		hits -= 1;
 		if (hits < 0) hits = 0;
+		if (isDead()) boundZone.ifPresent(z -> z.purge());
 	}
 	@Override public void defuse() {return;}
 	@Override public void cleanse() {return;}
@@ -50,6 +60,6 @@ public class RoadBlock extends Targetable {
 
 	@Override public SpriteInfo getSprite() {return sprite;}
 
-	@Override public RoadBlock clone() {return new RoadBlock(pos, hits, sprite);}
+	@Override public RoadBlock clone() {return new RoadBlock(pos, boundZone, hits, sprite);}
 }
 

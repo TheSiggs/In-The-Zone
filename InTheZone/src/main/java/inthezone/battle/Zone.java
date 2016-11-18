@@ -6,6 +6,7 @@ import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 import java.util.Collection;
+import java.util.Optional;
 
 public class Zone extends Targetable implements HasParentAgent {
 	public final MapPoint centre;
@@ -20,14 +21,14 @@ public class Zone extends Targetable implements HasParentAgent {
 	private final Stats stats;
 
 	private boolean purged = false;
-	private int turnsRemaining;
+	private Optional<Integer> turnsRemaining;
 
 	@Override public Character getParent() {return parent;}
 
 	public Zone(
 		MapPoint centre,
 		Collection<MapPoint> range,
-		int turns,
+		Optional<Integer> turns,  // empty for a zone that isn't turn limited
 		boolean hasMana,
 		Ability ability,
 		Character agent
@@ -49,7 +50,7 @@ public class Zone extends Targetable implements HasParentAgent {
 	public Zone(
 		MapPoint centre,
 		Collection<MapPoint> range,
-		int turns,
+		Optional<Integer> turns,
 		Ability ability,
 		Character parent,
 		boolean hasMana,
@@ -76,7 +77,7 @@ public class Zone extends Targetable implements HasParentAgent {
 	 * Call once at the start of each turn
 	 * */
 	public boolean canRemoveNow() {
-		turnsRemaining -= 1;
+		turnsRemaining = turnsRemaining.map(t -> t - 1);
 		return reap();
 	}
 
@@ -94,7 +95,9 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public void applyStatus(StatusEffect status) {return;}
 	@Override public boolean isPushable() {return false;}
 	@Override public boolean isEnemyOf(Character character) {return true;}
-	@Override public boolean isDead() {return purged || turnsRemaining <= 0;}
+	@Override public boolean isDead() {
+		return purged || turnsRemaining.map(t -> t <= 0).orElse(false);
+	}
 	@Override public SpriteInfo getSprite() {return null;}
 	@Override public boolean reap() {return isDead();}
 

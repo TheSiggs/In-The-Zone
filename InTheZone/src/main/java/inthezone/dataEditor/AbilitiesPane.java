@@ -54,6 +54,7 @@ public class AbilitiesPane extends VBox {
 	private final TreeTableColumn<AbilityInfoModel, String> type = new TreeTableColumn<>("Type");
 	private final TreeTableColumn<AbilityInfoModel, Boolean> trap = new TreeTableColumn<>("Trap");
 	private final TreeTableColumn<AbilityInfoModel, Integer> zoneTurns = new TreeTableColumn<>("Zone");
+	private final TreeTableColumn<AbilityInfoModel, Boolean> boundZone = new TreeTableColumn<>("Bound zone");
 	private final TreeTableColumn<AbilityInfoModel, Integer> ap = new TreeTableColumn<>("AP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> mp = new TreeTableColumn<>("MP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> pp = new TreeTableColumn<>("PP cost");
@@ -275,6 +276,7 @@ public class AbilitiesPane extends VBox {
 		type.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("type"));
 		trap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("trap"));
 		zoneTurns.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("zoneTurns"));
+		boundZone.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("boundZone"));
 		ap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("ap"));
 		mp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("mp"));
 		pp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("pp"));
@@ -297,6 +299,7 @@ public class AbilitiesPane extends VBox {
 		type.setSortable(false);
 		trap.setSortable(false);
 		zoneTurns.setSortable(false);
+		boundZone.setSortable(false);
 		ap.setSortable(false);
 		mp.setSortable(false);
 		pp.setSortable(false);
@@ -327,6 +330,8 @@ public class AbilitiesPane extends VBox {
 			forTreeTableColumn(trap));
 		zoneTurns.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
+		boundZone.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
+			forTreeTableColumn(boundZone));
 		ap.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		mp.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>

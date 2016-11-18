@@ -10,6 +10,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final AbilityType type;
 	public final boolean trap;
 	public final int zoneTurns;
+	public final boolean boundZone;
 	public final int ap;
 	public final int mp;
 	public final int pp;
@@ -34,6 +35,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		AbilityType type,
 		boolean trap,
 		int zoneTurns,
+		boolean boundZone,
 		int ap,
 		int mp,
 		int pp,
@@ -52,6 +54,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.type = type;
 		this.trap = trap;
 		this.zoneTurns = zoneTurns;
+		this.boundZone = boundZone;
 		this.ap = ap;
 		this.mp = mp;
 		this.pp = pp;
@@ -75,6 +78,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		r.put("type", type.toString());
 		r.put("trap", trap);
 		r.put("zoneTurns", zoneTurns);
+		r.put("boundZone", boundZone);
 		r.put("ap", ap);
 		r.put("mp", mp);
 		r.put("pp", pp);
@@ -98,6 +102,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		Object rtype = json.get("type");
 		Object rtrap = json.get("trap");
 		Object rzoneTurns = json.get("zoneTurns");
+		Object rboundZone = json.get("boundZone");
 		Object rap = json.get("ap");
 		Object rmp = json.get("mp");
 		Object rpp = json.get("pp");
@@ -129,6 +134,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 			AbilityType type = AbilityType.parse((String) rtype);
 			boolean trap = rtrap == null? false : (Boolean) rtrap;
 			Number zoneTurns = rzoneTurns == null? 0 : (Number) rzoneTurns;
+			boolean boundZone = rboundZone == null? false : (Boolean) rboundZone;
 			Number ap = (Number) rap;
 			Number mp = (Number) rmp;
 			Number pp = (Number) rpp;
@@ -160,7 +166,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 			}
 
 			return new AbilityInfo(
-				name, type, trap, zoneTurns.intValue(),
+				name, type, trap, zoneTurns.intValue(), boundZone,
 				ap.intValue(), mp.intValue(),
 				pp.intValue(), eff.doubleValue(),
 				chance.doubleValue(), heal, range,

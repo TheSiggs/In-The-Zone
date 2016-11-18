@@ -69,7 +69,7 @@ public class BattleState {
 	 * Place a new obstacle.
 	 * */
 	public RoadBlock placeObstacle(MapPoint p, StandardSprites sprites) {
-		RoadBlock r = new RoadBlock(p, sprites);
+		RoadBlock r = new RoadBlock(p, Optional.empty(), sprites);
 		targetable.add(r);
 		return r;
 	}
@@ -95,7 +95,7 @@ public class BattleState {
 		// make sure that this zone doesn't overlap an existing zone
 		if (range.stream().anyMatch(p -> zoneMap.containsKey(p))) return Optional.empty();
 
-		Zone z = new Zone(centre, range, turns, agent.hasMana(), a, agent);
+		Zone z = new Zone(centre, range, Optional.of(turns), agent.hasMana(), a, agent);
 		zones.add(z);
 		for (MapPoint p : range) zoneMap.put(p, z);
 		return Optional.of(z);

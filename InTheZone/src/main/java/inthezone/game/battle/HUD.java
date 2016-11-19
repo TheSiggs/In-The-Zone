@@ -61,7 +61,8 @@ public class HUD extends AnchorPane {
 		endTurnButton.disableProperty().bind(view.isMyTurn.not());
 		resignButton.disableProperty().bind(view.isMyTurn.not());
 		itemsButton.disableProperty().bind(view.isMyTurn.not()
-			.or(view.isCharacterSelected.not()));
+			.or(view.isCharacterSelected.not())
+			.or(view.areAllItemsUsed));
 		abilitiesButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.isCharacterSelected.not()));
 

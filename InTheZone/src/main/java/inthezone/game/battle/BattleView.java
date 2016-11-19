@@ -124,6 +124,7 @@ public class BattleView
 	public final BooleanProperty isCharacterSelected = new SimpleBooleanProperty(false);
 	public final BooleanProperty multiTargeting = new SimpleBooleanProperty(false);
 	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
+	public final BooleanProperty areAllItemsUsed = new SimpleBooleanProperty(false);
 
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
 	private final double[] sarrowx = new double[] {
@@ -531,6 +532,7 @@ public class BattleView
 		if (targetingItem && !targets.isEmpty()) {
 			selectedCharacter.ifPresent(c -> battle.requestCommand(
 				new UseItemCommandRequest(c.getPos(), targets.iterator().next())));
+			areAllItemsUsed.setValue(true);
 			cancelAbility();
 			setMode(MOVE);
 			return;

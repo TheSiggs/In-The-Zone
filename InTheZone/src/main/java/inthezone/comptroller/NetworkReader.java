@@ -112,6 +112,11 @@ public class NetworkReader implements Runnable {
 							"Server error: unexpected message of kind " + msg.kind);
 				}
 			}
+
+			// if we get to here, then the connection was closed.
+			lobbyListener.serverError(new ProtocolException("Server shut down"));
+			parent.interrupt();
+
 		} catch (IOException e) {
 			// TODO: try to recover the situation
 		} catch (ProtocolException e) {

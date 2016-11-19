@@ -75,6 +75,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	{
 		super();
 		this.player = player;
+		this.setMinSize(0, 0);
 
 		toolbar.setFocusTraversable(false);
 		stage.setFocusTraversable(false);

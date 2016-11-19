@@ -70,7 +70,7 @@ public class LobbyView extends VBox {
 		});
 
 		challenge.setOnAction(event -> {
-			if (config.loadouts.size() < 1) {
+			if (config.loadouts.isEmpty()) {
 				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
 				a.setHeaderText("You must create at least one loadout before issuing a challenge");
 				a.showAndWait();
@@ -135,6 +135,11 @@ public class LobbyView extends VBox {
 	}
 
 	public void challengeFrom(String player, StartBattleCommandRequest otherCmd) {
+		if (config.loadouts.isEmpty()) {
+			// Automatically refuse the challenge
+			parent.network.refuseChallenge(player);
+		}
+
 		Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Accept this challenge?",
 			ButtonType.YES, ButtonType.NO);
 		a.setHeaderText(player + " challenges you to battle!");

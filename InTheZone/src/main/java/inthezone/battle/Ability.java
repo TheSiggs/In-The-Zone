@@ -83,9 +83,10 @@ public class Ability {
 	 * Determine if this ability can be applied to a particular target.
 	 * */
 	public boolean canTarget(Targetable agent, Targetable target) {
-		if (agent instanceof Character) {
+		if (target.getPos().equals(agent.getPos())) {
+			return info.range.targetMode.self;
+		} else if (agent instanceof Character) {
 			return
-				(info.range.targetMode.self && target.getPos().equals(agent.getPos())) ||
 				(info.range.targetMode.enemies && target.isEnemyOf((Character) agent)) ||
 				(info.range.targetMode.allies && !target.isEnemyOf((Character) agent));
 		} else if (agent instanceof HasParentAgent) {

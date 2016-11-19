@@ -19,6 +19,7 @@ import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.UseAbilityCommand;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.battle.commands.UseItemCommandRequest;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
@@ -104,6 +105,7 @@ public class BattleView
 	private Optional<Ability> rootTargetingAbility = Optional.empty();
 	private Optional<Ability> targetingAbility = Optional.empty();
 	private Collection<MapPoint> targets = new ArrayList<>();
+	private boolean targetingItem = false;
 
 	// A queue of points from which to recast a recursive ability
 	private MapPoint castFrom = null;
@@ -353,22 +355,33 @@ public class BattleView
 			case TARGET:
 				stage.clearAllHighlighting();
 				c = selectedCharacter.orElseThrow(() -> new RuntimeException(
-					"Attempted to move but no character was selected"));
-				if (!targetingAbility.isPresent())
-					throw new RuntimeException("Attempted to target null ability");
+					"Attempted to use ability or item but no character was selected"));
 
-				if (targetingAbility.get().recursionLevel > 0) {
-					this.castFrom = recastFrom.poll();
-					if (castFrom == null) {
-						setMode(MOVE); return;
+
+				if (targetingAbility.isPresent()) {
+					if (targetingAbility.get().recursionLevel > 0) {
+						this.castFrom = recastFrom.poll();
+						if (castFrom == null) {
+							setMode(MOVE); return;
+						}
 					}
-				}
 
-				getFutureWithRetry(battle.getTargetingInfo(c, castFrom, targetingAbility.get()))
-					.ifPresent(tr -> {
-						tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
-						canvas.setSelectable(tr);
-					});
+					getFutureWithRetry(battle.getTargetingInfo(c, castFrom, targetingAbility.get()))
+						.ifPresent(tr -> {
+							tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
+							canvas.setSelectable(tr);
+						});
+
+				} else if (targetingItem) {
+					getFutureWithRetry(battle.getItemTargetingInfo(c))
+						.ifPresent(tr -> {
+							tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
+							canvas.setSelectable(tr);
+						});
+
+				} else {
+					throw new RuntimeException("Attempted to target null ability");
+				}
 				break;
 		}
 
@@ -396,12 +409,16 @@ public class BattleView
 					stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
 					if (!stage.isHighlighted(p)) return;
 
-					selectedCharacter.ifPresent(c -> {
-						getFutureWithRetry(battle.getAttackArea(
-								c, castFrom, p, targetingAbility.get()))
-							.ifPresent(area -> area.stream().forEach(pp ->
-								stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
-					});
+					if (targetingItem) {
+						if (canvas.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_ATTACKAREA);
+					} else {
+						selectedCharacter.ifPresent(c -> {
+							getFutureWithRetry(battle.getAttackArea(
+									c, castFrom, p, targetingAbility.get()))
+								.ifPresent(area -> area.stream().forEach(pp ->
+									stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
+						});
+					}
 					break;
 
 				case PUSH:
@@ -445,8 +462,23 @@ public class BattleView
 		battle.requestCommand(new EndTurnCommandRequest());
 	}
 
+	/**
+	 * Send the resign message
+	 * */
 	public void sendResign() {
 		battle.requestCommand(new ResignCommandRequest(player));
+	}
+
+	/**
+	 * The selected character uses an item
+	 * */
+	public void useItem() {
+		if (!selectedCharacter.isPresent()) throw new RuntimeException(
+			"Attempted to use item but no character was selected");
+
+		targetingItem = true;
+		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
+		setupTargeting();
 	}
 
 	/**
@@ -455,6 +487,8 @@ public class BattleView
 	public void useAbility(Ability ability) {
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to target ability but no character was selected");
+
+		targetingItem = false;
 		rootTargetingAbility = Optional.of(ability);
 		targetingAbility = Optional.of(ability);
 		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
@@ -468,6 +502,13 @@ public class BattleView
 	}
 
 	private void setupTargeting() {
+		if (targetingItem) {
+			numTargets.setValue(1);
+			multiTargeting.setValue(false);
+			setMode(TARGET);
+			return;
+		}
+
 		targetingAbility.ifPresent(a -> {
 			numTargets.setValue(a.info.range.nTargets);
 			multiTargeting.setValue(a.info.range.nTargets > 1);
@@ -476,6 +517,7 @@ public class BattleView
 	}
 
 	private void cancelAbility() {
+		targetingItem = false;
 		recastFrom.clear();
 		numTargets.setValue(0);
 		multiTargeting.setValue(false);
@@ -486,7 +528,15 @@ public class BattleView
 	 * number of targets.
 	 * */
 	public void applyAbility() {
-		if (targets.size() > 0) {
+		if (targetingItem && !targets.isEmpty()) {
+			selectedCharacter.ifPresent(c -> battle.requestCommand(
+				new UseItemCommandRequest(c.getPos(), targets.iterator().next())));
+			cancelAbility();
+			setMode(MOVE);
+			return;
+		}
+
+		if (!targets.isEmpty()) {
 			selectedCharacter.ifPresent(c ->
 				battle.requestCommand(new UseAbilityCommandRequest(
 					c.getPos(), AbilityAgentType.CHARACTER,

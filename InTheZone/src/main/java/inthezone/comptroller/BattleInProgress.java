@@ -162,7 +162,10 @@ public class BattleInProgress implements Runnable {
 					});
 				a.attackArea.ifPresent(attackArea ->
 					attackArea.complete(battle.battleState.getAffectedArea(
-						a.subject.getPos(), AbilityAgentType.CHARACTER, a.castFrom, a.ability, a.target)));
+						a.subject.getPos(), AbilityAgentType.CHARACTER,
+						a.castFrom, a.ability, a.target)));
+				a.itemTargeting.ifPresent(itemTargeting ->
+					itemTargeting.complete(battle.battleState.getItemArea(a.subject.getPos())));
 
 				// handle command completion
 				if (a.completion.isPresent()) {
@@ -322,6 +325,17 @@ public class BattleInProgress implements Runnable {
 
 		if (!accepting) r.cancel(true); else {
 			queueActionWithRetry(Action.targeting(c, castFrom, a, r));
+		}
+		return r;
+	}
+
+	public synchronized Future<Collection<MapPoint>> getItemTargetingInfo(
+		Character c
+	) {
+		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
+
+		if (!accepting) r.cancel(true); else {
+			queueActionWithRetry(Action.itemTargeting(c, r));
 		}
 		return r;
 	}

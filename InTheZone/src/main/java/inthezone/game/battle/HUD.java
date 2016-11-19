@@ -21,7 +21,7 @@ public class HUD extends AnchorPane {
 	private final VBox endButtons = new VBox();
 	private final Button endTurnButton = new Button("End turn");
 	private final Button resignButton = new Button("Resign");
-	private final Button itemsButton = new Button("Items");
+	private final Button itemsButton = new Button("Use potion");
 	private final Button abilitiesButton = new Button("Abilities");
 
 	private final MultiTargetAssistant multiTargetAssistant;
@@ -55,6 +55,8 @@ public class HUD extends AnchorPane {
 
 		abilitiesButton.setOnAction(event ->
 			abilitiesMenu.show(abilitiesButton, Side.TOP, 0, 0));
+
+		itemsButton.setOnAction(event -> view.useItem());
 
 		endTurnButton.disableProperty().bind(view.isMyTurn.not());
 		resignButton.disableProperty().bind(view.isMyTurn.not());

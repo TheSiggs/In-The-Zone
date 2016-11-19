@@ -371,5 +371,12 @@ public class BattleState {
 				.collect(Collectors.toList())
 		).orElse(new ArrayList<>());
 	}
+
+	public Collection<MapPoint> getItemArea(MapPoint p) {
+		Item item = new HealthPotion();
+		return LineOfSight.getDiamond(p, 1).stream()
+			.filter(t -> terrain.terrain.hasTile(t) && item.canAffect(this, t))
+			.collect(Collectors.toList());
+	}
 }
 

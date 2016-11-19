@@ -80,6 +80,13 @@ public class DisconnectedView extends FlowPane {
 		});
 
 		sandpit.setOnAction(event -> {
+			if (config.loadouts.size() < 1) {
+				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
+				a.setHeaderText("You must create at least one loadout before starting a game");
+				a.showAndWait();
+				return;
+			}
+
 			try {
 				parent.showScreen(
 					new ChallengePane(gameData, config, Optional.empty(),

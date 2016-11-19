@@ -7,6 +7,7 @@ import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
+import inthezone.game.loadoutEditor.LoadoutView;
 import isogame.engine.CorruptDataException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,7 +27,7 @@ import java.util.Optional;
 public class LobbyView extends VBox {
 	private final ObservableList<ServerPlayer> players =
 		FXCollections.observableArrayList();
-
+	
 	private final Map<String, ServerPlayer>	playerNames = new HashMap<>();
 
 	private final ContentPane parent;
@@ -46,8 +47,9 @@ public class LobbyView extends VBox {
 
 		final FlowPane toolbar = new FlowPane();
 		final Button logout = new Button("Logout");
+		final Button loadouts = new Button("Edit loadouts");
 		final Button challenge = new Button("Challenge");
-		toolbar.getChildren().addAll(challenge, logout);
+		toolbar.getChildren().addAll(challenge, loadouts, logout);
 
 		final VBox mainPane = new VBox();
 
@@ -63,7 +65,18 @@ public class LobbyView extends VBox {
 			parent.network.logout();
 		});
 
+		loadouts.setOnAction(event -> {
+			parent.showScreen(new LoadoutView(config, gameData), v -> {});
+		});
+
 		challenge.setOnAction(event -> {
+			if (config.loadouts.size() < 1) {
+				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
+				a.setHeaderText("You must create at least one loadout before issuing a challenge");
+				a.showAndWait();
+				return;
+			}
+
 			ServerPlayer s = playerList.getSelectionModel().getSelectedItem();
 			if (s != null) {
 				try {

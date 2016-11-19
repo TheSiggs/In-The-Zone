@@ -47,6 +47,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	private final FlowPane toolbar = new FlowPane();
 	private final ComboBox<String> stage = new ComboBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
+	private final Button cancelButton = new Button("Cancel");
 	private final Button doneButton = new Button("Done");
 
 	private final CharacterSelector characterSelector = new CharacterSelector();
@@ -78,6 +79,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.setFocusTraversable(false);
 		stage.setFocusTraversable(false);
 		loadout.setFocusTraversable(false);
+		cancelButton.setFocusTraversable(false);
 		doneButton.setFocusTraversable(false);
 
 		doneButton.setDisable(true);
@@ -85,7 +87,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		toolbar.getChildren().addAll(
 			new Label("Stage"), stage,
 			new Label("Loadout"), loadout,
-			doneButton);
+			cancelButton, doneButton);
 		toolbar.setStyle("-fx-background-color:#FFFFFF");
 		guiRoot.setTop(toolbar);
 
@@ -176,6 +178,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 						l == null || characterPositions.size() != l.characters.size());
 				}
 			});
+		});
+
+		cancelButton.setOnAction(event -> {
+			onDone.accept(Optional.empty());
 		});
 
 		doneButton.setOnAction(event -> {

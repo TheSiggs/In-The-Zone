@@ -149,7 +149,7 @@ public class LobbyView extends VBox {
 					parent.showScreen(
 						new ChallengePane(gameData, config,
 							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer()), oCmdReq -> {
-								if (oCmdReq == null) {
+								if (!oCmdReq.isPresent()) {
 									parent.network.refuseChallenge(player);
 								} else {
 									try {

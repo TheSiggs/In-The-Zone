@@ -16,7 +16,9 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final TextField loadoutName = new TextField("<loadout name>");
 	private final ListView<CharacterProfile> profiles = new ListView<>();
 	private final Button done = new Button("Done");
+	private final Button delete = new Button("Delete this loadout");
 
 	public LoadoutView(ClientConfig config, GameDataFactory gameData) {
 		loadout.setCellFactory(LoadoutCell.forListView());
@@ -69,7 +72,9 @@ public class LoadoutView extends DialogScreen<Void> {
 		HBox loadoutSelection = new HBox();
 		loadoutSelection.getChildren()
 			.addAll(new Label("Loadout"), loadout, newLoadout);
-		rightPane.getChildren().addAll(loadoutSelection, loadoutName, profiles, done);
+		FlowPane toolbar = new FlowPane();
+		toolbar.getChildren().addAll(done, delete);
+		rightPane.getChildren().addAll(loadoutSelection, loadoutName, profiles, toolbar);
 
 		profiles.setCellFactory(CharacterIndicatorCell.forListView());
 
@@ -95,6 +100,26 @@ public class LoadoutView extends DialogScreen<Void> {
 		profiles.getSelectionModel().select(null);
 		profiles.getSelectionModel().select(0);
 
+		// The delete button
+		delete.setOnAction(event -> {
+			LoadoutModel s = loadout.getSelectionModel().getSelectedItem();
+			if (s == null) return;
+
+			Alert a = new Alert(Alert.AlertType.CONFIRMATION, null, ButtonType.NO, ButtonType.YES);
+			a.setHeaderText("Really delete " + s.name.getValue() + "?");
+			if (a.showAndWait().map(b -> b.equals(ButtonType.NO)).orElse(true)) {
+				return;
+			}
+
+			if (loadoutsModel.size() == 1){
+				loadoutsModel.add(emptyLoadout(config, gameData));
+			}
+			SingleSelectionModel sel = loadout.getSelectionModel();
+			if (sel.getSelectedIndex() == 0) sel.selectNext(); else sel.selectPrevious();
+			loadoutsModel.remove(s);
+		});
+
+		// The done button
 		done.setOnAction(event -> {
 			config.loadouts.clear();
 			for (LoadoutModel m : loadoutsModel)

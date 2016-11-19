@@ -1,7 +1,6 @@
 package inthezone.battle.data;
 
 import inthezone.battle.Character;
-import inthezone.battle.InventoryItem;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;

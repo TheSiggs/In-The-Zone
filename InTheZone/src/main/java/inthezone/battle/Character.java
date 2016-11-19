@@ -32,7 +32,6 @@ public class Character extends Targetable {
 	public final Collection<Ability> abilities;
 	public final Ability basicAbility;
 	private final Stats baseStats;
-	private final int maxHP;
 
 	private Optional<StatusEffect> statusBuff = Optional.empty();
 	private Optional<StatusEffect> statusDebuff = Optional.empty();
@@ -43,7 +42,7 @@ public class Character extends Targetable {
 	private int mp = 0;
 	private int hp = 0;
 
-	public Character(
+	private Character(
 		int id,
 		String name,
 		Player player,
@@ -51,7 +50,6 @@ public class Character extends Targetable {
 		Collection<Ability> abilities,
 		Ability basicAbility,
 		Stats baseStats,
-		int maxHP,
 		Optional<StatusEffect> statusBuff,
 		Optional<StatusEffect> statusDebuff,
 		boolean hasMana,
@@ -67,7 +65,6 @@ public class Character extends Targetable {
 		this.abilities = abilities;
 		this.basicAbility = basicAbility;
 		this.baseStats = baseStats;
-		this.maxHP = maxHP;
 		this.statusBuff = statusBuff;
 		this.statusDebuff = statusDebuff;
 		this.hasMana = hasMana;
@@ -89,7 +86,6 @@ public class Character extends Targetable {
 			abilities,
 			basicAbility,
 			baseStats,
-			maxHP,
 			statusBuff,
 			statusDebuff,
 			hasMana,
@@ -117,10 +113,9 @@ public class Character extends Targetable {
 		this.basicAbility = new Ability(profile.basicAbility);
 		this.hasMana = hasMana;
 		this.pos = pos;
-		this.maxHP = baseStats.hp;
 		this.ap = baseStats.ap;
 		this.mp = baseStats.mp;
-		this.hp = maxHP;
+		this.hp = baseStats.hp;
 	}
 
 	public int getAP() {
@@ -136,7 +131,7 @@ public class Character extends Targetable {
 	}
 
 	public int getMaxHP() {
-		return maxHP;
+		return baseStats.hp;
 	}
 
 	@Override public boolean hasMana() {
@@ -176,7 +171,7 @@ public class Character extends Targetable {
 		this.ap += ap;
 		this.mp += mp;
 		this.hp += hp;
-		if (this.hp > maxHP) this.hp = maxHP;
+		if (this.hp > baseStats.hp) this.hp = baseStats.hp;
 		if (this.ap < 0) ap = 0;
 		if (this.mp < 0) mp = 0;
 		if (this.hp < 0) hp = 0;
@@ -203,6 +198,10 @@ public class Character extends Targetable {
 			if (ap < 0) ap = 0;
 			if (mp < 0) mp = 0;
 		}
+	}
+
+	public void useItem(Item item) {
+		ap = Math.max(0, ap - 1);
 	}
 
 	public void usePush() {
@@ -306,7 +305,7 @@ public class Character extends Targetable {
 	}
 
 	@Override public void dealDamage(int damage) {
-		hp = Math.max(0, hp - damage);
+		hp = Math.min(baseStats.hp, Math.max(0, hp - damage));
 		System.err.println("HP: " + hp + " after damage " + damage);
 	}
 

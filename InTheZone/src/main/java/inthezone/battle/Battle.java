@@ -177,7 +177,15 @@ public class Battle {
 		}
 	}
 
-	public void doUseItem(MapPoint agent, Item item) {
+	/**
+	 * Handle item effects
+	 * */
+	public void doUseItem(MapPoint agent, MapPoint target, Item item) {
+		battleState.getCharacterAt(agent).ifPresent(a ->
+			battleState.getCharacterAt(target).ifPresent(t -> {
+				item.doEffect(t);
+				a.useItem(item);
+			}));
 	}
 
 	public List<Targetable> doPushPull(List<MapPoint> path) {

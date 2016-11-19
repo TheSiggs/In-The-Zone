@@ -8,17 +8,17 @@ import java.util.List;
 
 public class UseItemCommandRequest extends CommandRequest {
 	private final MapPoint agent;
-	private final Item item;
+	private final MapPoint target;
 
-	public UseItemCommandRequest(MapPoint agent, Item item) {
+	public UseItemCommandRequest(MapPoint agent, MapPoint target) {
 		this.agent = agent;
-		this.item = item;
+		this.target = target;
 	}
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		List<Command> r = new ArrayList<>();
-		r.add(new UseItemCommand(agent, item));
+		r.add(new UseItemCommand(agent, target));
 		return r;
 	}
 }

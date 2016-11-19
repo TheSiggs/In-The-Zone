@@ -39,7 +39,11 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final Button done = new Button("Done");
 	private final Button delete = new Button("Delete this loadout");
 
+	private final ClientConfig config;
+
 	public LoadoutView(ClientConfig config, GameDataFactory gameData) {
+		this.config = config;
+
 		loadout.setCellFactory(LoadoutCell.forListView());
 		loadout.setButtonCell(new LoadoutCell());
 
@@ -117,19 +121,24 @@ public class LoadoutView extends DialogScreen<Void> {
 			SingleSelectionModel sel = loadout.getSelectionModel();
 			if (sel.getSelectedIndex() == 0) sel.selectNext(); else sel.selectPrevious();
 			loadoutsModel.remove(s);
+			saveLoadouts();
 		});
 
 		// The done button
 		done.setOnAction(event -> {
-			config.loadouts.clear();
-			for (LoadoutModel m : loadoutsModel)
-				config.loadouts.add(m.encodeLoadout());
-			config.writeConfig();
+			saveLoadouts();
 			onDone.accept(null);
 		});
 
 		content.getChildren().addAll(cp, rightPane);
 		this.getChildren().add(content);
+	}
+
+	private void saveLoadouts() {
+		config.loadouts.clear();
+		for (LoadoutModel m : loadoutsModel)
+			config.loadouts.add(m.encodeLoadout());
+		config.writeConfig();
 	}
 
 	private static LoadoutModel emptyLoadout(

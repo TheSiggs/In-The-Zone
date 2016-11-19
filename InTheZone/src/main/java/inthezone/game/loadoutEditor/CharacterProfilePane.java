@@ -14,6 +14,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import java.util.stream.Collectors;
 
 public class CharacterProfilePane extends HBox{
 	private CharacterProfileModel profile = null;
@@ -53,7 +54,9 @@ public class CharacterProfilePane extends HBox{
 		profile = new CharacterProfileModel(c);
 
 		allAbilities.setItems(FXCollections.observableArrayList(
-			c.rootCharacter.abilities));
+			c.rootCharacter.abilities.stream()
+				.filter(a -> a.type != AbilityType.BASIC)
+				.collect(Collectors.toList())));
 
 		basicAbilitiesModel.clear();
 		for (AbilityInfo a : c.rootCharacter.abilities)

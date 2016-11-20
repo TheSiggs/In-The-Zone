@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
+import isogame.engine.MapPoint;
 import java.util.Optional;
 
 public class ModeSelect extends Mode {
@@ -8,24 +9,24 @@ public class ModeSelect extends Mode {
 
 	public ModeSelect(BattleView view) {
 		this.view = view;
-		view.canvas.getStage().clearAllHighlighting();
+		view.getStage().clearAllHighlighting();
 	}
 
-	@Override private void handleSelection(MapPoint p) {
-		Optional<Character> = view.getCharacterAt(p);
+	@Override public void handleSelection(MapPoint p) {
+		Optional<Character> oc = view.getCharacterAt(p);
 
-		if (oc.isPresent() && oc.get().player == player) {
+		if (oc.isPresent() && oc.get().player == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}
 	}
 
-	@Override private void handleMouseOver(MapPoint p) {
+	@Override public void handleMouseOver(MapPoint p) {
 		return;
 	}
 
-	@Override private void handleMouseOut() {
+	@Override public void handleMouseOut() {
 		return;
 	}
 }

@@ -1,11 +1,14 @@
-package inthezone.battle.game;
+package inthezone.game.battle;
 
+import inthezone.battle.Ability;
 import inthezone.battle.Character;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
 import isogame.engine.MapPoint;
+import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Queue;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
@@ -13,8 +16,9 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 public class ModeTarget extends Mode {
 	private final BattleView view;
 	private final Character selectedCharacter;
-	private Ability rootTargetingAbility = Optional.empty();
-	private Ability targetingAbility = Optional.empty();
+	private final Queue<MapPoint> recastFrom;
+	private Ability rootTargetingAbility;
+	private Ability targetingAbility;
 	private MapPoint castFrom;
 
 	private Collection<MapPoint> targets = new ArrayList<>();
@@ -25,10 +29,11 @@ public class ModeTarget extends Mode {
 	) {
 		this.view = view;
 		this.selectedCharacter = selectedCharacter;
+		this.recastFrom = recastFrom;
 		this.rootTargetingAbility = ability;
 		this.castFrom = selectedCharacter.getPos();
 
-		view.canvas.getStage().clearAllHighlighting();
+		view.getStage().clearAllHighlighting();
 	}
 
 	public static Mode getModeTarget(
@@ -37,6 +42,7 @@ public class ModeTarget extends Mode {
 	) {
 		ModeTarget r = new ModeTarget(view, selectedCharacter, ability, recastFrom);
 		return r.setupTargeting(ability);
+
 	}
 
 	private Mode setupTargeting(Ability a) {
@@ -44,7 +50,7 @@ public class ModeTarget extends Mode {
 		view.numTargets.setValue(a.info.range.nTargets);
 		view.multiTargeting.setValue(a.info.range.nTargets > 1);
 		if (a.recursionLevel > 0) {
-			return new ModeAnimating();
+			return new ModeAnimating(view);
 
 		} else {
 			if (targetingAbility.recursionLevel > 0) {
@@ -54,28 +60,37 @@ public class ModeTarget extends Mode {
 				}
 			}
 
-			Stage stage = view.getStage();
-			getFutureWithRetry(view.battle.getTargetingInfo(
-				selectedCharacter, castFrom, targetingAbility.)).ifPresent(tr -> {
-					tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
-					view.canvas.setSelectable(tr);
-				});
+			if (a.info.range.range == 0) {
+				// range 0 abilities get applied immediately
+				targets.add(castFrom);
+				return applyAbility();
+
+			} else {
+				Stage stage = view.getStage();
+				getFutureWithRetry(view.battle.getTargetingInfo(
+					selectedCharacter, castFrom, targetingAbility)).ifPresent(tr -> {
+						tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
+						view.setSelectable(tr);
+					});
 			}
+		}
+
+		return this;
 	}
 
-	private void addTarget(MapPoint p) {
+	private Mode addTarget(MapPoint p) {
 		targets.add(p);
-		view.numTargets.setValue(numTargets.getValue() - 1);
-		if (numTargets.getValue() == 0) applyAbility();
+		view.numTargets.setValue(view.numTargets.getValue() - 1);
+		if (view.numTargets.getValue() == 0) return applyAbility(); else return this;
 	}
 
 	/**
 	 * Apply the selected ability now, even if we haven't selected the maximum
 	 * number of targets.
 	 * */
-	public void applyAbility() {
+	public Mode applyAbility() {
 		if (!targets.isEmpty()) {
-			battle.requestCommand(new UseAbilityCommandRequest(
+			view.battle.requestCommand(new UseAbilityCommandRequest(
 				selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
 				selectedCharacter.getPos(), targets, targetingAbility));
 		}
@@ -84,46 +99,44 @@ public class ModeTarget extends Mode {
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
 		if (nextAbility.isPresent()) {
-			hud.writeMessage("Subsequent!");
-			targetingAbility
-			setupTargeting(nextAbility.get());
+			// TODO: rethink this
+			//hud.writeMessage("Subsequent!");
+			targetingAbility = nextAbility.get();
+			return setupTargeting(targetingAbility);
 		} else {
 			nextAbility = rootTargetingAbility.getRecursion();
 			if (nextAbility.isPresent()) {
-				hud.writeMessage("Recursive rebound!");
+				//hud.writeMessage("Recursive rebound!");
 				rootTargetingAbility = nextAbility.get();
-				setupTargeting(nextAbility.get());
+				return setupTargeting(nextAbility.get());
 			} else {
-				view.setDefaultMode();
+				return new ModeMove(view, selectedCharacter);
 			}
 		}
 	}
 
-	@Override private void handleSelection(MapPoint p) {
-		if (view.canvas.isSelectable(p)) {
-			addTarget(p);
+	@Override public void handleSelection(MapPoint p) {
+		if (view.isSelectable(p)) {
+			Mode r = addTarget(p);
+			if (r != this) view.setMode(r);
 		} else {
 			view.selectCharacter(Optional.empty());
 		}
 	}
 
-	@Override private void handleMouseOver(MapPoint p) {
+	@Override public void handleMouseOver(MapPoint p) {
 		Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
 		if (!stage.isHighlighted(p)) return; // TODO: is this necessary
 
-		if (targetingItem) {
-			if (view.canvas.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_ATTACKAREA);
-		} else {
-			getFutureWithRetry(battle.getAttackArea(
-					selectedCharacter, castFrom, p, targetingAbility.get()))
-				.ifPresent(area -> area.stream().forEach(pp ->
-					stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
-		}
+		getFutureWithRetry(view.battle.getAttackArea(
+				selectedCharacter, castFrom, p, targetingAbility))
+			.ifPresent(area -> area.stream().forEach(pp ->
+				stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
 	}
 
-	@Override private void handleMouseOut() {
-		view.canvas.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
+	@Override public void handleMouseOut() {
+		view.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
 	}
 }
 

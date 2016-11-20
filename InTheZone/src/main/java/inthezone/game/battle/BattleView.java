@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
+import static inthezone.game.battle.Highlighters.HIGHLIGHT_ZONE;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -61,21 +62,10 @@ public class BattleView
 	private final static double walkSpeed = 1.2;
 	private final static double pushSpeed = 2;
 
-	private final MapView canvas;
-	private final Player player;
-	private final BattleInProgress battle;
+	public final BattleInProgress battle;
+	public final Player player;
 
-	private final static int HIGHLIGHT_ZONE       = 0;
-	private final static int HIGHLIGHT_TARGET     = 1;
-	private final static int HIGHLIGHT_MOVE       = 2;
-	private final static int HIGHLIGHT_PATH       = 3;
-	private final static int HIGHLIGHT_ATTACKAREA = 4;
-	private final Highlighter[] highlights = new Highlighter[] {
-		new Highlighter(Color.rgb(0xFF, 0x88, 0x00, 0.2)),
-		new Highlighter(Color.rgb(0xFF, 0xFF, 0x00, 0.2)),
-		new Highlighter(Color.rgb(0x00, 0xFF, 0x00, 0.2)),
-		new Highlighter(Color.rgb(0x00, 0x00, 0xFF, 0.2)),
-		new Highlighter(Color.rgb(0xFF, 0x00, 0x00, 0.2))};
+	private final MapView canvas;
 
 	// The HUD GUI components
 	private final HUD hud;
@@ -138,7 +128,7 @@ public class BattleView
 		this.hud = new HUD(this, gameData.getStandardSprites());
 
 		this.canvas = new MapView(this,
-			gameData.getStage(startBattle.stage), true, false, highlights);
+			gameData.getStage(startBattle.stage), true, false, Highlighters.highlights);
 		canvas.widthProperty().bind(this.widthProperty());
 		canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
@@ -149,7 +139,7 @@ public class BattleView
 
 		Collection<Sprite> sprites = startBattle.makeSprites();
 		for (Sprite s : sprites) {
-			Stage stage = canvas.getStage();
+			Stage stage = getStage();
 			stage.addSprite(s);
 			s.setDecalRenderer(renderDecals);
 
@@ -161,7 +151,7 @@ public class BattleView
 					setDefaultMode();
 					doNextCommand();
 				} else {
-					setMode(new ModeOtherTurn());
+					setMode(new ModeOtherTurn(this));
 				}
 			});
 		}
@@ -190,11 +180,11 @@ public class BattleView
 	}
 
 	public void selectCharacter(Optional<Character> c) {
-		if (mode != OTHER_TURN && mode != ANIMATING) {
+		if (!mode.isInteractive()) {
 			if (c.isPresent() && !c.get().isDead()) {
 				selectedCharacter = c;
 				isCharacterSelected.setValue(true);
-				setMode(new ModeMove(this, c));
+				setMode(new ModeMove(this, c.get()));
 			} else {
 				selectedCharacter = Optional.empty();
 				isCharacterSelected.setValue(false);
@@ -204,9 +194,22 @@ public class BattleView
 		}
 	}
 
+	public void setSelectable(Collection<MapPoint> mr) {
+		canvas.setSelectable(mr);
+	}
+
+	public boolean isSelectable(MapPoint p) {
+		return canvas.isSelectable(p);
+	}
+
+	public Optional<Character> getCharacterAt(MapPoint p) {
+		return characters.values().stream()
+			.filter(c -> c.getPos().equals(p)).findFirst();
+	}
+
 	private Consumer<MapPoint> handleSelection() {
 		return p -> {
-			if (p == null && mode != TELEPORT) {
+			if (p == null && mode.canCancel()) {
 				selectCharacter(Optional.empty());
 			} else  {
 				mode.handleSelection(p);
@@ -214,13 +217,18 @@ public class BattleView
 		};
 	}
 
-	private void setMode(Mode mode) {
+	public Stage getStage() {
+		return canvas.getStage();
+	}
+
+	// TODO: can we make this private
+	public void setMode(Mode mode) {
 		this.mode = mode;
-		for (MapPoint p : zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
+		for (MapPoint p : zones) getStage().setHighlight(p, HIGHLIGHT_ZONE);
 	}
 
 	private Consumer<MapPoint> handleMouseOver() {
-		return p -> mode.handleMouseOver();
+		return p -> mode.handleMouseOver(p);
 	}
 
 	private Runnable handleMouseOut() {
@@ -258,9 +266,7 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to use item but no character was selected");
 
-		targetingItem = true;
-		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
-		setupTargeting();
+		setMode(new ModeTargetItem(this, selectedCharacter.get()));
 	}
 
 	/**
@@ -270,17 +276,8 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to target ability but no character was selected");
 
-		targetingItem = false;
-		rootTargetingAbility = Optional.of(ability);
-		targetingAbility = Optional.of(ability);
-		this.castFrom = selectedCharacter.map(c -> c.getPos()).orElse(null);
-		setupTargeting();
-
-		// range 0 abilities get applied immediately
-		if (ability.info.range.range == 0) {
-			targets.add(castFrom);
-			applyAbility();
-		}
+		setMode(ModeTarget.getModeTarget(
+			this, selectedCharacter.get(), ability, recastFrom));
 	}
 
 	/**
@@ -289,7 +286,7 @@ public class BattleView
 	 * */
 	public void applyAbility() {
 		if (mode instanceof ModeTarget) {
-			((ModeTarget) mode).applyAbility();
+			setMode(((ModeTarget) mode).applyAbility());
 		}
 	}
 
@@ -300,21 +297,21 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to push but no character was selected");
 
-		setMode(new ModePush(this, selectedCharacter));
+		setMode(new ModePush(this, selectedCharacter.get()));
 	}
 
 	@Override
 	public void startTurn(List<Targetable> characters) {
 		isMyTurn.setValue(true);
 		updateCharacters(characters);
-		setMode(new ModeSelect(););
+		setMode(new ModeSelect(this));
 	}
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
 		updateCharacters(characters);
-		setMode(new ModeOtherTurn());
+		setMode(new ModeOtherTurn(this));
 	}
 
 	@Override
@@ -334,7 +331,7 @@ public class BattleView
 	@Override
 	public void command(ExecutedCommand ec) {
 		commandQueue.add(ec);
-		if (mode != ANIMATING) doNextCommand();
+		if (!(mode instanceof ModeAnimating)) doNextCommand();
 	}
 
 	private void doNextCommand() {
@@ -393,7 +390,7 @@ public class BattleView
 	private void instantEffect(
 		InstantEffect effect, List<Targetable> affectedCharacters
 	) {
-		Stage stage = canvas.getStage();
+		Stage stage = getStage();
 
 		if (effect instanceof PullPush) {
 			PullPush pullpush = (PullPush) effect;
@@ -428,8 +425,8 @@ public class BattleView
 	private void scheduleMovement(
 		String animation, double speed, List<MapPoint> path, Character affected
 	) {
-		setMode(new ModeAnimating());
-		Stage stage = canvas.getStage();
+		setMode(new ModeAnimating(this));
+		Stage stage = getStage();
 		MapPoint start = path.get(0);
 		MapPoint end = path.get(1);
 		MapPoint v = end.subtract(start);
@@ -481,7 +478,7 @@ public class BattleView
 					}
 
 					if (c.isDead()) {
-						Sprite s = canvas.getStage().getSpritesByTile(c.getPos()).stream()
+						Sprite s = getStage().getSpritesByTile(c.getPos()).stream()
 							.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
 						s.setAnimation("dead");
 					}
@@ -511,12 +508,12 @@ public class BattleView
 				
 			} else if (t.reap()) {
 				Sprite s = temporaryImmobileObjects.remove(t.getPos());
-				if (s != null) canvas.getStage().removeSprite(s);
+				if (s != null) getStage().removeSprite(s);
 
 			} else if (!temporaryImmobileObjects.containsKey(t.getPos())) {
 				Sprite s = new Sprite(t.getSprite());
 				s.pos = t.getPos();
-				canvas.getStage().addSprite(s);
+				getStage().addSprite(s);
 				temporaryImmobileObjects.put(t.getPos(), s);
 			}
 		}

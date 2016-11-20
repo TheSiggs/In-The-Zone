@@ -2,9 +2,12 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import isogame.engine.MapPoint;
+import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
+import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTeleport extends Mode {
 	private final BattleView view;
@@ -19,12 +22,14 @@ public class ModeTeleport extends Mode {
 		this.teleportQueue = teleportQueue;
 		this.teleportRange = teleportRange;
 
-		view.canvas.getStage().clearAllHighlighting();
+		view.getStage().clearAllHighlighting();
 		nextTeleport();
 	}
 
-	@Overide private void handleSelection(MapPoint p) {
-		if (view.canvas.isSelectable(p)) {
+	@Override public boolean canCancel() {return false;}
+
+	@Override public void handleSelection(MapPoint p) {
+		if (view.isSelectable(p)) {
 			teleportDestinations.add(p);
 			teleportQueue.remove();
 			nextTeleport();
@@ -35,7 +40,7 @@ public class ModeTeleport extends Mode {
 		Character teleporting = teleportQueue.peek();
 		if (teleporting == null) {
 			view.battle.completeEffect(teleportDestinations);
-			view.resetMode();
+			view.setDefaultMode(); // TODO: rethink this
 		} else {
 			Stage stage = view.getStage();
 			stage.clearAllHighlighting();
@@ -44,19 +49,19 @@ public class ModeTeleport extends Mode {
 					mr.add(teleporting.getPos());
 					mr.removeAll(teleportDestinations);
 					mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
-					view.canvas.setSelectable(mr);
+					view.setSelectable(mr);
 				});
 		}
 	}
 
 
-	@Overide private void handleMouseOver(MapPoint p) {
+	@Override public void handleMouseOver(MapPoint p) {
 		Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_PATH);
-		if (view.canvas.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_PATH);
+		if (view.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_PATH);
 	}
 
-	@Overide private void handleMouseOut() {
+	@Override public void handleMouseOut() {
 		return;
 	}
 }

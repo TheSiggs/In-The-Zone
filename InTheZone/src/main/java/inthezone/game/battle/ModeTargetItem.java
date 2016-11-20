@@ -1,7 +1,11 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
+import inthezone.battle.commands.UseItemCommandRequest;
 import isogame.engine.MapPoint;
+import isogame.engine.Stage;
+import java.util.Optional;
+import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTargetItem extends Mode {
@@ -13,8 +17,8 @@ public class ModeTargetItem extends Mode {
 		this.selectedCharacter = selectedCharacter;
 	}
 
-	@Override private void handleSelection(MapPoint p) {
-		} else if (canvas.isSelectable(p)) {
+	@Override public void handleSelection(MapPoint p) {
+		if (view.isSelectable(p)) {
 			view.battle.requestCommand(new UseItemCommandRequest(
 				selectedCharacter.getPos(), p));
 			view.areAllItemsUsed.setValue(true);
@@ -24,17 +28,17 @@ public class ModeTargetItem extends Mode {
 		}
 	}
 
-	@Override private void handleMouseOver(MapPoint p) {
+	@Override public void handleMouseOver(MapPoint p) {
 		Stage stage = view.getStage();
 		getFutureWithRetry(view.battle.getItemTargetingInfo(selectedCharacter))
 			.ifPresent(tr -> {
-				tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
-				canvas.setSelectable(tr);
+				tr.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_TARGET));
+				view.setSelectable(tr);
 			});
 	}
 
-	@Override private void handleMouseOut() {
-		view.canvas.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
+	@Override public void handleMouseOut() {
+		view.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
 	}
 }
 

@@ -10,9 +10,11 @@ import java.util.Optional;
  * A GUI mode.
  * */
 public abstract class Mode {
-	private abstract void handleSelection(MapPoint p);
-	private abstract void handleMouseOver(MapPoint p);
-	private abstract void handleMouseOut();
+	public abstract void handleSelection(MapPoint p);
+	public abstract void handleMouseOver(MapPoint p);
+	public abstract void handleMouseOut();
+	public boolean isInteractive() {return true;}
+	public boolean canCancel() {return true;}
 
 	public static <T> Optional<T> getFutureWithRetry(Future<T> f) {
 		while (true) {

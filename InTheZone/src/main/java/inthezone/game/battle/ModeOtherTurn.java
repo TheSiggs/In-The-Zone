@@ -8,19 +8,21 @@ public class ModeOtherTurn extends Mode {
 
 	public ModeOtherTurn(BattleView view) {
 		this.view = view;
-		view.canvas.getStage().clearAllHighlighting();
+		view.getStage().clearAllHighlighting();
 		view.selectCharacter(Optional.empty());
 	}
 
-	@Overide private void handleSelection(MapPoint p) {
+	@Override public boolean isInteractive() {return false;}
+
+	@Override public void handleSelection(MapPoint p) {
 		return;
 	}
 
-	@Overide private void handleMouseOver(MapPoint p) {
+	@Override public void handleMouseOver(MapPoint p) {
 		return;
 	}
 
-	@Overide private void handleMouseOut() {
+	@Override public void handleMouseOut() {
 		return;
 	}
 }

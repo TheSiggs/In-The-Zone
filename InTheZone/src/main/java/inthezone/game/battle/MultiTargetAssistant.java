@@ -32,7 +32,5 @@ public class MultiTargetAssistant extends HBox {
 
 		this.getChildren().addAll(message, done);
 	}
-
-
 }
 

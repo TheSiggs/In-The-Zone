@@ -4,22 +4,16 @@ import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
-import inthezone.battle.commands.AbilityAgentType;
-import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
-import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.battle.commands.PushCommand;
-import inthezone.battle.commands.PushCommandRequest;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.UseAbilityCommand;
-import inthezone.battle.commands.UseAbilityCommandRequest;
-import inthezone.battle.commands.UseItemCommandRequest;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
@@ -51,9 +45,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +54,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
-import static inthezone.game.battle.BattleViewMode.*;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -71,10 +61,21 @@ public class BattleView
 	private final static double walkSpeed = 1.2;
 	private final static double pushSpeed = 2;
 
-	public final MapView canvas;
-	public final BattleInProgress battle;
-
+	private final MapView canvas;
 	private final Player player;
+	private final BattleInProgress battle;
+
+	private final static int HIGHLIGHT_ZONE       = 0;
+	private final static int HIGHLIGHT_TARGET     = 1;
+	private final static int HIGHLIGHT_MOVE       = 2;
+	private final static int HIGHLIGHT_PATH       = 3;
+	private final static int HIGHLIGHT_ATTACKAREA = 4;
+	private final Highlighter[] highlights = new Highlighter[] {
+		new Highlighter(Color.rgb(0xFF, 0x88, 0x00, 0.2)),
+		new Highlighter(Color.rgb(0xFF, 0xFF, 0x00, 0.2)),
+		new Highlighter(Color.rgb(0x00, 0xFF, 0x00, 0.2)),
+		new Highlighter(Color.rgb(0x00, 0x00, 0xFF, 0.2)),
+		new Highlighter(Color.rgb(0xFF, 0x00, 0x00, 0.2))};
 
 	// The HUD GUI components
 	private final HUD hud;
@@ -107,7 +108,7 @@ public class BattleView
 	private Queue<Character> teleportQueue = new LinkedList<>();
 	private List<MapPoint> teleportDestinations = new ArrayList<>();
 
-	private BattleViewMode mode = SELECT;
+	private Mode mode = new ModeSelect(this);
 
 	// status properties for the HUD
 	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
@@ -157,12 +158,10 @@ public class BattleView
 			chain.doOnFinished(() -> {
 				s.setAnimation("idle");
 				if (isMyTurn.getValue()) {
-					if (teleportQueue.size() > 0) setMode(TELEPORT);
-					else if (selectedCharacter.isPresent()) setMode(MOVE);
-					else setMode(SELECT);
+					setDefaultMode();
 					doNextCommand();
 				} else {
-					setMode(OTHER_TURN);
+					setMode(new ModeOtherTurn());
 				}
 			});
 		}
@@ -176,22 +175,13 @@ public class BattleView
 		this.getChildren().addAll(canvas, hud);
 	}
 
-	public Optional<Character> getCharacterAt(MapPoint p) {
-		return oc = characters.values().stream()
-			.filter(c -> c.getPos().equals(p)).findFirst();
-	}
-
-	private static <T> Optional<T> getFutureWithRetry(Future<T> f) {
-		while (true) {
-			try {
-				return Optional.of(f.get());
-			} catch (InterruptedException e) {
-				/* ignore */
-			} catch (ExecutionException e) {
-				return Optional.empty();
-			} catch (CancellationException e) {
-				return Optional.empty();
-			} 
+	public void setDefaultMode() {
+		if (teleportQueue.size() > 0) {
+			setMode(new ModeTeleport(this, teleportQueue, teleportRange));
+		} else if (selectedCharacter.isPresent()) {
+			setMode(new ModeMove(this, selectedCharacter.get()));
+		} else {
+			setMode(new ModeSelect(this));
 		}
 	}
 
@@ -204,138 +194,37 @@ public class BattleView
 			if (c.isPresent() && !c.get().isDead()) {
 				selectedCharacter = c;
 				isCharacterSelected.setValue(true);
-				setMode(MOVE);
+				setMode(new ModeMove(this, c));
 			} else {
 				selectedCharacter = Optional.empty();
 				isCharacterSelected.setValue(false);
-				setMode(SELECT);
+				setMode(new ModeSelect(this));
 			}
 			hud.selectCharacter(c.orElse(null));
 		}
 	}
 
-
 	private Consumer<MapPoint> handleSelection() {
 		return p -> {
-			if (mode == ANIMATING) return;
 			if (p == null && mode != TELEPORT) {
-				selectCharacter(Optional.empty()); return;
+				selectCharacter(Optional.empty());
+			} else  {
+				mode.handleSelection(p);
 			}
-
-			Optional<Character> oc = characters.values().stream()
-				.filter(c -> c.getPos().equals(p)).findFirst();
-
-			switch (mode) {
-				case SELECT:
-					break;
-
-				case MOVE:
-					break;
-
-				case TELEPORT:
-					break;
-
-				case PUSH:
-					break;
-
-				case TARGET:
-					break;
-			}
-
 		};
 	}
 
-	private void setMode(BattleViewMode mode) {
-		Stage stage = canvas.getStage();
-		Character c;
-
-		stage.clearAllHighlighting();
-
-		switch (mode) {
-			case OTHER_TURN:
-				cancelAbility();
-				canvas.getStage().clearAllHighlighting();
-				selectCharacter(Optional.empty());
-				break;
-
-			case ANIMATING:
-				canvas.getStage().clearAllHighlighting();
-				break;
-
-			case SELECT:
-				cancelAbility();
-				canvas.getStage().clearAllHighlighting();
-				break;
-
-			case PUSH:
-
-				break;
-
-			case MOVE:
-				cancelAbility();
-				break;
-
-			case TELEPORT:
-				break;
-
-			case TARGET:
-
-				} else if (targetingItem) {
-					getFutureWithRetry(battle.getItemTargetingInfo(c))
-						.ifPresent(tr -> {
-							tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
-							canvas.setSelectable(tr);
-						});
-
-				break;
-		}
-
-		for (MapPoint p : zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
-
+	private void setMode(Mode mode) {
 		this.mode = mode;
+		for (MapPoint p : zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
 
 	private Consumer<MapPoint> handleMouseOver() {
-		return p -> {
-			Stage stage = canvas.getStage();
-
-			switch (mode) {
-				case MOVE:
-				break;
-
-				case TARGET:
-					stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
-					if (!stage.isHighlighted(p)) return;
-
-					if (targetingItem) {
-						if (canvas.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_ATTACKAREA);
-					} else {
-						selectedCharacter.ifPresent(c -> {
-							getFutureWithRetry(battle.getAttackArea(
-									c, castFrom, p, targetingAbility.get()))
-								.ifPresent(area -> area.stream().forEach(pp ->
-									stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
-						});
-					}
-					break;
-
-				case PUSH:
-					break;
-
-				case TELEPORT:
-					break;
-			}
-		};
+		return p -> mode.handleMouseOver();
 	}
 
 	private Runnable handleMouseOut() {
-		return () -> {
-			switch (mode) {
-				case MOVE:
-				case TARGET:
-					canvas.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
-			}
-		};
+		return () -> mode.handleMouseOut();
 	}
 
 	private SpriteDecalRenderer renderDecals = (cx, s, t, angle) -> {
@@ -394,12 +283,14 @@ public class BattleView
 		}
 	}
 
-
-	private void cancelAbility() {
-		targetingItem = false;
-		recastFrom.clear();
-		numTargets.setValue(0);
-		multiTargeting.setValue(false);
+	/**
+	 * Apply the selected ability now, even if we haven't selected the maximum
+	 * number of targets.
+	 * */
+	public void applyAbility() {
+		if (mode instanceof ModeTarget) {
+			((ModeTarget) mode).applyAbility();
+		}
 	}
 
 	/**
@@ -409,21 +300,21 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to push but no character was selected");
 
-		setMode(PUSH);
+		setMode(new ModePush(this, selectedCharacter));
 	}
 
 	@Override
 	public void startTurn(List<Targetable> characters) {
 		isMyTurn.setValue(true);
 		updateCharacters(characters);
-		setMode(SELECT);
+		setMode(new ModeSelect(););
 	}
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
 		updateCharacters(characters);
-		setMode(OTHER_TURN);
+		setMode(new ModeOtherTurn());
 	}
 
 	@Override
@@ -491,11 +382,12 @@ public class BattleView
 			for (DamageToTarget d: ((UseAbilityCommand) ec.cmd).getTargets()) {
 				recastFrom.add(d.target);
 			}
-			setMode(TARGET);
+			// TODO: revisit this
+			//setMode(TARGET);
 		}
 
 		updateCharacters(ec.affected);
-		if (mode != ANIMATING) doNextCommand();
+		if (!(mode instanceof ModeAnimating)) doNextCommand();
 	}
 
 	private void instantEffect(
@@ -536,7 +428,7 @@ public class BattleView
 	private void scheduleMovement(
 		String animation, double speed, List<MapPoint> path, Character affected
 	) {
-		setMode(ANIMATING);
+		setMode(new ModeAnimating());
 		Stage stage = canvas.getStage();
 		MapPoint start = path.get(0);
 		MapPoint end = path.get(1);
@@ -610,11 +502,11 @@ public class BattleView
 			} else if (t instanceof Zone) {
 				if (t.reap()) {
 					zones.removeAll(((Zone) t).range);
-					setMode(mode); // reset the highlighting
+					// TODO: reset highlighting
 
 				} else {
 					zones.addAll(((Zone) t).range);
-					setMode(mode); // reset the highlighting
+					// TODO: reset highlighting
 				}
 				
 			} else if (t.reap()) {
@@ -638,8 +530,8 @@ public class BattleView
 			teleportRange = teleport.range;
 			teleportQueue.clear();
 			teleportQueue.addAll(teleport.affectedCharacters);
-			teleportDestinations.clear();
-			setMode(TELEPORT);
+
+			setMode(new ModeTeleport(this, teleportQueue, teleportRange));
 		} else {
 			throw new RuntimeException("Cannot complete instant effect " + e);
 		}

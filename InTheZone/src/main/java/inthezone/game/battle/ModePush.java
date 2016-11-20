@@ -14,6 +14,8 @@ public class ModePush extends Mode {
 		this.view = view;
 		this.selectedCharacter = selectedCharacter;
 
+		view.canvas.getStage().clearAllHighlighting();
+
 		MapPoint centre = c.getPos();
 		Collection<MapPoint> r = new ArrayList<>();
 		r.add(centre.add(new MapPoint( 1, 0)));

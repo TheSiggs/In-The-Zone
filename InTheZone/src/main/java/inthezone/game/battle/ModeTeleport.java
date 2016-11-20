@@ -19,6 +19,7 @@ public class ModeTeleport extends Mode {
 		this.teleportQueue = teleportQueue;
 		this.teleportRange = teleportRange;
 
+		view.canvas.getStage().clearAllHighlighting();
 		nextTeleport();
 	}
 
@@ -38,7 +39,7 @@ public class ModeTeleport extends Mode {
 		} else {
 			Stage stage = view.getStage();
 			stage.clearAllHighlighting();
-			view.getFutureWithRetry(view.battle.getTeleportRange(teleporting, teleportRange))
+			getFutureWithRetry(view.battle.getTeleportRange(teleporting, teleportRange))
 				.ifPresent(mr -> {
 					mr.add(teleporting.getPos());
 					mr.removeAll(teleportDestinations);

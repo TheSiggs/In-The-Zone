@@ -8,6 +8,7 @@ public class ModeSelect extends Mode {
 
 	public ModeSelect(BattleView view) {
 		this.view = view;
+		view.canvas.getStage().clearAllHighlighting();
 	}
 
 	@Override private void handleSelection(MapPoint p) {

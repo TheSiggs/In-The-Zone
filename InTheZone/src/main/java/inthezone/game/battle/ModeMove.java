@@ -16,6 +16,8 @@ public class MoveMode extends Mode {
 	public MoveMode(BattleView view, Character selectedCharacter) {
 		this.selectedCharacter = character;
 
+		view.canvas.getStage().clearAllHighlighting();
+
 		getFutureWithRetry(view.battle.getMoveRange(selectedCharacter)).ifPresent(mr -> {
 			mr.stream().forEach(p -> view.getStage().setHighlight(p, HIGHLIGHT_MOVE));
 			view.canvas.setSelectable(mr);
@@ -23,6 +25,8 @@ public class MoveMode extends Mode {
 	}
 
 	@Override private void handleSelection(MapPoint p) {
+		Optional<Character> oc = view.getCharacterAt(p);
+
 		if (oc.isPresent() && oc.get().player == player) {
 			view.selectCharacter(Optional.of(oc.get()));
 		} else if (canvas.isSelectable(p)) {

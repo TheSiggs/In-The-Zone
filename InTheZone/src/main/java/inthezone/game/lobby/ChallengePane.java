@@ -9,6 +9,7 @@ import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
 import isogame.engine.FacingDirection;
+import isogame.engine.Highlighter;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -100,8 +101,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
 
-		final Paint[] highlights =
-			new Paint[] {Color.rgb(0x00, 0x00, 0xFF, 0.2)};
+		final Highlighter[] highlights =
+			new Highlighter[] {new Highlighter(Color.rgb(0x00, 0x00, 0xFF, 0.2))};
 
 		this.startPosChooser = new MapView(this,
 			useStage.map(s -> gameData.getStage(s)).orElse(null),

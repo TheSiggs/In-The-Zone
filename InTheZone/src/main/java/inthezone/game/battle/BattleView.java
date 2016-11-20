@@ -34,6 +34,7 @@ import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
 import isogame.engine.AnimationChain;
+import isogame.engine.Highlighter;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -79,12 +80,12 @@ public class BattleView
 	private final static int HIGHLIGHT_MOVE       = 2;
 	private final static int HIGHLIGHT_PATH       = 3;
 	private final static int HIGHLIGHT_ATTACKAREA = 4;
-	private final Paint[] highlights = new Paint[] {
-		Color.rgb(0xFF, 0x88, 0x00, 0.2),
-		Color.rgb(0xFF, 0xFF, 0x00, 0.2),
-		Color.rgb(0x00, 0xFF, 0x00, 0.2),
-		Color.rgb(0x00, 0x00, 0xFF, 0.2),
-		Color.rgb(0xFF, 0x00, 0x00, 0.2)};
+	private final Highlighter[] highlights = new Highlighter[] {
+		new Highlighter(Color.rgb(0xFF, 0x88, 0x00, 0.2)),
+		new Highlighter(Color.rgb(0xFF, 0xFF, 0x00, 0.2)),
+		new Highlighter(Color.rgb(0x00, 0xFF, 0x00, 0.2)),
+		new Highlighter(Color.rgb(0x00, 0x00, 0xFF, 0.2)),
+		new Highlighter(Color.rgb(0xFF, 0x00, 0x00, 0.2))};
 
 	// The HUD GUI components
 	private final HUD hud;

@@ -17,7 +17,9 @@ public class ModeMove extends Mode {
 
 	public ModeMove(BattleView view, Character selectedCharacter) {
 		this.selectedCharacter = selectedCharacter;
+	}
 
+	@Override public void setupMode() {
 		view.getStage().clearAllHighlighting();
 
 		getFutureWithRetry(view.battle.getMoveRange(selectedCharacter)).ifPresent(mr -> {
@@ -34,7 +36,7 @@ public class ModeMove extends Mode {
 		} else if (view.isSelectable(p)) {
 			view.battle.requestCommand(
 				new MoveCommandRequest(selectedCharacter.getPos(), p, selectedCharacter.player));
-			view.setDefaultMode();
+			setupMode();
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

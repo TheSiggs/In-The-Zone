@@ -3,7 +3,12 @@ package inthezone.game.battle;
 import isogame.engine.MapPoint;
 
 public class ModeAnimating extends Mode {
+	private final BattleView view;
 	public ModeAnimating(BattleView view) {
+		this.view = view;
+	}
+
+	@Override public void setupMode() {
 		view.getStage().clearAllHighlighting();
 	}
 

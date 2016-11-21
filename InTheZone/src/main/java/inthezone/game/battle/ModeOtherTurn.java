@@ -8,6 +8,9 @@ public class ModeOtherTurn extends Mode {
 
 	public ModeOtherTurn(BattleView view) {
 		this.view = view;
+	}
+
+	@Override public void setupMode() {
 		view.getStage().clearAllHighlighting();
 		view.selectCharacter(Optional.empty());
 	}

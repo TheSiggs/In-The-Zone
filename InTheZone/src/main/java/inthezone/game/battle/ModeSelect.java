@@ -9,6 +9,9 @@ public class ModeSelect extends Mode {
 
 	public ModeSelect(BattleView view) {
 		this.view = view;
+	}
+
+	@Override public void setupMode() {
 		view.getStage().clearAllHighlighting();
 	}
 

@@ -17,12 +17,21 @@ public class ModeTargetItem extends Mode {
 		this.selectedCharacter = selectedCharacter;
 	}
 
+	@Override public void setupMode() {
+		Stage stage = view.getStage();
+		getFutureWithRetry(view.battle.getItemTargetingInfo(selectedCharacter))
+			.ifPresent(tr -> {
+				tr.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_TARGET));
+				view.setSelectable(tr);
+			});
+	}
+
 	@Override public void handleSelection(MapPoint p) {
 		if (view.isSelectable(p)) {
 			view.battle.requestCommand(new UseItemCommandRequest(
 				selectedCharacter.getPos(), p));
 			view.areAllItemsUsed.setValue(true);
-			view.setDefaultMode();
+			view.modes.nextMode();
 		} else {
 			view.selectCharacter(Optional.empty());
 		}
@@ -30,11 +39,8 @@ public class ModeTargetItem extends Mode {
 
 	@Override public void handleMouseOver(MapPoint p) {
 		Stage stage = view.getStage();
-		getFutureWithRetry(view.battle.getItemTargetingInfo(selectedCharacter))
-			.ifPresent(tr -> {
-				tr.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_TARGET));
-				view.setSelectable(tr);
-			});
+		stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
+		if (view.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_ATTACKAREA);
 	}
 
 	@Override public void handleMouseOut() {

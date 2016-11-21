@@ -17,7 +17,9 @@ public class ModePush extends Mode {
 	public ModePush(BattleView view, Character selectedCharacter) {
 		this.view = view;
 		this.selectedCharacter = selectedCharacter;
+	}
 
+	@Override public void setupMode() {
 		view.getStage().clearAllHighlighting();
 
 		MapPoint centre = selectedCharacter.getPos();
@@ -35,7 +37,7 @@ public class ModePush extends Mode {
 	@Override public void handleSelection(MapPoint p) {
 		if (view.isSelectable(p)) {
 			view.battle.requestCommand(new PushCommandRequest(selectedCharacter.getPos(), p));
-			view.setDefaultMode();
+			view.modes.nextMode();
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

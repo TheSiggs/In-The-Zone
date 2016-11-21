@@ -10,6 +10,7 @@ import java.util.Optional;
  * A GUI mode.
  * */
 public abstract class Mode {
+	public abstract void setupMode();
 	public abstract void handleSelection(MapPoint p);
 	public abstract void handleMouseOver(MapPoint p);
 	public abstract void handleMouseOut();

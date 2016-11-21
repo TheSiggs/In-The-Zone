@@ -28,7 +28,6 @@ import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
 import isogame.engine.AnimationChain;
-import isogame.engine.Highlighter;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -42,7 +41,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -77,36 +75,22 @@ public class BattleView
 	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
 
 	// Keep track of which squares contain zones
-	private final Collection<MapPoint> zones = new HashSet<>();
+	public final Collection<MapPoint> zones = new HashSet<>();
 
-	// the selected character
+	// The selected character
 	private Optional<Character> selectedCharacter = Optional.empty();
 
-	// the current ability.  If mode is TARGET then this must not be null.
-	private Optional<Ability> rootTargetingAbility = Optional.empty();
-	private Optional<Ability> targetingAbility = Optional.empty();
-	private Collection<MapPoint> targets = new ArrayList<>();
-	private boolean targetingItem = false;
+	// The current mode
+	public final ModeManager modes; 
 
-	// A queue of points from which to recast a recursive ability
-	private MapPoint castFrom = null;
-	private Queue<MapPoint> recastFrom = new LinkedList<>();
-
-	// A queue of characters to retarget
-	private int teleportRange = 0;
-	private Character teleporting = null;
-	private Queue<Character> teleportQueue = new LinkedList<>();
-	private List<MapPoint> teleportDestinations = new ArrayList<>();
-
-	private Mode mode = new ModeSelect(this);
-
-	// status properties for the HUD
+	// Status properties for the HUD
 	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
 	public final BooleanProperty isCharacterSelected = new SimpleBooleanProperty(false);
 	public final BooleanProperty multiTargeting = new SimpleBooleanProperty(false);
 	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
 	public final BooleanProperty areAllItemsUsed = new SimpleBooleanProperty(false);
 
+	// The selection arrow
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
 	private final double[] sarrowx = new double[] {
 		GlobalConstants.TILEW * 3.0/8.0,
@@ -125,6 +109,8 @@ public class BattleView
 		super();
 
 		this.player = player;
+		this.modes = new ModeManager(
+			new ModeSelect(this), new ModeOtherTurn(this), this);
 		this.hud = new HUD(this, gameData.getStandardSprites());
 
 		this.canvas = new MapView(this,
@@ -133,9 +119,16 @@ public class BattleView
 		canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
-		canvas.doOnSelection(handleSelection());
-		canvas.doOnMouseOver(handleMouseOver());
-		canvas.doOnMouseOut(handleMouseOut());
+		canvas.doOnSelection(
+			p -> {
+				if (p == null && modes.getMode().canCancel()) {
+					selectCharacter(Optional.empty());
+				} else  {
+					modes.getMode().handleSelection(p);
+				}
+			});
+		canvas.doOnMouseOver(p -> modes.getMode().handleMouseOver(p));
+		canvas.doOnMouseOut(() -> modes.getMode().handleMouseOut());
 
 		Collection<Sprite> sprites = startBattle.makeSprites();
 		for (Sprite s : sprites) {
@@ -147,32 +140,19 @@ public class BattleView
 			stage.registerAnimationChain(chain);
 			chain.doOnFinished(() -> {
 				s.setAnimation("idle");
-				if (isMyTurn.getValue()) {
-					setDefaultMode();
-					doNextCommand();
-				} else {
-					setMode(new ModeOtherTurn(this));
-				}
+				modes.nextMode();
+				doNextCommand();
 			});
 		}
 
-		canvas.setSelectableSprites(sprites);
-		
 		battle = new BattleInProgress(
 			startBattle, player, otherPlayer, network, gameData, this);
 		(new Thread(battle)).start();
 
+		// init the mode
+		canvas.setSelectableSprites(sprites);
+		modes.nextMode();
 		this.getChildren().addAll(canvas, hud);
-	}
-
-	public void setDefaultMode() {
-		if (teleportQueue.size() > 0) {
-			setMode(new ModeTeleport(this, teleportQueue, teleportRange));
-		} else if (selectedCharacter.isPresent()) {
-			setMode(new ModeMove(this, selectedCharacter.get()));
-		} else {
-			setMode(new ModeSelect(this));
-		}
 	}
 
 	public void selectCharacterById(int id) {
@@ -180,16 +160,17 @@ public class BattleView
 	}
 
 	public void selectCharacter(Optional<Character> c) {
-		if (!mode.isInteractive()) {
+		if (modes.getMode().isInteractive()) {
 			if (c.isPresent() && !c.get().isDead()) {
 				selectedCharacter = c;
 				isCharacterSelected.setValue(true);
-				setMode(new ModeMove(this, c.get()));
+				modes.setBaseMode(new ModeMove(this, c.get()));
 			} else {
 				selectedCharacter = Optional.empty();
 				isCharacterSelected.setValue(false);
-				setMode(new ModeSelect(this));
+				modes.setBaseMode(new ModeSelect(this));
 			}
+			modes.resetMode();
 			hud.selectCharacter(c.orElse(null));
 		}
 	}
@@ -207,32 +188,8 @@ public class BattleView
 			.filter(c -> c.getPos().equals(p)).findFirst();
 	}
 
-	private Consumer<MapPoint> handleSelection() {
-		return p -> {
-			if (p == null && mode.canCancel()) {
-				selectCharacter(Optional.empty());
-			} else  {
-				mode.handleSelection(p);
-			}
-		};
-	}
-
 	public Stage getStage() {
 		return canvas.getStage();
-	}
-
-	// TODO: can we make this private
-	public void setMode(Mode mode) {
-		this.mode = mode;
-		for (MapPoint p : zones) getStage().setHighlight(p, HIGHLIGHT_ZONE);
-	}
-
-	private Consumer<MapPoint> handleMouseOver() {
-		return p -> mode.handleMouseOver(p);
-	}
-
-	private Runnable handleMouseOut() {
-		return () -> mode.handleMouseOut();
 	}
 
 	private SpriteDecalRenderer renderDecals = (cx, s, t, angle) -> {
@@ -266,7 +223,7 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to use item but no character was selected");
 
-		setMode(new ModeTargetItem(this, selectedCharacter.get()));
+		modes.switchMode(new ModeTargetItem(this, selectedCharacter.get()));
 	}
 
 	/**
@@ -276,8 +233,7 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to target ability but no character was selected");
 
-		setMode(ModeTarget.getModeTarget(
-			this, selectedCharacter.get(), ability, recastFrom));
+		modes.switchMode(new ModeTarget(this, selectedCharacter.get(), ability));
 	}
 
 	/**
@@ -285,9 +241,8 @@ public class BattleView
 	 * number of targets.
 	 * */
 	public void applyAbility() {
-		if (mode instanceof ModeTarget) {
-			setMode(((ModeTarget) mode).applyAbility());
-		}
+		Mode mode = modes.getMode();
+		if (mode instanceof ModeTarget) ((ModeTarget) mode).applyAbility();
 	}
 
 	/**
@@ -297,21 +252,21 @@ public class BattleView
 		if (!selectedCharacter.isPresent()) throw new RuntimeException(
 			"Attempted to push but no character was selected");
 
-		setMode(new ModePush(this, selectedCharacter.get()));
+		modes.switchMode(new ModePush(this, selectedCharacter.get()));
 	}
 
 	@Override
 	public void startTurn(List<Targetable> characters) {
 		isMyTurn.setValue(true);
 		updateCharacters(characters);
-		setMode(new ModeSelect(this));
+		modes.resetMode();
 	}
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
 		updateCharacters(characters);
-		setMode(new ModeOtherTurn(this));
+		modes.resetMode();
 	}
 
 	@Override
@@ -331,7 +286,7 @@ public class BattleView
 	@Override
 	public void command(ExecutedCommand ec) {
 		commandQueue.add(ec);
-		if (!(mode instanceof ModeAnimating)) doNextCommand();
+		if (modes.getMode().isInteractive()) doNextCommand();
 	}
 
 	private void doNextCommand() {
@@ -372,7 +327,7 @@ public class BattleView
 				a.showAndWait();
 			}
 
-		} else if (ec.cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
+		} /*else if (ec.cmd instanceof UseAbilityCommand && isMyTurn.getValue() &&
 			targetingAbility.map(a -> a.recursionLevel > 0).orElse(false)
 		) {
 			// add all of the targets of this ability to the recast from list
@@ -381,10 +336,10 @@ public class BattleView
 			}
 			// TODO: revisit this
 			//setMode(TARGET);
-		}
+		}*/
 
 		updateCharacters(ec.affected);
-		if (!(mode instanceof ModeAnimating)) doNextCommand();
+		if (modes.getMode().isInteractive()) doNextCommand();
 	}
 
 	private void instantEffect(
@@ -425,7 +380,7 @@ public class BattleView
 	private void scheduleMovement(
 		String animation, double speed, List<MapPoint> path, Character affected
 	) {
-		setMode(new ModeAnimating(this));
+		modes.switchMode(new ModeAnimating(this));
 		Stage stage = getStage();
 		MapPoint start = path.get(0);
 		MapPoint end = path.get(1);
@@ -524,11 +479,9 @@ public class BattleView
 		if (e instanceof Teleport) {
 			hud.writeMessage("Select teleport destination");
 			Teleport teleport = (Teleport) e;
-			teleportRange = teleport.range;
-			teleportQueue.clear();
-			teleportQueue.addAll(teleport.affectedCharacters);
+			modes.switchMode(new ModeTeleport(this,
+				teleport.affectedCharacters, teleport.range));
 
-			setMode(new ModeTeleport(this, teleportQueue, teleportRange));
 		} else {
 			throw new RuntimeException("Cannot complete instant effect " + e);
 		}

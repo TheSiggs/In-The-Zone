@@ -12,14 +12,13 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_MOVE;
 
 public class ModePush extends Mode {
 	private final Character selectedCharacter;
-	private final BattleView view;
 
 	public ModePush(BattleView view, Character selectedCharacter) {
-		this.view = view;
+		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
-	@Override public void setupMode() {
+	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 
 		MapPoint centre = selectedCharacter.getPos();
@@ -32,12 +31,14 @@ public class ModePush extends Mode {
 		Stage stage = view.getStage();
 		r.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
 		view.setSelectable(r);
+
+		return this;
 	}
 
 	@Override public void handleSelection(MapPoint p) {
 		if (view.isSelectable(p)) {
 			view.battle.requestCommand(new PushCommandRequest(selectedCharacter.getPos(), p));
-			view.modes.nextMode();
+			view.setMode(new ModeAnimating(view));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}
@@ -50,7 +51,7 @@ public class ModePush extends Mode {
 	}
 
 	@Override public void handleMouseOut() {
-		return;
+		view.getStage().clearHighlighting(HIGHLIGHT_ATTACKAREA);
 	}
 }
 

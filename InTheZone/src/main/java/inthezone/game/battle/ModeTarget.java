@@ -15,19 +15,19 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTarget extends Mode {
-	private final BattleView view;
 	private final Character selectedCharacter;
 	private final Queue<MapPoint> recastFrom;
 	private Ability rootTargetingAbility;
 	private Ability targetingAbility;
 	private MapPoint castFrom;
+	private int recursionLevel = 0;
 
 	private Collection<MapPoint> targets = new ArrayList<>();
 
 	public ModeTarget(
 		BattleView view, Character selectedCharacter, Ability ability
 	) {
-		this.view = view;
+		super(view);
 		this.selectedCharacter = selectedCharacter;
 		this.recastFrom = new LinkedList<>();
 		this.rootTargetingAbility = ability;
@@ -35,22 +35,22 @@ public class ModeTarget extends Mode {
 		this.castFrom = selectedCharacter.getPos();
 	}
 
-	@Override public void setupMode() {
+	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 		view.numTargets.setValue(targetingAbility.info.range.nTargets);
 		view.multiTargeting.setValue(targetingAbility.info.range.nTargets > 1);
 
-		if (targetingAbility.recursionLevel > 0) {
+		if (recursionLevel > 0) {
 			castFrom = recastFrom.poll();
 			if (castFrom == null) {
-				view.modes.resetMode(); return;
+				return applyAbility();
 			}
 		}
 
 		if (targetingAbility.info.range.range == 0) {
 			// range 0 abilities get applied immediately
 			targets.add(castFrom);
-			applyAbility();
+			return applyAbility();
 
 		} else {
 			Stage stage = view.getStage();
@@ -60,49 +60,55 @@ public class ModeTarget extends Mode {
 					view.setSelectable(tr);
 				});
 		}
+
+		return this;
 	}
 
-	private void addTarget(MapPoint p) {
+	private Mode addTarget(MapPoint p) {
 		targets.add(p);
 		view.numTargets.setValue(view.numTargets.getValue() - 1);
-		if (view.numTargets.getValue() == 0) applyAbility();
+		if (view.numTargets.getValue() == 0) {
+			return applyAbility();
+		} else {
+			return this;
+		}
 	}
 
 	/**
 	 * Apply the selected ability now, even if we haven't selected the maximum
 	 * number of targets.
 	 * */
-	public void applyAbility() {
-		if (targets.isEmpty()) return; else {
+	public Mode applyAbility() {
+		if (targets.isEmpty()) {
+			return this;
+
+		} else if (recursionLevel < targetingAbility.info.recursion) {
+			recursionLevel += 1;
+			return this;
+
+		} else {
 			view.battle.requestCommand(new UseAbilityCommandRequest(
 				selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
 				selectedCharacter.getPos(), targets, targetingAbility));
 			targets.clear();
 		}
 
+
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
 		if (nextAbility.isPresent()) {
-			// TODO: rethink this
-			//hud.writeMessage("Subsequent!");
 			targetingAbility = nextAbility.get();
-			setupMode();
+			return new ModeAnimating(view, this);
+
 		} else {
-			nextAbility = rootTargetingAbility.getRecursion();
-			if (nextAbility.isPresent()) {
-				//hud.writeMessage("Recursive rebound!");
-				rootTargetingAbility = nextAbility.get();
-				targetingAbility = rootTargetingAbility;
-				setupMode();
-			} else {
-				view.modes.resetMode();
-			}
+			return new ModeAnimating(view);
 		}
 	}
 
 	@Override public void handleSelection(MapPoint p) {
 		if (view.isSelectable(p)) {
-			addTarget(p);
+			Mode r = addTarget(p);
+			if (r != this) view.setMode(r);
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

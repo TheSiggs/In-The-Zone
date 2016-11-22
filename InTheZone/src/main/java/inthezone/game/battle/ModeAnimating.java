@@ -3,27 +3,25 @@ package inthezone.game.battle;
 import isogame.engine.MapPoint;
 
 public class ModeAnimating extends Mode {
-	private final BattleView view;
+	private final Mode previous;
+
 	public ModeAnimating(BattleView view) {
-		this.view = view;
+		this(view, new ModeSelect(view));
 	}
 
-	@Override public void setupMode() {
-		view.getStage().clearAllHighlighting();
+	public ModeAnimating(BattleView view, Mode previous) {
+		super(view);
+		this.previous = previous;
 	}
 
 	@Override public boolean isInteractive() {return false;}
 
-	@Override public void handleSelection(MapPoint p) {
-		return;
-	}
-
-	@Override public void handleMouseOver(MapPoint p) {
-		return;
-	}
-
-	@Override public void handleMouseOut() {
-		return;
+	@Override public Mode animationDone() {
+		if (view.isMyTurn.getValue()) {
+			return previous;
+		} else {
+			return new ModeOtherTurn(view);
+		}
 	}
 }
 

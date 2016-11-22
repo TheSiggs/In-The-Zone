@@ -12,24 +12,27 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTeleport extends Mode {
-	private final BattleView view;
+	private final Mode lastMode;
 	private final Queue<Character> teleportQueue = new LinkedList<>();
 	private final List<MapPoint> teleportDestinations = new ArrayList<>();
 	private final int teleportRange;
 
 	public ModeTeleport(
-		BattleView view, Collection<Character> teleportQueue, int teleportRange
+		BattleView view, Mode lastMode,
+		Collection<Character> teleportQueue, int teleportRange
 	) {
-		this.view = view;
+		super(view);
+		this.lastMode = lastMode;
 		this.teleportQueue.addAll(teleportQueue);
 		this.teleportRange = teleportRange;
 	}
 
-	@Override public void setupMode() {
+	@Override public Mode setupMode() {
 		Character teleporting = teleportQueue.peek();
 		if (teleporting == null) {
 			view.battle.completeEffect(teleportDestinations);
-			view.modes.nextMode();
+			return lastMode;
+
 		} else {
 			Stage stage = view.getStage();
 			stage.clearAllHighlighting();
@@ -40,7 +43,9 @@ public class ModeTeleport extends Mode {
 					mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 					view.setSelectable(mr);
 				});
+			return this;
 		}
+
 	}
 
 	@Override public boolean canCancel() {return false;}
@@ -49,7 +54,8 @@ public class ModeTeleport extends Mode {
 		if (view.isSelectable(p)) {
 			teleportDestinations.add(p);
 			teleportQueue.remove();
-			setupMode();
+			Mode r = setupMode();
+			if (r != this) view.setMode(r);
 		}
 	}
 

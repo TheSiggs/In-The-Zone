@@ -13,30 +13,32 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
  * */
 public class ModeMove extends Mode {
 	private Character selectedCharacter;
-	private BattleView view;
 
 	public ModeMove(BattleView view, Character selectedCharacter) {
+		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
-	@Override public void setupMode() {
+	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 
 		getFutureWithRetry(view.battle.getMoveRange(selectedCharacter)).ifPresent(mr -> {
 			mr.stream().forEach(p -> view.getStage().setHighlight(p, HIGHLIGHT_MOVE));
 			view.setSelectable(mr);
 		});
+
+		return this;
 	}
 
 	@Override public void handleSelection(MapPoint p) {
-		Optional<Character> oc = view.getCharacterAt(p);
+		Optional<Character> oc = view.commands.getCharacterAt(p);
 
 		if (oc.isPresent() && oc.get().player == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));
 		} else if (view.isSelectable(p)) {
 			view.battle.requestCommand(
 				new MoveCommandRequest(selectedCharacter.getPos(), p, selectedCharacter.player));
-			setupMode();
+			view.setMode(new ModeAnimating(view));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

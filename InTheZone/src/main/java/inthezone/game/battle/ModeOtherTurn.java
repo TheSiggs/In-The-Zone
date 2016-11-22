@@ -4,29 +4,20 @@ import isogame.engine.MapPoint;
 import java.util.Optional;
 
 public class ModeOtherTurn extends Mode {
-	private final BattleView view;
-
 	public ModeOtherTurn(BattleView view) {
-		this.view = view;
+		super(view);
 	}
 
-	@Override public void setupMode() {
+	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 		view.selectCharacter(Optional.empty());
+		return this;
 	}
 
 	@Override public boolean isInteractive() {return false;}
 
-	@Override public void handleSelection(MapPoint p) {
-		return;
-	}
-
-	@Override public void handleMouseOver(MapPoint p) {
-		return;
-	}
-
-	@Override public void handleMouseOut() {
-		return;
+	@Override public Mode animationDone() {
+		return this;
 	}
 }
 

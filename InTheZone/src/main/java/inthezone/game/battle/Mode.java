@@ -10,10 +10,31 @@ import java.util.Optional;
  * A GUI mode.
  * */
 public abstract class Mode {
-	public abstract void setupMode();
-	public abstract void handleSelection(MapPoint p);
-	public abstract void handleMouseOver(MapPoint p);
-	public abstract void handleMouseOut();
+	protected final BattleView view;
+
+	protected Mode(BattleView view) {
+		this.view = view;
+	}
+
+	/**
+	 * Start this mode.  Can trigger an instant transition to another mode.
+	 * */
+	public Mode setupMode() {
+		view.getStage().clearAllHighlighting();
+		return this;
+	}
+
+	/**
+	 * An animation is complete.
+	 * */
+	public Mode animationDone() {
+		throw new RuntimeException(
+			"GUI entered an invalid state.  Animation completed but we weren't waiting on any animation");
+	}
+
+	public void handleSelection(MapPoint p) {}
+	public void handleMouseOver(MapPoint p) {}
+	public void handleMouseOut() {}
 	public boolean isInteractive() {return true;}
 	public boolean canCancel() {return true;}
 
@@ -30,6 +51,5 @@ public abstract class Mode {
 			} 
 		}
 	}
-
 }
 

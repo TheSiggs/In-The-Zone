@@ -9,21 +9,22 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTargetItem extends Mode {
-	private final BattleView view;
 	private final Character selectedCharacter;
 
 	public ModeTargetItem(BattleView view, Character selectedCharacter) {
-		this.view = view;
+		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
-	@Override public void setupMode() {
+	@Override public Mode setupMode() {
 		Stage stage = view.getStage();
 		getFutureWithRetry(view.battle.getItemTargetingInfo(selectedCharacter))
 			.ifPresent(tr -> {
 				tr.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_TARGET));
 				view.setSelectable(tr);
 			});
+
+		return this;
 	}
 
 	@Override public void handleSelection(MapPoint p) {
@@ -31,7 +32,7 @@ public class ModeTargetItem extends Mode {
 			view.battle.requestCommand(new UseItemCommandRequest(
 				selectedCharacter.getPos(), p));
 			view.areAllItemsUsed.setValue(true);
-			view.modes.nextMode();
+			view.setMode(new ModeSelect(view));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

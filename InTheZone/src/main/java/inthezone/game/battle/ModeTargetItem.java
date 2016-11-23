@@ -17,6 +17,10 @@ public class ModeTargetItem extends Mode {
 		this.selectedCharacter = selectedCharacter;
 	}
 
+	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+		return new ModeTargetItem(view, selectedCharacter);
+	}
+
 	@Override public Mode setupMode() {
 		Stage stage = view.getStage();
 		getFutureWithRetry(view.battle.requestInfo(new InfoTargetingItem(selectedCharacter)))

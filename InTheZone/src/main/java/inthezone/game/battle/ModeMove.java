@@ -21,6 +21,10 @@ public class ModeMove extends Mode {
 		this.selectedCharacter = selectedCharacter;
 	}
 
+	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+		return new ModeMove(view, selectedCharacter);
+	}
+
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 

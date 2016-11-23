@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
@@ -26,6 +27,12 @@ public class ModeTeleport extends Mode {
 		this.lastMode = lastMode;
 		this.teleportQueue.addAll(teleportQueue);
 		this.teleportRange = teleportRange;
+	}
+
+	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+		return new ModeTeleport(view,
+			lastMode.updateSelectedCharacter(selectedCharacter),
+			teleportQueue, teleportRange);
 	}
 
 	@Override public Mode setupMode() {

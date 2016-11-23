@@ -1,6 +1,8 @@
 package inthezone.game.battle;
 
+import inthezone.battle.Targetable;
 import isogame.engine.MapPoint;
+import java.util.List;
 import java.util.Optional;
 
 public class ModeOtherTurn extends Mode {

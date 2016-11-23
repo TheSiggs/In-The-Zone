@@ -18,6 +18,10 @@ public class ModePush extends Mode {
 		this.selectedCharacter = selectedCharacter;
 	}
 
+	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+		return new ModePush(view, selectedCharacter);
+	}
+
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 

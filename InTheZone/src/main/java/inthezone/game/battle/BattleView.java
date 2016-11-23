@@ -31,6 +31,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ZONE;
 
@@ -53,6 +54,8 @@ public class BattleView
 	public final BooleanProperty multiTargeting = new SimpleBooleanProperty(false);
 	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
 	public final BooleanProperty areAllItemsUsed = new SimpleBooleanProperty(false);
+
+	private boolean inAnimation = false;
 
 	public BattleView(
 		StartBattleCommand startBattle, Player player,
@@ -94,11 +97,11 @@ public class BattleView
 			chain.doOnFinished(() -> {
 				s.setAnimation("idle");
 
-				boolean registeredAnimations = false;
-				while (!registeredAnimations && !commands.isEmpty()) {
-					registeredAnimations = commands.doNextCommand();
+				boolean inAnimation = false;
+				while (!inAnimation && !commands.isEmpty()) {
+					inAnimation = commands.doNextCommand();
 				}
-				if (!registeredAnimations) setMode(mode.animationDone());
+				if (!inAnimation) setMode(mode.animationDone());
 			});
 		}
 
@@ -113,6 +116,8 @@ public class BattleView
 	}
 
 	private Mode mode;
+
+	public Mode getMode() {return mode;}
 
 	/**
 	 * Switch to a different UI mode.
@@ -165,7 +170,7 @@ public class BattleView
 	 * Update information about the selected character.
 	 * */
 	public void updateSelectedCharacter(Character c) {
-		// TODO: update modes too
+		setMode(mode.updateSelectedCharacter(c));
 		selectedCharacter.ifPresent(sc -> {
 			if (sc.id == c.id) selectedCharacter = Optional.of(c);
 		});
@@ -210,20 +215,24 @@ public class BattleView
 	 * The selected character uses an item
 	 * */
 	public void useItem() {
-		if (!selectedCharacter.isPresent()) throw new RuntimeException(
-			"Attempted to use item but no character was selected");
-
-		setMode(new ModeTargetItem(this, selectedCharacter.get()));
+		try {
+			setMode(new ModeTargetItem(this, selectedCharacter.get()));
+		} catch (NoSuchElementException e) {
+			throw new RuntimeException(
+				"Attempted to use item but no character was selected");
+		}
 	}
 
 	/**
 	 * The selected character uses an ability.
 	 * */
 	public void useAbility(Ability ability) {
-		if (!selectedCharacter.isPresent()) throw new RuntimeException(
-			"Attempted to target ability but no character was selected");
-
-		setMode(new ModeTarget(this, selectedCharacter.get(), ability));
+		try {
+			setMode(new ModeTarget(this, selectedCharacter.get(), ability));
+		} catch (NoSuchElementException e) {
+			throw new RuntimeException(
+				"Attempted to target ability but no character was selected");
+		}
 	}
 
 	/**
@@ -231,16 +240,20 @@ public class BattleView
 	 * number of targets.
 	 * */
 	public void applyAbility() {
-		if (mode instanceof ModeTarget) ((ModeTarget) mode).applyAbility();
+		if (mode instanceof ModeTarget)
+			setMode(((ModeTarget) mode).applyAbility());
 	}
 
 	/**
 	 * The selected character initiates a push.
 	 * */
 	public void usePush() {
-		if (!selectedCharacter.isPresent()) throw new RuntimeException(
-			"Attempted to push but no character was selected");
-
+		try {
+			setMode(new ModePush(this, selectedCharacter.get()));
+		} catch (NoSuchElementException e) {
+			throw new RuntimeException(
+				"Attempted to push but no character was selected");
+		}
 	}
 
 	@Override
@@ -272,7 +285,10 @@ public class BattleView
 	@Override
 	public void command(ExecutedCommand ec) {
 		commands.queueCommand(ec);
-		if (mode.isInteractive()) commands.doNextCommand();
+		if (!inAnimation) {
+			inAnimation = commands.doNextCommand();
+			if (!inAnimation) setMode(mode.animationDone());
+		}
 	}
 
 	@Override

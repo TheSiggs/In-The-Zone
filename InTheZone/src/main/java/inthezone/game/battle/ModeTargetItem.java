@@ -37,7 +37,7 @@ public class ModeTargetItem extends Mode {
 			view.battle.requestCommand(new UseItemCommandRequest(
 				selectedCharacter.getPos(), p));
 			view.areAllItemsUsed.setValue(true);
-			view.setMode(new ModeSelect(view));
+			view.setMode(new ModeAnimating(view));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

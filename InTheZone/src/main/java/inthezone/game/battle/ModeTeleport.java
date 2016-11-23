@@ -14,13 +14,13 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTeleport extends Mode {
-	private final Mode lastMode;
+	private final ModeAnimating lastMode;
 	private final Queue<Character> teleportQueue = new LinkedList<>();
 	private final List<MapPoint> teleportDestinations = new ArrayList<>();
 	private final int teleportRange;
 
 	public ModeTeleport(
-		BattleView view, Mode lastMode,
+		BattleView view, ModeAnimating lastMode,
 		Collection<Character> teleportQueue, int teleportRange
 	) {
 		super(view);
@@ -62,8 +62,7 @@ public class ModeTeleport extends Mode {
 		if (view.isSelectable(p)) {
 			teleportDestinations.add(p);
 			teleportQueue.remove();
-			Mode r = setupMode();
-			if (r != this) view.setMode(r);
+			view.setMode(setupMode());
 		}
 	}
 

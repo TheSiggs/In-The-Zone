@@ -12,10 +12,12 @@ import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
@@ -23,11 +25,16 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 public class ModeTarget extends Mode {
 	private final Character selectedCharacter;
 	private final Queue<MapPoint> recastFrom;
-	private Ability rootTargetingAbility;
 	private Ability targetingAbility;
 	private MapPoint castFrom;
 	private int recursionLevel = 0;
 	private int remainingTargets;
+	private boolean canCancel = true;
+
+	@Override public boolean canCancel() {return canCancel;}
+
+	// used for recursion to track which characters we've already rebounded off.
+	private final Set<MapPoint> retargetedFrom = new HashSet<>();
 
 	private final Collection<MapPoint> allTargets = new ArrayList<>();
 	private final Collection<MapPoint> thisRoundTargets = new ArrayList<>();
@@ -38,42 +45,47 @@ public class ModeTarget extends Mode {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 		this.recastFrom = new LinkedList<>();
-		this.rootTargetingAbility = ability;
 		this.targetingAbility = ability;
 		this.castFrom = selectedCharacter.getPos();
 		this.remainingTargets = ability.info.range.nTargets;
+		retargetedFrom.add(selectedCharacter.getPos());
 	}
 
 	private ModeTarget(
 		BattleView view,
 		Character selectedCharacter,
 		Queue<MapPoint> recastFrom,
-		Ability rootTargetingAbility,
 		Ability targetingAbility,
 		MapPoint castFrom,
+		boolean canCancel,
 		int recursionLevel,
 		int remainingTargets,
+		Set<MapPoint> retargetedFrom,
 		Collection<MapPoint> allTargets,
 		Collection<MapPoint> thisRoundTargets
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 		this.recastFrom = recastFrom;
-		this.rootTargetingAbility = rootTargetingAbility;
 		this.targetingAbility = targetingAbility;
 		this.castFrom = castFrom;
+		this.canCancel = canCancel;
 		this.recursionLevel = recursionLevel;
 		this.remainingTargets = remainingTargets;
+		this.retargetedFrom.addAll(retargetedFrom);
 		this.allTargets.addAll(allTargets);
 		this.thisRoundTargets.addAll(thisRoundTargets);
 	}
 
 	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
-		return new ModeTarget(
+		ModeTarget r = new ModeTarget(
 			view, selectedCharacter, recastFrom,
-			rootTargetingAbility, targetingAbility,
-			castFrom, recursionLevel,
-			remainingTargets, allTargets, thisRoundTargets);
+			targetingAbility, castFrom, canCancel, recursionLevel,
+			remainingTargets, retargetedFrom,
+			allTargets, thisRoundTargets);
+		r.retargetedFrom.remove(this.selectedCharacter.getPos());
+		r.retargetedFrom.add(selectedCharacter.getPos());
+		return r;
 	}
 
 	@Override public Mode setupMode() {
@@ -117,25 +129,30 @@ public class ModeTarget extends Mode {
 		if (allTargets.isEmpty()) {
 			return this;
 
-		} else {
-			if (recursionLevel < targetingAbility.info.recursion) {
-				recursionLevel += 1;
+		} else if (recursionLevel < targetingAbility.info.recursion) {
+			recursionLevel += 1;
 
-				// get the recast points
-				getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
-						selectedCharacter, targetingAbility, castFrom, thisRoundTargets)))
-					.ifPresent(affected -> queueRecastPoints(affected));
+			// get the recast points
+			getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
+					selectedCharacter, targetingAbility, castFrom, thisRoundTargets)))
+				.ifPresent(affected -> {
+					queueRecastPoints(affected);
+					retargetedFrom.addAll(affected.stream().map(t ->
+						t.getPos()).collect(Collectors.toList()));
+				});
 
-				thisRoundTargets.clear();
-				castFrom = recastFrom.poll();
-				remainingTargets = targetingAbility.info.range.nTargets;
-				if (castFrom != null) return this;
-			}
-
-			view.battle.requestCommand(new UseAbilityCommandRequest(
-				selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
-				selectedCharacter.getPos(), allTargets, targetingAbility));
+			thisRoundTargets.clear();
+			castFrom = recastFrom.poll();
+			remainingTargets = targetingAbility.info.range.nTargets;
+			if (castFrom != null) return this;
+			retargetedFrom.clear();
 		}
+
+		canCancel = false;
+		view.multiTargeting.setValue(false);
+		view.battle.requestCommand(new UseAbilityCommandRequest(
+			selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
+			selectedCharacter.getPos(), allTargets, targetingAbility));
 
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
@@ -156,7 +173,7 @@ public class ModeTarget extends Mode {
 	private void queueRecastPoints(Collection<Targetable> affected) {
 		recastFrom.addAll(affected.stream()
 			.filter(t -> t instanceof Character &&
-				((Character) t).player == view.player)
+				!retargetedFrom.contains(t.getPos()))
 			.map(t -> t.getPos())
 			.collect(Collectors.toList()));
 	}

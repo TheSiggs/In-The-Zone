@@ -20,7 +20,7 @@ public class ModeAnimating extends Mode {
 
 	@Override public boolean isInteractive() {return false;}
 
-	@Override public Mode updateSelectedCharacter(Character selected) {
+	@Override public ModeAnimating updateSelectedCharacter(Character selected) {
 		return new ModeAnimating(view, previous.updateSelectedCharacter(selected));
 	}
 

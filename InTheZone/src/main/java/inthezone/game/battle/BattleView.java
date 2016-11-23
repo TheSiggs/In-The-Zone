@@ -18,7 +18,6 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
-import isogame.engine.AnimationChain;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -42,6 +41,7 @@ public class BattleView
 	public final BattleInProgress battle;
 	public final Player player;
 	public final CommandProcessor commands;
+	public final SpriteManager sprites;
 	private Optional<Character> selectedCharacter = Optional.empty();
 
 	// UI components
@@ -55,7 +55,11 @@ public class BattleView
 	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
 	public final BooleanProperty areAllItemsUsed = new SimpleBooleanProperty(false);
 
+	// Are we expecting an animation completion event from the game engine.
 	private boolean inAnimation = false;
+
+	// Instant effect completions must be delayed until the command queue is empty.
+	private Optional<Runnable> instantEffectCompletion = Optional.empty();
 
 	public BattleView(
 		StartBattleCommand startBattle, Player player,
@@ -86,32 +90,30 @@ public class BattleView
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
 
 		final DecalRenderer decals = new DecalRenderer(this);
-		final Collection<Sprite> sprites = startBattle.makeSprites();
-		for (Sprite s : sprites) {
-			Stage stage = getStage();
-			stage.addSprite(s);
-			s.setDecalRenderer(decals);
+		final Collection<Sprite> allSprites = startBattle.makeSprites();
+		this.sprites = new SpriteManager(this, allSprites, decals, () -> {
+			inAnimation = false;
+			while (!inAnimation && !commands.isEmpty()) {
+				inAnimation = commands.doNextCommand();
+			}
 
-			AnimationChain chain = new AnimationChain(s);
-			stage.registerAnimationChain(chain);
-			chain.doOnFinished(() -> {
-				s.setAnimation("idle");
-
-				inAnimation = false;
-				while (!inAnimation && !commands.isEmpty()) {
-					inAnimation = commands.doNextCommand();
+			if (!inAnimation) {
+				if (commands.isEmpty() && instantEffectCompletion.isPresent()) {
+					instantEffectCompletion.get().run();
+					instantEffectCompletion = Optional.empty();
+				} else {
+					setMode(mode.animationDone());
 				}
-				if (!inAnimation) setMode(mode.animationDone());
-			});
-		}
+			}
+		});
 
 		battle = new BattleInProgress(
 			startBattle, player, otherPlayer, network, gameData, this);
 		(new Thread(battle)).start();
 
 		// init the mode
-		canvas.setSelectableSprites(sprites);
-		setMode(new ModeSelect(this));
+		canvas.setSelectableSprites(allSprites);
+		setMode(new ModeAnimating(this));
 		this.getChildren().addAll(canvas, hud);
 	}
 
@@ -126,7 +128,7 @@ public class BattleView
 		this.mode = mode.setupMode();
 		System.err.println("Setting mode " + mode + ", transformed to " + this.mode);
 		Stage stage = getStage();
-		for (MapPoint p : commands.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
+		for (MapPoint p : sprites.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
 
 	/**
@@ -145,7 +147,7 @@ public class BattleView
 	 * Select a particular character.
 	 * */
 	public void selectCharacterById(int id) {
-		selectCharacter(Optional.ofNullable(commands.characters.get(id)));
+		selectCharacter(Optional.ofNullable(sprites.getCharacterById(id)));
 	}
 
 	/**
@@ -264,14 +266,14 @@ public class BattleView
 	@Override
 	public void startTurn(List<Targetable> characters) {
 		isMyTurn.setValue(true);
-		commands.updateCharacters(characters);
+		sprites.updateCharacters(characters);
 		setMode(new ModeSelect(this));
 	}
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
-		commands.updateCharacters(characters);
+		sprites.updateCharacters(characters);
 	}
 
 	@Override
@@ -295,15 +297,28 @@ public class BattleView
 
 	@Override
 	public void completeEffect(InstantEffect e) {
-		if (e instanceof Teleport) {
-			hud.writeMessage("Select teleport destination");
-			Teleport teleport = (Teleport) e;
-			setMode(new ModeTeleport(this, mode,
-				teleport.affectedCharacters, teleport.range));
+		if (instantEffectCompletion.isPresent()) throw new RuntimeException(
+			"Invalid UI state.  Attempted to complete an instant effect, but we're already completing a different instant effect");
 
-		} else {
-			throw new RuntimeException("Cannot complete instant effect " + e);
-		}
+		instantEffectCompletion = Optional.of(() -> {
+			System.err.println("complete effect now");
+			if (e instanceof Teleport) {
+				hud.writeMessage("Select teleport destination");
+				Teleport teleport = (Teleport) e;
+
+				try {
+					System.err.println("Now the mode is " + this.mode);
+					setMode(new ModeTeleport(this, (ModeAnimating) this.mode,
+						teleport.affectedCharacters, teleport.range));
+				} catch (ClassCastException ee) {
+					throw new RuntimeException(
+						"Invalid UI state.  Attempted to teleport from a non-animating mode.");
+				}
+
+			} else {
+				throw new RuntimeException("Cannot complete instant effect " + e);
+			}
+		});
 	}
 }
 

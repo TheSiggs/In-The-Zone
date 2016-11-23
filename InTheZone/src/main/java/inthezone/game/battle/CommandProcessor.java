@@ -1,7 +1,6 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
-import inthezone.battle.commands.Command;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
@@ -13,21 +12,12 @@ import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.PullPush;
 import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
-import inthezone.battle.Zone;
 import isogame.engine.MapPoint;
-import isogame.engine.Sprite;
-import isogame.engine.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 /**
  * Schedule animations in response to commands from the battle layer.
@@ -37,10 +27,6 @@ public class CommandProcessor {
 	private final static double pushSpeed = 2;
 
 	private final Queue<ExecutedCommand> commandQueue = new LinkedList<>();
-	public final Map<Integer, Character> characters = new HashMap<>();
-	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
-	public final Collection<MapPoint> zones = new HashSet<>();
-
 	private final BattleView view;
 
 	public CommandProcessor(BattleView view) {
@@ -49,11 +35,6 @@ public class CommandProcessor {
 
 	public boolean isEmpty() {
 		return commandQueue.isEmpty();
-	}
-
-	public Optional<Character> getCharacterAt(MapPoint p) {
-		return characters.values().stream()
-			.filter(c -> c.getPos().equals(p)).findFirst();
 	}
 
 	/**
@@ -70,6 +51,8 @@ public class CommandProcessor {
 	public boolean doNextCommand() {
 		ExecutedCommand ec = commandQueue.poll();
 		if (ec == null) return false;
+
+		System.err.println(ec.cmd.getJSON().toString());
 
 		final boolean registeredAnimations;
 
@@ -88,7 +71,7 @@ public class CommandProcessor {
 			if (path.size() < 2) return false;
 
 			Character agent = (Character) ec.affected.get(0);
-			scheduleMovement("walk", walkSpeed, path, agent);
+			view.sprites.scheduleMovement("walk", walkSpeed, path, agent);
 			registeredAnimations = true;
 
 		} else if (ec.cmd instanceof PushCommand) {
@@ -121,7 +104,7 @@ public class CommandProcessor {
 			registeredAnimations = false;
 		}
 
-		updateCharacters(ec.affected);
+		view.sprites.updateCharacters(ec.affected);
 		return registeredAnimations;
 	}
 
@@ -131,8 +114,6 @@ public class CommandProcessor {
 	private boolean instantEffect(
 		InstantEffect effect, List<Targetable> affectedCharacters
 	) {
-		Stage stage = view.getStage();
-
 		if (effect instanceof PullPush) {
 			PullPush pullpush = (PullPush) effect;
 			if (pullpush.paths.size() != affectedCharacters.size()) {
@@ -140,7 +121,7 @@ public class CommandProcessor {
 			}
 
 			for (int i = 0; i < pullpush.paths.size(); i++) {
-				scheduleMovement("idle", pushSpeed,
+				view.sprites.scheduleMovement("idle", pushSpeed,
 					pullpush.paths.get(i), (Character) affectedCharacters.get(i));
 			}
 			return true;
@@ -154,10 +135,8 @@ public class CommandProcessor {
 
 			for (int i = 0; i < destinations.size(); i++) {
 				int id = ((Character) affectedCharacters.get(i)).id;
-				MapPoint tile = characters.get(id).getPos();
-				Sprite s = stage.getSpritesByTile(tile).stream()
-					.filter(x -> x.userData.equals(id)).findFirst().get();
-				stage.queueTeleportSprite(s, destinations.get(i));
+				view.sprites.scheduleTeleport(
+					view.sprites.getCharacterById(id), destinations.get(i));
 			}
 			return true;
 
@@ -166,98 +145,5 @@ public class CommandProcessor {
 		}
 	}
 
-	private void scheduleMovement(
-		String animation, double speed, List<MapPoint> path, Character affected
-	) {
-		Stage stage = view.getStage();
-		MapPoint start = path.get(0);
-		MapPoint end = path.get(1);
-		MapPoint v = end.subtract(start);
-
-		int id = affected.id;
-		Sprite s = stage.getSpritesByTile(start).stream()
-			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
-
-		for (MapPoint p : path.subList(2, path.size())) {
-			if (!end.add(v).equals(p)) {
-				stage.queueMoveSprite(s, start, end, animation, speed);
-				start = end;
-				v = p.subtract(start);
-			}
-			end = p;
-		}
-
-		stage.queueMoveSprite(s, start, end, animation, speed);
-	}
-
-	public void updateCharacters(List<? extends Targetable> characters) {
-		if (this.characters.isEmpty()) {
-			for (Targetable c : characters) {
-				if (c instanceof Character)
-					this.characters.put(((Character) c).id, (Character) c);
-			}
-			view.hud.init(this.characters.values().stream()
-				.filter(c -> c.player == view.player).collect(Collectors.toList()));
-
-		} else {
-			for (Targetable t : characters) {
-				if (t instanceof Character) {
-					Character c = (Character) t;
-					Character old = this.characters.get(c.id);
-					view.updateSelectedCharacter(c);
-
-					if (old != null) {
-						if (c.player == view.player) view.hud.updateAbilities(c, c.hasMana());
-						CharacterInfoBox box = view.hud.characters.get(c.id);
-						if (box != null) {
-							box.updateAP(c.getAP(), c.getStats().ap);
-							box.updateMP(c.getMP(), c.getStats().mp);
-							box.updateHP(c.getHP(), c.getMaxHP());
-							box.updateStatus(c.getStatusBuff(), c.getStatusDebuff());
-						}
-
-					}
-
-					if (c.isDead()) {
-						Sprite s = view.getStage().getSpritesByTile(c.getPos()).stream()
-							.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
-						s.setAnimation("dead");
-					}
-
-					this.characters.put(c.id, c);
-				}
-			}
-		}
-
-		handleTemporaryImmobileObjects(characters);
-	}
-
-	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
-		for (Targetable t : tios) {
-			if (t instanceof Character) {
-				continue;
-
-			} else if (t instanceof Zone) {
-				if (t.reap()) {
-					zones.removeAll(((Zone) t).range);
-					view.resetHighlighting();
-
-				} else {
-					zones.addAll(((Zone) t).range);
-					view.resetHighlighting();
-				}
-				
-			} else if (t.reap()) {
-				Sprite s = temporaryImmobileObjects.remove(t.getPos());
-				if (s != null) view.getStage().removeSprite(s);
-
-			} else if (!temporaryImmobileObjects.containsKey(t.getPos())) {
-				Sprite s = new Sprite(t.getSprite());
-				s.pos = t.getPos();
-				view.getStage().addSprite(s);
-				temporaryImmobileObjects.put(t.getPos(), s);
-			}
-		}
-	}
 }
 

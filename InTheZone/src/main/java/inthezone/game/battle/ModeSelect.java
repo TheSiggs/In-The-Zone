@@ -20,7 +20,7 @@ public class ModeSelect extends Mode {
 	}
 
 	@Override public void handleSelection(MapPoint p) {
-		Optional<Character> oc = view.commands.getCharacterAt(p);
+		Optional<Character> oc = view.sprites.getCharacterAt(p);
 
 		if (oc.isPresent() && oc.get().player == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));

@@ -126,7 +126,6 @@ public class BattleView
 	 * */
 	public void setMode(Mode mode) {
 		this.mode = mode.setupMode();
-		System.err.println("Setting mode " + mode + ", transformed to " + this.mode);
 		Stage stage = getStage();
 		for (MapPoint p : sprites.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
@@ -272,7 +271,9 @@ public class BattleView
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
+		selectedCharacter = Optional.empty();
 		isMyTurn.setValue(false);
+		setMode(new ModeOtherTurn(this));
 		sprites.updateCharacters(characters);
 	}
 
@@ -301,13 +302,11 @@ public class BattleView
 			"Invalid UI state.  Attempted to complete an instant effect, but we're already completing a different instant effect");
 
 		instantEffectCompletion = Optional.of(() -> {
-			System.err.println("complete effect now");
 			if (e instanceof Teleport) {
 				hud.writeMessage("Select teleport destination");
 				Teleport teleport = (Teleport) e;
 
 				try {
-					System.err.println("Now the mode is " + this.mode);
 					setMode(new ModeTeleport(this, (ModeAnimating) this.mode,
 						teleport.affectedCharacters, teleport.range));
 				} catch (ClassCastException ee) {

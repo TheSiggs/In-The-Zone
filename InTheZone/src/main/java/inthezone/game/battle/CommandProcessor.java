@@ -52,8 +52,6 @@ public class CommandProcessor {
 		ExecutedCommand ec = commandQueue.poll();
 		if (ec == null) return false;
 
-		System.err.println(ec.cmd.getJSON().toString());
-
 		final boolean registeredAnimations;
 
 		if (ec.cmd instanceof UseAbilityCommand && !view.isMyTurn.getValue()) {
@@ -85,7 +83,6 @@ public class CommandProcessor {
 			registeredAnimations = instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
 
 		} else if (ec.cmd instanceof EndTurnCommand) {
-			view.isMyTurn.setValue(!view.isMyTurn.getValue());
 			registeredAnimations = false;
 
 		} else if (ec.cmd instanceof ResignCommand) {

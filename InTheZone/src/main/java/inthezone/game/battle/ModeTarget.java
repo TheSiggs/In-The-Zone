@@ -4,6 +4,8 @@ import inthezone.battle.Ability;
 import inthezone.battle.Character;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.comptroller.InfoAttackArea;
+import inthezone.comptroller.InfoTargeting;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
@@ -54,8 +56,8 @@ public class ModeTarget extends Mode {
 
 		} else {
 			Stage stage = view.getStage();
-			getFutureWithRetry(view.battle.getTargetingInfo(
-				selectedCharacter, castFrom, targetingAbility)).ifPresent(tr -> {
+			getFutureWithRetry(view.battle.requestInfo(new InfoTargeting(
+				selectedCharacter, castFrom, targetingAbility))).ifPresent(tr -> {
 					tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 					view.setSelectable(tr);
 				});
@@ -119,8 +121,8 @@ public class ModeTarget extends Mode {
 		stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
 		if (!stage.isHighlighted(p)) return;
 
-		getFutureWithRetry(view.battle.getAttackArea(
-				selectedCharacter, castFrom, p, targetingAbility))
+		getFutureWithRetry(view.battle.requestInfo(new InfoAttackArea(
+				selectedCharacter, targetingAbility, castFrom, p)))
 			.ifPresent(area -> area.stream().forEach(pp ->
 				stage.setHighlight(pp, HIGHLIGHT_ATTACKAREA)));
 	}

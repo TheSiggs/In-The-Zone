@@ -2,6 +2,8 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.commands.MoveCommandRequest;
+import inthezone.comptroller.InfoMoveRange;
+import inthezone.comptroller.InfoPath;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.Optional;
@@ -22,10 +24,11 @@ public class ModeMove extends Mode {
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 
-		getFutureWithRetry(view.battle.getMoveRange(selectedCharacter)).ifPresent(mr -> {
-			mr.stream().forEach(p -> view.getStage().setHighlight(p, HIGHLIGHT_MOVE));
-			view.setSelectable(mr);
-		});
+		getFutureWithRetry(view.battle.requestInfo(new InfoMoveRange(selectedCharacter)))
+			.ifPresent(mr -> {
+				mr.stream().forEach(p -> view.getStage().setHighlight(p, HIGHLIGHT_MOVE));
+				view.setSelectable(mr);
+			});
 
 		return this;
 	}
@@ -48,7 +51,7 @@ public class ModeMove extends Mode {
 		Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_PATH);
 
-		getFutureWithRetry(view.battle.getPath(selectedCharacter, p))
+		getFutureWithRetry(view.battle.requestInfo(new InfoPath(selectedCharacter, p)))
 			.ifPresent(path -> path.stream()
 				.forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH)));
 	}

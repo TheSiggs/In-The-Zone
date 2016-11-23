@@ -1,23 +1,17 @@
 package inthezone.comptroller;
 
 import inthezone.ai.CommandGenerator;
-import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleOutcome;
-import inthezone.battle.Character;
-import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
-import inthezone.battle.commands.FatigueCommand;
 import inthezone.battle.commands.InstantEffectCommand;
-import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
-import inthezone.battle.LineOfSight;
 import inthezone.battle.Targetable;
 import inthezone.battle.Zone;
 import isogame.engine.MapPoint;
@@ -25,16 +19,12 @@ import javafx.application.Platform;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class BattleInProgress implements Runnable {
 	private final Battle battle;
@@ -89,7 +79,8 @@ public class BattleInProgress implements Runnable {
 			commandRequests.drainTo(actions);
 		}
 
-		for (Action a : actions) a.cancel();
+		for (Action a : actions)
+			if (a instanceof InfoRequest) ((InfoRequest) a).cancel();
 	}
 
 	@Override
@@ -135,52 +126,29 @@ public class BattleInProgress implements Runnable {
 		while(true) {
 			try {
 				Action a = commandRequests.take();
+				a.completeAction(battle);
+				Optional<CommandRequest> crq = a.getCommandRequest();
 
 				// handle a command request
-				if (a.crq.isPresent()) {
-					try {
-						commandQueue.addAll(a.crq.get().makeCommand(battle.battleState));
-						if (doCommands()) return;
-					} catch (CommandException e) {
-						Platform.runLater(() -> listener.badCommand(e));
-					}
+				if (crq.isPresent()) {
+					commandQueue.addAll(crq.get().makeCommand(battle.battleState));
+					if (doCommands()) return;
 				}
 
-				// handle a move range request
-				a.moveRange.ifPresent(moveRange ->
-					moveRange.complete(computeMoveRange(a.subject)));
-				a.path.ifPresent(path ->
-					path.complete(battle.battleState.findValidPath(
-						a.subject.getPos(), a.target, a.subject.player)));
-				a.teleportRange.ifPresent(teleportRange ->
-					teleportRange.complete(computeTeleportRange(a.subject, a.range)));
-
-				// handle targeting request
-				a.targeting.ifPresent(targeting -> {
-						targeting.complete(battle.battleState.getTargetableArea(
-							a.subject.getPos(), a.castFrom, a.ability));
-					});
-				a.attackArea.ifPresent(attackArea ->
-					attackArea.complete(battle.battleState.getAffectedArea(
-						a.subject.getPos(), AbilityAgentType.CHARACTER,
-						a.castFrom, a.ability, a.target)));
-				a.itemTargeting.ifPresent(itemTargeting ->
-					itemTargeting.complete(battle.battleState.getItemArea(a.subject.getPos())));
-
 				// handle command completion
-				if (a.completion.isPresent()) {
-					try {
-						Command cmd = commandQueue.peek();
-						if (cmd == null)
-							throw new CommandException("No command to complete");
-						InstantEffectCommand i = (InstantEffectCommand) cmd;
-						i.complete(a.completion.get());
+				if (a instanceof ActionComplete) {
+					Command cmd = commandQueue.peek();
+					if (cmd == null)
+						throw new CommandException("No command to complete");
 
+					try {
+						((ActionComplete) a).completeCommand((InstantEffectCommand) cmd);
 						if (doCommands()) return;
 					} catch (ClassCastException e) {
 						Platform.runLater(() -> listener.badCommand(
 							new CommandException("Expected instant effect command", e)));
 					}
+
 				}
 			} catch (InterruptedException e) {
 				// Do nothing
@@ -260,113 +228,22 @@ public class BattleInProgress implements Runnable {
 		}
 	}
 
+	/**
+	 * Send a command request.
+	 * */
 	public synchronized void requestCommand(CommandRequest cmd) {
 		if (!accepting) return;
-		queueActionWithRetry(new Action(cmd));
+		queueActionWithRetry(new Action(Optional.of(cmd)));
 	}
 
 	/**
-	 * Get a path for a character to a target.
-	 * @return the empty list if there is no path.
+	 * Send a request for information, getting the result as a future.
 	 * */
-	public synchronized Future<List<MapPoint>> getPath(Character c, MapPoint target) {
-		CompletableFuture<List<MapPoint>> r = new CompletableFuture<>();
-
-		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(Action.path(c, target, r));
+	public synchronized <T> Future<T> requestInfo(InfoRequest<T> r) {
+		if (!accepting) r.cancel(); else {
+			queueActionWithRetry(r);
 		}
-		return r;
-	}
-
-	/**
-	 * Get all the points that a character could move to on this turn.
-	 * */
-	public synchronized Future<Collection<MapPoint>> getMoveRange(Character c) {
-		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-
-		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(Action.moveRange(c, r));
-		}
-		return r;
-	}
-
-	/**
-	 * Compute all the points that a character could move to on this turn.
-	 * */
-	private Collection<MapPoint> computeMoveRange(Character c) {
-		Set<MapPoint> r = new HashSet<>();
-		int w = battle.battleState.terrain.terrain.w;
-		int h = battle.battleState.terrain.terrain.h;
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				MapPoint p = new MapPoint(x, y);
-				List<MapPoint> path = battle.battleState.findPath(c.getPos(), p, c.player);
-				if (battle.battleState.canMove(path)) r.add(p);
-			}
-		}
-
-		return r;
-	}
-
-	private Collection<MapPoint> computeTeleportRange(Character c, int range) {
-		Collection<MapPoint> diamond = LineOfSight.getDiamond(c.getPos(), range);
-		return diamond.stream()
-			.filter(p -> battle.battleState.isSpaceFree(p))
-			.collect(Collectors.toList());
-	}
-
-	/**
-	 * Get all of the possible targets for an ability.
-	 * */
-	public synchronized Future<Collection<MapPoint>> getTargetingInfo(
-		Character c, MapPoint castFrom, Ability a
-	) {
-		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-
-		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(Action.targeting(c, castFrom, a, r));
-		}
-		return r;
-	}
-
-	public synchronized Future<Collection<MapPoint>> getItemTargetingInfo(
-		Character c
-	) {
-		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-
-		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(Action.itemTargeting(c, r));
-		}
-		return r;
-	}
-
-	/**
-	 * Get all of the points that would be affected if we target the specified
-	 * square.
-	 * */
-	public synchronized Future<Collection<MapPoint>> getAttackArea(
-		Character c, MapPoint castFrom, MapPoint target, Ability a
-	) {
-		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-
-		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(Action.attackArea(c, castFrom, target, a, r));
-		}
-		return r;
-	}
-
-	/**
-	 * Get all the tiles we can teleport to.
-	 * */
-	public synchronized Future<Collection<MapPoint>> getTeleportRange(
-		Character c, int range
-	) {
-		CompletableFuture<Collection<MapPoint>> r = new CompletableFuture<>();
-
-		if (!accepting) r.cancel(true); else {
-			queueActionWithRetry(Action.teleportRange(c, range, r));
-		}
-		return r;
+		return r.complete;
 	}
 
 	/**
@@ -375,7 +252,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	public synchronized void completeEffect(List<MapPoint> completion) {
 		if (accepting) {
-			queueActionWithRetry(new Action(completion));
+			queueActionWithRetry(new ActionComplete(completion));
 		}
 	}
 }

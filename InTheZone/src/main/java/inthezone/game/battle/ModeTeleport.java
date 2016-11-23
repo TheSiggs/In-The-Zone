@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
+import inthezone.comptroller.InfoTeleportRange;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class ModeTeleport extends Mode {
 		} else {
 			Stage stage = view.getStage();
 			stage.clearAllHighlighting();
-			getFutureWithRetry(view.battle.getTeleportRange(teleporting, teleportRange))
-				.ifPresent(mr -> {
+			getFutureWithRetry(view.battle.requestInfo(
+				new InfoTeleportRange(teleporting, teleportRange))).ifPresent(mr -> {
 					mr.add(teleporting.getPos());
 					mr.removeAll(teleportDestinations);
 					mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));

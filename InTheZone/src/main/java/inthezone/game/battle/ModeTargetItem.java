@@ -2,6 +2,7 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.commands.UseItemCommandRequest;
+import inthezone.comptroller.InfoTargetingItem;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.Optional;
@@ -18,7 +19,7 @@ public class ModeTargetItem extends Mode {
 
 	@Override public Mode setupMode() {
 		Stage stage = view.getStage();
-		getFutureWithRetry(view.battle.getItemTargetingInfo(selectedCharacter))
+		getFutureWithRetry(view.battle.requestInfo(new InfoTargetingItem(selectedCharacter)))
 			.ifPresent(tr -> {
 				tr.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_TARGET));
 				view.setSelectable(tr);

@@ -318,6 +318,11 @@ public class BattleView
 				throw new RuntimeException("Cannot complete instant effect " + e);
 			}
 		});
+
+		if (!inAnimation) {
+			instantEffectCompletion.get().run();
+			instantEffectCompletion = Optional.empty();
+		}
 	}
 }
 

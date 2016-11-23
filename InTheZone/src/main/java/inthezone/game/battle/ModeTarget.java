@@ -99,6 +99,12 @@ public class ModeTarget extends Mode {
 			return applyAbility();
 
 		} else {
+			if (recursionLevel > 0) {
+				view.hud.writeMessage("Recursive rebound " + recursionLevel + "!");
+			}
+			if (!canCancel) {
+				view.hud.writeMessage("The attack rebounds!");
+			}
 			Stage stage = view.getStage();
 			getFutureWithRetry(view.battle.requestInfo(new InfoTargeting(
 				selectedCharacter, castFrom, targetingAbility))).ifPresent(tr -> {
@@ -158,6 +164,7 @@ public class ModeTarget extends Mode {
 
 		if (nextAbility.isPresent()) {
 			thisRoundTargets.clear();
+			allTargets.clear();
 			targetingAbility = nextAbility.get();
 			return new ModeAnimating(view, this);
 

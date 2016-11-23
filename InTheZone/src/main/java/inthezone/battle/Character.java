@@ -192,7 +192,7 @@ public class Character extends Targetable {
 	}
 
 	public void useAbility(Ability ability) {
-		if (ability.subsequentLevel == 0 && ability.recursionLevel == 0) {
+		if (ability.subsequentLevel == 0) {
 			ap -= ability.info.ap;
 			mp -= ability.info.mp;
 			if (ap < 0) ap = 0;

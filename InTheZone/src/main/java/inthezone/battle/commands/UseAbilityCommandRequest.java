@@ -37,7 +37,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 		if ((ability.info.trap) && agentType == AbilityAgentType.CHARACTER) {
 			commands.add(new UseAbilityCommand(agent, agentType, castFrom,
-				ability.rootName, targets, new ArrayList<>(), 0, 0));
+				ability.rootName, targets, new ArrayList<>(), 0));
 
 		} else {
 			// get the targets
@@ -80,7 +80,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			// Main damage
 			mainEffect = new UseAbilityCommand(agent, agentType,
 				castFrom, ability.rootName, targets, allTargets,
-				ability.subsequentLevel, ability.recursionLevel);
+				ability.subsequentLevel);
 				
 			// Post instant effect
 			if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {

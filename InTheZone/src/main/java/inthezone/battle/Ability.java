@@ -14,54 +14,42 @@ public class Ability {
 	public final boolean isMana;
 	public final String rootName;
 	public final int subsequentLevel;
-	public final int recursionLevel;
 
 	public Ability(AbilityInfo info) {
 		this.info = info;
 		this.rootName = info.name;
 		this.subsequentLevel = 0;
-		this.recursionLevel = 0;
 		this.isMana = false;
 	}
 
 	private Ability(
 		AbilityInfo info, String name,
-		int subsequentLevel, int recursionLevel, boolean isMana
+		int subsequentLevel, boolean isMana
 	) {
 		this.info = info;
 		this.rootName = name;
 		this.subsequentLevel = subsequentLevel;
-		this.recursionLevel = recursionLevel;
 		this.isMana = isMana;
 	}
 
 	public Ability getMana() {
-		return info.mana.map(m -> new Ability(m, rootName, 0, 0, true)).orElse(this);
+		return info.mana.map(m -> new Ability(m, rootName, 0, true)).orElse(this);
 	}
 
 	public Optional<Ability> getSubsequent() {
 		return info.subsequent.map(i ->
-			new Ability(i, rootName, subsequentLevel + 1, 0, isMana));
-	}
-
-	public Optional<Ability> getRecursion() {
-		if (recursionLevel < info.recursion) {
-			return Optional.of(new Ability(
-				info, rootName, subsequentLevel, recursionLevel + 1, isMana));
-		} else {
-			return Optional.empty();
-		}
+			new Ability(i, rootName, subsequentLevel + 1, isMana));
 	}
 
 	public Optional<Ability> getNext(
-		boolean mana, int subsequentLevel, int recursionLevel
+		boolean mana, int subsequentLevel
 	) {
 		Optional<Ability> r = Optional.of(this);
 
 		if (mana) {
 			Optional<Ability> manaAbility =
 				r.flatMap(a -> a.info.mana.map(aa ->
-					new Ability(aa, rootName, 0, 0, true)));
+					new Ability(aa, rootName, 0, true)));
 			if (manaAbility.isPresent()) r = manaAbility;
 		}
 
@@ -69,14 +57,7 @@ public class Ability {
 			r = r.flatMap(a -> getSubsequent());
 		}
 
-		return r.flatMap(a -> {
-				if (recursionLevel <= a.info.recursion) {
-					return Optional.of(new Ability(
-						a.info, rootName, a.subsequentLevel, recursionLevel, isMana));
-				} else {
-					return Optional.empty();
-				}
-			});
+		return r;
 	}
 
 	/**

@@ -109,15 +109,17 @@ public class BattleInProgress implements Runnable {
 	private void turn() {
 		List<Zone> zones = battle.doTurnStart(thisPlayer);
 
-		Platform.runLater(() -> {
-			List<Targetable> affected = new ArrayList<>();
-			affected.addAll(battle.battleState.cloneCharacters());
-			affected.addAll(zones);
-			listener.startTurn(affected);
-		});
-
 		try {
 			commandQueue.addAll(battle.getTurnStart(thisPlayer));
+
+			final boolean commandsComming = !commandQueue.isEmpty();
+			Platform.runLater(() -> {
+				List<Targetable> affected = new ArrayList<>();
+				affected.addAll(battle.battleState.cloneCharacters());
+				affected.addAll(zones);
+				listener.startTurn(affected, commandsComming);
+			});
+
 			if (doCommands()) return;
 		} catch (CommandException e) {
 			Platform.runLater(() -> listener.badCommand(e));
@@ -178,6 +180,13 @@ public class BattleInProgress implements Runnable {
 			// A single command could get expanded into multiple commands if we
 			// trigger any traps or zones
 			List<ExecutedCommand> allCmds = cmd.doCmdComputingTriggers(battle);
+
+			// mark the last command in the queue
+			if (commandQueue.isEmpty()) {
+				ExecutedCommand last = allCmds.remove(allCmds.size() - 1);
+				allCmds.add(last.markLastInSequence());
+			}
+
 			for (ExecutedCommand ec : allCmds) {
 				Platform.runLater(() -> listener.command(ec));
 

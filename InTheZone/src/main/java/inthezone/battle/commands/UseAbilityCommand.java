@@ -21,7 +21,7 @@ import org.json.simple.JSONObject;
 
 public class UseAbilityCommand extends Command {
 	private MapPoint agent;
-	private AbilityAgentType agentType;
+	public final AbilityAgentType agentType;
 	private final MapPoint castFrom;
 	public final String ability;
 	private final Collection<MapPoint> targetSquares;

@@ -16,8 +16,10 @@ public interface BattleListener {
 	/**
 	 * Start the player's turn.
 	 * @param characters Data for all the characters to update the HUD.
+	 * @param commandsComming true if we should wait for some start of turn
+	 * commands.
 	 * */
-	public void startTurn(List<Targetable> characters);
+	public void startTurn(List<Targetable> characters, boolean commandsComming);
 
 	/**
 	 * Start the other player's turn.

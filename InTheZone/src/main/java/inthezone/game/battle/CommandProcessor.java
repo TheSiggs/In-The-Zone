@@ -29,6 +29,8 @@ public class CommandProcessor {
 	private final Queue<ExecutedCommand> commandQueue = new LinkedList<>();
 	private final BattleView view;
 
+	private boolean isComplete = false;
+
 	public CommandProcessor(BattleView view) {
 		this.view = view;
 	}
@@ -36,6 +38,8 @@ public class CommandProcessor {
 	public boolean isEmpty() {
 		return commandQueue.isEmpty();
 	}
+
+	public boolean isComplete() {return isComplete;}
 
 	/**
 	 * Put a command on the queue.
@@ -55,18 +59,24 @@ public class CommandProcessor {
 		final boolean registeredAnimations;
 
 		if (ec.cmd instanceof UseAbilityCommand && !view.isMyTurn.getValue()) {
-			UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
-			Targetable agent = ec.affected.get(0);
-			if (agent instanceof Character) {
-				view.hud.writeMessage(((Character) agent).name + " uses " + ua.ability + "!");
-			} else {
-				view.hud.writeMessage("It's a trap!");
+			switch (((UseAbilityCommand) ec.cmd).agentType) {
+				case CHARACTER:
+					UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
+					Targetable agent = ec.affected.get(0);
+					view.hud.writeMessage(((Character) agent).name + " uses " + ua.ability + "!");
+					break;
+				case ZONE:
+					view.hud.writeMessage("A zone is triggered!");
+					break;
+				case TRAP:
+					view.hud.writeMessage("A trap is triggered!");
+					break;
 			}
 		}
 
 		if (ec.cmd instanceof MoveCommand) {
 			List<MapPoint> path = ((MoveCommand) ec.cmd).path;
-			if (path.size() < 2) return false;
+			if (path.size() < 2) throw new RuntimeException("Invalid move path");
 
 			Character agent = (Character) ec.affected.get(0);
 			view.sprites.scheduleMovement("walk", walkSpeed, path, agent);
@@ -102,6 +112,7 @@ public class CommandProcessor {
 		}
 
 		view.sprites.updateCharacters(ec.affected);
+		isComplete = ec.lastInSequence;
 		return registeredAnimations;
 	}
 

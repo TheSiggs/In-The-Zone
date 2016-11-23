@@ -116,6 +116,15 @@ public class ModeTarget extends Mode {
 		return this;
 	}
 
+	/**
+	 * Apply the selected ability now, even if we haven't selected the maximum
+	 * number of targets.
+	 * */
+	public Mode applyNow() {
+		allTargets.addAll(thisRoundTargets);
+		return applyAbility();
+	}
+
 	private Mode addTarget(MapPoint p) {
 		thisRoundTargets.add(p);
 		remainingTargets -= 1;
@@ -127,11 +136,7 @@ public class ModeTarget extends Mode {
 		}
 	}
 
-	/**
-	 * Apply the selected ability now, even if we haven't selected the maximum
-	 * number of targets.
-	 * */
-	public Mode applyAbility() {
+	private Mode applyAbility() {
 		if (allTargets.isEmpty()) {
 			return this;
 

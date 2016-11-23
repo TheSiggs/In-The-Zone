@@ -101,7 +101,7 @@ public class BattleView
 				if (commands.isEmpty() && instantEffectCompletion.isPresent()) {
 					instantEffectCompletion.get().run();
 					instantEffectCompletion = Optional.empty();
-				} else {
+				} else if (commands.isComplete()) {
 					setMode(mode.animationDone());
 				}
 			}
@@ -126,6 +126,7 @@ public class BattleView
 	 * */
 	public void setMode(Mode mode) {
 		this.mode = mode.setupMode();
+		System.err.println("Set mode " + mode + " transforming to " + this.mode);
 		Stage stage = getStage();
 		for (MapPoint p : sprites.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
@@ -247,7 +248,7 @@ public class BattleView
 	 * */
 	public void applyAbility() {
 		if (mode instanceof ModeTarget)
-			setMode(((ModeTarget) mode).applyAbility());
+			setMode(((ModeTarget) mode).applyNow());
 	}
 
 	/**
@@ -263,15 +264,21 @@ public class BattleView
 	}
 
 	@Override
-	public void startTurn(List<Targetable> characters) {
+	public void startTurn(List<Targetable> characters, boolean commandsComming) {
 		isMyTurn.setValue(true);
 		sprites.updateCharacters(characters);
-		setMode(new ModeSelect(this));
+
+		if (commandsComming) {
+			setMode(new ModeAnimating(this));
+		} else {
+			setMode(new ModeSelect(this));
+		}
 	}
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
 		selectedCharacter = Optional.empty();
+		isCharacterSelected.setValue(false);
 		isMyTurn.setValue(false);
 		setMode(new ModeOtherTurn(this));
 		sprites.updateCharacters(characters);
@@ -291,9 +298,10 @@ public class BattleView
 
 	@Override
 	public void command(ExecutedCommand ec) {
+		System.err.println(ec.cmd.getJSON());
 		commands.queueCommand(ec);
 		if (!inAnimation) inAnimation = commands.doNextCommand();
-		if (!inAnimation) setMode(mode.animationDone());
+		if (!inAnimation && commands.isComplete()) setMode(mode.animationDone());
 	}
 
 	@Override

@@ -97,7 +97,7 @@ public class BattleView
 			chain.doOnFinished(() -> {
 				s.setAnimation("idle");
 
-				boolean inAnimation = false;
+				inAnimation = false;
 				while (!inAnimation && !commands.isEmpty()) {
 					inAnimation = commands.doNextCommand();
 				}
@@ -124,6 +124,7 @@ public class BattleView
 	 * */
 	public void setMode(Mode mode) {
 		this.mode = mode.setupMode();
+		System.err.println("Setting mode " + mode + ", transformed to " + this.mode);
 		Stage stage = getStage();
 		for (MapPoint p : commands.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
@@ -170,9 +171,11 @@ public class BattleView
 	 * Update information about the selected character.
 	 * */
 	public void updateSelectedCharacter(Character c) {
-		setMode(mode.updateSelectedCharacter(c));
 		selectedCharacter.ifPresent(sc -> {
-			if (sc.id == c.id) selectedCharacter = Optional.of(c);
+			if (sc.id == c.id) {
+				selectedCharacter = Optional.of(c);
+				setMode(mode.updateSelectedCharacter(c));
+			}
 		});
 	}
 
@@ -202,6 +205,7 @@ public class BattleView
 	 * */
 	public void sendEndTurn() {
 		battle.requestCommand(new EndTurnCommandRequest());
+		setMode(new ModeAnimating(this));
 	}
 
 	/**
@@ -209,6 +213,7 @@ public class BattleView
 	 * */
 	public void sendResign() {
 		battle.requestCommand(new ResignCommandRequest(player));
+		setMode(new ModeAnimating(this));
 	}
 
 	/**
@@ -267,7 +272,6 @@ public class BattleView
 	public void endTurn(List<Targetable> characters) {
 		isMyTurn.setValue(false);
 		commands.updateCharacters(characters);
-		setMode(new ModeOtherTurn(this));
 	}
 
 	@Override
@@ -285,10 +289,8 @@ public class BattleView
 	@Override
 	public void command(ExecutedCommand ec) {
 		commands.queueCommand(ec);
-		if (!inAnimation) {
-			inAnimation = commands.doNextCommand();
-			if (!inAnimation) setMode(mode.animationDone());
-		}
+		if (!inAnimation) inAnimation = commands.doNextCommand();
+		if (!inAnimation) setMode(mode.animationDone());
 	}
 
 	@Override

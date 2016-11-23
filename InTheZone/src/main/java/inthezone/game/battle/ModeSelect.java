@@ -13,7 +13,7 @@ public class ModeSelect extends Mode {
 		view.getStage().clearAllHighlighting();
 		Optional<Character> s = view.getSelectedCharacter();
 		if (s.isPresent()) {
-			return new ModeMove(view, s.get());
+			return (new ModeMove(view, s.get())).setupMode();
 		} else {
 			return this;
 		}

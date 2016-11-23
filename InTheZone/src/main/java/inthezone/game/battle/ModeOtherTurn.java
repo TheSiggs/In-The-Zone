@@ -12,7 +12,6 @@ public class ModeOtherTurn extends Mode {
 
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
-		view.selectCharacter(Optional.empty());
 		return this;
 	}
 

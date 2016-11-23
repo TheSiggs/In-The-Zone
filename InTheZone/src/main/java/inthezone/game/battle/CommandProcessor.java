@@ -2,6 +2,7 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
+import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
@@ -99,6 +100,10 @@ public class CommandProcessor {
 
 		} else if (ec.cmd instanceof InstantEffectCommand) {
 			registeredAnimations = instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
+
+		} else if (ec.cmd instanceof EndTurnCommand) {
+			view.isMyTurn.setValue(!view.isMyTurn.getValue());
+			registeredAnimations = false;
 
 		} else if (ec.cmd instanceof ResignCommand) {
 			if (((ResignCommand) ec.cmd).player != view.player) {

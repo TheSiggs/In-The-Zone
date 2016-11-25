@@ -153,14 +153,17 @@ public class Battle {
 	 * @return at most one zone.
 	 * */
 	public List<Zone> createZone(
-		Ability ability, Character agent, Collection<MapPoint> ps
+		Ability ability, Character agent, Optional<RoadBlock> bind, Collection<MapPoint> ps
 	) {
 		Set<MapPoint> range = new HashSet<>();
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
 			p, AbilityAgentType.CHARACTER, p, ability, p));
 
+		Optional<Integer> turns = ability.info.boundZone?
+			Optional.empty() : Optional.of(ability.info.zoneTurns);
+
 		return battleState.placeZone(
-				ps.iterator().next(), range, ability, ability.info.zoneTurns, agent)
+				ps.iterator().next(), range, ability, turns, bind, agent)
 			.map(x -> Stream.of(x))
 			.orElse(Stream.empty()).collect(Collectors.toList());
 	}

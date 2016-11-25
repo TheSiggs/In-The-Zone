@@ -54,6 +54,11 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 	public Map<MapPoint, MapPoint> getRetargeting() {return new HashMap<>();}
 
 	/**
+	 * Get the locations of the objects constructed by this instant effect.
+	 * */
+	public List<MapPoint> getConstructed() {return new ArrayList<>();}
+
+	/**
 	 * Determine if this instant effect is ready to run
 	 * */
 	public boolean isComplete() {return true;}

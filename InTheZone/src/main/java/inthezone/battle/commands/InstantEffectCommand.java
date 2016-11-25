@@ -109,7 +109,10 @@ public class InstantEffectCommand extends Command {
 
 		if (postAbility.isPresent() || postEffect.isPresent()) {
 			Map<MapPoint, MapPoint> retarget = effect.getRetargeting();
-			postAbility.ifPresent(a -> a.retarget(retarget));
+			postAbility.ifPresent(a -> {
+				a.registerConstructedObjects(effect.getConstructed());
+				a.retarget(retarget);
+			});
 			postEffect.ifPresent(a -> a.retarget(turn.battleState, retarget));
 		}
 

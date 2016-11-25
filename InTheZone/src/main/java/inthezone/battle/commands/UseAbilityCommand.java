@@ -6,6 +6,7 @@ import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
+import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
@@ -27,6 +28,8 @@ public class UseAbilityCommand extends Command {
 	private final Collection<MapPoint> targetSquares;
 	private Collection<DamageToTarget> targets;
 	public final int subsequentLevel;
+
+	private final List<MapPoint> constructed = new ArrayList<>();
 
 	public Collection<DamageToTarget> getTargets() {return targets;}
 
@@ -158,10 +161,23 @@ public class UseAbilityCommand extends Command {
 			// do the ability now
 			battle.doAbility(agent, agentType, abilityData, targets);
 
-			// if it's a zone ability, also create the zone
-			if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
+			// If it's a zone ability, also create the zone
+			// bound zones
+			if (abilityData.info.boundZone && agentType == AbilityAgentType.CHARACTER) {
+				r.addAll(constructed.stream()
+					.flatMap(p -> battle.battleState.getTargetableAt(p).stream())
+					.filter(t -> t instanceof RoadBlock).findFirst()
+					.flatMap(o ->
+						battle.battleState.getCharacterAt(agent)
+							.map(c -> battle.createZone(
+								abilityData, c, Optional.of((RoadBlock) o), targetSquares)))
+					.orElseThrow(() -> new CommandException("Invalid ability command")));
+
+			// unbound zones
+			} else if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
 				r.addAll(battle.battleState.getCharacterAt(agent)
-					.map(c -> battle.createZone(abilityData, c, targetSquares))
+					.map(c -> battle.createZone(
+						abilityData, c, Optional.empty(), targetSquares))
 					.orElseThrow(() -> new CommandException("Invalid ability command")));
 			}
 		}
@@ -170,7 +186,8 @@ public class UseAbilityCommand extends Command {
 	}
 
 	/**
-	 * Called when the targets are moved by an instant effect
+	 * Called when the targets are moved by an instant effect.
+	 * @param retarget A mapping from old character positions to their new positions.
 	 * */
 	public void retarget(Map<MapPoint, MapPoint> retarget) {
 		Collection<DamageToTarget> newDTT = new ArrayList<>();
@@ -184,6 +201,13 @@ public class UseAbilityCommand extends Command {
 			}
 		}
 		this.targets = newDTT;
+	}
+
+	/**
+	 * Called when new objects are created by instant effects.
+	 * */
+	public void registerConstructedObjects(List<MapPoint> constructed) {
+		this.constructed.addAll(constructed);
 	}
 }
 

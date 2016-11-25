@@ -14,13 +14,13 @@ public class RoadBlock extends Targetable {
 	private int hits;
 	private final SpriteInfo sprite;
 
-	private final Optional<Zone> boundZone;
+	private Optional<Zone> boundZone;
 
 	public RoadBlock(
-		MapPoint pos, Optional<Zone> boundZone, StandardSprites sprites
+		MapPoint pos, StandardSprites sprites
 	) {
 		this.pos = pos;
-		this.boundZone = boundZone;
+		this.boundZone = Optional.empty();
 		hits = HITS_TO_DESTROY;
 		this.sprite = sprites.roadBlock;
 	}
@@ -32,6 +32,10 @@ public class RoadBlock extends Targetable {
 		this.boundZone = boundZone;
 		this.hits = hits;
 		this.sprite = sprite;
+	}
+
+	public void bindZone(Zone zone) {
+		this.boundZone = Optional.of(zone);
 	}
 
 	@Override public boolean blocksSpace(Player player) {return true;}

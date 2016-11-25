@@ -78,11 +78,18 @@ public class Obstacles extends InstantEffect {
 		return new Obstacles(targets, agent);
 	}
 
+	private final List<MapPoint> constructedObjects = new ArrayList<>();
+
 	@Override public List<Targetable> apply(Battle battle) throws CommandException {
-		return battle.doObstacles(placements.stream()
+		List<Targetable> r = battle.doObstacles(placements.stream()
 			.filter(p -> battle.battleState.isSpaceFree(p))
 			.collect(Collectors.toList()));
+		constructedObjects.clear();
+		for (Targetable t : r) constructedObjects.add(t.getPos());
+		return r;
 	}
+
+	@Override public List<MapPoint> getConstructed() {return constructedObjects;}
 
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget

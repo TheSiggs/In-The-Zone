@@ -35,7 +35,7 @@ public class PushCommandRequest extends CommandRequest {
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
 		Targetable t = battleState.getTargetableAt(target).stream()
 			.filter(x -> !(x instanceof Trap)).findFirst()
-			.orElseThrow(() -> new CommandException("Invalid push command"));
+			.orElseThrow(() -> new CommandException("1: Invalid push command"));
 
 		Collection<MapPoint> targets = new ArrayList<>();
 		targets.add(target);
@@ -48,7 +48,7 @@ public class PushCommandRequest extends CommandRequest {
 			}
 
 			return Optional.empty();
-		}).orElseThrow(() -> new CommandException("Invalid push command request"));
+		}).orElseThrow(() -> new CommandException("2: Invalid push command request"));
 
 		List<Command> lr = new ArrayList<>();
 		lr.add(r);

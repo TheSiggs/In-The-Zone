@@ -39,7 +39,7 @@ public abstract class Targetable implements Obstacle {
 	// return true if this targetable should be removed from the board
 	public abstract boolean reap();
 
-	protected Optional<Zone> currentZone = Optional.empty();
+	public Optional<Zone> currentZone = Optional.empty();
 
 	/**
 	 * Generate a zone effect, if the triggering conditions are met.

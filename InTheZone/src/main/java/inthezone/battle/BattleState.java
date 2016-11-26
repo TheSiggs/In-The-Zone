@@ -98,7 +98,10 @@ public class BattleState {
 
 		Zone z = new Zone(centre, range, turns, agent.hasMana(), a, agent);
 		zones.add(z);
-		for (MapPoint p : range) zoneMap.put(p, z);
+		for (MapPoint p : range) {
+			zoneMap.put(p, z);
+			getTargetableAt(p).forEach(t -> t.currentZone = Optional.of(z));
+		}
 
 		bind.ifPresent(o -> o.bindZone(z));
 		return Optional.of(z);

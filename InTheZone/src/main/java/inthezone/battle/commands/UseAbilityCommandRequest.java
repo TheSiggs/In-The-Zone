@@ -56,14 +56,19 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			// get the instant effect targets
 			List<MapPoint> preTargets = new ArrayList<>();
 			List<MapPoint> postTargets = new ArrayList<>();
-			for (DamageToTarget t : allTargets) {
-				if (t.pre) preTargets.add(t.target);
-				if (t.post) postTargets.add(t.target);
+
+			// Only do instant effects when the agent is a character.
+			if (agentType == AbilityAgentType.CHARACTER) {
+				for (DamageToTarget t : allTargets) {
+					if (t.pre) preTargets.add(t.target);
+					if (t.post) postTargets.add(t.target);
+				}
+
+				ability.info.instantBefore.ifPresent(i -> {
+					if (i.isField()) preTargets.addAll(targets);});
+				ability.info.instantAfter.ifPresent(i -> {
+					if (i.isField()) postTargets.addAll(targets);});
 			}
-			ability.info.instantBefore.ifPresent(i -> {
-				if (i.isField()) preTargets.addAll(targets);});
-			ability.info.instantAfter.ifPresent(i -> {
-				if (i.isField()) postTargets.addAll(targets);});
 
 			InstantEffectCommand preEffect = null;
 			UseAbilityCommand mainEffect;

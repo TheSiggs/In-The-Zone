@@ -1,11 +1,14 @@
 package inthezone.battle;
 
+import inthezone.battle.commands.Command;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class RoadBlock extends Targetable {
@@ -36,6 +39,12 @@ public class RoadBlock extends Targetable {
 
 	public void bindZone(Zone zone) {
 		this.boundZone = Optional.of(zone);
+	}
+
+	@Override public List<Command> triggerZone(BattleState battle) {
+		if (!battle.getZoneAt(pos).equals(boundZone))
+			return super.triggerZone(battle);
+		else return new ArrayList<>();
 	}
 
 	@Override public boolean blocksSpace(Player player) {return true;}

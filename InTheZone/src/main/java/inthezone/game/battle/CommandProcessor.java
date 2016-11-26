@@ -83,11 +83,15 @@ public class CommandProcessor {
 			registeredAnimations = true;
 
 		} else if (ec.cmd instanceof PushCommand) {
-			// The first element in the affected characters list for a push command
-			// is the agent of the push.  This element must be removed before
-			// proceeding to the processing of the push effect.
-			registeredAnimations = instantEffect(((PushCommand) ec.cmd).effect,
-				ec.affected.subList(1, ec.affected.size()));
+			if (ec.affected.isEmpty()) {
+				registeredAnimations = false;
+			} else {
+				// The first element in the affected characters list for a push command
+				// is the agent of the push.  This element must be removed before
+				// proceeding to the processing of the push effect.
+				registeredAnimations = instantEffect(((PushCommand) ec.cmd).effect,
+					ec.affected.subList(1, ec.affected.size()));
+			}
 
 		} else if (ec.cmd instanceof InstantEffectCommand) {
 			registeredAnimations = instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);

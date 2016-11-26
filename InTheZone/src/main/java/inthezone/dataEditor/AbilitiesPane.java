@@ -368,6 +368,7 @@ public class AbilitiesPane extends VBox {
 		hookOnEditCommit(name, changed);
 		hookOnEditCommit(type, changed);
 		hookOnEditCommit(trap, changed);
+		hookOnEditCommit(boundZone, changed);
 		hookOnEditCommit(zoneTurns, changed);
 		hookOnEditCommit(ap, changed);
 		hookOnEditCommit(mp, changed);
@@ -389,7 +390,8 @@ public class AbilitiesPane extends VBox {
 
 		@SuppressWarnings("unchecked")
 		boolean v = table.getColumns().setAll(
-			name, type, trap, zoneTurns, ap, mp, pp, eff, chance, heal, range, radius,
+			name, type, trap, zoneTurns, boundZone,
+			ap, mp, pp, eff, chance, heal, range, radius,
 			piercing, targetMode, nTargets, los,
 			recursion, instantBefore, instantAfter, statusEffect);
 	}

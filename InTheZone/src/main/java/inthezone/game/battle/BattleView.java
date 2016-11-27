@@ -72,6 +72,8 @@ public class BattleView
 		this.commands = new CommandProcessor(this);
 		this.hud = new HUD(this, gameData.getStandardSprites());
 
+		final DecalRenderer decals = new DecalRenderer(this);
+
 		this.canvas = new MapView(this,
 			gameData.getStage(startBattle.stage), true, false, Highlighters.highlights);
 		canvas.widthProperty().bind(this.widthProperty());
@@ -86,10 +88,11 @@ public class BattleView
 					mode.handleSelection(p);
 				}
 			});
+		canvas.doOnMouseOverSprite(decals::handleMouseOver);
+		canvas.doOnMouseOutSprite(decals::handleMouseOut);
 		canvas.doOnMouseOver(p -> mode.handleMouseOver(p));
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
 
-		final DecalRenderer decals = new DecalRenderer(this);
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
 		this.sprites = new SpriteManager(this, allSprites, decals, () -> {
 			inAnimation = false;
@@ -113,6 +116,7 @@ public class BattleView
 
 		// init the mode
 		canvas.setSelectableSprites(allSprites);
+		canvas.setMouseOverSprites(allSprites);
 		setMode(new ModeAnimating(this));
 		this.getChildren().addAll(canvas, hud);
 	}

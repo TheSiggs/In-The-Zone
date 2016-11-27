@@ -6,7 +6,6 @@ import inthezone.battle.Zone;
 import isogame.engine.AnimationChain;
 import isogame.engine.MapPoint;
 import isogame.engine.Sprite;
-import isogame.engine.SpriteDecalRenderer;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,12 +29,15 @@ public class SpriteManager {
 
 	private int spritesInMotion = 0;
 
+	private final DecalRenderer decals;
+
 	public SpriteManager(
 		BattleView view, Collection<Sprite> sprites,
-		SpriteDecalRenderer decals, Runnable onAnimationsFinished
+		DecalRenderer decals, Runnable onAnimationsFinished
 	) {
 		this.view = view;
 		this.sprites.addAll(sprites);
+		this.decals = decals;
 
 		for (Sprite s : this.sprites) {
 			Stage stage = view.getStage();
@@ -118,9 +120,12 @@ public class SpriteManager {
 	 * */
 	public void updateCharacters(List<? extends Targetable> characters) {
 		if (this.characters.isEmpty()) {
-			for (Targetable c : characters) {
-				if (c instanceof Character)
-					this.characters.put(((Character) c).id, (Character) c);
+			for (Targetable t : characters) {
+				if (t instanceof Character) {
+					Character c = (Character) t;
+					this.characters.put(c.id, c);
+					decals.registerCharacter(c);
+				}
 			}
 			view.hud.init(this.characters.values().stream()
 				.filter(c -> c.player == view.player).collect(Collectors.toList()));
@@ -134,7 +139,7 @@ public class SpriteManager {
 
 					if (old != null) {
 						if (c.player == view.player) view.hud.updateAbilities(c, c.hasMana());
-						CharacterInfoBox box = view.hud.characters.get(c.id);
+						final CharacterInfoBox box = view.hud.characters.get(c.id);
 						if (box != null) {
 							box.updateAP(c.getAP(), c.getStats().ap);
 							box.updateMP(c.getMP(), c.getStats().mp);
@@ -142,6 +147,7 @@ public class SpriteManager {
 							box.updateStatus(c.getStatusBuff(), c.getStatusDebuff());
 						}
 
+						decals.updateCharacter(c);
 					}
 
 					if (c.isDead()) {

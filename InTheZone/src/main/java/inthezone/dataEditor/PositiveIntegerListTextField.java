@@ -11,7 +11,7 @@ public class PositiveIntegerListTextField extends TypedTextField<List<Integer>> 
 			String[] ts = t.split("\\s*,\\s*");
 			List<Integer> r = new ArrayList<>();
 			for (String s : ts) {
-				r.add(Integer.parseUnsignedInt(t));
+				r.add(Integer.parseUnsignedInt(s));
 			}
 			return Optional.of(r);
 

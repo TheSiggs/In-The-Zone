@@ -7,9 +7,11 @@ import isogame.engine.SpriteInfo;
 import isogame.resource.ResourceLocator;
 import javafx.scene.image.Image;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,6 +25,10 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public final Collection<AbilityInfo> abilities;
 	public final boolean playable;
 
+	public final List<Integer> hpCurve;
+	public final List<Integer> attackCurve;
+	public final List<Integer> defenceCurve;
+
 	private final Map<String, AbilityInfo> abilitiesIndex = new HashMap<>();
 
 	public CharacterInfo(
@@ -32,7 +38,10 @@ public class CharacterInfo implements HasJSONRepresentation {
 		String portraitFile,
 		Stats stats,
 		Collection<AbilityInfo> abilities,
-		boolean playable
+		boolean playable,
+		List<Integer> hpCurve,
+		List<Integer> attackCurve,
+		List<Integer> defenceCurve
 	) {
 		this.name = name;
 		this.stats = stats;
@@ -41,6 +50,10 @@ public class CharacterInfo implements HasJSONRepresentation {
 		this.portraitFile = portraitFile;
 		this.abilities = abilities;
 		this.playable = playable;
+
+		this.hpCurve = hpCurve;
+		this.attackCurve = attackCurve;
+		this.defenceCurve = defenceCurve;
 
 		for (AbilityInfo a : abilities) abilitiesIndex.put(a.name, a);
 	}
@@ -66,6 +79,22 @@ public class CharacterInfo implements HasJSONRepresentation {
 			as.add(a.getJSON());
 		}
 		r.put("abilities", as);
+		r.put("hpCurve", makeCurve(hpCurve));
+		r.put("attackCurve", makeCurve(attackCurve));
+		r.put("defenceCurve", makeCurve(defenceCurve));
+		return r;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static JSONArray makeCurve(List<Integer> curve) {
+		JSONArray r = new JSONArray();
+		for (Integer i : curve) r.add(i);
+		return r;
+	}
+
+	private static List<Integer> decodeCurve(JSONArray a) {
+		List<Integer> r = new ArrayList<>();
+		for (int i = 0; i < a.size(); i++) r.add(((Number) a.get(i)).intValue());
 		return r;
 	}
 
@@ -79,6 +108,9 @@ public class CharacterInfo implements HasJSONRepresentation {
 		Object rportrait = json.get("portrait");
 		Object rplayable = json.get("playable");
 		Object rabilities = json.get("abilities");
+		Object rhpCurve = json.get("hpCurve");
+		Object rattackCurve = json.get("attackCurve");
+		Object rdefenceCurve = json.get("defenceCurve");
 
 		try {
 			if (rname == null) throw new CorruptDataException("Missing character name");
@@ -121,8 +153,16 @@ public class CharacterInfo implements HasJSONRepresentation {
 				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a));
 			}
 
+			List<Integer> hpCurve = rhpCurve == null?
+				new ArrayList<>() : decodeCurve((JSONArray) rhpCurve);
+			List<Integer> attackCurve = rhpCurve == null?
+				new ArrayList<>() : decodeCurve((JSONArray) rattackCurve);
+			List<Integer> defenceCurve = rhpCurve == null?
+				new ArrayList<>() : decodeCurve((JSONArray) rdefenceCurve);
+
 			return new CharacterInfo(
-				name, sprite, portrait, portraitFile, stats, allAbilities, playable);
+				name, sprite, portrait, portraitFile, stats, allAbilities, playable,
+				hpCurve, attackCurve, defenceCurve);
 		} catch(ClassCastException e) {
 			throw new CorruptDataException("Type error in character", e);
 		}

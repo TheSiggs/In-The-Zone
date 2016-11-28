@@ -33,6 +33,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -52,9 +53,9 @@ public class CharacterPane extends TitledPane {
 	private final PositiveIntegerField ap;
 	private final PositiveIntegerField mp;
 	private final PositiveIntegerField power;
-	private final PositiveIntegerField hp;
-	private final PositiveIntegerField attack;
-	private final PositiveIntegerField defence;
+	private final PositiveIntegerListTextField hp;
+	private final PositiveIntegerListTextField attack;
+	private final PositiveIntegerListTextField defence;
 	private final TreeItem<AbilityInfoModel> abilitiesRoot;
 
 	private String portraitFilename;
@@ -141,6 +142,14 @@ public class CharacterPane extends TitledPane {
 	public CharacterInfo getCharacter()
 		throws CorruptDataException
 	{
+		List<Integer> hpCurve = hp.getValue();
+		List<Integer> attackCurve = attack.getValue();
+		List<Integer> defenceCurve = defence.getValue();
+
+		int baseHP = hpCurve.isEmpty()? 0 : hpCurve.remove(0);
+		int baseAttack = attackCurve.isEmpty()? 0 : attackCurve.remove(0);
+		int baseDefence = defenceCurve.isEmpty()? 0 : defenceCurve.remove(0);
+
 		return new CharacterInfo(
 			name.getText(),
 			sprite.getValue(),
@@ -148,10 +157,11 @@ public class CharacterPane extends TitledPane {
 			portraitFilename,
 			new Stats(
 				ap.getValue(), mp.getValue(),
-				power.getValue(), hp.getValue(),
-				attack.getValue(), defence.getValue()),
+				power.getValue(), baseHP,
+				baseAttack, baseDefence),
 			getAbilities(),
-			playable.isSelected());
+			playable.isSelected(),
+			hpCurve, attackCurve, defenceCurve);
 	}
 
 	public Collection<AbilityInfo> getAbilities() throws CorruptDataException {
@@ -190,6 +200,13 @@ public class CharacterPane extends TitledPane {
 		return r;
 	}
 
+	private List<Integer> decodeCurve(int base, List<Integer> curve) {
+		List<Integer> r = new ArrayList<>();
+		r.add(base);
+		r.addAll(curve);
+		return r;
+	}
+
 	public CharacterPane(
 		File dataRoot,
 		CharacterInfo character,
@@ -220,9 +237,13 @@ public class CharacterPane extends TitledPane {
 		ap = new PositiveIntegerField(character.stats.ap);
 		mp = new PositiveIntegerField(character.stats.mp);
 		power = new PositiveIntegerField(character.stats.power);
-		hp = new PositiveIntegerField(character.stats.hp);
-		attack = new PositiveIntegerField(character.stats.attack);
-		defence = new PositiveIntegerField(character.stats.defence);
+
+		hp = new PositiveIntegerListTextField(decodeCurve(
+			character.stats.hp, character.hpCurve));
+		attack = new PositiveIntegerListTextField(decodeCurve(
+			character.stats.attack, character.attackCurve));
+		defence = new PositiveIntegerListTextField(decodeCurve(
+			character.stats.defence, character.defenceCurve));
 
 		portrait.setOnAction(x -> {
 			changed.setValue(true);

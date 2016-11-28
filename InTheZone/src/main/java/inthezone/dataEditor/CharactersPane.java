@@ -103,7 +103,8 @@ public class CharactersPane extends VBox {
 			CharacterInfo c = new CharacterInfo(
 				"New character", null,
 				portrait, "portrait/blank.png",
-				s, new LinkedList<>(), true);
+				s, new LinkedList<>(), true,
+				new LinkedList<>(), new LinkedList<>(), new LinkedList<>());
 			CharacterPane pane =
 				new CharacterPane(dataDir, c, gameData, changed, abilities);
 			characters.getPanes().add(pane);

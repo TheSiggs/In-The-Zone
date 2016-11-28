@@ -63,12 +63,14 @@ public class HealthBar {
 		updateAnimations(t);
 		if (alpha == 0) return;
 
+		double d = W * position;
+
 		cx.save();
 		cx.setGlobalAlpha(alpha);
 		cx.setFill(background);
-		cx.fillRect(X, Y, W, H);
+		cx.fillRect(X + d, Y, W - d, H);
 		cx.setFill(health);
-		cx.fillRect(X, Y, W * position, H);
+		cx.fillRect(X, Y, d, H);
 		cx.restore();
 	}
 

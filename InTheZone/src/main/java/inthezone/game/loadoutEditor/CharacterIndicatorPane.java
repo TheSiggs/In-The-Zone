@@ -30,6 +30,8 @@ public class CharacterIndicatorPane extends GridPane {
 		this.add(power,   1, 2);
 		this.add(attack,  1, 3);
 		this.add(defence, 1, 4);
+
+		updateProfile(profile);
 	}
 
 	public void updateProfile(CharacterProfile profile) {

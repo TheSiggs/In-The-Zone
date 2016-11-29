@@ -13,9 +13,13 @@ public class CharacterProfile implements HasJSONRepresentation {
 	public final CharacterInfo rootCharacter;
 	public final Collection<AbilityInfo> abilities;
 	public final AbilityInfo basicAbility;
-	public final int extraAttack;
-	public final int extraDefence;
-	public final int extraHP;
+	public final int attackPP;
+	public final int defencePP;
+	public final int hpPP;
+
+	private final int extraAttack;
+	private final int extraDefence;
+	private final int extraHP;
 
 	public CharacterProfile(CharacterInfo rootCharacter)
 		throws CorruptDataException
@@ -29,22 +33,41 @@ public class CharacterProfile implements HasJSONRepresentation {
 		extraAttack = 0;
 		extraDefence = 0;
 		extraHP = 0;
+
+		attackPP = 0;
+		defencePP = 0;
+		hpPP = 0;
 	}
 
 	public CharacterProfile(
 		CharacterInfo rootCharacter,
 		Collection<AbilityInfo> abilities,
 		AbilityInfo basicAbility,
-		int extraAttack,
-		int extraDefence,
-		int extraHP
-	) {
+		int attackPP,
+		int defencePP,
+		int hpPP
+	) throws CorruptDataException {
 		this.rootCharacter = rootCharacter;
 		this.abilities = abilities;
 		this.basicAbility = basicAbility;
-		this.extraAttack = extraAttack;
-		this.extraDefence = extraDefence;
-		this.extraHP = extraHP;
+
+		this.attackPP = attackPP;
+		this.defencePP = defencePP;
+		this.hpPP = hpPP;
+
+		if (attackPP < 0 || attackPP > rootCharacter.attackCurve.size())
+			throw new CorruptDataException("Invalid attack pp " + attackPP);
+		if (defencePP < 0 || defencePP > rootCharacter.defenceCurve.size())
+			throw new CorruptDataException("Invalid defence pp " + defencePP);
+		if (hpPP < 0 || hpPP > rootCharacter.hpCurve.size())
+			throw new CorruptDataException("Invalid hp pp " + hpPP);
+
+		this.extraAttack = attackPP == 0? 0 :
+			rootCharacter.attackCurve.get(attackPP - 1) - rootCharacter.stats.attack;
+		this.extraDefence = defencePP == 0? 0 :
+			rootCharacter.attackCurve.get(defencePP - 1) - rootCharacter.stats.defence;
+		this.extraHP = hpPP == 0? 0 :
+			rootCharacter.attackCurve.get(hpPP - 1) - rootCharacter.stats.hp;
 	}
 
 	public Stats getBaseStats() {
@@ -61,9 +84,9 @@ public class CharacterProfile implements HasJSONRepresentation {
 		r.put("for", rootCharacter.name);
 		r.put("abilities", a);
 		r.put("basicAbility", basicAbility.name);
-		r.put("attack", extraAttack);
-		r.put("defence", extraDefence);
-		r.put("HP", extraHP);
+		r.put("attack", attackPP);
+		r.put("defence", defencePP);
+		r.put("HP", hpPP);
 		return r;
 	}
 

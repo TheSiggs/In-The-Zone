@@ -3,6 +3,7 @@ package inthezone.game.loadoutEditor;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
+import isogame.engine.CorruptDataException;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -53,9 +54,13 @@ public class CharacterProfileModel {
 	}
 
 	private CharacterProfile encodeProfile() {
-		return new CharacterProfile(
-			rootCharacter, new ArrayList<>(abilities),
-			basicAbility.getValue(), 0, 0, 0);
+		try {
+			return new CharacterProfile(
+				rootCharacter, new ArrayList<>(abilities),
+				basicAbility.getValue(), 0, 0, 0);
+		} catch (CorruptDataException e) {
+			throw new RuntimeException("Invalid character profile", e);
+		}
 	}
 
 	private int computeCost() {

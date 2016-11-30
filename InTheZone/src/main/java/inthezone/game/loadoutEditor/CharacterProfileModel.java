@@ -5,11 +5,13 @@ import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
 import isogame.engine.CorruptDataException;
 import javafx.beans.Observable;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +21,10 @@ import java.util.stream.Collectors;
 public class CharacterProfileModel {
 	public final ObservableList<AbilityInfo> abilities = FXCollections.observableArrayList();
 	public final ObjectProperty<AbilityInfo> basicAbility = new SimpleObjectProperty<>();
+
+	public final IntegerProperty hpPP = new SimpleIntegerProperty(0);
+	public final IntegerProperty attackPP = new SimpleIntegerProperty(0);
+	public final IntegerProperty defencePP = new SimpleIntegerProperty(0);
 
 	private final ReadOnlyIntegerWrapper cost = new ReadOnlyIntegerWrapper(0);
 	private final ReadOnlyObjectWrapper<CharacterProfile> profile =
@@ -57,7 +63,8 @@ public class CharacterProfileModel {
 		try {
 			return new CharacterProfile(
 				rootCharacter, new ArrayList<>(abilities),
-				basicAbility.getValue(), 0, 0, 0);
+				basicAbility.getValue(), hpPP.getValue(),
+				attackPP.getValue(), defencePP.getValue());
 		} catch (CorruptDataException e) {
 			throw new RuntimeException("Invalid character profile", e);
 		}
@@ -65,6 +72,9 @@ public class CharacterProfileModel {
 
 	private int computeCost() {
 		return
+			hpPP.getValue() +
+			attackPP.getValue() +
+			defencePP.getValue() +
 			basicAbility.getValue().pp + 
 			abilities.stream().map(a -> a.pp).collect(
 				Collectors.summingInt(x -> (int) x));

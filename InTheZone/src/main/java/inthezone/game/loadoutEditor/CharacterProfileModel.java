@@ -4,7 +4,7 @@ import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
 import isogame.engine.CorruptDataException;
-import javafx.beans.Observable;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -32,16 +32,25 @@ public class CharacterProfileModel {
 
 	private CharacterInfo rootCharacter = null;
 
+	public void unbindAll() {
+		basicAbility.unbind();
+		hpPP.unbind();
+		attackPP.unbind();
+		defencePP.unbind();
+	}
+
 	public CharacterProfileModel(CharacterProfile c) {
 		init(c);
-		basicAbility.addListener(v -> {
+		InvalidationListener update = v -> {
 			cost.setValue(computeCost());
 			profile.setValue(encodeProfile());
-		});
-		abilities.addListener((Observable v) -> {
-			cost.setValue(computeCost());
-			profile.setValue(encodeProfile());
-		});
+		};
+
+		basicAbility.addListener(update);
+		abilities.addListener(update);
+		hpPP.addListener(update);
+		attackPP.addListener(update);
+		defencePP.addListener(update);
 	}
 
 	public void init(CharacterProfile c) {
@@ -63,8 +72,9 @@ public class CharacterProfileModel {
 		try {
 			return new CharacterProfile(
 				rootCharacter, new ArrayList<>(abilities),
-				basicAbility.getValue(), hpPP.getValue(),
-				attackPP.getValue(), defencePP.getValue());
+				basicAbility.getValue(), 
+				attackPP.getValue(), defencePP.getValue(),
+				hpPP.getValue());
 		} catch (CorruptDataException e) {
 			throw new RuntimeException("Invalid character profile", e);
 		}

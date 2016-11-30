@@ -65,9 +65,9 @@ public class CharacterProfile implements HasJSONRepresentation {
 		this.extraAttack = attackPP == 0? 0 :
 			rootCharacter.attackCurve.get(attackPP - 1) - rootCharacter.stats.attack;
 		this.extraDefence = defencePP == 0? 0 :
-			rootCharacter.attackCurve.get(defencePP - 1) - rootCharacter.stats.defence;
+			rootCharacter.defenceCurve.get(defencePP - 1) - rootCharacter.stats.defence;
 		this.extraHP = hpPP == 0? 0 :
-			rootCharacter.attackCurve.get(hpPP - 1) - rootCharacter.stats.hp;
+			rootCharacter.hpCurve.get(hpPP - 1) - rootCharacter.stats.hp;
 	}
 
 	public Stats getBaseStats() {

@@ -74,6 +74,8 @@ public class CharacterProfilePane extends VBox {
 	}
 
 	public void setCharacterProfile(CharacterProfile c) {
+		if (profile != null) profile.unbindAll();
+
 		profile = new CharacterProfileModel(c);
 
 		allAbilities.setItems(FXCollections.observableArrayList(
@@ -85,6 +87,8 @@ public class CharacterProfilePane extends VBox {
 		for (AbilityInfo a : c.rootCharacter.abilities)
 			if (a.type == AbilityType.BASIC) basicAbilitiesModel.add(a);
 		basicAbilities.getSelectionModel().select(profile.basicAbility.getValue());
+		profile.basicAbility.bind(
+			basicAbilities.getSelectionModel().selectedItemProperty());
 
 		selectedAbilities.setItems(profile.abilities);
 		selectedAbilities.setCellFactory(
@@ -104,6 +108,10 @@ public class CharacterProfilePane extends VBox {
 			attack.getValueFactory().getConverter().toString(c.attackPP));
 		defence.getEditor().setText(
 			defence.getValueFactory().getConverter().toString(c.defencePP));
+
+		profile.hpPP.bind(hp.valueProperty());
+		profile.attackPP.bind(attack.valueProperty());
+		profile.defencePP.bind(defence.valueProperty());
 	}
 }
 

@@ -30,7 +30,7 @@ public class CharacterProfileModel {
 	private final ReadOnlyObjectWrapper<CharacterProfile> profile =
 		new ReadOnlyObjectWrapper<>(null);
 
-	private CharacterInfo rootCharacter = null;
+	public CharacterInfo rootCharacter = null;
 
 	public void unbindAll() {
 		basicAbility.unbind();
@@ -58,6 +58,9 @@ public class CharacterProfileModel {
 		basicAbility.setValue(c.basicAbility);
 		abilities.clear();
 		for (AbilityInfo a : c.abilities) abilities.add(a);
+
+		profile.setValue(encodeProfile());
+		cost.setValue(computeCost());
 	}
 
 	public ReadOnlyIntegerProperty costProperty() {

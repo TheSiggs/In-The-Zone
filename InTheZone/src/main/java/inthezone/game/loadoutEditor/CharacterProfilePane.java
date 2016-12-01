@@ -73,18 +73,18 @@ public class CharacterProfilePane extends VBox {
 		this.getChildren().addAll(toolbar, abilitiesArea);
 	}
 
-	public void setCharacterProfile(CharacterProfile c) {
-		if (profile != null) profile.unbindAll();
+	public void setCharacterProfile(CharacterProfileModel profile) {
+		if (this.profile != null) this.profile.unbindAll();
 
-		profile = new CharacterProfileModel(c);
+		this.profile = profile;
 
 		allAbilities.setItems(FXCollections.observableArrayList(
-			c.rootCharacter.abilities.stream()
+			profile.rootCharacter.abilities.stream()
 				.filter(a -> a.type != AbilityType.BASIC)
 				.collect(Collectors.toList())));
 
 		basicAbilitiesModel.clear();
-		for (AbilityInfo a : c.rootCharacter.abilities)
+		for (AbilityInfo a : profile.rootCharacter.abilities)
 			if (a.type == AbilityType.BASIC) basicAbilitiesModel.add(a);
 		basicAbilities.getSelectionModel().select(profile.basicAbility.getValue());
 		profile.basicAbility.bind(
@@ -94,20 +94,20 @@ public class CharacterProfilePane extends VBox {
 		selectedAbilities.setCellFactory(
 			RemovableAbilityCell.forListView(profile.abilities));
 
-		hp.setValueFactory(new PPSpinnerFactory(c.hpPP,
-			c.rootCharacter.stats.hp, c.rootCharacter.hpCurve));
-		attack.setValueFactory(new PPSpinnerFactory(c.attackPP,
-			c.rootCharacter.stats.attack, c.rootCharacter.attackCurve));
-		defence.setValueFactory(new PPSpinnerFactory(c.defencePP,
-			c.rootCharacter.stats.defence, c.rootCharacter.defenceCurve));
+		hp.setValueFactory(new PPSpinnerFactory(profile.hpPP.getValue(),
+			profile.rootCharacter.stats.hp, profile.rootCharacter.hpCurve));
+		attack.setValueFactory(new PPSpinnerFactory(profile.attackPP.getValue(),
+			profile.rootCharacter.stats.attack, profile.rootCharacter.attackCurve));
+		defence.setValueFactory(new PPSpinnerFactory(profile.defencePP.getValue(),
+			profile.rootCharacter.stats.defence, profile.rootCharacter.defenceCurve));
 
 		// Force the spinners to update the display area
 		hp.getEditor().setText(
-			hp.getValueFactory().getConverter().toString(c.hpPP));
+			hp.getValueFactory().getConverter().toString(profile.hpPP.getValue()));
 		attack.getEditor().setText(
-			attack.getValueFactory().getConverter().toString(c.attackPP));
+			attack.getValueFactory().getConverter().toString(profile.attackPP.getValue()));
 		defence.getEditor().setText(
-			defence.getValueFactory().getConverter().toString(c.defencePP));
+			defence.getValueFactory().getConverter().toString(profile.defencePP.getValue()));
 
 		profile.hpPP.bind(hp.valueProperty());
 		profile.attackPP.bind(attack.valueProperty());

@@ -5,28 +5,24 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
-public class CharacterIndicatorCell extends ListCell<CharacterProfile> {
+public class CharacterIndicatorCell extends ListCell<CharacterProfileModel> {
 	private CharacterIndicatorPane cell = null;
 
-	public static Callback<ListView<CharacterProfile>, ListCell<CharacterProfile>>
+	public static Callback<ListView<CharacterProfileModel>, ListCell<CharacterProfileModel>>
 		forListView()
 	{
 		return (listView -> new CharacterIndicatorCell());
 	}
 
 	@Override
-	public void updateItem(CharacterProfile profile, boolean empty) {
+	public void updateItem(CharacterProfileModel profile, boolean empty) {
 		super.updateItem(profile, empty);
 
 		if (empty) {
 			setText(null);
 			setGraphic(null);
 		} else {
-			if (cell == null) { 
-				cell = new CharacterIndicatorPane(profile);
-			} else {
-				cell.updateProfile(profile);
-			}
+			cell = new CharacterIndicatorPane(profile);
 			setGraphic(cell);
 		}
 	}

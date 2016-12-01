@@ -35,7 +35,7 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final ComboBox<LoadoutModel> loadout = new ComboBox<>(loadoutsModel);
 	private final Button newLoadout = new Button("+");
 	private final TextField loadoutName = new TextField("<loadout name>");
-	private final ListView<CharacterProfile> profiles = new ListView<>();
+	private final ListView<CharacterProfileModel> profiles = new ListView<>();
 	private final Button done = new Button("Done");
 	private final Button delete = new Button("Delete this loadout");
 
@@ -82,23 +82,9 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		profiles.setCellFactory(CharacterIndicatorCell.forListView());
 
-		ChangeListener<CharacterProfile> profileListener =
-			(p, s0, s1) -> {
-				int i = profiles.getSelectionModel().getSelectedIndex();
-				loadout.getSelectionModel().getSelectedItem().profiles.set(i, s1);
-			};
-
 		profiles.getSelectionModel().selectedItemProperty()
 			.addListener((p, s0, s1) -> {
-				try {
-					cp.profileProperty().removeListener(profileListener);
-				} catch (NullPointerException e) {
-					/* Doesn't matter */
-				}
-				if (s1 != null) {
-					cp.setCharacterProfile(s1);
-					cp.profileProperty().addListener(profileListener);
-				}
+				if (s1 != null) cp.setCharacterProfile(s1);
 			});
 
 		profiles.getSelectionModel().select(null);

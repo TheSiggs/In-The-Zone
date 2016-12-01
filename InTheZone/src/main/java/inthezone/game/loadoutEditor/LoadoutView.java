@@ -7,7 +7,10 @@ import inthezone.battle.data.Loadout;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
-import javafx.beans.value.ChangeListener;
+import javafx.beans.binding.NumberExpression;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -19,8 +22,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class LoadoutView extends DialogScreen<Void> {
 
 	private final CharacterProfilePane cp = new CharacterProfilePane();
 	private final HBox content = new HBox();
-	private final VBox rightPane = new VBox();
+	private final GridPane rightPane = new GridPane();
 
 	private final ComboBox<LoadoutModel> loadout = new ComboBox<>(loadoutsModel);
 	private final Button newLoadout = new Button("+");
@@ -38,6 +41,9 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final ListView<CharacterProfileModel> profiles = new ListView<>();
 	private final Button done = new Button("Done");
 	private final Button delete = new Button("Delete this loadout");
+
+	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
+	private final Label costLabel = new Label("Cost: ");
 
 	private final ClientConfig config;
 
@@ -63,6 +69,10 @@ public class LoadoutView extends DialogScreen<Void> {
 					s1.name.bind(loadoutName.textProperty());
 					profiles.setItems(s1.profiles);
 					profiles.getSelectionModel().select(0);
+
+					totalCost.bind(s1.profiles.stream()
+						.map(pr -> (NumberExpression) pr.costProperty())
+						.reduce(new SimpleIntegerProperty(0), (x, y) -> x.add(y)));
 				}
 			});
 
@@ -78,7 +88,17 @@ public class LoadoutView extends DialogScreen<Void> {
 			.addAll(new Label("Loadout"), loadout, newLoadout);
 		FlowPane toolbar = new FlowPane();
 		toolbar.getChildren().addAll(done, delete);
-		rightPane.getChildren().addAll(loadoutSelection, loadoutName, profiles, toolbar);
+
+		rightPane.add(loadoutSelection, 0, 0, 3, 1);
+		rightPane.add(new Label("Name: "), 0, 1);
+		rightPane.add(loadoutName, 1, 1);
+		rightPane.add(costLabel, 2, 1);
+		rightPane.add(profiles, 0, 2, 3, 1);
+		rightPane.add(toolbar, 0, 3, 3, 1);
+
+		costLabel.textProperty().bind(
+			(new SimpleStringProperty(" Total cost: "))
+				.concat(totalCost).concat(" / " + Loadout.maxPP));
 
 		profiles.setCellFactory(CharacterIndicatorCell.forListView());
 

@@ -13,6 +13,8 @@ public class Loadout implements HasJSONRepresentation {
 	public final String name;
 	public final List<CharacterProfile> characters = new ArrayList<>();
 
+	public final static int maxPP = 30;
+
 	public Loadout(
 		String name,
 		List<CharacterProfile> characters

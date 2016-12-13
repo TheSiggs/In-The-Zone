@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 public class AbilityInfo implements HasJSONRepresentation {
+	public final boolean banned;
 	public final String name;
 	public final AbilityType type;
 	public final boolean trap;
@@ -30,6 +31,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	}
 
 	public AbilityInfo(
+		boolean banned,
 		String name,
 		AbilityType type,
 		boolean trap,
@@ -48,6 +50,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		Optional<InstantEffectInfo> instantAfter,
 		Optional<StatusEffectInfo> statusEffect
 	) {
+		this.banned = banned;
 		this.name = name;
 		this.type = type;
 		this.trap = trap;
@@ -71,6 +74,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
+		r.put("banned", banned);
 		r.put("name", name);
 		r.put("type", type.toString());
 		r.put("trap", trap);
@@ -94,6 +98,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public static AbilityInfo fromJSON(JSONObject json)
 		throws CorruptDataException
 	{
+		Object rbanned = json.get("banned");
 		Object rname = json.get("name");
 		Object rtype = json.get("type");
 		Object rtrap = json.get("trap");
@@ -128,6 +133,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 			if (rrange == null) throw new CorruptDataException("Missing range in ability " + name);
 			if (rrecursion == null) throw new CorruptDataException("Missing recursion in ability " + name);
 
+			boolean banned = rbanned == null? false : (Boolean) rbanned;
 			AbilityType type = AbilityType.parse((String) rtype);
 			boolean trap = rtrap == null? false : (Boolean) rtrap;
 			Number ap = (Number) rap;
@@ -176,7 +182,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 			}
 
 			return new AbilityInfo(
-				name, type, trap, zone,
+				banned, name, type, trap, zone,
 				ap.intValue(), mp.intValue(),
 				pp.intValue(), eff.doubleValue(),
 				chance.doubleValue(), heal, range,

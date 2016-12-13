@@ -115,6 +115,7 @@ public class CharacterPane extends TitledPane {
 		} catch (CorruptDataException e) { /* IGNORE */ }
 
 		return new AbilityInfo(
+			a.getBanned(),
 			a.getName(),
 			AbilityType.parse(a.getType()),
 			a.getTrap(),

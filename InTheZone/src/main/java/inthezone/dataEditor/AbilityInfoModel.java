@@ -1,39 +1,45 @@
 package inthezone.dataEditor;
 
 import inthezone.battle.data.AbilityInfo;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class AbilityInfoModel {
-	private final SimpleStringProperty name;
-	private final SimpleStringProperty type;
-	private final SimpleBooleanProperty trap;
-	private final SimpleStringProperty zone;
-	private final SimpleIntegerProperty ap;
-	private final SimpleIntegerProperty mp;
-	private final SimpleIntegerProperty pp;
-	private final SimpleDoubleProperty eff;
-	private final SimpleDoubleProperty chance;
-	private final SimpleBooleanProperty heal;
+	private final BooleanProperty banned;
+	private final StringProperty name;
+	private final StringProperty type;
+	private final BooleanProperty trap;
+	private final StringProperty zone;
+	private final IntegerProperty ap;
+	private final IntegerProperty mp;
+	private final IntegerProperty pp;
+	private final DoubleProperty eff;
+	private final DoubleProperty chance;
+	private final BooleanProperty heal;
 
-	private final SimpleIntegerProperty range;
-	private final SimpleIntegerProperty radius;
-	private final SimpleBooleanProperty piercing;
-	private final SimpleStringProperty targetMode;
-	private final SimpleIntegerProperty nTargets;
-	private final SimpleBooleanProperty los;
+	private final IntegerProperty range;
+	private final IntegerProperty radius;
+	private final BooleanProperty piercing;
+	private final StringProperty targetMode;
+	private final IntegerProperty nTargets;
+	private final BooleanProperty los;
 
-	private final SimpleBooleanProperty isMana;
-	private final SimpleBooleanProperty isSubsequent;
-	private final SimpleIntegerProperty recursion;
+	private final BooleanProperty isMana;
+	private final BooleanProperty isSubsequent;
+	private final IntegerProperty recursion;
 
-	private final SimpleStringProperty instantBefore;
-	private final SimpleStringProperty instantAfter;
-	private final SimpleStringProperty statusEffect;
+	private final StringProperty instantBefore;
+	private final StringProperty instantAfter;
+	private final StringProperty statusEffect;
 
 	public AbilityInfoModel(boolean isMana, boolean isSubsequent) {
+		this.banned = new SimpleBooleanProperty(false);
 		this.name = new SimpleStringProperty("New ability");
 		this.type = new SimpleStringProperty("skill");
 		this.trap = new SimpleBooleanProperty(false);
@@ -59,6 +65,7 @@ public class AbilityInfoModel {
 	}
 
 	public void init(AbilityInfo i) {
+		this.banned.setValue(i.banned);
 		this.name.setValue(i.name);
 		this.type.setValue(i.type.toString().toLowerCase());
 		this.trap.setValue(i.trap);
@@ -102,6 +109,7 @@ public class AbilityInfoModel {
 
 	private AbilityInfoModel clone(boolean isMana, boolean isSubsequent) {
 		AbilityInfoModel r = new AbilityInfoModel(isMana, isSubsequent);
+		r.banned.setValue(banned.getValue());
 		r.name.setValue(name.getValue());
 		r.type.setValue(type.getValue());
 		r.trap.setValue(trap.getValue());
@@ -124,70 +132,73 @@ public class AbilityInfoModel {
 		return r;
 	}
 
-	public SimpleStringProperty nameProperty() { return name; }
+	public BooleanProperty bannedProperty() { return banned; }
+	public boolean getBanned() { return banned.getValue(); }
+
+	public StringProperty nameProperty() { return name; }
 	public String getName() { return name.getValue(); }
 
-	public SimpleStringProperty typeProperty() { return type; }
+	public StringProperty typeProperty() { return type; }
 	public String getType() { return type.getValue(); }
 
-	public SimpleBooleanProperty trapProperty() { return trap; }
+	public BooleanProperty trapProperty() { return trap; }
 	public boolean getTrap() { return trap.getValue(); }
 
-	public SimpleStringProperty zoneProperty() { return zone; }
+	public StringProperty zoneProperty() { return zone; }
 	public String getZone() { return zone.getValue(); }
 
-	public SimpleIntegerProperty apProperty() { return ap; }
+	public IntegerProperty apProperty() { return ap; }
 	public int getAP() { return ap.getValue(); }
 
-	public SimpleIntegerProperty mpProperty() { return mp; }
+	public IntegerProperty mpProperty() { return mp; }
 	public int getMP() { return mp.getValue(); }
 
-	public SimpleIntegerProperty ppProperty() { return pp; }
+	public IntegerProperty ppProperty() { return pp; }
 	public int getPP() { return pp.getValue(); }
 
-	public SimpleDoubleProperty effProperty() { return eff; }
+	public DoubleProperty effProperty() { return eff; }
 	public double getEff() { return eff.getValue(); }
 
-	public SimpleDoubleProperty chanceProperty() { return chance; }
+	public DoubleProperty chanceProperty() { return chance; }
 	public double getChance() { return chance.getValue(); }
 
-	public SimpleBooleanProperty healProperty() { return heal; }
+	public BooleanProperty healProperty() { return heal; }
 	public boolean getHeal() { return heal.getValue(); }
 
-	public SimpleIntegerProperty rangeProperty() { return range; }
+	public IntegerProperty rangeProperty() { return range; }
 	public int getRange() { return range.getValue(); }
 
-	public SimpleIntegerProperty radiusProperty() { return radius; }
+	public IntegerProperty radiusProperty() { return radius; }
 	public int getRadius() { return radius.getValue(); }
 
-	public SimpleBooleanProperty piercingProperty() { return piercing; }
+	public BooleanProperty piercingProperty() { return piercing; }
 	public boolean getPiercing() { return piercing.getValue(); }
 
-	public SimpleStringProperty targetModeProperty() { return targetMode; }
+	public StringProperty targetModeProperty() { return targetMode; }
 	public String getTargetMode() { return targetMode.getValue(); }
 
-	public SimpleIntegerProperty nTargetsProperty() { return nTargets; }
+	public IntegerProperty nTargetsProperty() { return nTargets; }
 	public int getnTargets() { return nTargets.getValue(); }
 
-	public SimpleBooleanProperty losProperty() { return los; }
+	public BooleanProperty losProperty() { return los; }
 	public boolean getLOS() { return los.getValue(); }
 
-	public SimpleBooleanProperty isManaProperty() { return isMana; }
+	public BooleanProperty isManaProperty() { return isMana; }
 	public boolean getIsMana() { return isMana.getValue(); }
 
-	public SimpleBooleanProperty isSubsequentProperty() { return isSubsequent; }
+	public BooleanProperty isSubsequentProperty() { return isSubsequent; }
 	public boolean getIsSubsequent() { return isSubsequent.getValue(); }
 
-	public SimpleIntegerProperty recursionProperty() { return recursion; }
+	public IntegerProperty recursionProperty() { return recursion; }
 	public int getRecursion() { return recursion.getValue(); }
 
-	public SimpleStringProperty instantBeforeProperty() { return instantBefore; }
+	public StringProperty instantBeforeProperty() { return instantBefore; }
 	public String getInstantBefore() { return instantBefore.getValue(); }
 
-	public SimpleStringProperty instantAfterProperty() { return instantAfter; }
+	public StringProperty instantAfterProperty() { return instantAfter; }
 	public String getInstantAfter() { return instantAfter.getValue(); }
 
-	public SimpleStringProperty statusEffectProperty() { return statusEffect; }
+	public StringProperty statusEffectProperty() { return statusEffect; }
 	public String getStatusEffect() { return statusEffect.getValue(); }
 }
 

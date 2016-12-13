@@ -51,6 +51,7 @@ public class AbilitiesPane extends VBox {
 	private final Button up = new Button("Up");
 	private final Button down = new Button("Down");
 	
+	private final TreeTableColumn<AbilityInfoModel, Boolean> banned = new TreeTableColumn<>("Banned");
 	private final TreeTableColumn<AbilityInfoModel, String> name = new TreeTableColumn<>("Name");
 	private final TreeTableColumn<AbilityInfoModel, String> type = new TreeTableColumn<>("Type");
 	private final TreeTableColumn<AbilityInfoModel, Boolean> trap = new TreeTableColumn<>("Trap");
@@ -275,6 +276,7 @@ public class AbilitiesPane extends VBox {
 			}
 		});
 
+		banned.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("banned"));
 		name.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("name"));
 		type.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("type"));
 		trap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("trap"));
@@ -296,6 +298,7 @@ public class AbilitiesPane extends VBox {
 		instantAfter.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("instantAfter"));
 		statusEffect.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("statusEffect"));
 
+		banned.setSortable(false);
 		name.setSortable(false);
 		name.setPrefWidth(240);
 		type.setSortable(false);
@@ -323,6 +326,8 @@ public class AbilitiesPane extends VBox {
 		statusEffect.setSortable(false);
 		statusEffect.setPrefWidth(200);
 
+		banned.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
+			forTreeTableColumn(banned));
 		name.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, String>
 			forTreeTableColumn(StringField::new, selection));
 		type.setCellFactory(ChoiceBoxTreeTableCell.<AbilityInfoModel, String>
@@ -364,6 +369,7 @@ public class AbilitiesPane extends VBox {
 		statusEffect.setCellFactory(EffectField.<AbilityInfoModel>
 			forTreeTableColumn(enumValues(StatusEffectType.class), selection));
 
+		hookOnEditCommit(banned, changed);
 		hookOnEditCommit(name, changed);
 		hookOnEditCommit(type, changed);
 		hookOnEditCommit(trap, changed);
@@ -388,7 +394,7 @@ public class AbilitiesPane extends VBox {
 
 		@SuppressWarnings("unchecked")
 		boolean v = table.getColumns().setAll(
-			name, type, trap, zone,
+			banned, name, type, trap, zone,
 			ap, mp, pp, eff, chance, heal, range, radius,
 			piercing, targetMode, nTargets, los,
 			recursion, instantBefore, instantAfter, statusEffect);

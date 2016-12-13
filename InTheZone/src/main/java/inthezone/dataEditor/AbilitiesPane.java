@@ -2,6 +2,7 @@ package inthezone.dataEditor;
 
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
+import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.StatusEffectInfo;
@@ -53,8 +54,7 @@ public class AbilitiesPane extends VBox {
 	private final TreeTableColumn<AbilityInfoModel, String> name = new TreeTableColumn<>("Name");
 	private final TreeTableColumn<AbilityInfoModel, String> type = new TreeTableColumn<>("Type");
 	private final TreeTableColumn<AbilityInfoModel, Boolean> trap = new TreeTableColumn<>("Trap");
-	private final TreeTableColumn<AbilityInfoModel, Integer> zoneTurns = new TreeTableColumn<>("Zone");
-	private final TreeTableColumn<AbilityInfoModel, Boolean> boundZone = new TreeTableColumn<>("Bound zone");
+	private final TreeTableColumn<AbilityInfoModel, String> zone = new TreeTableColumn<>("Zone");
 	private final TreeTableColumn<AbilityInfoModel, Integer> ap = new TreeTableColumn<>("AP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> mp = new TreeTableColumn<>("MP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> pp = new TreeTableColumn<>("PP cost");
@@ -77,6 +77,9 @@ public class AbilitiesPane extends VBox {
 
 	private final ObservableList<String> types =
 		FXCollections.observableArrayList(enumValues(AbilityType.class));
+
+	private final ObservableList<String> zoneTypes =
+		FXCollections.observableArrayList(enumValues(AbilityZoneType.class));
 
 	private final ObservableList<String> targetModes =
 		FXCollections.observableArrayList("E", "A", "S", "EA", "ES", "AS", "EAS");
@@ -275,8 +278,7 @@ public class AbilitiesPane extends VBox {
 		name.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("name"));
 		type.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("type"));
 		trap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("trap"));
-		zoneTurns.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("zoneTurns"));
-		boundZone.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("boundZone"));
+		zone.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("zone"));
 		ap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("ap"));
 		mp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("mp"));
 		pp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("pp"));
@@ -298,8 +300,7 @@ public class AbilitiesPane extends VBox {
 		name.setPrefWidth(240);
 		type.setSortable(false);
 		trap.setSortable(false);
-		zoneTurns.setSortable(false);
-		boundZone.setSortable(false);
+		zone.setSortable(false);
 		ap.setSortable(false);
 		mp.setSortable(false);
 		pp.setSortable(false);
@@ -328,10 +329,8 @@ public class AbilitiesPane extends VBox {
 			forTreeTableColumn(types));
 		trap.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
 			forTreeTableColumn(trap));
-		zoneTurns.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
-			forTreeTableColumn(PositiveIntegerField::new, selection));
-		boundZone.setCellFactory(CheckBoxTreeTableCell.<AbilityInfoModel>
-			forTreeTableColumn(boundZone));
+		zone.setCellFactory(ChoiceBoxTreeTableCell.<AbilityInfoModel, String>
+			forTreeTableColumn(zoneTypes));
 		ap.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		mp.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
@@ -368,8 +367,7 @@ public class AbilitiesPane extends VBox {
 		hookOnEditCommit(name, changed);
 		hookOnEditCommit(type, changed);
 		hookOnEditCommit(trap, changed);
-		hookOnEditCommit(boundZone, changed);
-		hookOnEditCommit(zoneTurns, changed);
+		hookOnEditCommit(zone, changed);
 		hookOnEditCommit(ap, changed);
 		hookOnEditCommit(mp, changed);
 		hookOnEditCommit(pp, changed);
@@ -390,7 +388,7 @@ public class AbilitiesPane extends VBox {
 
 		@SuppressWarnings("unchecked")
 		boolean v = table.getColumns().setAll(
-			name, type, trap, zoneTurns, boundZone,
+			name, type, trap, zone,
 			ap, mp, pp, eff, chance, heal, range, radius,
 			piercing, targetMode, nTargets, los,
 			recursion, instantBefore, instantAfter, statusEffect);

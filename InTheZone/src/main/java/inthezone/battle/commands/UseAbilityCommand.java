@@ -6,6 +6,7 @@ import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
+import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
@@ -164,7 +165,10 @@ public class UseAbilityCommand extends Command {
 
 			// If it's a zone ability, also create the zone
 			// bound zones
-			if (abilityData.info.boundZone && agentType == AbilityAgentType.CHARACTER) {
+			if (
+				abilityData.info.zone == AbilityZoneType.BOUND_ZONE &&
+				agentType == AbilityAgentType.CHARACTER
+			) {
 				System.err.println("Make bound zone with " + constructed.toString());
 				System.err.println("Agent is " + battle.battleState.getCharacterAt(agent).toString()); 
 
@@ -179,7 +183,10 @@ public class UseAbilityCommand extends Command {
 				}
 
 			// unbound zones
-			} else if (abilityData.info.zoneTurns > 0 && agentType == AbilityAgentType.CHARACTER) {
+			} else if (
+				abilityData.info.zone == AbilityZoneType.ZONE &&
+				agentType == AbilityAgentType.CHARACTER
+			) {
 				r.addAll(battle.battleState.getCharacterAt(agent)
 					.map(c -> battle.createZone(
 						abilityData, c, Optional.empty(), targetSquares))

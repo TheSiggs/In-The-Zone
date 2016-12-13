@@ -9,8 +9,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final String name;
 	public final AbilityType type;
 	public final boolean trap;
-	public final int zoneTurns;
-	public final boolean boundZone;
+	public final AbilityZoneType zone;
 	public final int ap;
 	public final int mp;
 	public final int pp;
@@ -34,8 +33,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		String name,
 		AbilityType type,
 		boolean trap,
-		int zoneTurns,
-		boolean boundZone,
+		AbilityZoneType zone,
 		int ap,
 		int mp,
 		int pp,
@@ -53,8 +51,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.name = name;
 		this.type = type;
 		this.trap = trap;
-		this.zoneTurns = zoneTurns;
-		this.boundZone = boundZone;
+		this.zone = zone;
 		this.ap = ap;
 		this.mp = mp;
 		this.pp = pp;
@@ -77,8 +74,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		r.put("name", name);
 		r.put("type", type.toString());
 		r.put("trap", trap);
-		r.put("zoneTurns", zoneTurns);
-		r.put("boundZone", boundZone);
+		r.put("zone", zone.toString());
 		r.put("ap", ap);
 		r.put("mp", mp);
 		r.put("pp", pp);
@@ -101,8 +97,9 @@ public class AbilityInfo implements HasJSONRepresentation {
 		Object rname = json.get("name");
 		Object rtype = json.get("type");
 		Object rtrap = json.get("trap");
-		Object rzoneTurns = json.get("zoneTurns");
-		Object rboundZone = json.get("boundZone");
+		Object rzoneTurns = json.get("zoneTurns"); // deprecated
+		Object rboundZone = json.get("boundZone"); // deprecated
+		Object rzone = json.get("zone");
 		Object rap = json.get("ap");
 		Object rmp = json.get("mp");
 		Object rpp = json.get("pp");
@@ -133,8 +130,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 
 			AbilityType type = AbilityType.parse((String) rtype);
 			boolean trap = rtrap == null? false : (Boolean) rtrap;
-			Number zoneTurns = rzoneTurns == null? 0 : (Number) rzoneTurns;
-			boolean boundZone = rboundZone == null? false : (Boolean) rboundZone;
 			Number ap = (Number) rap;
 			Number mp = (Number) rmp;
 			Number pp = (Number) rpp;
@@ -148,6 +143,21 @@ public class AbilityInfo implements HasJSONRepresentation {
 			Optional<InstantEffectInfo> instantBefore;
 			Optional<InstantEffectInfo> instantAfter;
 			Optional<StatusEffectInfo> statusEffect;
+
+			AbilityZoneType zone;
+			if (rzone == null) {
+				// boundZone and zoneTurns are deprecated, but we might have to parse
+				// them for compatability.
+				if (rboundZone != null && ((Boolean) rboundZone)) {
+					zone = AbilityZoneType.BOUND_ZONE;
+				} else if (rzoneTurns != null && ((Number) rzoneTurns).intValue() > 0) {
+					zone = AbilityZoneType.ZONE;
+				} else {
+					zone = AbilityZoneType.NONE;
+				}
+			} else {
+				zone = AbilityZoneType.fromString((String) rzone);
+			}
 
 			if (rmana == null) mana = Optional.empty(); else {
 				mana = Optional.of(AbilityInfo.fromJSON((JSONObject) rmana));
@@ -166,7 +176,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 			}
 
 			return new AbilityInfo(
-				name, type, trap, zoneTurns.intValue(), boundZone,
+				name, type, trap, zone,
 				ap.intValue(), mp.intValue(),
 				pp.intValue(), eff.doubleValue(),
 				chance.doubleValue(), heal, range,

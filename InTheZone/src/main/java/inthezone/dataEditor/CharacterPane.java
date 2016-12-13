@@ -3,6 +3,7 @@ package inthezone.dataEditor;
 import com.diffplug.common.base.Errors;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
+import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.InstantEffectInfo;
@@ -117,8 +118,7 @@ public class CharacterPane extends TitledPane {
 			a.getName(),
 			AbilityType.parse(a.getType()),
 			a.getTrap(),
-			a.getZoneTurns(),
-			a.getBoundZone(),
+			AbilityZoneType.fromString(a.getZone()),
 			a.getAP(),
 			a.getMP(),
 			a.getPP(),

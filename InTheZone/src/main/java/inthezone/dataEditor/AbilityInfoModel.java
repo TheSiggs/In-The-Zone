@@ -10,8 +10,7 @@ public class AbilityInfoModel {
 	private final SimpleStringProperty name;
 	private final SimpleStringProperty type;
 	private final SimpleBooleanProperty trap;
-	private final SimpleIntegerProperty zoneTurns;
-	private final SimpleBooleanProperty boundZone;
+	private final SimpleStringProperty zone;
 	private final SimpleIntegerProperty ap;
 	private final SimpleIntegerProperty mp;
 	private final SimpleIntegerProperty pp;
@@ -38,8 +37,7 @@ public class AbilityInfoModel {
 		this.name = new SimpleStringProperty("New ability");
 		this.type = new SimpleStringProperty("skill");
 		this.trap = new SimpleBooleanProperty(false);
-		this.zoneTurns = new SimpleIntegerProperty(0);
-		this.boundZone = new SimpleBooleanProperty(false);
+		this.zone = new SimpleStringProperty("None");
 		this.ap = new SimpleIntegerProperty(2);
 		this.mp = new SimpleIntegerProperty(0);
 		this.pp = new SimpleIntegerProperty(1);
@@ -64,8 +62,7 @@ public class AbilityInfoModel {
 		this.name.setValue(i.name);
 		this.type.setValue(i.type.toString().toLowerCase());
 		this.trap.setValue(i.trap);
-		this.zoneTurns.setValue(i.zoneTurns);
-		this.boundZone.setValue(i.boundZone);
+		this.zone.setValue(i.zone.toString().toLowerCase());
 		this.ap.setValue(i.ap);
 		this.mp.setValue(i.mp);
 		this.pp.setValue(i.pp);
@@ -108,8 +105,7 @@ public class AbilityInfoModel {
 		r.name.setValue(name.getValue());
 		r.type.setValue(type.getValue());
 		r.trap.setValue(trap.getValue());
-		r.zoneTurns.setValue(zoneTurns.getValue());
-		r.boundZone.setValue(boundZone.getValue());
+		r.zone.setValue(zone.getValue());
 		r.ap.setValue(ap.getValue());
 		r.mp.setValue(mp.getValue());
 		r.pp.setValue(pp.getValue());
@@ -137,11 +133,8 @@ public class AbilityInfoModel {
 	public SimpleBooleanProperty trapProperty() { return trap; }
 	public boolean getTrap() { return trap.getValue(); }
 
-	public SimpleIntegerProperty zoneTurnsProperty() { return zoneTurns; }
-	public int getZoneTurns() { return zoneTurns.getValue(); }
-
-	public SimpleBooleanProperty boundZoneProperty() { return boundZone; }
-	public boolean getBoundZone() { return boundZone.getValue(); }
+	public SimpleStringProperty zoneProperty() { return zone; }
+	public String getZone() { return zone.getValue(); }
 
 	public SimpleIntegerProperty apProperty() { return ap; }
 	public int getAP() { return ap.getValue(); }
@@ -196,6 +189,5 @@ public class AbilityInfoModel {
 
 	public SimpleStringProperty statusEffectProperty() { return statusEffect; }
 	public String getStatusEffect() { return statusEffect.getValue(); }
-
 }
 

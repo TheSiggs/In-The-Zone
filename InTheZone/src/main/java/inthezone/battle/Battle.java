@@ -4,6 +4,7 @@ import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.FatigueCommand;
+import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
@@ -22,6 +23,8 @@ import java.util.stream.Stream;
  * This class processes battle commands.
  * */
 public class Battle {
+	private final static int zoneTurns = 4;
+
 	public final BattleState battleState;
 	private final StandardSprites sprites;
 
@@ -159,8 +162,8 @@ public class Battle {
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
 			p, AbilityAgentType.CHARACTER, p, ability, p));
 
-		Optional<Integer> turns = ability.info.boundZone?
-			Optional.empty() : Optional.of(ability.info.zoneTurns);
+		Optional<Integer> turns = ability.info.zone == AbilityZoneType.BOUND_ZONE?
+			Optional.empty() : Optional.of(zoneTurns);
 
 		return battleState.placeZone(
 				ps.iterator().next(), range, ability, turns, bind, agent)

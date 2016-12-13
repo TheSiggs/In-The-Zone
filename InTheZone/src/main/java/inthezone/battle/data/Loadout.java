@@ -6,6 +6,7 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,6 +22,18 @@ public class Loadout implements HasJSONRepresentation {
 	) {
 		this.name = name;
 		this.characters.addAll(characters);
+	}
+
+	/**
+	 * Determine if this loadout is suitable for tournament play. i.e. it has no
+	 * banned abilities and the total cost is acceptable.
+	 * */
+	public boolean isLegitimate() {
+		return
+			!characters.stream().flatMap(c -> c.abilities.stream())
+				.anyMatch(a -> a.banned) &&
+			characters.stream().map(c -> c.computeCost()).collect(
+				Collectors.summingInt(x -> (int) x)) <= maxPP;
 	}
 
 	@Override
@@ -65,9 +78,8 @@ public class Loadout implements HasJSONRepresentation {
 		return r;
 	}
 
-	@Override
-	public String toString() {
-		return name;
+	@Override public String toString() {
+		return name + (isLegitimate()? "" : " (BANNED)");
 	}
 }
 

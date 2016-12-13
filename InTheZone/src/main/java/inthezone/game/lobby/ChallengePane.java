@@ -143,7 +143,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		}
 
 		loadout.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
-			if (s != null) {
+			if (s != null && s.isLegitimate()) {
 				characterSelector.setCharacters(s.characters);
 			}
 		});

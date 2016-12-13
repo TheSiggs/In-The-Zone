@@ -16,7 +16,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class CharacterProfileModel {
 	public final ObservableList<AbilityInfo> abilities = FXCollections.observableArrayList();
@@ -42,8 +41,9 @@ public class CharacterProfileModel {
 	public CharacterProfileModel(CharacterProfile c) {
 		init(c);
 		InvalidationListener update = v -> {
-			cost.setValue(computeCost());
-			profile.setValue(encodeProfile());
+			CharacterProfile newProfile = encodeProfile();
+			cost.setValue(newProfile.computeCost());
+			profile.setValue(newProfile);
 		};
 
 		basicAbility.addListener(update);
@@ -59,8 +59,9 @@ public class CharacterProfileModel {
 		abilities.clear();
 		for (AbilityInfo a : c.abilities) abilities.add(a);
 
-		profile.setValue(encodeProfile());
-		cost.setValue(computeCost());
+		CharacterProfile newProfile = encodeProfile();
+		cost.setValue(newProfile.computeCost());
+		profile.setValue(newProfile);
 	}
 
 	public ReadOnlyIntegerProperty costProperty() {
@@ -81,16 +82,6 @@ public class CharacterProfileModel {
 		} catch (CorruptDataException e) {
 			throw new RuntimeException("Invalid character profile", e);
 		}
-	}
-
-	private int computeCost() {
-		return
-			hpPP.getValue() +
-			attackPP.getValue() +
-			defencePP.getValue() +
-			basicAbility.getValue().pp + 
-			abilities.stream().map(a -> a.pp).collect(
-				Collectors.summingInt(x -> (int) x));
 	}
 }
 

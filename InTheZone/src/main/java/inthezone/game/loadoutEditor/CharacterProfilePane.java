@@ -80,7 +80,7 @@ public class CharacterProfilePane extends VBox {
 
 		allAbilities.setItems(FXCollections.observableArrayList(
 			profile.rootCharacter.abilities.stream()
-				.filter(a -> a.type != AbilityType.BASIC)
+				.filter(a -> !a.banned && a.type != AbilityType.BASIC)
 				.collect(Collectors.toList())));
 
 		basicAbilitiesModel.clear();
@@ -144,7 +144,7 @@ class RemovableAbilityCell extends ListCell<AbilityInfo> {
 
 		if (!empty) {
 			if (cell == null) makeCell();
-			name.setText(item.name);
+			name.setText(item.name + (item.banned? "(BANNED)" : ""));
 			remove.setOnAction(event -> items.remove(item));
 		}
 	}

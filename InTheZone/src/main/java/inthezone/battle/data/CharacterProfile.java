@@ -70,9 +70,21 @@ public class CharacterProfile implements HasJSONRepresentation {
 			rootCharacter.hpCurve.get(hpPP - 1) - rootCharacter.stats.hp;
 	}
 
+	/**
+	 * Get the base stats, taking PP into account.
+	 * */
 	public Stats getBaseStats() {
 		return rootCharacter.stats.add(new Stats(
 			0, 0, 0, extraHP, extraAttack, extraDefence));
+	}
+
+	/**
+	 * Compute the cost of this profile in PP.
+	 * */
+	public int computeCost() {
+		return hpPP + attackPP + defencePP + basicAbility.pp +
+			abilities.stream().map(a -> a.pp).collect(
+				Collectors.summingInt(x -> (int) x));
 	}
 
 	@Override

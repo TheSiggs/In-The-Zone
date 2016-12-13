@@ -53,13 +53,13 @@ public class CharacterProfilePane extends VBox {
 			new Label("Attack"), attack,
 			new Label("Defence"), defence);
 
+		allAbilities.setEditable(false);
 		allAbilitiesPane.getChildren().addAll(addAbility, allAbilities);
 
-		addAbility.setOnAction(event -> {
-			AbilityInfo i = allAbilities.getSelectionModel().getSelectedItem();
-			if (i != null && !profile.abilities.contains(i)) {
-				profile.abilities.add(i);
-			}
+		addAbility.setOnAction(event -> addAbility());
+
+		allAbilities.setOnMouseClicked(event -> {
+			if (event.getClickCount() > 1) addAbility();
 		});
 
 		hp.setPrefWidth(100);
@@ -71,6 +71,13 @@ public class CharacterProfilePane extends VBox {
 
 		abilitiesArea.getChildren().addAll(selectedPane, allAbilitiesPane);
 		this.getChildren().addAll(toolbar, abilitiesArea);
+	}
+
+	private void addAbility() {
+		AbilityInfo i = allAbilities.getSelectionModel().getSelectedItem();
+		if (i != null && !profile.abilities.contains(i)) {
+			profile.abilities.add(i);
+		}
 	}
 
 	public void setCharacterProfile(CharacterProfileModel profile) {
@@ -125,7 +132,6 @@ class RemovableAbilityCell extends ListCell<AbilityInfo> {
 	private void makeCell() {
 		cell = new HBox();
 		cell.getChildren().addAll(name, remove);
-		this.setGraphic(cell);
 	}
 
 	public static Callback<ListView<AbilityInfo>, ListCell<AbilityInfo>>
@@ -135,6 +141,7 @@ class RemovableAbilityCell extends ListCell<AbilityInfo> {
 	}
 
 	public RemovableAbilityCell(ObservableList<AbilityInfo> items) {
+		this.setText(null);
 		this.items = items;
 	}
 
@@ -142,8 +149,11 @@ class RemovableAbilityCell extends ListCell<AbilityInfo> {
 	protected void updateItem(AbilityInfo item, boolean empty) {
 		super.updateItem(item, empty);
 
-		if (!empty) {
+		if (empty) {
+			this.setGraphic(null);
+		} else {
 			if (cell == null) makeCell();
+			this.setGraphic(cell);
 			name.setText(item.name + (item.banned? "(BANNED)" : ""));
 			remove.setOnAction(event -> items.remove(item));
 		}

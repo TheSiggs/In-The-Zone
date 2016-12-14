@@ -140,13 +140,8 @@ public class SpriteManager {
 					if (old != null) {
 						if (c.player == view.player) view.hud.updateAbilities(c, c.hasMana());
 						final CharacterInfoBox box = view.hud.characters.get(c.id);
-						if (box != null) {
-							box.updateAP(c.getAP(), c.getStats().ap);
-							box.updateMP(c.getMP(), c.getStats().mp);
-							box.updateHP(c.getHP(), c.getMaxHP());
-							box.updateStatus(c.getStatusBuff(), c.getStatusDebuff());
-						}
 
+						if (box != null) box.updateCharacter(c);
 						decals.updateCharacter(c);
 					}
 

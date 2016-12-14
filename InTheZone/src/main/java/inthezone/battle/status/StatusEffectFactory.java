@@ -34,6 +34,7 @@ public class StatusEffectFactory {
 				return new FearedStatusEffect(info, c);
 			case PANICKED: return new PanickedStatusEffect(info);
 			case VAMPIRISM: return new Vampirism(info);
+			case COVER: return new Cover(info);
 			default: throw new RuntimeException("This cannot happen");
 		}
 	}

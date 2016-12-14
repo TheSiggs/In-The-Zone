@@ -10,6 +10,7 @@ import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.StatusEffectKind;
+import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.Debilitated;
 import inthezone.battle.status.Imprisoned;
 import inthezone.battle.status.Silenced;
@@ -35,6 +36,7 @@ public class Character extends Targetable {
 
 	private Optional<StatusEffect> statusBuff = Optional.empty();
 	private Optional<StatusEffect> statusDebuff = Optional.empty();
+	private boolean hasCover = false;
 
 	private boolean hasMana = false;
 	private MapPoint pos = new MapPoint(0, 0);
@@ -118,25 +120,12 @@ public class Character extends Targetable {
 		this.hp = baseStats.hp;
 	}
 
-	public int getAP() {
-		return ap;
-	}
-
-	public int getMP() {
-		return mp;
-	}
-
-	public int getHP() {
-		return hp;
-	}
-
-	public int getMaxHP() {
-		return baseStats.hp;
-	}
-
-	@Override public boolean hasMana() {
-		return hasMana;
-	}
+	public int getAP() { return ap; }
+	public int getMP() { return mp; }
+	public int getHP() { return hp; }
+	public int getMaxHP() { return baseStats.hp; }
+	public boolean hasCover() { return hasCover; }
+	@Override public boolean hasMana() { return hasMana; }
 
 	public boolean isVampiric() {
 		return statusBuff.map(s -> s instanceof Vampirism).orElse(false);
@@ -243,6 +232,7 @@ public class Character extends Targetable {
 		r.addAll(triggerZone(battle.battleState));
 
 		// handle status effects
+		hasCover = false;
 		statusBuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 
@@ -305,6 +295,7 @@ public class Character extends Targetable {
 	}
 
 	@Override public void dealDamage(int damage) {
+		if (hasCover) return;
 		hp = Math.min(baseStats.hp, Math.max(0, hp - damage));
 		System.err.println("HP: " + hp + " after damage " + damage);
 	}
@@ -320,7 +311,9 @@ public class Character extends Targetable {
 
 	@Override public void applyStatus(StatusEffect status) {
 		final StatusEffectInfo info = status.getInfo();
-		if (info.kind == StatusEffectKind.BUFF) {
+		if (info.type == StatusEffectType.COVER) {
+			hasCover = true;
+		} else if (info.kind == StatusEffectKind.BUFF) {
 			statusBuff = Optional.of(status);
 		} else {
 			statusDebuff = Optional.of(status);

@@ -2,6 +2,7 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.StatusEffect;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -51,20 +52,20 @@ public class CharacterInfoBox extends GridPane {
 		updateHP(character.getHP(), character.getMaxHP());
 	}
 
-	public void updateAP(int ap, int max) {
+	private void updateAP(int ap, int max) {
 		this.ap.setProgress((double) ap / (double) max);
 	}
 
-	public void updateMP(int mp, int max) {
+	private void updateMP(int mp, int max) {
 		this.mp.setProgress((double) mp / (double) max);
 	}
 
-	public void updateHP(int hp, int max) {
+	private void updateHP(int hp, int max) {
 		this.hp.setProgress((double) hp / (double) max);
 	}
 
-	public void updateStatus(
-		Optional<StatusEffect> buff, Optional<StatusEffect> debuff
+	private void updateStatus(
+		Optional<StatusEffect> buff, Optional<StatusEffect> debuff, boolean cover
 	) {
 		nameLine.getChildren().clear();
 		nameLine.getChildren().add(name);
@@ -72,6 +73,15 @@ public class CharacterInfoBox extends GridPane {
 			new ImageView(sprites.statusEffects.get(s.getInfo().type))));
 		debuff.ifPresent(s -> nameLine.getChildren().add(
 			new ImageView(sprites.statusEffects.get(s.getInfo().type))));
+		if (cover) nameLine.getChildren().add(
+			new ImageView(sprites.statusEffects.get(StatusEffectType.COVER)));
+	}
+
+	public void updateCharacter(Character c) {
+		updateAP(c.getAP(), c.getStats().ap);
+		updateMP(c.getMP(), c.getStats().mp);
+		updateHP(c.getHP(), c.getMaxHP());
+		updateStatus(c.getStatusBuff(), c.getStatusDebuff(), c.hasCover());
 	}
 
 	public void setSelected(boolean isSelected) {

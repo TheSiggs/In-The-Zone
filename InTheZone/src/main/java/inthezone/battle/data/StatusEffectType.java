@@ -6,7 +6,7 @@ public enum StatusEffectType {
 	ACCELERATED, DAZED, DEBILITATED, ENERGIZED, FEARED,
 	IMPRISONED, PRECISE, RESISTANT, VULNERABLE,
 	ONGOING, PANICKED, REGENERATION, SILENCED, SLOWED, STRENGTHENED,
-	STUNNED, VAMPIRISM, WEAKENED;
+	STUNNED, VAMPIRISM, WEAKENED, COVER;
 
 	public String getIconName() {
 		switch(this) {
@@ -28,6 +28,7 @@ public enum StatusEffectType {
 			case STUNNED: return "status/stunned.png";
 			case VAMPIRISM: return "status/vampirism.png";
 			case WEAKENED: return "status/weakened.png";
+			case COVER: return "status/cover.png";
 			default:
 				throw new RuntimeException("Invalid status effect type, this cannot happen");
 		}
@@ -53,6 +54,7 @@ public enum StatusEffectType {
 			case STUNNED: return StatusEffectKind.DEBUFF;
 			case VAMPIRISM: return StatusEffectKind.BUFF;
 			case WEAKENED: return StatusEffectKind.DEBUFF;
+			case COVER: return StatusEffectKind.BUFF;
 			default:
 				throw new RuntimeException("Invalid status effect type, this cannot happen");
 		}
@@ -80,6 +82,7 @@ public enum StatusEffectType {
 			case "stunned": return STUNNED;
 			case "vampirism": return VAMPIRISM;
 			case "weakened": return WEAKENED;
+			case "cover": return COVER;
 			default:
 				throw new CorruptDataException("Invalid status effect " + s);
 		}

@@ -67,6 +67,6 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 	 * Attempt to complete this instant effect.
 	 * @return true on success, false on fail.
 	 * */
-	public boolean complete(List<MapPoint> p) {return true;}
+	public boolean complete(BattleState battle, List<MapPoint> p) {return true;}
 }
 

@@ -260,6 +260,7 @@ public class PullPush extends InstantEffect {
 					if (oc.isPresent()) {
 						List<Command> cont = oc.get().continueTurnReset(battle);
 						for (Command c : cont) r.addAll(c.doCmdComputingTriggers(battle));
+						doneContinueTurn = true;
 					}
 				}
 			}

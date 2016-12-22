@@ -261,7 +261,7 @@ public class BattleInProgress implements Runnable {
 	 * */
 	public synchronized void completeEffect(List<MapPoint> completion) {
 		if (accepting) {
-			queueActionWithRetry(new ActionComplete(completion));
+			queueActionWithRetry(new ActionComplete(battle.battleState, completion));
 		}
 	}
 }

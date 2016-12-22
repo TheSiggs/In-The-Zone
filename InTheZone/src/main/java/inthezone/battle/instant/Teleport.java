@@ -168,10 +168,10 @@ public class Teleport extends InstantEffect {
 	}
 
 	@Override public boolean isComplete() {return !(destinations == null);}
-	@Override public boolean complete(List<MapPoint> ps) {
+	@Override public boolean complete(BattleState battle, List<MapPoint> ps) {
 		destinations = new ArrayList<>();
 		destinations.addAll(ps);
-		return destinations != null && targets.size() == destinations.size();
+		return targets.size() == destinations.size();
 	}
 }
 

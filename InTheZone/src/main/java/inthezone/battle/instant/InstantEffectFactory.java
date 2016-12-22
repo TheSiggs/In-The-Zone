@@ -29,6 +29,7 @@ public class InstantEffectFactory {
 			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets, false);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets, castFrom);
 			case OBSTACLES: return Obstacles.getEffect(castFrom, battleState, info, targets);
+			case MOVE: return Move.getEffect(battleState, info, targets, castFrom);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}
 	}
@@ -47,6 +48,7 @@ public class InstantEffectFactory {
 				case PULL: return PullPush.fromJSON(o);
 				case TELEPORT: return Teleport.fromJSON(o);
 				case OBSTACLES: return Obstacles.fromJSON(o);
+				case MOVE: return Move.fromJSON(o);
 				default: throw new ProtocolException("Unimplemented effect " + kind);
 			}
 		} catch (ClassCastException|CorruptDataException  e) {

@@ -54,8 +54,8 @@ public class InstantEffectCommand extends Command {
 	/**
 	 * Attempt to complete this command.
 	 * */
-	public void complete(List<MapPoint> ps) throws CommandException {
-		if (!effect.complete(ps))
+	public void complete(BattleState battle, List<MapPoint> ps) throws CommandException {
+		if (!effect.complete(battle, ps))
 			throw new CommandException("Could not complete instant effect");
 		isComplete = true;
 		waitingForCompletion = false;

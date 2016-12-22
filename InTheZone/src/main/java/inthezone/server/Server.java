@@ -2,27 +2,25 @@ package inthezone.server;
 
 import inthezone.battle.data.GameDataFactory;
 import isogame.engine.CorruptDataException;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class Server {
+public class Server extends Application {
 	public static final int DEFAULT_BACKLOG = 10;
 	public static final int DEFAULT_PORT = 8000; // for now!
 
-	public static void main(String args[]) {
-		Map<String, String> parsedArgs = new HashMap<>();
-		for (String arg : args) {
-			String[] p = arg.split("=");
-			if (p.length != 2) {
-				System.out.println("Invalid command line option " + arg);
-				commandLineError();
-			}
-			parsedArgs.put(p[0], p[1]);
-		}
+	public static void main(final String[] arguments) {
+		Application.launch(arguments);
+	}
 
+	@Override
+	public void start(Stage primaryStage) {
+		Map<String, String> parsedArgs = getParameters().getNamed();
 		System.err.println(parsedArgs.toString());
 
 		final Optional<File> baseDir = 
@@ -68,7 +66,7 @@ public class Server {
 
 	private static void commandLineError() {
 		System.out.println("Syntax: server (opt=value)*");
-		System.out.println("Valid options are: basedir, port, backlog");
+		System.out.println("Valid options are: --basedir, --port, --backlog");
 		System.exit(2);
 	}
 }

@@ -53,7 +53,6 @@ public class ModeTeleport extends Mode {
 				});
 			return this;
 		}
-
 	}
 
 	@Override public boolean canCancel() {return false;}

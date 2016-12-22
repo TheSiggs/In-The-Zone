@@ -14,7 +14,7 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
  * The selected character is to be moved.
  * */
 public class ModeMove extends Mode {
-	private Character selectedCharacter;
+	protected Character selectedCharacter;
 
 	public ModeMove(BattleView view, Character selectedCharacter) {
 		super(view);

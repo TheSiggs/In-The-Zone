@@ -12,6 +12,7 @@ import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.instant.InstantEffect;
+import inthezone.battle.instant.Move;
 import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleInProgress;
@@ -326,6 +327,18 @@ public class BattleView
 						"Invalid UI state.  Attempted to teleport from a non-animating mode.");
 				}
 
+			} else if (e instanceof Move) {
+				hud.writeMessage("Select move destination");
+				Move move = (Move) e;
+
+				try {
+					setMode(new ModeMoveEffect(this, (ModeAnimating) this.mode,
+						move.affectedCharacters, move.range));
+				} catch (ClassCastException ee) {
+					throw new RuntimeException(
+						"Invalid UI state.  Attempted to do move effect from a non-animating mode.");
+				}
+				
 			} else {
 				throw new RuntimeException("Cannot complete instant effect " + e);
 			}

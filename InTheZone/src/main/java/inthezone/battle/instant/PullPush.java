@@ -21,9 +21,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -141,12 +143,17 @@ public class PullPush extends InstantEffect {
 		List<MapPoint> sortedTargets = new ArrayList<>(targets);
 		sortedTargets.sort(Comparator.comparingInt(x -> castFrom.distance(x)));
 
+		Set<MapPoint> occupied = new HashSet<>();
+
 		for (MapPoint t : sortedTargets) {
-			List<MapPoint> path1 = getPullPath(battle, t, castFrom, info.param, true);
-			List<MapPoint> path2 = getPullPath(battle, t, castFrom, info.param, false);
+			List<MapPoint> path1 = getPullPath(battle, t, castFrom, occupied, info.param, true);
+			List<MapPoint> path2 = getPullPath(battle, t, castFrom, occupied, info.param, false);
 
 			List<MapPoint> path = path1.size() > path2.size()?  path1 : path2; 
-			if (path.size() > 0) paths.add(path);
+			if (path.size() > 0) {
+				paths.add(path);
+				occupied.add(path.get(path.size() - 1));
+			}
 		}
 
 		return new PullPush(info, castFrom, paths, isFear);
@@ -191,7 +198,8 @@ public class PullPush extends InstantEffect {
 	}
 
 	private static List<MapPoint> getPullPath(
-		BattleState battle, MapPoint from, MapPoint to, int limit, boolean bias
+		BattleState battle, MapPoint from, MapPoint to,
+		Set<MapPoint> occupied, int limit, boolean bias
 	) {
 		List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
 		List<MapPoint> path = new ArrayList<>();
@@ -204,6 +212,7 @@ public class PullPush extends InstantEffect {
 			path.size() <= limit &&
 			los.size() > 0 &&
 			battle.isSpaceFree(los.get(0)) &&
+			!occupied.contains(los.get(0)) &&
 			PathFinderNode.canTraverseBoundary(
 				last, los.get(0), battle.terrain.terrain)
 		) {

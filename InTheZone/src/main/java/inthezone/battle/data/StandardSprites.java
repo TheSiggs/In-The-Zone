@@ -21,6 +21,8 @@ public class StandardSprites {
 	public StandardSprites(Library l, ResourceLocator loc) throws CorruptDataException {
 		this.roadBlock = l.getSprite("roadblock");
 		this.trap = l.getSprite("trap");
+		if (roadBlock == null) throw CorruptDataException("Missing roadblock sprite");
+		if (trap == null) throw CorruptDataException("Missing trap sprite");
 		Arrays.stream(StatusEffectType.class.getEnumConstants()).forEach(t -> {
 			try {
 				statusEffects.put(t, new Image(loc.gfx(t.getIconName())));

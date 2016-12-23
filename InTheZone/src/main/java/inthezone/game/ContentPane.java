@@ -11,6 +11,7 @@ import inthezone.comptroller.Network;
 import inthezone.comptroller.NetworkCommandGenerator;
 import inthezone.game.battle.BattleView;
 import inthezone.game.lobby.LobbyView;
+import isogame.engine.CorruptDataException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -199,24 +200,32 @@ public class ContentPane extends StackPane implements LobbyListener {
 	public void startBattle(
 		StartBattleCommand ready, Player player, String playerName
 	) {
-		Platform.runLater(() ->
-			showScreen(new BattleView(
-				ready, player,
-				new NetworkCommandGenerator(network.readCommandQueue),
-				network, gameData), (Optional<BattleOutcome> oWinCond) -> {
-					String message = null;
-					if (oWinCond.isPresent()) {
-						switch (oWinCond.get()) {
-							case WIN: message = "You win!"; break;
-							case LOSE: message = "You lose."; break;
-							case DRAW: message = "It's a draw"; break;
+		Platform.runLater(() -> {
+			try {
+				showScreen(new BattleView(
+					ready, player,
+					new NetworkCommandGenerator(network.readCommandQueue),
+					network, gameData), (Optional<BattleOutcome> oWinCond) -> {
+						String message = null;
+						if (oWinCond.isPresent()) {
+							switch (oWinCond.get()) {
+								case WIN: message = "You win!"; break;
+								case LOSE: message = "You lose."; break;
+								case DRAW: message = "It's a draw"; break;
+							}
 						}
-					}
 
-					Alert a = new Alert(Alert.AlertType.ERROR, message, ButtonType.CLOSE);
-					a.setHeaderText("Battle over");
-					a.showAndWait();
-				}));
+						Alert a = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.CLOSE);
+						a.setHeaderText("Battle over");
+						a.showAndWait();
+					});
+
+			} catch (CorruptDataException e) {
+				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				a.setHeaderText("Error starting battle");
+				a.showAndWait();
+			}
+		});
 	}
 }
 

@@ -137,7 +137,7 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		}
 	}
 
-	public Battle doCmd(GameDataFactory gameData) {
+	public Battle doCmd(GameDataFactory gameData) throws CorruptDataException {
 		return new Battle(
 			new BattleState(gameData.getStage(stage), characters),
 			gameData.getStandardSprites());

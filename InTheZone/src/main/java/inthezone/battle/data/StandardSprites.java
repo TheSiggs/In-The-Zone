@@ -19,10 +19,11 @@ public class StandardSprites {
 	public final Map<StatusEffectType, Image> statusEffects = new HashMap<>();
 
 	public StandardSprites(Library l, ResourceLocator loc) throws CorruptDataException {
+		System.err.println("Make standard sprites");
 		this.roadBlock = l.getSprite("roadblock");
 		this.trap = l.getSprite("trap");
-		if (roadBlock == null) throw CorruptDataException("Missing roadblock sprite");
-		if (trap == null) throw CorruptDataException("Missing trap sprite");
+		if (roadBlock == null) throw new CorruptDataException("Missing roadblock sprite");
+		if (trap == null) throw new CorruptDataException("Missing trap sprite");
 		Arrays.stream(StatusEffectType.class.getEnumConstants()).forEach(t -> {
 			try {
 				statusEffects.put(t, new Image(loc.gfx(t.getIconName())));

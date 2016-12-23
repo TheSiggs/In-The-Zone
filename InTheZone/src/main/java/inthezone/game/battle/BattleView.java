@@ -19,6 +19,7 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
+import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -66,7 +67,7 @@ public class BattleView
 		StartBattleCommand startBattle, Player player,
 		CommandGenerator otherPlayer,
 		Network network, GameDataFactory gameData
-	) {
+	) throws CorruptDataException {
 		super();
 
 		this.player = player;

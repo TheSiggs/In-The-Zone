@@ -14,6 +14,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.Targetable;
 import inthezone.battle.Zone;
+import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import javafx.application.Platform;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class BattleInProgress implements Runnable {
 		CommandGenerator otherPlayer,
 		Network network,
 		GameDataFactory gameData, BattleListener listener
-	) {
+	) throws CorruptDataException {
 		this(
 			cmd.doCmd(gameData),
 			thisPlayer,

@@ -22,9 +22,9 @@ public class MessageChannel {
 
 	private final Queue<SendState> sendQueue = new LinkedList<>();
 	
-	private final ByteBuffer sndBuffer = ByteBuffer.allocate(4096);
-	private final ByteBuffer recBuffer = ByteBuffer.allocate(4096);
-	private final CharBuffer msgBuffer = CharBuffer.allocate(1024);
+	private final ByteBuffer sndBuffer = ByteBuffer.allocate(32 * 1024);
+	private final ByteBuffer recBuffer = ByteBuffer.allocate(32 * 1024);
+	private final CharBuffer msgBuffer = CharBuffer.allocate(8 * 1024);
 
 	private final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
 	private final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();

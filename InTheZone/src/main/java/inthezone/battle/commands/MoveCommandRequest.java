@@ -27,7 +27,7 @@ public class MoveCommandRequest extends CommandRequest {
 			r.add(new MoveCommand(path, false));
 			return r;
 		} else {
-			throw new CommandException("Bad path command request");
+			throw new CommandException("30: Bad path command request");
 		}
 	}
 }

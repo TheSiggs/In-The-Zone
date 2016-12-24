@@ -43,7 +43,7 @@ public class InstantEffectCommand extends Command {
 	public boolean isCompletedOrRequestCompletion() throws CommandException {
 		if (isComplete) return true; else {
 			if (waitingForCompletion) {
-				throw new CommandException("Incomplete instant effect");
+				throw new CommandException("10: Incomplete instant effect");
 			} else {
 				waitingForCompletion = true;
 				return false;
@@ -56,7 +56,7 @@ public class InstantEffectCommand extends Command {
 	 * */
 	public void complete(BattleState battle, List<MapPoint> ps) throws CommandException {
 		if (!effect.complete(battle, ps))
-			throw new CommandException("Could not complete instant effect");
+			throw new CommandException("11: Could not complete instant effect");
 		isComplete = true;
 		waitingForCompletion = false;
 	}

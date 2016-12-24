@@ -51,7 +51,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 							battleState.getAbilityTargets(agent, agentType, castFrom, ability, t).stream())
 						.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
 						.collect(Collectors.toList());
-				}).orElseThrow(() -> new CommandException("Invalid ability command request"));
+				}).orElseThrow(() -> new CommandException("60: Invalid ability command request"));
 
 			// get the instant effect targets
 			List<MapPoint> preTargets = new ArrayList<>();

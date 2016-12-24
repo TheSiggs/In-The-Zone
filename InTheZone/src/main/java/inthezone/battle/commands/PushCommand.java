@@ -68,7 +68,7 @@ public class PushCommand extends Command {
 		List<Targetable> r = new ArrayList<>();
 		if (effective) {
 			Character user = battle.battleState.getCharacterAt(agent)
-				.orElseThrow(() -> new CommandException("Cannot find push agent"));
+				.orElseThrow(() -> new CommandException("40: Cannot find push agent"));
 
 			user.usePush();
 			// by convention, we always put the agent first in the affected characters list.

@@ -129,12 +129,12 @@ public class UseAbilityCommand extends Command {
 		if (agentType == AbilityAgentType.TRAP) {
 			abilityData = battle.battleState.getTrapAt(castFrom)
 				.map(t -> t.ability).orElseThrow(() ->
-					new CommandException("1: Invalid ability command"));
+					new CommandException("50: Invalid ability command"));
 
 		} else if (agentType == AbilityAgentType.ZONE) {
 			abilityData = battle.battleState.getZoneAt(castFrom)
 				.map(z -> z.ability).orElseThrow(() ->
-					new CommandException("2: Invalid ability command"));
+					new CommandException("51: Invalid ability command"));
 
 		} else {
 			abilityData = battle.battleState.getCharacterAt(agent)
@@ -142,7 +142,7 @@ public class UseAbilityCommand extends Command {
 					.filter(a -> a.info.name.equals(ability)).findFirst())
 				.flatMap(a -> a.getNext(
 					battle.battleState.hasMana(agent), subsequentLevel))
-				.orElseThrow(() -> new CommandException("3: Invalid ability command"));
+				.orElseThrow(() -> new CommandException("52: Invalid ability command"));
 		}
 
 		List<Targetable> r = new ArrayList<>();
@@ -150,7 +150,7 @@ public class UseAbilityCommand extends Command {
 		if (abilityData.info.trap && agentType == AbilityAgentType.CHARACTER) {
 			return battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
-				.orElseThrow(() -> new CommandException("4: Invalid ability command"));
+				.orElseThrow(() -> new CommandException("53: Invalid ability command"));
 
 		} else {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
@@ -179,7 +179,7 @@ public class UseAbilityCommand extends Command {
 				if (o.isPresent()) {
 					r.addAll(battle.battleState.getCharacterAt(agent)
 						.map(c -> battle.createZone(abilityData, c, o, targetSquares))
-						.orElseThrow(() -> new CommandException("5: Invalid ability command")));
+						.orElseThrow(() -> new CommandException("54: Invalid ability command")));
 				}
 
 			// unbound zones
@@ -190,7 +190,7 @@ public class UseAbilityCommand extends Command {
 				r.addAll(battle.battleState.getCharacterAt(agent)
 					.map(c -> battle.createZone(
 						abilityData, c, Optional.empty(), targetSquares))
-					.orElseThrow(() -> new CommandException("6: Invalid ability command")));
+					.orElseThrow(() -> new CommandException("55: Invalid ability command")));
 			}
 		}
 

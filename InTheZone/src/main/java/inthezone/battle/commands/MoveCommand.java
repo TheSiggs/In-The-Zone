@@ -24,7 +24,7 @@ public class MoveCommand extends Command {
 	public MoveCommand(List<MapPoint> path, boolean isPanic)
 		throws CommandException
 	{
-		if (path.size() < 2) throw new CommandException("Bad path in move command");
+		if (path.size() < 2) throw new CommandException("20: Bad path in move command");
 		this.path = path;
 		this.isPanic = isPanic;
 	}
@@ -69,7 +69,7 @@ public class MoveCommand extends Command {
 
 	@Override
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
-		if (!battle.battleState.canMove(path)) throw new CommandException("Invalid move command");
+		if (!battle.battleState.canMove(path)) throw new CommandException("21: Invalid move command");
 		Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
 
 		battle.doMove(path);

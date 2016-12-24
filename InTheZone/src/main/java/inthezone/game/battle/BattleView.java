@@ -300,6 +300,7 @@ public class BattleView
 		Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 		a.setHeaderText("Game error!");
 		a.showAndWait();
+		battle.requestCommand(new ResignCommandRequest(player));
 	}
 
 	@Override

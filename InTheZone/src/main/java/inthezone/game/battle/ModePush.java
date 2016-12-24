@@ -2,6 +2,7 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.commands.PushCommandRequest;
+import inthezone.comptroller.InfoPush;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
@@ -23,18 +24,14 @@ public class ModePush extends Mode {
 	}
 
 	@Override public Mode setupMode() {
-		view.getStage().clearAllHighlighting();
-
-		MapPoint centre = selectedCharacter.getPos();
-		Collection<MapPoint> r = new ArrayList<>();
-		r.add(centre.add(new MapPoint( 1, 0)));
-		r.add(centre.add(new MapPoint(-1, 0)));
-		r.add(centre.add(new MapPoint( 0, 1)));
-		r.add(centre.add(new MapPoint( 0, -1)));
-
 		Stage stage = view.getStage();
-		r.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
-		view.setSelectable(r);
+		stage.clearAllHighlighting();
+
+		getFutureWithRetry(view.battle.requestInfo(new InfoPush(selectedCharacter)))
+			.ifPresent(mr -> {
+				mr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_MOVE));
+				view.setSelectable(mr);
+			});
 
 		return this;
 	}

@@ -18,11 +18,12 @@ public class InfoPush extends InfoRequest<List<MapPoint>> {
 	}
 
 	@Override public void completeAction(Battle battle) {
-		complete.complete(LineOfSight.getDiamond(subject.getPos(), 1).stream()
+		final MapPoint agent = subject.getPos();
+		complete.complete(LineOfSight.getDiamond(agent, 1).stream()
 			.filter(p -> battle.battleState.getTargetableAt(p).stream()
-				.anyMatch(t -> t.isPushable()))
+				.anyMatch(t -> t.isPushable() &&
+					battle.battleState.isSpaceFree(agent.addScale(p.subtract(agent), 2))))
 			.collect(Collectors.toList()));
 	}
 }
-
 

@@ -33,16 +33,17 @@ public class PushCommandRequest extends CommandRequest {
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
-		Targetable t = battleState.getTargetableAt(target).stream()
+		final Targetable t = battleState.getTargetableAt(target).stream()
 			.filter(x -> !(x instanceof Trap)).findFirst()
 			.orElseThrow(() -> new CommandException("1: Invalid push command"));
 
-		Collection<MapPoint> targets = new ArrayList<>();
+		final Collection<MapPoint> targets = new ArrayList<>();
 		targets.add(target);
 
 		Command r = battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {
-				boolean effective = t.isPushable();
+				final MapPoint d = agent.addScale(target.subtract(agent), 2);
+				final boolean effective = t.isPushable() && battleState.isSpaceFree(d);
 				return Optional.of(new PushCommand(agent, PullPush.getEffect(
 					battleState, pushEffect, agent, targets, false), effective));
 			}
@@ -50,7 +51,7 @@ public class PushCommandRequest extends CommandRequest {
 			return Optional.empty();
 		}).orElseThrow(() -> new CommandException("2: Invalid push command request"));
 
-		List<Command> lr = new ArrayList<>();
+		final List<Command> lr = new ArrayList<>();
 		lr.add(r);
 		return lr;
 	}

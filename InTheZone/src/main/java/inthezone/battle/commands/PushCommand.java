@@ -67,6 +67,7 @@ public class PushCommand extends Command {
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
 		List<Targetable> r = new ArrayList<>();
 		if (effective) {
+			System.err.println("Do push command effective");
 			Character user = battle.battleState.getCharacterAt(agent)
 				.orElseThrow(() -> new CommandException("40: Cannot find push agent"));
 

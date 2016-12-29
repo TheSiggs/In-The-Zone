@@ -77,10 +77,10 @@ public class Ability {
 		}
 	}
 
-	private static final double const_a = 3;
+	private static final double const_a = 15;
 	private static final double const_b = 4;
 	private static final double const_h = 12;
-	private static final double const_i = 15;
+	private static final double const_i = 75;
 	private static final double const_m = 0.5;
 	private static final double const_f = 0.15;
 

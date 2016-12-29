@@ -8,11 +8,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 
 public class CompiledResourceLocator implements ResourceLocator {
-	private final File gameDataCacheDir;
+	private final Optional<File> gameDataCacheDir;
 
-	public CompiledResourceLocator(File gameDataCacheDir) {
+	public CompiledResourceLocator(Optional<File> gameDataCacheDir) {
 		this.gameDataCacheDir = gameDataCacheDir;
 	}
 
@@ -32,20 +33,25 @@ public class CompiledResourceLocator implements ResourceLocator {
 
 	@Override
 	public InputStream gameData() throws IOException {
-		File gameDataFile = new File(gameDataFilename());
+		if (!gameDataCacheDir.isPresent()) {
+			return internalGameData();
+		} else {
+			File gameDataFile = new File(gameDataFilename());
 
-		if (!gameDataFile.exists()) {
-			// copy the compiled-in version to make a new cached version
-			if (!gameDataCacheDir.exists()) gameDataCacheDir.mkdir();
-			OutputStream fout = new FileOutputStream(gameDataFile);
-			InputStream fin = internalGameData();
-			int b;
-			while ((b = fin.read()) != -1) fout.write(b);
-			fout.close();
-			fin.close();
+			if (!gameDataFile.exists()) {
+				File cache = gameDataCacheDir.get();
+				// copy the compiled-in version to make a new cached version
+				if (!cache.exists()) cache.mkdir();
+				OutputStream fout = new FileOutputStream(gameDataFile);
+				InputStream fin = internalGameData();
+				int b;
+				while ((b = fin.read()) != -1) fout.write(b);
+				fout.close();
+				fin.close();
+			}
+
+			return new FileInputStream(gameDataFile);
 		}
-
-		return new FileInputStream(gameDataFile);
 	}
 
 	public InputStream internalGameData() throws IOException {
@@ -63,7 +69,11 @@ public class CompiledResourceLocator implements ResourceLocator {
 
 	@Override
 	public String gameDataFilename() {
-		return (new File(gameDataCacheDir, "game_data.json")).toString();
+		if (gameDataCacheDir.isPresent()) {
+			return (new File(gameDataCacheDir.get(), "game_data.json")).toString();
+		} else {
+			return "/gamedata/game_data.json";
+		}
 	}
 
 	@Override

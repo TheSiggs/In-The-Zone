@@ -26,7 +26,7 @@ public class DataEditor extends Application {
 		try {
 			File dataDir = getDataDir(primaryStage);
 			if (dataDir == null) System.exit(1);
-			GameDataFactory factory = new GameDataFactory(Optional.of(dataDir));
+			GameDataFactory factory = new GameDataFactory(Optional.of(dataDir), false);
 
 			// used to detect changes in the data so we know if it is necessary to save
 			final SimpleBooleanProperty changed = new SimpleBooleanProperty(false);

@@ -33,7 +33,7 @@ public class Server extends Application {
 			final int backlog = Optional.ofNullable(parsedArgs.get("backlog"))
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_BACKLOG);
 
-			GameDataFactory dataFactory = new GameDataFactory(baseDir);
+			GameDataFactory dataFactory = new GameDataFactory(baseDir, true);
 			Multiplexer multiplexer = new Multiplexer(port, backlog, dataFactory);
 
 			Thread mplexerThread = new Thread(multiplexer);

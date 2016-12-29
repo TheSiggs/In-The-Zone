@@ -41,7 +41,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 	private JSONObject json = null;
 
-	public GameDataFactory(Optional<File> baseDir)
+	public GameDataFactory(Optional<File> baseDir, boolean useInternal)
 		throws IOException, CorruptDataException
 	{
 		InputStream gameData;
@@ -51,7 +51,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 			this.loc = new DevelopmentResourceLocator(baseDir.get());
 			this.updateCache = false;
 		} else {
-			this.loc = new CompiledResourceLocator(gameDataCacheDir);
+			this.loc = new CompiledResourceLocator(
+				Optional.ofNullable(useInternal? null : gameDataCacheDir));
 			this.updateCache = true;
 		}
 

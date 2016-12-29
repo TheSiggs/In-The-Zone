@@ -60,7 +60,7 @@ public class Game extends Application {
 
 		try {
 			final GameDataFactory gameData =
-				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()));
+				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()), false);
 			final ClientConfig config = new ClientConfig(gameData);
 			final ContentPane contentPane = new ContentPane(
 				config, gameData, server, port, config.defaultPlayerName);

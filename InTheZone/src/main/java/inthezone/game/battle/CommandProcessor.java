@@ -97,6 +97,7 @@ public class CommandProcessor {
 			registeredAnimations = instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
 
 		} else if (ec.cmd instanceof EndTurnCommand) {
+			view.isMyTurn.setValue(false);
 			registeredAnimations = false;
 
 		} else if (ec.cmd instanceof ResignCommand) {

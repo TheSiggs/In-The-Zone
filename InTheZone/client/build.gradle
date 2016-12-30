@@ -1,18 +1,42 @@
-//apply from: '../common.gradle' // doesn't work!
 import org.apache.tools.ant.taskdefs.condition.Os
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+//apply from: '../common.gradle' // doesn't work!
+buildscript {
+    repositories {
+        jcenter()
+		maven {
+			url 'http://anonsvn.icesoft.org/repo/maven2/releases'
+		}
+		maven {
+		  url "https://plugins.gradle.org/m2/"
+		}
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-izpack-plugin:2.1'
+		//classpath 'org.codehaus.izpack:izpack-ant:5.0.7'
+		classpath 'org.icepdf.os:icepdf-core:6.0.1'
+		classpath "gradle.plugin.install4j.install4j:gradle_plugin:6.1.4"
+    }
+}
 
 plugins {
 	id 'com.github.johnrengelman.shadow' version '1.2.3'
 		id 'java'
 		id 'application'
 }
+apply plugin: 'com.bmuschko.izpack'
+apply plugin: "com.install4j.gradle"
 repositories {
 	jcenter()
+	maven {
+		url 'http://anonsvn.icesoft.org/repo/maven2/releases'
+	}
 }
 
 dependencies {
 	compile fileTree(dir: '../lib', include: '*.jar')
+	izpack 'org.codehaus.izpack:izpack-ant:5.0.7'
 }
 
 sourceSets {
@@ -74,4 +98,9 @@ distributions {
 				from { 'start_scripts' }
 			}
 	}
+}
+
+izpack {
+    //baseDir = file("$buildDir/izpack")
+    //baseDir = file("$buildDir")
 }

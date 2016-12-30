@@ -145,13 +145,9 @@ public class Character extends Targetable {
 		}
 	}
 
-	public Optional<StatusEffect> getStatusBuff() {
-		return statusBuff;
-	}
+	public Optional<StatusEffect> getStatusBuff() { return statusBuff; }
 
-	public Optional<StatusEffect> getStatusDebuff() {
-		return statusDebuff;
-	}
+	public Optional<StatusEffect> getStatusDebuff() { return statusDebuff; }
 
 	/**
 	 * Buff or debuff this character's points. Should be done after the turn reset.
@@ -270,13 +266,9 @@ public class Character extends Targetable {
 	/**
 	 * Remove all status effects
 	 * */
-	@Override public Stats getStats() {
-		return baseStats;
-	}
+	@Override public Stats getStats() { return baseStats; }
 
-	@Override public MapPoint getPos() {
-		return pos;
-	}
+	@Override public MapPoint getPos() { return pos; }
 
 	@Override public double getAttackBuff() {
 		double buff = statusBuff.map(s -> s.getAttackBuff()).orElse(0.0);
@@ -300,14 +292,14 @@ public class Character extends Targetable {
 		System.err.println("HP: " + hp + " after damage " + damage);
 	}
 
-	@Override public void defuse() {return;}
+	@Override public void defuse() { return; }
 
 	@Override public void cleanse() {
 		statusBuff = Optional.empty();
 		statusDebuff = Optional.empty();
 	}
 
-	@Override public void purge() {return;}
+	@Override public void purge() { return; }
 
 	@Override public void applyStatus(StatusEffect status) {
 		final StatusEffectInfo info = status.getInfo();
@@ -320,21 +312,17 @@ public class Character extends Targetable {
 		}
 	}
 
-	@Override public boolean isPushable() {
-		return true;
-	}
+	@Override public boolean isPushable() { return true; }
 
 	@Override public boolean isEnemyOf(Character c) {
 		return player != c.player;
 	}
 
-	@Override public boolean reap() {return false;}
+	@Override public boolean reap() { return false; }
 
-	@Override public SpriteInfo getSprite() {return sprite;}
+	@Override public SpriteInfo getSprite() { return sprite; }
 
-	@Override public boolean blocksSpace(Player player) {
-		return true;
-	}
+	@Override public boolean blocksSpace() { return true; }
 
 	@Override public boolean blocksPath(Player player) {
 		return !(hp == 0 || this.player == player);

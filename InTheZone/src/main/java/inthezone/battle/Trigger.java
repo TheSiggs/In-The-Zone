@@ -28,20 +28,7 @@ public class Trigger {
 	 * value is never length 0.
 	 * */
 	public List<MapPoint> shrinkPath(List<MapPoint> path) {
-		Optional<Zone> currentZone = null;
-		List<MapPoint> r = new ArrayList<>();
-		for (MapPoint p : path) {
-			r.add(p);
-
-			Optional<Zone> newZone = battle.getZoneAt(p);
-			if (currentZone == null) currentZone = newZone;
-			if (!currentZone.equals(newZone)) return r;
-
-			Optional<Trap> t = battle.getTrapAt(p);
-			if (t.isPresent()) return r;
-		}
-
-		return r;
+		return splitPath(path).get(0);
 	}
 
 	/**
@@ -50,10 +37,10 @@ public class Trigger {
 	 * @param path a non-empty path
 	 * @return A list of path segments, each a valid path in its own right.  The
 	 * first element in the return list may have length 1, which indicates that
-	 * the original path started on a trigger point.
+	 * the original path started on a trigger point.  Never returns an empty list.
 	 * */
 	public List<List<MapPoint>> splitPath(List<MapPoint> path) {
-		List<List<MapPoint>> r = new ArrayList<>();
+		final List<List<MapPoint>> r = new ArrayList<>();
 
 		boolean pathAdded = false;
 
@@ -67,7 +54,7 @@ public class Trigger {
 			if (currentZone == null) currentZone = newZone;
 
 			Optional<Trap> t = battle.getTrapAt(p);
-			if (t.isPresent() || !currentZone.equals(newZone)) {
+			if ((t.isPresent() || !currentZone.equals(newZone)) && battle.isSpaceFree(p)) {
 				currentZone = newZone;
 				r.add(currentPath);
 				pathAdded = true;

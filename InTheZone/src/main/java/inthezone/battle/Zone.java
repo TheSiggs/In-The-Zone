@@ -76,12 +76,11 @@ public class Zone extends Targetable implements HasParentAgent {
 	/**
 	 * Call once at the start of each turn
 	 * */
-	public boolean canRemoveNow() {
+	public void notifyTurn() {
 		turnsRemaining = turnsRemaining.map(t -> t - 1);
-		return reap();
 	}
 
-	@Override public boolean blocksSpace(Player player) {return false;}
+	@Override public boolean blocksSpace() {return false;}
 	@Override public boolean blocksPath(Player player) {return false;}
 
 	@Override public Stats getStats() {return stats;}

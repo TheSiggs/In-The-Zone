@@ -19,7 +19,7 @@ public class PanickedStatusEffect extends StatusEffect {
 	}
 
 	public List<Command> doBeforeTurn(Battle battle, Character c) {
-		final Set<MapPoint> obstacles = battle.battleState.spaceObstacles(c.player);
+		final Set<MapPoint> obstacles = battle.battleState.spaceObstacles();
 
 		Node<MapPoint> p = new PathFinderNode(
 			null, battle.battleState.terrain.terrain, obstacles,

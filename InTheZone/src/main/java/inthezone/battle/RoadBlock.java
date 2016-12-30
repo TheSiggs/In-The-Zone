@@ -47,7 +47,7 @@ public class RoadBlock extends Targetable {
 		else return new ArrayList<>();
 	}
 
-	@Override public boolean blocksSpace(Player player) {return true;}
+	@Override public boolean blocksSpace() {return true;}
 	@Override public boolean blocksPath(Player player) {return true;}
 
 	@Override public Stats getStats() {return new Stats();}

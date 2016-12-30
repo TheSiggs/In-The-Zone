@@ -108,13 +108,17 @@ public class BattleState {
 	}
 
 	/**
-	 * To be called once at the start of each turn to remove expired zones.
+	 * To be called once at the start of each turn.
 	 * */
+	public void notifyTurn() {
+		for (Zone z : zones) z.notifyTurn();
+	}
+
 	public List<Zone> removeExpiredZones() {
 		List<Zone> r = new ArrayList<>();
 
 		for (Zone z : zones) {
-			if (z.canRemoveNow()) {
+			if (z.reap()) {
 				r.add(z);
 				for (MapPoint p : z.range) zoneMap.remove(p);
 			}
@@ -227,7 +231,7 @@ public class BattleState {
 		return getCharacterAt(path.get(0)).map(c -> {
 			MapPoint target = path.get(path.size() - 1);
 
-			return !spaceObstacles(c.player).contains(target) &&
+			return !spaceObstacles().contains(target) &&
 				path.size() - 1 <= c.getMP();
 		}).orElse(false);
 	}
@@ -238,15 +242,17 @@ public class BattleState {
 	public boolean isSpaceFree(MapPoint p) {
 		return terrain.terrain.hasTile(p) &&
 			!(terrainObstacles.contains(p) ||
-				targetable.stream().anyMatch(c -> c.getPos().equals(p)));
+				targetable.stream()
+					.filter(t -> t.blocksSpace())
+					.anyMatch(t -> t.getPos().equals(p)));
 	}
 
 	/**
 	 * Points that are already occupied.
 	 * */
-	public Set<MapPoint> spaceObstacles(Player player) {
+	public Set<MapPoint> spaceObstacles() {
 		Set<MapPoint> r = new HashSet<>(targetable.stream()
-			.filter(c -> c.blocksSpace(player))
+			.filter(c -> c.blocksSpace())
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		r.addAll(terrainObstacles);
 		return r;

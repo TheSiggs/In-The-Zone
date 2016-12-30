@@ -57,6 +57,7 @@ public abstract class Targetable implements Obstacle {
 
 					r.addAll((new UseAbilityCommandRequest(pos, AbilityAgentType.ZONE, pos,
 						targets, zone.ability)).makeCommand(battle));
+					System.err.println("Constructed zone effect");
 				} catch (CommandException e) {
 					throw new RuntimeException("Internal logic error triggering zone", e);
 				}

@@ -49,6 +49,7 @@ public class Battle {
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
+		battleState.notifyTurn();
 		return battleState.removeExpiredZones();
 	}
 	

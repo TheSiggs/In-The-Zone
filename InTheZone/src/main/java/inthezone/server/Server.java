@@ -2,38 +2,40 @@ package inthezone.server;
 
 import inthezone.battle.data.GameDataFactory;
 import isogame.engine.CorruptDataException;
-import javafx.application.Application;
-import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class Server extends Application {
+public class Server {
 	public static final int DEFAULT_BACKLOG = 10;
 	public static final int DEFAULT_PORT = 8000; // for now!
 
-	public static void main(final String[] arguments) {
-		Application.launch(arguments);
-	}
+	public static void main(String args[]) {
+		Map<String, String> parsedArgs = new HashMap<>();
+		for (String arg : args) {
+			String[] p = arg.split("=");
+			if (p.length != 2) {
+				System.out.println("Invalid command line option " + arg);
+				commandLineError();
+			}
+			parsedArgs.put(p[0], p[1]);
+		}
 
-	@Override
-	public void start(Stage primaryStage) {
-		Map<String, String> parsedArgs = getParameters().getNamed();
 		System.err.println(parsedArgs.toString());
 
 		final Optional<File> baseDir = 
-			Optional.ofNullable(parsedArgs.get("basedir"))
+			Optional.ofNullable(parsedArgs.get("--basedir"))
 			.map(x -> (new File(x)).getAbsoluteFile());
 
 		try {
-			final int port = Optional.ofNullable(parsedArgs.get("port"))
+			final int port = Optional.ofNullable(parsedArgs.get("--port"))
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_PORT);
-			final int backlog = Optional.ofNullable(parsedArgs.get("backlog"))
+			final int backlog = Optional.ofNullable(parsedArgs.get("--backlog"))
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_BACKLOG);
 
-			GameDataFactory dataFactory = new GameDataFactory(baseDir, true);
+			GameDataFactory dataFactory = new GameDataFactory(baseDir, true, true);
 			Multiplexer multiplexer = new Multiplexer(port, backlog, dataFactory);
 
 			Thread mplexerThread = new Thread(multiplexer);
@@ -66,7 +68,7 @@ public class Server extends Application {
 
 	private static void commandLineError() {
 		System.out.println("Syntax: server (opt=value)*");
-		System.out.println("Valid options are: --basedir, --port, --backlog");
+		System.out.println("Valid options are: basedir, port, backlog");
 		System.exit(2);
 	}
 }

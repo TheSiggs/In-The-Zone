@@ -44,6 +44,14 @@ public class GameDataFactory implements HasJSONRepresentation {
 	public GameDataFactory(Optional<File> baseDir, boolean useInternal)
 		throws IOException, CorruptDataException
 	{
+		this(baseDir, useInternal, false);
+	}
+
+	public GameDataFactory(
+		Optional<File> baseDir, boolean useInternal, boolean nofx
+	)
+		throws IOException, CorruptDataException
+	{
 		InputStream gameData;
 		File gameDataFile;
 
@@ -57,7 +65,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 		}
 
 		this.globalLibrary = Library.fromFile(
-			loc.globalLibrary(), loc.globalLibraryFilename(), loc, null);
+			loc.globalLibrary(), loc.globalLibraryFilename(), loc, null, nofx);
 
 		gameData = loc.gameData();
 

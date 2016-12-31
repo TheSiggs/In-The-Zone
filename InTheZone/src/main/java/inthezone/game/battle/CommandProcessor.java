@@ -9,6 +9,7 @@ import inthezone.battle.commands.PushCommand;
 import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.UseAbilityCommand;
 import inthezone.battle.instant.InstantEffect;
+import inthezone.battle.instant.Move;
 import inthezone.battle.instant.PullPush;
 import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
@@ -150,6 +151,19 @@ public class CommandProcessor {
 				int id = ((Character) affectedCharacters.get(i)).id;
 				view.sprites.scheduleTeleport(
 					view.sprites.getCharacterById(id), destinations.get(i));
+			}
+			return true;
+
+		} else if (effect instanceof Move) {
+			Move move = (Move) effect;
+
+			if (move.paths.size() != affectedCharacters.size()) {
+				throw new RuntimeException("Invalid move effect, this cannot happen");
+			}
+
+			for (int i = 0; i < move.paths.size(); i++) {
+				view.sprites.scheduleMovement("walk", walkSpeed,
+					move.paths.get(i), (Character) affectedCharacters.get(i));
 			}
 			return true;
 

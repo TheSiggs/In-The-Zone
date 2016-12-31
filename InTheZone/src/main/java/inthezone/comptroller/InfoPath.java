@@ -11,15 +11,23 @@ import java.util.List;
 public class InfoPath extends InfoRequest<List<MapPoint>> {
 	private final Character subject;
 	private final MapPoint target;
+	private final int range;
 
 	public InfoPath(Character subject, MapPoint target) {
 		this.subject = subject;
 		this.target = target;
+		this.range = subject.getMP();
+	}
+
+	public InfoPath(Character subject, MapPoint target, int range) {
+		this.subject = subject;
+		this.target = target;
+		this.range = range;
 	}
 
 	@Override public void completeAction(Battle battle) {
 		complete.complete(battle.battleState.findValidPath(
-			subject.getPos(), target, subject.player));
+			subject.getPos(), target, subject.player, range));
 	}
 }
 

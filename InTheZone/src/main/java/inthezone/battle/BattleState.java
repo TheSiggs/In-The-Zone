@@ -216,24 +216,30 @@ public class BattleState {
 	 * @return The empty list if there is no valid path
 	 * */
 	public List<MapPoint> findValidPath(
-		MapPoint start, MapPoint target, Player player
+		MapPoint start, MapPoint target, Player player, int range
 	) {
 		List<MapPoint> path = findPath(start, target, player);
-		if (canMove(path)) return path; else return new ArrayList<>();
+		if (canMoveRange(range, path)) return path; else return new ArrayList<>();
 	}
 
 	/**
-	 * Determine if a path is valid.  A path is valid if it takes a character to
-	 * an unoccupied square and isn't longer than the character's mp.
+	 * Determine if a move path is valid.  A path is valid if it takes a
+	 * character to an unoccupied square and isn't longer than the character's
+	 * mp.
 	 * */
 	public boolean canMove(List<MapPoint> path) {
 		if (path.size() < 2) return false;
-		return getCharacterAt(path.get(0)).map(c -> {
-			MapPoint target = path.get(path.size() - 1);
+		return getCharacterAt(path.get(0))
+			.map(c -> canMoveRange(c.getMP(), path)).orElse(false);
+	}
 
-			return !spaceObstacles().contains(target) &&
-				path.size() - 1 <= c.getMP();
-		}).orElse(false);
+	/**
+	 * Determine if a move path is valid, using a fixed range instead of mp.
+	 * */
+	public boolean canMoveRange(int range, List<MapPoint> path) {
+		if (path.size() < 2) return false;
+		MapPoint target = path.get(path.size() - 1);
+		return !spaceObstacles().contains(target) && path.size() - 1 <= range;
 	}
 
 	/**

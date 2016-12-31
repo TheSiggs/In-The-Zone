@@ -116,8 +116,8 @@ public class Move extends InstantEffect {
 		final List<Targetable> affected = new ArrayList<>();
 
 		for (List<MapPoint> path : paths) {
-			battle.doMove(path);
 			battle.battleState.getCharacterAt(path.get(0)).ifPresent(c -> affected.add(c));
+			battle.doMove(path);
 		}
 
 		return affected;
@@ -144,7 +144,7 @@ public class Move extends InstantEffect {
 			List<List<MapPoint>> validPathSections = pathSections.stream()
 				.filter(x -> x.size() >= 2).collect(Collectors.toList());
 
-			// do the push/pull
+			// do the move
 			if (!validPathSections.isEmpty()) {
 				InstantEffect eff = new Move(
 					null, this.range, validPathSections, agent);
@@ -187,7 +187,7 @@ public class Move extends InstantEffect {
 	@Override public boolean complete(BattleState battle, List<MapPoint> ps) {
 		if (ps == null || affectedCharacters.size() != ps.size()) return false;
 
-		List<List<MapPoint>> paths = new ArrayList<>();
+		paths = new ArrayList<>();
 
 		for (int i = 0; i < ps.size(); i++) {
 			Character c = affectedCharacters.get(i);

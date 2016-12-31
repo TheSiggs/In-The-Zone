@@ -26,7 +26,7 @@ public class InfoMoveRange extends InfoRequest<Collection<MapPoint>> {
 
 	@Override public void completeAction(Battle battle) {
 		complete.complete(LineOfSight.getDiamond(subject.getPos(), range).stream()
-			.filter(p -> battle.battleState.canMove(
+			.filter(p -> battle.battleState.canMoveRange(range,
 				battle.battleState.findPath(subject.getPos(), p, subject.player)))
 			.collect(Collectors.toList()));
 	}

@@ -249,5 +249,9 @@ public class Battle {
 		}
 		return r;
 	}
+
+	public void doResign(Player player) {
+		battleState.resign(player);
+	}
 }
 

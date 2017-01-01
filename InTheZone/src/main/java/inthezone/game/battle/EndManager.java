@@ -11,24 +11,25 @@ public class EndManager extends HBox {
 	private final Label message = new Label(" ");
 	private final Button close = new Button("Close");
 
-	public EndManager(BattleView view, Optional<BattleOutcome> outcome, boolean resigned) {
+	public EndManager(BattleView view, BattleOutcome outcome) {
 		super();
 
 		this.setAlignment(Pos.CENTER);
 		this.getStyleClass().add("end-manager");
 
-		message.setText(
-			outcome.map(o -> {
-				switch (o) {
-					case WIN: return "You win!";
-					case LOSE: return "You lose.";
-					case DRAW: return "It's a draw.";
-					default: throw new RuntimeException("This cannot happen");
-				}
-			}).orElse(resigned? "You resigned." : "Other player resigned."));
+		String m = "";
+		switch (outcome) {
+			case WIN: m = "You win!"; break;
+			case LOSE: m = "You lose."; break;
+			case DRAW: m = "It's a draw."; break;
+			case RESIGN: m = "You resigned."; break;
+			case OTHER_RESIGNED: m = "Other player resigned."; break;
+			default: throw new RuntimeException("This cannot happen");
+		}
 
+		message.setText(m);
 
-		close.setOnAction(event -> view.handleEndBattle(outcome));
+		close.setOnAction(event -> view.handleEndBattle(Optional.of(outcome)));
 		this.getChildren().addAll(message, close);
 	}
 }

@@ -101,10 +101,6 @@ public class CommandProcessor {
 			view.isMyTurn.setValue(false);
 			registeredAnimations = false;
 
-		} else if (ec.cmd instanceof ResignCommand) {
-			view.handleResign(view.isMyTurn.getValue());
-			registeredAnimations = false;
-
 		} else if (ec.cmd instanceof UseAbilityCommand && view.isMyTurn.getValue()) {
 			view.getMode().updateAffected(ec.affected);
 			registeredAnimations = false;

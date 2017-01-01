@@ -135,10 +135,27 @@ public class BattleState {
 		targetable.remove(t);
 	}
 
+	private Optional<Player> resignedPlayer = Optional.empty();
+
+	/**
+	 * Register a resignation.
+	 * */
+	public void resign(Player player) {
+		resignedPlayer = Optional.of(player);
+	}
+
 	/**
 	 * Determine the outcome of the battle from the point of view of a player.
 	 * */
 	public Optional<BattleOutcome> getBattleOutcome(Player player) {
+		if (resignedPlayer.isPresent()) {
+			if (resignedPlayer.get() == player) {
+				return Optional.of(BattleOutcome.RESIGN);
+			} else {
+				return Optional.of(BattleOutcome.OTHER_RESIGNED);
+			}
+		}
+
 		boolean playerDead = characters.stream()
 			.filter(c -> c.player == player)
 			.allMatch(c -> c.isDead());

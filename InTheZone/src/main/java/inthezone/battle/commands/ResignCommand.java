@@ -46,6 +46,7 @@ public class ResignCommand extends Command {
 
 	@Override
 	public List<Targetable> doCmd(Battle turn) {
+		turn.doResign(player);
 		return new ArrayList<>();
 	}
 }

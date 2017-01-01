@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class HUD extends AnchorPane {
 	private final FlowPane characterInfoBoxes = new FlowPane();
@@ -110,7 +109,7 @@ public class HUD extends AnchorPane {
 	 * @param outcome The outcome, or nothing if a player resigned.
 	 * @param resigned True if this player resigned.
 	 * */
-	public void doEndMode(Optional<BattleOutcome> outcome, boolean resigned) {
+	public void doEndMode(BattleOutcome outcome) {
 		characterInfoBoxes.disableProperty().unbind();
 		endButtons.disableProperty().unbind();
 		abilitiesButton.disableProperty().unbind();
@@ -120,7 +119,7 @@ public class HUD extends AnchorPane {
 		endButtons.setDisable(true);
 		abilitiesButton.setDisable(true);
 		itemsButton.setDisable(true);
-		assistanceLine.getChildren().add(new EndManager(view, outcome, resigned));
+		assistanceLine.getChildren().add(new EndManager(view, outcome));
 	}
 
 	public void updateAbilities(Character c, boolean mana) {

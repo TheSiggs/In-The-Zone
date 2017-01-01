@@ -283,8 +283,7 @@ public class BattleView
 
 	@Override
 	public void endTurn(List<Targetable> characters) {
-		selectedCharacter = Optional.empty();
-		isCharacterSelected.setValue(false);
+		selectCharacter(Optional.empty());
 		isMyTurn.setValue(false);
 		setMode(new ModeOtherTurn(this));
 		sprites.updateCharacters(characters);
@@ -294,13 +293,7 @@ public class BattleView
 	public void endBattle(BattleOutcome outcome) {
 		selectCharacter(Optional.empty());
 		setMode(new ModeOtherTurn(this));
-		hud.doEndMode(Optional.of(outcome), false);
-	}
-
-	public void handleResign(boolean didIResign) {
-		selectCharacter(Optional.empty());
-		setMode(new ModeOtherTurn(this));
-		hud.doEndMode(Optional.empty(), didIResign);
+		hud.doEndMode(outcome);
 	}
 
 	public void handleEndBattle(Optional<BattleOutcome> outcome) {

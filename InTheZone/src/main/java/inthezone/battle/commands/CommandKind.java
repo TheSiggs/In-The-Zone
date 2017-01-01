@@ -7,12 +7,13 @@ import inthezone.protocol.ProtocolException;
  * which behaves a little differently to the others.
  * */
 public enum CommandKind {
-	ENDTURN, MOVE, PUSH, ABILITY, INSTANT, ITEM, RESIGN, FATIGUE;
+	ENDTURN, STARTTURN, MOVE, PUSH, ABILITY, INSTANT, ITEM, RESIGN, FATIGUE;
 
 	@Override
 	public String toString() {
 		switch (this) {
 			case ENDTURN: return "End";
+			case STARTTURN: return "Start";
 			case MOVE: return "Move";
 			case PUSH: return "Push";
 			case ABILITY: return "Ability";
@@ -27,6 +28,7 @@ public enum CommandKind {
 	public static CommandKind fromString(String s) throws ProtocolException {
 		switch (s) {
 			case "End": return CommandKind.ENDTURN;
+			case "Start": return CommandKind.STARTTURN;
 			case "Move": return CommandKind.MOVE;
 			case "Push": return CommandKind.PUSH;
 			case "Ability": return CommandKind.ABILITY;

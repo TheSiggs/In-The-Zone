@@ -6,7 +6,7 @@ import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.PushCommand;
-import inthezone.battle.commands.ResignCommand;
+import inthezone.battle.commands.StartTurnCommand;
 import inthezone.battle.commands.UseAbilityCommand;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.Move;
@@ -18,6 +18,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 
 /**
@@ -98,8 +99,32 @@ public class CommandProcessor {
 			registeredAnimations = instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
 
 		} else if (ec.cmd instanceof EndTurnCommand) {
-			view.isMyTurn.setValue(false);
+			EndTurnCommand cmd = (EndTurnCommand) ec.cmd;
+
+			if (cmd.player == view.player) {
+				view.isMyTurn.setValue(false);
+				view.setMode(new ModeOtherTurn(view));
+			} else {
+				view.isMyTurn.setValue(true);
+			}
 			registeredAnimations = false;
+
+		} else if (ec.cmd instanceof StartTurnCommand) {
+			StartTurnCommand cmd = (StartTurnCommand) ec.cmd;
+
+			if (cmd.player == view.player) {
+				view.isMyTurn.setValue(true);
+				if (cmd.commandsComming) {
+					view.setMode(new ModeAnimating(view));
+					registeredAnimations = true;
+				} else {
+					view.setMode(new ModeSelect(view));
+					registeredAnimations = false;
+				}
+			} else {
+				view.isMyTurn.setValue(false);
+				registeredAnimations = false;
+			}
 
 		} else if (ec.cmd instanceof UseAbilityCommand && view.isMyTurn.getValue()) {
 			view.getMode().updateAffected(ec.affected);
@@ -163,6 +188,5 @@ public class CommandProcessor {
 			return false;
 		}
 	}
-
 }
 

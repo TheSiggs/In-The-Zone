@@ -98,6 +98,7 @@ public class BattleView
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
 		this.sprites = new SpriteManager(this, allSprites, decals, () -> {
 			inAnimation = false;
+
 			while (!inAnimation && !commands.isEmpty()) {
 				inAnimation = commands.doNextCommand();
 			}
@@ -212,7 +213,10 @@ public class BattleView
 	 * Send the end turn message.
 	 * */
 	public void sendEndTurn() {
-		battle.requestCommand(new EndTurnCommandRequest());
+		selectedCharacter = Optional.empty();
+		isCharacterSelected.setValue(false);
+		hud.selectCharacter(null);
+		battle.requestCommand(new EndTurnCommandRequest(player));
 		setMode(new ModeAnimating(this));
 	}
 
@@ -220,6 +224,9 @@ public class BattleView
 	 * Send the resign message
 	 * */
 	public void sendResign() {
+		selectedCharacter = Optional.empty();
+		isCharacterSelected.setValue(false);
+		hud.selectCharacter(null);
 		battle.requestCommand(new ResignCommandRequest(player));
 		setMode(new ModeAnimating(this));
 	}
@@ -267,26 +274,6 @@ public class BattleView
 			throw new RuntimeException(
 				"Attempted to push but no character was selected");
 		}
-	}
-
-	@Override
-	public void startTurn(List<Targetable> characters, boolean commandsComming) {
-		isMyTurn.setValue(true);
-		sprites.updateCharacters(characters);
-
-		if (commandsComming) {
-			setMode(new ModeAnimating(this));
-		} else {
-			setMode(new ModeSelect(this));
-		}
-	}
-
-	@Override
-	public void endTurn(List<Targetable> characters) {
-		selectCharacter(Optional.empty());
-		isMyTurn.setValue(false);
-		setMode(new ModeOtherTurn(this));
-		sprites.updateCharacters(characters);
 	}
 
 	@Override

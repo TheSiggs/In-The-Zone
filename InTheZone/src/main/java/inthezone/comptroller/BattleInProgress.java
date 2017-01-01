@@ -10,6 +10,7 @@ import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.commands.StartTurnCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.Targetable;
@@ -118,7 +119,13 @@ public class BattleInProgress implements Runnable {
 				List<Targetable> affected = new ArrayList<>();
 				affected.addAll(battle.battleState.cloneCharacters());
 				affected.addAll(zones);
-				listener.startTurn(affected, commandsComming);
+				try {
+					listener.command(
+						(new StartTurnCommand(thisPlayer, affected, commandsComming))
+						.doCmdComputingTriggers(battle).get(0));
+				} catch (CommandException e) {
+					listener.badCommand(e);
+				}
 			});
 
 			if (doCommands()) return;
@@ -215,7 +222,12 @@ public class BattleInProgress implements Runnable {
 			List<Targetable> affected = new ArrayList<>();
 			affected.addAll(battle.battleState.cloneCharacters());
 			affected.addAll(zones);
-			listener.endTurn(affected);
+			try {
+				listener.command((new StartTurnCommand(thisPlayer.otherPlayer(), affected, false))
+					.doCmdComputingTriggers(battle).get(0));
+			} catch (CommandException e) {
+				listener.badCommand(e);
+			}
 		});
 
 		otherPlayer.generateCommands(battle, listener, thisPlayer.otherPlayer());

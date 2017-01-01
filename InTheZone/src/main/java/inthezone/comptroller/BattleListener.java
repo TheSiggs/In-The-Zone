@@ -14,20 +14,6 @@ import java.util.List;
  * */
 public interface BattleListener {
 	/**
-	 * Start the player's turn.
-	 * @param characters Data for all the characters to update the HUD.
-	 * @param commandsComming true if we should wait for some start of turn
-	 * commands.
-	 * */
-	public void startTurn(List<Targetable> characters, boolean commandsComming);
-
-	/**
-	 * Start the other player's turn.
-	 * @param characters Data for all the characters to update the HUD.
-	 * */
-	public void endTurn(List<Targetable> characters);
-
-	/**
 	 * Deal with the battle end condition.
 	 * */
 	public void endBattle(BattleOutcome outcome);

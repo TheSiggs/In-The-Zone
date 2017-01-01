@@ -37,7 +37,7 @@ public class SimpleAI implements CommandGenerator {
 		}
 
 		try {
-			Command cmd = new EndTurnCommand();
+			Command cmd = new EndTurnCommand(forPlayer);
 			ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
 			Platform.runLater(() -> listener.command(ec));
 		} catch (CommandException e) {

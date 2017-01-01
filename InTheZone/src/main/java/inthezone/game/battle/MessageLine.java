@@ -7,7 +7,7 @@ import javafx.animation.Timeline;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
-public class MessageLine extends Label{
+public class MessageLine extends Label {
 	private final Timeline animation = new Timeline();
 
 	private final static double VISIBLE_DURATION = 4 * 1000;

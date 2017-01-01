@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Ability;
+import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
 import javafx.geometry.Pos;
@@ -102,6 +103,24 @@ public class HUD extends AnchorPane {
 
 		for (CharacterInfoBox box : characters.values())
 			box.setSelected(box.id == id);
+	}
+
+	/**
+	 * Switch to battle end mode.
+	 * @param outcome The outcome, or nothing if a player resigned.
+	 * @param resigned True if this player resigned.
+	 * */
+	public void doEndMode(Optional<BattleOutcome> outcome, boolean resigned) {
+		characterInfoBoxes.disableProperty().unbind();
+		endButtons.disableProperty().unbind();
+		abilitiesButton.disableProperty().unbind();
+		itemsButton.disableProperty().unbind();
+
+		characterInfoBoxes.setDisable(true);
+		endButtons.setDisable(true);
+		abilitiesButton.setDisable(true);
+		itemsButton.setDisable(true);
+		assistanceLine.getChildren().add(new EndManager(view, outcome, resigned));
 	}
 
 	public void updateAbilities(Character c, boolean mana) {

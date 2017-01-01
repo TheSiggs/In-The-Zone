@@ -249,11 +249,5 @@ public class Battle {
 		}
 		return r;
 	}
-
-	public void doResign(Player player) {
-		battleState.characters.stream()
-			.filter(c -> c.player == player)
-			.forEach(c -> c.kill());
-	}
 }
 

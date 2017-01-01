@@ -292,7 +292,19 @@ public class BattleView
 
 	@Override
 	public void endBattle(BattleOutcome outcome) {
-		onDone.accept(Optional.of(outcome));
+		selectCharacter(Optional.empty());
+		setMode(new ModeOtherTurn(this));
+		hud.doEndMode(Optional.of(outcome), false);
+	}
+
+	public void handleResign(boolean didIResign) {
+		selectCharacter(Optional.empty());
+		setMode(new ModeOtherTurn(this));
+		hud.doEndMode(Optional.empty(), didIResign);
+	}
+
+	public void handleEndBattle(Optional<BattleOutcome> outcome) {
+		onDone.accept(outcome);
 	}
 
 	@Override

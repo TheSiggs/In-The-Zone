@@ -102,11 +102,7 @@ public class CommandProcessor {
 			registeredAnimations = false;
 
 		} else if (ec.cmd instanceof ResignCommand) {
-			if (((ResignCommand) ec.cmd).player != view.player) {
-				Alert a = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
-				a.setHeaderText("Opponent resigns");
-				a.showAndWait();
-			}
+			view.handleResign(view.isMyTurn.getValue());
 			registeredAnimations = false;
 
 		} else if (ec.cmd instanceof UseAbilityCommand && view.isMyTurn.getValue()) {

@@ -205,20 +205,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 				showScreen(new BattleView(
 					ready, player,
 					new NetworkCommandGenerator(network.readCommandQueue),
-					network, gameData), (Optional<BattleOutcome> oWinCond) -> {
-						String message = null;
-						if (oWinCond.isPresent()) {
-							switch (oWinCond.get()) {
-								case WIN: message = "You win!"; break;
-								case LOSE: message = "You lose."; break;
-								case DRAW: message = "It's a draw"; break;
-							}
-						}
-
-						Alert a = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.CLOSE);
-						a.setHeaderText("Battle over");
-						a.showAndWait();
-					});
+					network, gameData), oWinCond -> {});
 
 			} catch (CorruptDataException e) {
 				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);

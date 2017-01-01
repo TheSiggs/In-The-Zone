@@ -121,6 +121,11 @@ public class Ability {
 			(double) t.hp) / const_i;
 	}
 
+	/**
+	 * @param a Agent
+	 * @param t Target
+	 * @param r Revenge bonus
+	 * */
 	public DamageToTarget computeDamageToTarget(
 		Targetable a, Targetable t, double r
 	) {

@@ -1,19 +1,25 @@
 .character-info-box {
-	-fx-background-color: white;
-	-fx-border-color: black;
-	-fx-border-style: solid;
+	-fx-background-color:white;
+	-fx-border-color:black;
+	-fx-border-style:solid;
 }
 
 .multitarget-assistant {
-	-fx-background-color: white;
+	-fx-background-color:white;
+}
+
+.end-manager {
+	-fx-background-color:white;
+	-fx-border-color:black;
+	-fx-border-style:solid;
 }
 
 .character-info-box-selected {
-	-fx-background-color: yellow;
+	-fx-background-color:yellow;
 }
 
 .message-line {
-	-fx-background-color: white;
-	-fx-opacity: 0.0;
+	-fx-background-color:white;
+	-fx-opacity:0.0;
 }
 

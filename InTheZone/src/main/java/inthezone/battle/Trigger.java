@@ -27,19 +27,20 @@ public class Trigger {
 	 * the start point of the original path was a trigger point.  The return
 	 * value is never length 0.
 	 * */
-	public List<MapPoint> shrinkPath(List<MapPoint> path) {
-		return splitPath(path).get(0);
+	public List<MapPoint> shrinkPath(Targetable agent, List<MapPoint> path) {
+		return splitPath(agent, path).get(0);
 	}
 
 	/**
 	 * Split a path into multiple segments, such that each segment is a valid
 	 * path, and triggers only occur on the ends of paths.
+	 * @param agent the agent walking the path
 	 * @param path a non-empty path
 	 * @return A list of path segments, each a valid path in its own right.  The
 	 * first element in the return list may have length 1, which indicates that
 	 * the original path started on a trigger point.  Never returns an empty list.
 	 * */
-	public List<List<MapPoint>> splitPath(List<MapPoint> path) {
+	public List<List<MapPoint>> splitPath(Targetable agent, List<MapPoint> path) {
 		final List<List<MapPoint>> r = new ArrayList<>();
 
 		boolean pathAdded = false;
@@ -54,7 +55,13 @@ public class Trigger {
 			if (currentZone == null) currentZone = newZone;
 
 			Optional<Trap> t = battle.getTrapAt(p);
-			if ((t.isPresent() || !currentZone.equals(newZone)) && battle.isSpaceFree(p)) {
+			boolean triggerTrap = t.map(tt ->
+				tt.ability.canTarget(tt.parent, agent)).orElse(false);
+			boolean triggerZone = !currentZone.equals(newZone) &&
+				currentZone.map(z ->
+					z.ability.canTarget(z.parent, agent)).orElse(false);
+
+			if ((triggerTrap || triggerZone) && battle.isSpaceFree(p)) {
 				currentZone = newZone;
 				r.add(currentPath);
 				pathAdded = true;
@@ -75,16 +82,21 @@ public class Trigger {
 		List<Command> r = new ArrayList<>();
 
 		battle.getZoneAt(p).ifPresent(zone -> {
-			for (Targetable t : battle.getTargetableAt(p))
-				r.addAll(t.triggerZone(battle));
+			battle.getTargetableAt(p).stream()
+				.filter(t -> zone.ability.canTarget(zone.parent, t))
+				.forEach(t -> r.addAll(t.triggerZone(battle)));
 		});
 
 		battle.getTrapAt(p).ifPresent(trap -> {
 			try {
 				List<Casting> targets = new ArrayList<>(); targets.add(new Casting(p, p));
 
-				r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP,
-					trap.ability, targets)).makeCommand(battle));
+				if (battle.getTargetableAt(p).stream()
+					.anyMatch(t -> trap.ability.canTarget(trap.parent, t)))
+				{
+					r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP,
+						trap.ability, targets)).makeCommand(battle));
+				}
 			} catch (CommandException e) {
 				throw new RuntimeException("Internal logic error triggering trap", e);
 			}

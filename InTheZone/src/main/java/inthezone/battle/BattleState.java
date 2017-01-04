@@ -402,7 +402,8 @@ public class BattleState {
 		return getAgentAt(agent, agentType).map(a ->
 			area.stream()
 				.flatMap(p -> getTargetableAt(p).stream())
-				.filter(t -> ability.canTarget(a, t))
+				.filter(t -> ability.canTarget(
+					a instanceof HasParentAgent? ((HasParentAgent) a).getParent() : a, t))
 				.collect(Collectors.toList())
 		).orElse(new ArrayList<>());
 	}

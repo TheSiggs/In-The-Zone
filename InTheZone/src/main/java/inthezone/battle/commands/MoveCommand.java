@@ -85,7 +85,9 @@ public class MoveCommand extends Command {
 	{
 		List<ExecutedCommand> r = new ArrayList<>();
 
-		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(path);
+		Character agent = turn.battleState.getCharacterAt(path.get(0)).orElseThrow(() ->
+			new CommandException("MV1: No character at start of path"));
+		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(agent, path);
 		
 		if (path1.size() >= 2) {
 			Command move1 = new MoveCommand(path1, false);

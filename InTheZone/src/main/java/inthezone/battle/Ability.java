@@ -63,6 +63,9 @@ public class Ability {
 
 	/**
 	 * Determine if this ability can be applied to a particular target.
+	 * @param agent The doer of the ability
+	 * @param target The target of the ability
+	 * @return true if agent can target the target, otherwise false.
 	 * */
 	public boolean canTarget(Targetable agent, Targetable target) {
 		if (target.getPos().equals(agent.getPos())) {

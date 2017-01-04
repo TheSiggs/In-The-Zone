@@ -39,6 +39,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	private Collection<DamageToTarget> computeDamageToTargets(
 		BattleState battleState, Targetable a
 	) {
+		System.err.println("Computing damage for " + a);
 		final double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
 			battleState.getRevengeBonus(((Character) a).player);
 
@@ -50,6 +51,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					battleState.getAffectedArea(agent, agentType, ability, casting))
 				.stream().filter(t -> !targeted.contains(t.getPos()))
 				.collect(Collectors.toList());
+
+			System.err.println("Casting " + casting + " yielded " + targets);
 
 			targeted.addAll(targets.stream()
 				.map(t -> t.getPos()).collect(Collectors.toList()));

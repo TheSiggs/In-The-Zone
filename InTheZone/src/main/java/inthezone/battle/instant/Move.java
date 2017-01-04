@@ -130,8 +130,15 @@ public class Move extends InstantEffect {
 		List<ExecutedCommand> r = new ArrayList<>();
 
 		List<List<List<MapPoint>>> splitPaths = paths.stream()
-			.map(path -> battle.battleState.trigger.splitPath(path))
-			.collect(Collectors.toList());
+			.map(path -> {
+				if (path.size() == 0) return new ArrayList<List<MapPoint>>(); else {
+					Character agent =
+						battle.battleState.getCharacterAt(path.get(0)).orElse(null);
+					if (agent == null) return new ArrayList<List<MapPoint>>(); else {
+						return battle.battleState.trigger.splitPath(agent, path);
+					}
+				}
+			}).collect(Collectors.toList());
 
 		while (!splitPaths.isEmpty()) {
 			List<List<MapPoint>> pathSections = new ArrayList<>();

@@ -44,11 +44,6 @@ public abstract class Mode {
 	}
 
 	/**
-	 * Update the characters that have been affected by this mode.
-	 * */
-	public void updateAffected(List<Targetable> affected) {}
-
-	/**
 	 * An animation is complete.
 	 * @param affected The targetables affected by the animation.
 	 * */

@@ -29,10 +29,6 @@ public class ModeAnimating extends Mode {
 		return new ModeAnimating(view, previous.retarget(retargeting));
 	}
 
-	@Override public void updateAffected(List<Targetable> affected) {
-		previous.updateAffected(affected);
-	}
-
 	@Override public Mode animationDone() {
 		if (view.isMyTurn.getValue()) {
 			return previous;

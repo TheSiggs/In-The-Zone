@@ -47,6 +47,7 @@ public class ModeTarget extends Mode {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 		this.recastFrom = new LinkedList<>();
+		this.recastFrom.add(subsequentLevelMarker);
 		this.targetingAbility = ability;
 		this.castFrom = selectedCharacter.getPos();
 		this.remainingTargets = ability.info.range.nTargets;
@@ -67,7 +68,8 @@ public class ModeTarget extends Mode {
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
-		this.recastFrom = recastFrom;
+		this.recastFrom = new LinkedList<>();
+		this.recastFrom.addAll(recastFrom);
 		this.targetingAbility = targetingAbility;
 		this.castFrom = castFrom;
 		this.canCancel = canCancel;
@@ -100,8 +102,6 @@ public class ModeTarget extends Mode {
 	}
 
 	@Override public Mode setupMode() {
-		System.err.println("Set up targeting");
-
 		view.getStage().clearAllHighlighting();
 		view.numTargets.setValue(remainingTargets);
 		view.multiTargeting.setValue(targetingAbility.info.range.nTargets > 1);
@@ -149,17 +149,22 @@ public class ModeTarget extends Mode {
 		}
 	}
 
+	private static final MapPoint subsequentLevelMarker = new MapPoint(-1, -1);
+
 	private Mode applyAbility() {
-		if (allCastings.isEmpty()) {
-			return this;
+		if (allCastings.isEmpty()) return this;
 
-		} else if (!recastFrom.isEmpty()) {
+		if (recursionLevel > 0 && !recastFrom.isEmpty()) {
 			castFrom = recastFrom.poll();
+			if (castFrom.equals(subsequentLevelMarker)) castFrom = recastFrom.poll();
 			remainingTargets = targetingAbility.info.range.nTargets;
-			return this;
+			if (castFrom != null) return this; else {
+				recastFrom.add(subsequentLevelMarker);
+			}
+		}
 
-		} else if (recursionLevel < targetingAbility.info.recursion) {
-			recursionLevel += 1;
+		if (recursionLevel < targetingAbility.info.recursion) {
+			this.recursionLevel += 1;
 
 			// Get the recast points.
 			getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
@@ -173,8 +178,9 @@ public class ModeTarget extends Mode {
 			thisRoundCastings.clear();
 
 			castFrom = recastFrom.poll();
+			if (castFrom.equals(subsequentLevelMarker)) castFrom = recastFrom.poll();
 			remainingTargets = targetingAbility.info.range.nTargets;
-			if (castFrom != null) return this;
+			if (castFrom != null) return this; else recastFrom.clear();
 		}
 
 		// Get the recast points for subsequent abilities.  This may not work
@@ -182,10 +188,6 @@ public class ModeTarget extends Mode {
 		getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
 				selectedCharacter, targetingAbility, allCastings)))
 			.ifPresent(this::queueRecastPoints);
-
-		System.err.println(allCastings);
-		System.err.println("Recast queue: " + recastFrom);
-		System.err.println("Retargeted from : " + retargetedFrom);
 
 		canCancel = false;
 		retargetedFrom.addAll(recastFrom);
@@ -196,14 +198,24 @@ public class ModeTarget extends Mode {
 
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
+		if (!recastFrom.isEmpty()) {
+			castFrom = recastFrom.poll();
+			if (!castFrom.equals(subsequentLevelMarker)) {
+				thisRoundCastings.clear();
+				allCastings.clear();
+				remainingTargets = targetingAbility.info.range.nTargets;
+				return castFrom == null?
+					new ModeAnimating(view) : new ModeAnimating(view, this);
+			}
+		}
+
 		if (nextAbility.isPresent()) {
-			System.err.println("Got subsequent");
 			thisRoundCastings.clear();
 			allCastings.clear();
 			targetingAbility = nextAbility.get();
 
 			castFrom = recastFrom.poll();
-			System.err.println("Recasting from " + castFrom);
+			recastFrom.add(subsequentLevelMarker);
 			remainingTargets = targetingAbility.info.range.nTargets;
 			return castFrom == null?
 				new ModeAnimating(view) : new ModeAnimating(view, this);
@@ -213,16 +225,13 @@ public class ModeTarget extends Mode {
 		}
 	}
 
-	@Override public void updateAffected(List<Targetable> affected) {
-		queueRecastPoints(affected);
-	}
-
 	private void queueRecastPoints(Collection<Targetable> affected) {
-		recastFrom.addAll(affected.stream()
+		Collection<MapPoint> affected1 = affected.stream()
 			.filter(t -> t instanceof Character &&
 				!retargetedFrom.contains(t.getPos()))
 			.map(t -> t.getPos())
-			.collect(Collectors.toList()));
+			.collect(Collectors.toList());
+		recastFrom.addAll(affected1);
 	}
 
 	@Override public void handleSelection(MapPoint p) {

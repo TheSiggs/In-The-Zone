@@ -127,7 +127,6 @@ public class CommandProcessor {
 			}
 
 		} else if (ec.cmd instanceof UseAbilityCommand && view.isMyTurn.getValue()) {
-			view.getMode().updateAffected(ec.affected);
 			registeredAnimations = false;
 
 		} else {

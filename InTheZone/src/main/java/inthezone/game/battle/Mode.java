@@ -7,6 +7,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,6 +33,13 @@ public abstract class Mode {
 	 * Some properties of the selected character have changed.
 	 * */
 	public Mode updateSelectedCharacter(Character selected) {
+		return this;
+	}
+
+	/**
+	 * Register retargeting information.
+	 * */
+	public Mode retarget(Map<MapPoint, MapPoint> retargeting) {
 		return this;
 	}
 

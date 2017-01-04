@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class ModeTarget extends Mode {
 	@Override public boolean canCancel() {return canCancel;}
 
 	// used for recursion to track which characters we've already rebounded off.
-	private final Set<MapPoint> retargetedFrom = new HashSet<>();
+	private Set<MapPoint> retargetedFrom = new HashSet<>();
 
 	private final Collection<Casting> allCastings = new ArrayList<>();
 	private final Collection<Casting> thisRoundCastings = new ArrayList<>();
@@ -49,7 +50,6 @@ public class ModeTarget extends Mode {
 		this.targetingAbility = ability;
 		this.castFrom = selectedCharacter.getPos();
 		this.remainingTargets = ability.info.range.nTargets;
-		retargetedFrom.add(selectedCharacter.getPos());
 	}
 
 	private ModeTarget(
@@ -84,12 +84,24 @@ public class ModeTarget extends Mode {
 			targetingAbility, castFrom, canCancel, recursionLevel,
 			remainingTargets, retargetedFrom,
 			allCastings, thisRoundCastings);
-		r.retargetedFrom.remove(this.selectedCharacter.getPos());
-		r.retargetedFrom.add(selectedCharacter.getPos());
 		return r;
 	}
 
+	@Override public Mode retarget(Map<MapPoint, MapPoint> retargeting) {
+		castFrom = retargeting.getOrDefault(castFrom, castFrom);
+		retargetedFrom = retargetedFrom.stream()
+			.map(x -> retargeting.getOrDefault(x, x))
+			.collect(Collectors.toSet());
+		for (int i = 0; i < recastFrom.size(); i++) {
+			MapPoint x = recastFrom.poll();
+			recastFrom.add(retargeting.getOrDefault(x, x));
+		}
+		return this;
+	}
+
 	@Override public Mode setupMode() {
+		System.err.println("Set up targeting");
+
 		view.getStage().clearAllHighlighting();
 		view.numTargets.setValue(remainingTargets);
 		view.multiTargeting.setValue(targetingAbility.info.range.nTargets > 1);
@@ -171,9 +183,11 @@ public class ModeTarget extends Mode {
 				selectedCharacter, targetingAbility, allCastings)))
 			.ifPresent(this::queueRecastPoints);
 
+		System.err.println(allCastings);
+		System.err.println("Recast queue: " + recastFrom);
+		System.err.println("Retargeted from : " + retargetedFrom);
+
 		canCancel = false;
-		retargetedFrom.clear();
-		retargetedFrom.add(selectedCharacter.getPos());
 		retargetedFrom.addAll(recastFrom);
 		view.multiTargeting.setValue(false);
 		view.battle.requestCommand(new UseAbilityCommandRequest(
@@ -183,11 +197,13 @@ public class ModeTarget extends Mode {
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
 		if (nextAbility.isPresent()) {
+			System.err.println("Got subsequent");
 			thisRoundCastings.clear();
 			allCastings.clear();
 			targetingAbility = nextAbility.get();
 
 			castFrom = recastFrom.poll();
+			System.err.println("Recasting from " + castFrom);
 			remainingTargets = targetingAbility.info.range.nTargets;
 			return castFrom == null?
 				new ModeAnimating(view) : new ModeAnimating(view, this);

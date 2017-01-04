@@ -145,6 +145,7 @@ public class CommandProcessor {
 	private boolean instantEffect(
 		InstantEffect effect, List<Targetable> affectedCharacters
 	) {
+		view.retargetMode(effect.getRetargeting());
 		if (effect instanceof PullPush) {
 			PullPush pullpush = (PullPush) effect;
 			if (pullpush.paths.size() != affectedCharacters.size()) {

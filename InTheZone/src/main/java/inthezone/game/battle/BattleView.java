@@ -32,6 +32,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ZONE;
@@ -136,6 +137,10 @@ public class BattleView
 		System.err.println("Set mode " + mode + " transforming to " + this.mode);
 		Stage stage = getStage();
 		for (MapPoint p : sprites.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
+	}
+
+	public void retargetMode(Map<MapPoint, MapPoint> retargeting) {
+		this.mode = this.mode.retarget(retargeting);
 	}
 
 	/**

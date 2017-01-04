@@ -46,13 +46,13 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		final Collection<DamageToTarget> r = new ArrayList<>();
 		final Set<MapPoint> targeted = new HashSet<>();
 		for (Casting casting : castings) {
-			Collection<Targetable> targets = 
-				battleState.getAbilityTargets(agent, agentType, ability,
-					battleState.getAffectedArea(agent, agentType, ability, casting))
+			Set<MapPoint> area = battleState.getAffectedArea(agent, agentType, ability, casting);
+
+			Collection<Targetable> targets = battleState.getAbilityTargets(agent, agentType, ability, area)
 				.stream().filter(t -> !targeted.contains(t.getPos()))
 				.collect(Collectors.toList());
 
-			System.err.println("Casting " + casting + " yielded " + targets);
+			System.err.println("Casting " + casting + " with agent " + agent + " yielded " + targets + " with aoe " + ability.info.range.radius + " in area " + area);
 
 			targeted.addAll(targets.stream()
 				.map(t -> t.getPos()).collect(Collectors.toList()));

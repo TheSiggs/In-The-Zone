@@ -42,5 +42,9 @@ public class Casting implements HasJSONRepresentation {
 			throw new ProtocolException("Error parsing casting");
 		}
 	}
+
+	@Override public String toString() {
+		return "Casting from " + castFrom + " of " + target;
+	}
 }
 

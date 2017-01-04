@@ -4,6 +4,7 @@ import inthezone.battle.Character;
 import inthezone.battle.Targetable;
 import isogame.engine.MapPoint;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ModeAnimating extends Mode {
@@ -22,6 +23,10 @@ public class ModeAnimating extends Mode {
 
 	@Override public ModeAnimating updateSelectedCharacter(Character selected) {
 		return new ModeAnimating(view, previous.updateSelectedCharacter(selected));
+	}
+
+	@Override public Mode retarget(Map<MapPoint, MapPoint> retargeting) {
+		return new ModeAnimating(view, previous.retarget(retargeting));
 	}
 
 	@Override public void updateAffected(List<Targetable> affected) {

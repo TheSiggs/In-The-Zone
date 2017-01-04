@@ -131,7 +131,7 @@ public class Battle {
 			t.dealDamage(d.damage);
 			if (d.statusEffect.isPresent()) {
 				try {
-					t.applyStatus(d.statusEffect.get().resolve(battleState));
+					t.applyStatus(this, d.statusEffect.get().resolve(battleState));
 				} catch (ProtocolException e) {
 					throw new CommandException("Invalid status effect", e);
 				}

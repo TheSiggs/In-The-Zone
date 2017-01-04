@@ -77,7 +77,7 @@ public class Trap extends Targetable implements HasParentAgent {
 	@Override public void defuse() {defused = true;}
 	@Override public void cleanse() {return;}
 	@Override public void purge() {return;}
-	@Override public void applyStatus(StatusEffect status) {return;}
+	@Override public void applyStatus(Battle battle, StatusEffect status) {return;}
 	@Override public boolean isPushable() {return false;}
 	@Override public boolean isEnemyOf(Character character) {return true;}
 	@Override public boolean isDead() {return defused;}

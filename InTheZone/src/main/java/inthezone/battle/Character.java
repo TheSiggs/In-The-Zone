@@ -304,8 +304,9 @@ public class Character extends Targetable {
 
 	@Override public void purge() { return; }
 
-	@Override public void applyStatus(StatusEffect status) {
+	@Override public void applyStatus(Battle battle, StatusEffect status) {
 		final StatusEffectInfo info = status.getInfo();
+		status.doNow(battle, this);
 		if (info.type == StatusEffectType.COVER) {
 			hasCover = true;
 		} else if (info.kind == StatusEffectKind.BUFF) {

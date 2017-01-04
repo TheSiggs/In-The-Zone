@@ -63,5 +63,10 @@ public class PointStatusEffect extends StatusEffect {
 		c.pointsBuff(ap, mp, hp);
 		return new ArrayList<>();
 	}
+
+	@Override public List<Command> doNow(Battle battle, Character c) {
+		c.pointsBuff(ap, mp, 0);
+		return new ArrayList<>();
+	}
 }
 

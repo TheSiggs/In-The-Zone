@@ -9,6 +9,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import java.util.Optional;
 
 /**
@@ -22,6 +23,10 @@ public class CharacterInfoBox extends GridPane {
 	private final ProgressBar ap = new ProgressBar(1);
 	private final ProgressBar mp = new ProgressBar(1);
 	private final ProgressBar hp = new ProgressBar(1);
+
+	private final Label nap = new Label("/");
+	private final Label nmp = new Label("/");
+	private final Label nhp = new Label("/");
 
 	private boolean isSelected = false;
 
@@ -39,9 +44,9 @@ public class CharacterInfoBox extends GridPane {
 		name.setText(character.name);
 		nameLine.getChildren().add(name);
 		this.add(nameLine, 0, 0, 2, 1);
-		this.addRow(1, new Label("ap"), ap);
-		this.addRow(2, new Label("mp"), mp);
-		this.addRow(3, new Label("hp"), hp);
+		this.addRow(1, new Label("ap"), new StackPane(ap, nap));
+		this.addRow(2, new Label("mp"), new StackPane(mp, nmp));
+		this.addRow(3, new Label("hp"), new StackPane(hp, nhp));
 
 		ap.setMouseTransparent(true);
 		mp.setMouseTransparent(true);
@@ -54,14 +59,17 @@ public class CharacterInfoBox extends GridPane {
 
 	private void updateAP(int ap, int max) {
 		this.ap.setProgress((double) ap / (double) max);
+		this.nap.setText(ap + " / " + max);
 	}
 
 	private void updateMP(int mp, int max) {
 		this.mp.setProgress((double) mp / (double) max);
+		this.nmp.setText(mp + " / " + max);
 	}
 
 	private void updateHP(int hp, int max) {
 		this.hp.setProgress((double) hp / (double) max);
+		this.nhp.setText(hp + " / " + max);
 	}
 
 	private void updateStatus(

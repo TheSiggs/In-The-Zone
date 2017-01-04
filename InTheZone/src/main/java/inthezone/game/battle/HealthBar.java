@@ -4,12 +4,15 @@ import isogame.engine.Sprite;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import static isogame.GlobalConstants.TILEH;
 import static isogame.GlobalConstants.TILEW;
 
 public class HealthBar {
 	private int hp;
 	private int maxHP;
+
+	private int hpChange = 0;
 
 	private double targetPosition;
 	private double position = 1.0;
@@ -42,6 +45,7 @@ public class HealthBar {
 	}
 
 	public void updateHP(int hp, int maxHP) {
+		hpChange = hp - this.hp;
 		this.hp = hp;
 		this.maxHP = maxHP;
 		targetPosition = (double) hp / (double) maxHP;
@@ -54,6 +58,8 @@ public class HealthBar {
 	public void hide() {
 		hiding = true;
 	}
+
+	private static final Font hpChangeFont = new Font(48d);
 
 	/**
 	 * Render a health bar
@@ -72,6 +78,12 @@ public class HealthBar {
 		cx.setFill(health);
 		cx.fillRect(X, Y, d, H);
 		cx.restore();
+
+		if (hpChange != 0) {
+			cx.setFill(background);
+			cx.setFont(hpChangeFont);
+			cx.fillText("" + hpChange, X, Y - H);
+		}
 	}
 
 	private void updateAnimations(long t) {

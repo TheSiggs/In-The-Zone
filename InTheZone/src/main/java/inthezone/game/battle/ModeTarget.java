@@ -138,8 +138,6 @@ public class ModeTarget extends Mode {
 	}
 
 	private Mode applyAbility() {
-		System.err.println("Apply ability");
-
 		if (allCastings.isEmpty()) {
 			return this;
 
@@ -149,14 +147,12 @@ public class ModeTarget extends Mode {
 			return this;
 
 		} else if (recursionLevel < targetingAbility.info.recursion) {
-			System.err.println("Recursion level: " + recursionLevel);
 			recursionLevel += 1;
 
 			// Get the recast points.
 			getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
 					selectedCharacter, targetingAbility, thisRoundCastings)))
 				.ifPresent(affected -> {
-					System.err.println("Affected by ability: " + affected);
 					queueRecastPoints(affected);
 					retargetedFrom.addAll(affected.stream().map(t ->
 						t.getPos()).collect(Collectors.toList()));
@@ -165,11 +161,8 @@ public class ModeTarget extends Mode {
 			thisRoundCastings.clear();
 
 			castFrom = recastFrom.poll();
-			System.err.println("Recasting from " + castFrom);
 			remainingTargets = targetingAbility.info.range.nTargets;
-			System.err.println("Remaining targets " + remainingTargets);
 			if (castFrom != null) return this;
-			System.err.println("Fall through");
 		}
 
 		// Get the recast points for subsequent abilities.  This may not work
@@ -180,6 +173,8 @@ public class ModeTarget extends Mode {
 
 		canCancel = false;
 		retargetedFrom.clear();
+		retargetedFrom.add(selectedCharacter.getPos());
+		retargetedFrom.addAll(recastFrom);
 		view.multiTargeting.setValue(false);
 		view.battle.requestCommand(new UseAbilityCommandRequest(
 			selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
@@ -188,15 +183,12 @@ public class ModeTarget extends Mode {
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
 		if (nextAbility.isPresent()) {
-			System.err.println("Do subsequent");
 			thisRoundCastings.clear();
 			allCastings.clear();
 			targetingAbility = nextAbility.get();
 
 			castFrom = recastFrom.poll();
-			System.err.println("Subsequent recasting from " + castFrom);
 			remainingTargets = targetingAbility.info.range.nTargets;
-			System.err.println("Remaining targets " + remainingTargets);
 			return castFrom == null?
 				new ModeAnimating(view) : new ModeAnimating(view, this);
 

@@ -22,14 +22,25 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	private final AbilityAgentType agentType;
 	private final Collection<Casting> castings = new ArrayList<>();
 	private final Ability ability;
+	private final Set<MapPoint> ineligible;
 
 	public UseAbilityCommandRequest(
 		MapPoint agent, AbilityAgentType agentType,
 		Ability ability, Collection<Casting> castings
 	) {
+		this(agent, agentType, ability, new HashSet<>(), castings);
+	}
+
+	public UseAbilityCommandRequest(
+		MapPoint agent, AbilityAgentType agentType,
+		Ability ability, Collection<MapPoint> ineligible,
+		Collection<Casting> castings
+	) {
 		this.agent = agent;
 		this.agentType = agentType;
 		this.ability = ability;
+		this.ineligible = new HashSet<>();
+		this.ineligible.addAll(ineligible);
 		this.castings.addAll(castings);
 	}
 
@@ -49,7 +60,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			Set<MapPoint> area = battleState.getAffectedArea(agent, agentType, ability, casting);
 
 			Collection<Targetable> targets = battleState.getAbilityTargets(agent, agentType, ability, area)
-				.stream().filter(t -> !targeted.contains(t.getPos()))
+				.stream().filter(t -> !targeted.contains(t.getPos()) && !ineligible.contains(t.getPos()))
 				.collect(Collectors.toList());
 
 			System.err.println("Casting " + casting + " with agent " + agent + " yielded " + targets + " with aoe " + ability.info.range.radius + " in area " + area);

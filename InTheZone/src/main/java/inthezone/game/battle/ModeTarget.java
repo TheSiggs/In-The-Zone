@@ -190,11 +190,15 @@ public class ModeTarget extends Mode {
 			.ifPresent(this::queueRecastPoints);
 
 		canCancel = false;
-		retargetedFrom.addAll(recastFrom);
 		view.multiTargeting.setValue(false);
+		System.err.println("Retargeted from " + retargetedFrom);
 		view.battle.requestCommand(new UseAbilityCommandRequest(
 			selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
-			targetingAbility, allCastings));
+			targetingAbility,
+			recursionLevel > 0 ? new HashSet<>() : retargetedFrom,
+			allCastings));
+
+		retargetedFrom.addAll(recastFrom);
 
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 

@@ -132,9 +132,10 @@ public class UseAbilityCommand extends Command {
 		final List<Targetable> r = new ArrayList<>();
 
 		if (agentType == AbilityAgentType.CHARACTER && abilityData.info.trap) {
-			return battle.battleState.getCharacterAt(agent)
+			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
+			r.addAll(battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
-				.orElseThrow(() -> new CommandException("53: Missing ability agent"));
+				.orElseThrow(() -> new CommandException("53: Missing ability agent")));
 
 		} else {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));

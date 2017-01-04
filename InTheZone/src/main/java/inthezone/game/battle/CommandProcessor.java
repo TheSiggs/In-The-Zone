@@ -116,7 +116,7 @@ public class CommandProcessor {
 				view.isMyTurn.setValue(true);
 				if (cmd.commandsComming) {
 					view.setMode(new ModeAnimating(view));
-					registeredAnimations = true;
+					registeredAnimations = false;
 				} else {
 					view.setMode(new ModeSelect(view));
 					registeredAnimations = false;

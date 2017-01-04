@@ -65,7 +65,7 @@ public class FatigueCommand extends Command {
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
 		List<Targetable> r = new ArrayList<>();
 		for (DamageToTarget d : targets) {
-			battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
+			battle.battleState.getTargetableAt(d.target.target).forEach(t -> r.add(t));
 		}
 
 		battle.doFatigue(targets);

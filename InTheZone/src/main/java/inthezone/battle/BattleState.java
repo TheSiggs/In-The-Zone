@@ -370,16 +370,16 @@ public class BattleState {
 	/**
 	 * Get all the tiles that will be affected by an ability.
 	 * */
-	public Collection<MapPoint> getAffectedArea(
+	public Set<MapPoint> getAffectedArea(
 		MapPoint agent, AbilityAgentType agentType,
-		MapPoint castFrom, Ability ability, MapPoint target
+		Ability ability, Casting casting
 	) {
 		int radius = agentType == AbilityAgentType.ZONE? 0 : ability.info.range.radius;
 
-		Collection<MapPoint> r =
-			LineOfSight.getDiamond(target, radius).stream()
+		Set<MapPoint> r =
+			LineOfSight.getDiamond(casting.target, radius).stream()
 				.filter(p -> terrain.terrain.hasTile(p))
-				.collect(Collectors.toList());
+				.collect(Collectors.toSet());
 
 		if (agentType == AbilityAgentType.CHARACTER && ability.info.range.piercing) {
 			Player player = getCharacterAt(agent).map(c -> c.player)
@@ -387,7 +387,7 @@ public class BattleState {
 					"Attempted to get targeting information for a non-existent character"));
 
 			Set<MapPoint> pr = new HashSet<>(r);
-			Collection<MapPoint> los = getLOS(castFrom, target, movementObstacles(player));
+			Collection<MapPoint> los = getLOS(casting.castFrom, casting.target, movementObstacles(player));
 			if (los != null) pr.addAll(los);
 			return pr;
 		}
@@ -397,10 +397,10 @@ public class BattleState {
 
 	public Collection<Targetable> getAbilityTargets(
 		MapPoint agent, AbilityAgentType agentType,
-		MapPoint castFrom, Ability ability, MapPoint target
+		Ability ability, Set<MapPoint> area
 	) {
 		return getAgentAt(agent, agentType).map(a ->
-			getAffectedArea(agent, agentType, castFrom, ability, target).stream()
+			area.stream()
 				.flatMap(p -> getTargetableAt(p).stream())
 				.filter(t -> ability.canTarget(a, t))
 				.collect(Collectors.toList())

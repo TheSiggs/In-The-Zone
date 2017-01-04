@@ -5,8 +5,9 @@ import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.Range;
 import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffectFactory;
-import java.util.Optional;
+import isogame.engine.MapPoint;
 import java.util.Collection;
+import java.util.Optional;
 
 public class Ability {
 	public final AbilityInfo info;
@@ -127,7 +128,7 @@ public class Ability {
 	 * @param r Revenge bonus
 	 * */
 	public DamageToTarget computeDamageToTarget(
-		Targetable a, Targetable t, double r
+		Targetable a, Targetable t, MapPoint castFrom, double r
 	) {
 		Stats aStats = a.getStats();
 		Stats tStats = t.getStats();
@@ -142,7 +143,7 @@ public class Ability {
 		Optional<Character> characterAgent =
 			Optional.ofNullable(a instanceof Character? (Character) a : null);
 
-		return new DamageToTarget(t.getPos(),
+		return new DamageToTarget(new Casting(castFrom, t.getPos()),
 			t instanceof Trap, t instanceof Zone, rdamage,
 			imposeEffect(chance, info.statusEffect
 				.map(i -> StatusEffectFactory.getEffect(i, rdamage, characterAgent))
@@ -154,14 +155,14 @@ public class Ability {
 		BattleState battle, Character a, Collection<DamageToTarget> targets
 	) {
 		long characterTargets = targets.stream().filter(d ->
-			d.damage > 0 && battle.getCharacterAt(d.target).isPresent()
+			d.damage > 0 && battle.getCharacterAt(d.target.target).isPresent()
 		).count();
 		double qh = ((double) characterTargets) * const_f * info.eff;
 		int damage =
 			(int) (-1d * Math.ceil(healingFormula(a.hasMana(), qh, a.getStats())));
 
-		return new DamageToTarget(a.getPos(), false, false, damage,
-			Optional.empty(), false, false);
+		return new DamageToTarget(new Casting(a.getPos(), a.getPos()),
+			false, false, damage, Optional.empty(), false, false);
 	}
 
 	private <T> Optional<T> imposeEffect(double p, T effect) {

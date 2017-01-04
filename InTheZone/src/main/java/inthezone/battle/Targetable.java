@@ -53,10 +53,10 @@ public abstract class Targetable implements Obstacle {
 			currentZone = newZone;
 			newZone.ifPresent(zone -> {
 				try {
-					List<MapPoint> targets = new ArrayList<>(); targets.add(pos);
+					List<Casting> castings = new ArrayList<>(); castings.add(new Casting(pos, pos));
 
-					r.addAll((new UseAbilityCommandRequest(pos, AbilityAgentType.ZONE, pos,
-						targets, zone.ability)).makeCommand(battle));
+					r.addAll((new UseAbilityCommandRequest(pos, AbilityAgentType.ZONE,
+						zone.ability, castings)).makeCommand(battle));
 					System.err.println("Constructed zone effect");
 				} catch (CommandException e) {
 					throw new RuntimeException("Internal logic error triggering zone", e);
@@ -66,6 +66,5 @@ public abstract class Targetable implements Obstacle {
 
 		return r;
 	}
-
 }
 

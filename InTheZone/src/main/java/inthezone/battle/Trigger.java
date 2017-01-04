@@ -81,10 +81,10 @@ public class Trigger {
 
 		battle.getTrapAt(p).ifPresent(trap -> {
 			try {
-				List<MapPoint> targets = new ArrayList<>(); targets.add(p);
+				List<Casting> targets = new ArrayList<>(); targets.add(new Casting(p, p));
 
-				r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP, p,
-					targets, trap.ability)).makeCommand(battle));
+				r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP,
+					trap.ability, targets)).makeCommand(battle));
 			} catch (CommandException e) {
 				throw new RuntimeException("Internal logic error triggering trap", e);
 			}

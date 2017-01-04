@@ -66,7 +66,8 @@ public class Battle {
 			r.add(new FatigueCommand(
 				battleState.characters.stream()
 					.filter(c -> c.player == player)
-					.map(c -> new DamageToTarget(c.getPos(), false, false,
+					.map(c -> new DamageToTarget(
+						new Casting(c.getPos(), c.getPos()), false, false,
 						(int) Math.ceil(Ability.damageFormulaStatic(
 							(round - 7) * fatigueEff, 0, 0, 0, 0, fatigueStats, c.getStats())),
 						Optional.empty(), false, false))
@@ -93,6 +94,8 @@ public class Battle {
 	 * @param agent The location of the agent.  For traps and zones this is the
 	 * actual location of the trap / zone, not the location of the character that
 	 * cast the trap.
+	 * @param ability The ability being used, from the original agent, not the
+	 * trap or zone.
 	 * */
 	public void doAbility(
 		MapPoint agent,
@@ -109,17 +112,17 @@ public class Battle {
 		for (DamageToTarget d : targets) {
 			final Targetable t;
 			if (d.isTargetATrap) {
-				t = battleState.getTrapAt(d.target).orElseThrow(() ->
+				t = battleState.getTrapAt(d.target.target).orElseThrow(() ->
 					new CommandException("Expected trap at " +
 						d.target.toString() + " but there was none"));
 
 			} else if (d.isTargetAZone) {
-				t = battleState.getZoneAt(d.target).orElseThrow(() ->
+				t = battleState.getZoneAt(d.target.target).orElseThrow(() ->
 					new CommandException("Expected zone at " +
 						d.target.toString() + " but there was none"));
 
 			} else {
-				t = battleState.getTargetableAt(d.target).stream()
+				t = battleState.getTargetableAt(d.target.target).stream()
 					.filter(x -> !(x instanceof Trap)).findFirst().orElseThrow(() ->
 						new CommandException("Expected targetable at " +
 							d.target.toString() + " but there was none"));
@@ -161,7 +164,7 @@ public class Battle {
 	) {
 		Set<MapPoint> range = new HashSet<>();
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
-			p, AbilityAgentType.CHARACTER, p, ability, p));
+			p, AbilityAgentType.CHARACTER, ability, new Casting(p, p)));
 
 		Optional<Integer> turns = ability.info.zone == AbilityZoneType.BOUND_ZONE?
 			Optional.empty() : Optional.of(zoneTurns);
@@ -177,7 +180,7 @@ public class Battle {
 	 * */
 	public void doFatigue(Collection<DamageToTarget> targets) {
 		for (DamageToTarget d : targets) {
-			Character t = battleState.getCharacterAt(d.target)
+			Character t = battleState.getCharacterAt(d.target.target)
 				.orElseThrow(() -> new RuntimeException(
 					"Attempted to attack non-target, command verification code failed"));
 			t.dealDamage(d.damage);

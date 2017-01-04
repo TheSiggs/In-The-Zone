@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
+import inthezone.battle.Casting;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.AbilityZoneType;
@@ -24,7 +25,6 @@ import org.json.simple.JSONObject;
 public class UseAbilityCommand extends Command {
 	private MapPoint agent;
 	public final AbilityAgentType agentType;
-	private final MapPoint castFrom;
 	public final String ability;
 	private final Collection<MapPoint> targetSquares;
 	private Collection<DamageToTarget> targets;
@@ -36,14 +36,13 @@ public class UseAbilityCommand extends Command {
 
 	public UseAbilityCommand(
 		MapPoint agent, AbilityAgentType agentType,
-		MapPoint castFrom, String ability,
+		String ability,
 		Collection<MapPoint> targetSquares,
 		Collection<DamageToTarget> targets,
 		int subsequentLevel
 	) {
 		this.agent = agent;
 		this.agentType = agentType;
-		this.castFrom = castFrom;
 		this.ability = ability;
 		this.targetSquares = targetSquares;
 		this.targets = targets;
@@ -57,7 +56,6 @@ public class UseAbilityCommand extends Command {
 		r.put("kind", CommandKind.ABILITY.toString());
 		r.put("agent", agent.getJSON());
 		r.put("agentType", agentType.toString());
-		r.put("castFrom", castFrom.getJSON());
 		r.put("ability", ability);
 		r.put("subsequentLevel", subsequentLevel);
 		JSONArray ta = new JSONArray();
@@ -76,7 +74,6 @@ public class UseAbilityCommand extends Command {
 		Object okind = json.get("kind");
 		Object oagent = json.get("agent");
 		Object oagentType = json.get("agentType");
-		Object ocastFrom = json.get("castFrom");
 		Object oability = json.get("ability");
 		Object otargets = json.get("targets");
 		Object otargetSquares = json.get("targetSquares");
@@ -85,7 +82,6 @@ public class UseAbilityCommand extends Command {
 		if (okind == null) throw new ProtocolException("Missing command type");
 		if (oagent == null) throw new ProtocolException("Missing ability agent");
 		if (oagentType == null) throw new ProtocolException("Missing ability agent type");
-		if (ocastFrom == null) throw new ProtocolException("Missing tile to cast ability from");
 		if (oability == null) throw new ProtocolException("Missing ability");
 		if (otargets == null) throw new ProtocolException("Missing ability targets");
 		if (otargets == null) throw new ProtocolException("Missing ability targetSqaures");
@@ -98,7 +94,6 @@ public class UseAbilityCommand extends Command {
 			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
 			AbilityAgentType agentType =
 				AbilityAgentType.fromString((String) oagentType);
-			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
 			String ability = (String) oability;
 			Number subsequentLevel = (Number) osubsequentLevel;
 
@@ -115,7 +110,7 @@ public class UseAbilityCommand extends Command {
 			}
 
 			return new UseAbilityCommand(
-				agent, agentType, castFrom, ability, targetSquares, targets,
+				agent, agentType, ability, targetSquares, targets,
 				subsequentLevel.intValue());
 		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing ability command", e);
@@ -124,39 +119,28 @@ public class UseAbilityCommand extends Command {
 
 	@Override
 	public List<? extends Targetable> doCmd(Battle battle) throws CommandException {
-		Ability abilityData;
+		final Ability abilityData = battle.battleState.getCharacterAt(agent)
+			.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())
+				.filter(a -> a.info.name.equals(ability)).findFirst())
+			.flatMap(a -> a.getNext(
+				battle.battleState.hasMana(agent), subsequentLevel))
+			.orElse(null);
 
-		if (agentType == AbilityAgentType.TRAP) {
-			abilityData = battle.battleState.getTrapAt(castFrom)
-				.map(t -> t.ability).orElseThrow(() ->
-					new CommandException("50: Invalid ability command"));
+		if (abilityData == null && agentType == AbilityAgentType.CHARACTER)
+			throw new CommandException("52: No such ability");
 
-		} else if (agentType == AbilityAgentType.ZONE) {
-			abilityData = battle.battleState.getZoneAt(castFrom)
-				.map(z -> z.ability).orElseThrow(() ->
-					new CommandException("51: Invalid ability command"));
+		final List<Targetable> r = new ArrayList<>();
 
-		} else {
-			abilityData = battle.battleState.getCharacterAt(agent)
-				.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())
-					.filter(a -> a.info.name.equals(ability)).findFirst())
-				.flatMap(a -> a.getNext(
-					battle.battleState.hasMana(agent), subsequentLevel))
-				.orElseThrow(() -> new CommandException("52: Invalid ability command"));
-		}
-
-		List<Targetable> r = new ArrayList<>();
-
-		if (abilityData.info.trap && agentType == AbilityAgentType.CHARACTER) {
+		if (agentType == AbilityAgentType.CHARACTER && abilityData.info.trap) {
 			return battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
-				.orElseThrow(() -> new CommandException("53: Invalid ability command"));
+				.orElseThrow(() -> new CommandException("53: Missing ability agent"));
 
 		} else {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			battle.battleState.getTrapAt(agent).ifPresent(t -> r.add(t));
 			for (DamageToTarget d : targets) {
-				battle.battleState.getTargetableAt(d.target).forEach(t -> r.add(t));
+				battle.battleState.getTargetableAt(d.target.target).forEach(t -> r.add(t));
 			}
 
 			// do the ability now
@@ -166,8 +150,8 @@ public class UseAbilityCommand extends Command {
 			// If it's a zone ability, also create the zone
 			// bound zones
 			if (
-				abilityData.info.zone == AbilityZoneType.BOUND_ZONE &&
-				agentType == AbilityAgentType.CHARACTER
+				agentType == AbilityAgentType.CHARACTER &&
+				abilityData.info.zone == AbilityZoneType.BOUND_ZONE
 			) {
 				System.err.println("Make bound zone with " + constructed.toString());
 				System.err.println("Agent is " + battle.battleState.getCharacterAt(agent).toString()); 
@@ -184,8 +168,8 @@ public class UseAbilityCommand extends Command {
 
 			// unbound zones
 			} else if (
-				abilityData.info.zone == AbilityZoneType.ZONE &&
-				agentType == AbilityAgentType.CHARACTER
+				agentType == AbilityAgentType.CHARACTER &&
+				abilityData.info.zone == AbilityZoneType.ZONE
 			) {
 				r.addAll(battle.battleState.getCharacterAt(agent)
 					.map(c -> battle.createZone(
@@ -202,17 +186,12 @@ public class UseAbilityCommand extends Command {
 	 * @param retarget A mapping from old character positions to their new positions.
 	 * */
 	public void retarget(Map<MapPoint, MapPoint> retarget) {
-		Collection<DamageToTarget> newDTT = new ArrayList<>();
-		for (MapPoint x : retarget.keySet()) {
-			if (agent.equals(x)) {
-				this.agent = retarget.get(x);
-			} else {
-				this.targets.stream()
-					.filter(t -> t.target.equals(x)).findFirst()
-					.ifPresent(t -> newDTT.add(t.retarget(retarget.get(x))));
-			}
-		}
-		this.targets = newDTT;
+		this.agent = retarget.getOrDefault(agent, agent);
+		this.targets = targets.stream()
+			.map(t -> t.retarget(new Casting(
+				retarget.getOrDefault(t.target.castFrom, t.target.castFrom),
+				retarget.getOrDefault(t.target.target, t.target.target))))
+			.collect(Collectors.toList());
 	}
 
 	/**

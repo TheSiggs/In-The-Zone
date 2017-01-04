@@ -2,60 +2,86 @@ package inthezone.battle.commands;
 
 import inthezone.battle.Ability;
 import inthezone.battle.BattleState;
+import inthezone.battle.Casting;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.instant.InstantEffectFactory;
+import inthezone.battle.Targetable;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UseAbilityCommandRequest extends CommandRequest {
 	private final MapPoint agent;
 	private final AbilityAgentType agentType;
-	private final MapPoint castFrom;
-	private final Collection<MapPoint> targets = new ArrayList<>();
+	private final Collection<Casting> castings = new ArrayList<>();
 	private final Ability ability;
 
 	public UseAbilityCommandRequest(
-		MapPoint agent, AbilityAgentType agentType, MapPoint castFrom,
-		Collection<MapPoint> targets, Ability ability
+		MapPoint agent, AbilityAgentType agentType,
+		Ability ability, Collection<Casting> castings
 	) {
 		this.agent = agent;
 		this.agentType = agentType;
-		this.castFrom = castFrom;
-		this.targets.addAll(targets);
 		this.ability = ability;
+		this.castings.addAll(castings);
+	}
+
+	/**
+	 * @param a The agent targetable.
+	 * */
+	private Collection<DamageToTarget> computeDamageToTargets(
+		BattleState battleState, Targetable a
+	) {
+		final double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
+			battleState.getRevengeBonus(((Character) a).player);
+
+		final Collection<DamageToTarget> r = new ArrayList<>();
+		final Set<MapPoint> targeted = new HashSet<>();
+		for (Casting casting : castings) {
+			Collection<Targetable> targets = 
+				battleState.getAbilityTargets(agent, agentType, ability,
+					battleState.getAffectedArea(agent, agentType, ability, casting))
+				.stream().filter(t -> !targeted.contains(t.getPos()))
+				.collect(Collectors.toList());
+
+			targeted.addAll(targets.stream()
+				.map(t -> t.getPos()).collect(Collectors.toList()));
+			for (Targetable t : targets) r.add(
+				ability.computeDamageToTarget(a, t, casting.castFrom, revengeBonus));
+		}
+
+		return r;
 	}
 
 	@Override
 	public List<Command> makeCommand(BattleState battleState) throws CommandException {
-		List<Command> commands = new ArrayList<>();
+		final Collection<MapPoint> targetSquares = castings.stream()
+			.map(c -> c.target).collect(Collectors.toList());
+
+		final List<Command> commands = new ArrayList<>();
 
 		if ((ability.info.trap) && agentType == AbilityAgentType.CHARACTER) {
-			commands.add(new UseAbilityCommand(agent, agentType, castFrom,
-				ability.rootName, targets, new ArrayList<>(), 0));
+			commands.add(new UseAbilityCommand(agent, agentType,
+				ability.rootName, targetSquares, new ArrayList<>(), 0));
 
 		} else {
 			// get the targets
-			Collection<DamageToTarget> allTargets =
-				battleState.getAgentAt(agent, agentType).map(a -> {
-					double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
-						battleState.getRevengeBonus(((Character) a).player);
-
-					return targets.stream()
-						.flatMap(t ->
-							battleState.getAbilityTargets(agent, agentType, castFrom, ability, t).stream())
-						.map(t -> ability.computeDamageToTarget(a, t, revengeBonus))
-						.collect(Collectors.toList());
-				}).orElseThrow(() -> new CommandException("60: Invalid ability command request"));
+			final Collection<DamageToTarget> allTargets =
+				battleState.getAgentAt(agent, agentType)
+					.map(a -> computeDamageToTargets(battleState, a))
+					.orElseThrow(() ->
+						new CommandException("60: Invalid ability command request"));
 
 			// get the instant effect targets
-			List<MapPoint> preTargets = new ArrayList<>();
-			List<MapPoint> postTargets = new ArrayList<>();
+			final List<Casting> preTargets = new ArrayList<>();
+			final List<Casting> postTargets = new ArrayList<>();
 
 			// Only do instant effects when the agent is a character.
 			if (agentType == AbilityAgentType.CHARACTER) {
@@ -65,13 +91,13 @@ public class UseAbilityCommandRequest extends CommandRequest {
 				}
 
 				ability.info.instantBefore.ifPresent(i -> {
-					if (i.isField()) preTargets.addAll(targets);});
+					if (i.isField()) preTargets.addAll(castings);});
 				ability.info.instantAfter.ifPresent(i -> {
-					if (i.isField()) postTargets.addAll(targets);});
+					if (i.isField()) postTargets.addAll(castings);});
 			}
 
 			InstantEffectCommand preEffect = null;
-			UseAbilityCommand mainEffect;
+			final UseAbilityCommand mainEffect;
 			InstantEffectCommand postEffect = null;
 
 			// deal with vampirism
@@ -83,9 +109,10 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			}
 			
 			// Main damage
-			mainEffect = new UseAbilityCommand(agent, agentType,
-				castFrom, ability.rootName, targets, allTargets,
-				ability.subsequentLevel);
+			mainEffect = new UseAbilityCommand(
+				agent, agentType, ability.rootName,
+				targetSquares,
+				allTargets, ability.subsequentLevel);
 				
 			// Post instant effect
 			if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {
@@ -111,18 +138,20 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 	private InstantEffectCommand makeInstantEffect(
 		BattleState battleState,
-		List<MapPoint> effectTargets,
+		List<Casting> effectTargets,
 		InstantEffectInfo effect,
 		Optional<UseAbilityCommand> postCommand,
 		Optional<InstantEffectCommand> postEffect
-	) {
-		Collection<MapPoint> targetArea = targets.stream()
-			.flatMap(t -> battleState.getAffectedArea(
-				agent, agentType, castFrom, ability, t).stream())
+	) throws CommandException {
+		Collection<MapPoint> targetArea = castings.stream()
+			.flatMap(casting -> battleState.getAffectedArea(
+				agent, agentType, ability, casting).stream())
 			.collect(Collectors.toList());
 
+		List<MapPoint> targets =
+			effectTargets.stream().map(c -> c.target).collect(Collectors.toList());
 		return new InstantEffectCommand(InstantEffectFactory.getEffect(
-			battleState, effect, castFrom, targetArea, effectTargets),
+			battleState, effect, agent, targetArea, targets),
 			postCommand, postEffect);
 	}
 }

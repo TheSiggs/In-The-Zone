@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 public class DamageToTarget implements HasJSONRepresentation {
-	public final MapPoint target;
+	public final Casting target;
 	public final boolean isTargetATrap;
 	public final boolean isTargetAZone;
 	public final int damage;
@@ -19,7 +19,7 @@ public class DamageToTarget implements HasJSONRepresentation {
 	public final boolean post;
 
 	public DamageToTarget(
-		MapPoint target,
+		Casting target,
 		boolean isTargetATrap,
 		boolean isTargetAZone,
 		int damage,
@@ -63,7 +63,7 @@ public class DamageToTarget implements HasJSONRepresentation {
 		if (odamage == null) throw new ProtocolException("Missing damage amount");
 
 		try {
-			MapPoint target = MapPoint.fromJSON((JSONObject) otarget);
+			Casting target = Casting.fromJSON((JSONObject) otarget);
 			Boolean trap = (Boolean) otrap;
 			Boolean zone = (Boolean) ozone;
 			Number damage = (Number) odamage;
@@ -77,15 +77,13 @@ public class DamageToTarget implements HasJSONRepresentation {
 				damage.intValue(), effect, false, false);
 		} catch (ClassCastException e) {
 			throw new ProtocolException("Error parsing damage", e);
-		} catch (CorruptDataException e) {
-			throw new ProtocolException("Error parsing damage", e);
 		}
 	}
 
 	/**
 	 * The target has moved since the damage was calculated
 	 * */
-	public DamageToTarget retarget(MapPoint to) {
+	public DamageToTarget retarget(Casting to) {
 		if (isTargetATrap || isTargetAZone) {
 			return this;
 		} else {

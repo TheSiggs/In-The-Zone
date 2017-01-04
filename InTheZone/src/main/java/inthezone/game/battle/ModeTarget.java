@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Ability;
+import inthezone.battle.Casting;
 import inthezone.battle.Character;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
@@ -36,8 +37,8 @@ public class ModeTarget extends Mode {
 	// used for recursion to track which characters we've already rebounded off.
 	private final Set<MapPoint> retargetedFrom = new HashSet<>();
 
-	private final Collection<MapPoint> allTargets = new ArrayList<>();
-	private final Collection<MapPoint> thisRoundTargets = new ArrayList<>();
+	private final Collection<Casting> allCastings = new ArrayList<>();
+	private final Collection<Casting> thisRoundCastings = new ArrayList<>();
 
 	public ModeTarget(
 		BattleView view, Character selectedCharacter, Ability ability
@@ -61,8 +62,8 @@ public class ModeTarget extends Mode {
 		int recursionLevel,
 		int remainingTargets,
 		Set<MapPoint> retargetedFrom,
-		Collection<MapPoint> allTargets,
-		Collection<MapPoint> thisRoundTargets
+		Collection<Casting> allCastings,
+		Collection<Casting> thisRoundCastings
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
@@ -73,8 +74,8 @@ public class ModeTarget extends Mode {
 		this.recursionLevel = recursionLevel;
 		this.remainingTargets = remainingTargets;
 		this.retargetedFrom.addAll(retargetedFrom);
-		this.allTargets.addAll(allTargets);
-		this.thisRoundTargets.addAll(thisRoundTargets);
+		this.allCastings.addAll(allCastings);
+		this.thisRoundCastings.addAll(thisRoundCastings);
 	}
 
 	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
@@ -82,7 +83,7 @@ public class ModeTarget extends Mode {
 			view, selectedCharacter, recastFrom,
 			targetingAbility, castFrom, canCancel, recursionLevel,
 			remainingTargets, retargetedFrom,
-			allTargets, thisRoundTargets);
+			allCastings, thisRoundCastings);
 		r.retargetedFrom.remove(this.selectedCharacter.getPos());
 		r.retargetedFrom.add(selectedCharacter.getPos());
 		return r;
@@ -95,7 +96,7 @@ public class ModeTarget extends Mode {
 
 		if (targetingAbility.info.range.range == 0) {
 			// range 0 abilities get applied immediately
-			allTargets.add(castFrom);
+			allCastings.add(new Casting(castFrom, castFrom));
 			return applyAbility();
 
 		} else {
@@ -121,15 +122,15 @@ public class ModeTarget extends Mode {
 	 * number of targets.
 	 * */
 	public Mode applyNow() {
-		allTargets.addAll(thisRoundTargets);
+		allCastings.addAll(thisRoundCastings);
 		return applyAbility();
 	}
 
 	private Mode addTarget(MapPoint p) {
-		thisRoundTargets.add(p);
+		thisRoundCastings.add(new Casting(castFrom, p));
 		remainingTargets -= 1;
 		if (remainingTargets <= 0) {
-			allTargets.addAll(thisRoundTargets);
+			allCastings.addAll(thisRoundCastings);
 			return applyAbility();
 		} else {
 			return this;
@@ -137,41 +138,67 @@ public class ModeTarget extends Mode {
 	}
 
 	private Mode applyAbility() {
-		if (allTargets.isEmpty()) {
+		System.err.println("Apply ability");
+
+		if (allCastings.isEmpty()) {
+			return this;
+
+		} else if (!recastFrom.isEmpty()) {
+			castFrom = recastFrom.poll();
+			remainingTargets = targetingAbility.info.range.nTargets;
 			return this;
 
 		} else if (recursionLevel < targetingAbility.info.recursion) {
+			System.err.println("Recursion level: " + recursionLevel);
 			recursionLevel += 1;
 
-			// get the recast points
+			// Get the recast points.
 			getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
-					selectedCharacter, targetingAbility, castFrom, thisRoundTargets)))
+					selectedCharacter, targetingAbility, thisRoundCastings)))
 				.ifPresent(affected -> {
+					System.err.println("Affected by ability: " + affected);
 					queueRecastPoints(affected);
 					retargetedFrom.addAll(affected.stream().map(t ->
 						t.getPos()).collect(Collectors.toList()));
 				});
 
-			thisRoundTargets.clear();
+			thisRoundCastings.clear();
+
 			castFrom = recastFrom.poll();
+			System.err.println("Recasting from " + castFrom);
 			remainingTargets = targetingAbility.info.range.nTargets;
+			System.err.println("Remaining targets " + remainingTargets);
 			if (castFrom != null) return this;
-			retargetedFrom.clear();
+			System.err.println("Fall through");
 		}
 
+		// Get the recast points for subsequent abilities.  This may not work
+		// properly if the ability also has recursion.
+		getFutureWithRetry(view.battle.requestInfo(new InfoAffected(
+				selectedCharacter, targetingAbility, allCastings)))
+			.ifPresent(this::queueRecastPoints);
+
 		canCancel = false;
+		retargetedFrom.clear();
 		view.multiTargeting.setValue(false);
 		view.battle.requestCommand(new UseAbilityCommandRequest(
 			selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
-			selectedCharacter.getPos(), allTargets, targetingAbility));
+			targetingAbility, allCastings));
 
 		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
 		if (nextAbility.isPresent()) {
-			thisRoundTargets.clear();
-			allTargets.clear();
+			System.err.println("Do subsequent");
+			thisRoundCastings.clear();
+			allCastings.clear();
 			targetingAbility = nextAbility.get();
-			return new ModeAnimating(view, this);
+
+			castFrom = recastFrom.poll();
+			System.err.println("Subsequent recasting from " + castFrom);
+			remainingTargets = targetingAbility.info.range.nTargets;
+			System.err.println("Remaining targets " + remainingTargets);
+			return castFrom == null?
+				new ModeAnimating(view) : new ModeAnimating(view, this);
 
 		} else {
 			return new ModeAnimating(view);

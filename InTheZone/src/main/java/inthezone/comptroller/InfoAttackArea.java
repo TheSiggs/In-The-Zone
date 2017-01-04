@@ -2,6 +2,7 @@ package inthezone.comptroller;
 
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
+import inthezone.battle.Casting;
 import inthezone.battle.Character;
 import inthezone.battle.commands.AbilityAgentType;
 import isogame.engine.MapPoint;
@@ -25,7 +26,7 @@ public class InfoAttackArea extends InfoRequest<Collection<MapPoint>> {
 	@Override public void completeAction(Battle battle) {
 		complete.complete(battle.battleState.getAffectedArea(
 			subject.getPos(), AbilityAgentType.CHARACTER,
-			castFrom, ability, target));
+			ability, new Casting(castFrom, target)));
 	}
 }
 

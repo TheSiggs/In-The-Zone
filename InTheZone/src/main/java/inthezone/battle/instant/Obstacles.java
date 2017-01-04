@@ -45,7 +45,7 @@ public class Obstacles extends InstantEffect {
 	{
 		Object okind = json.get("kind");
 		Object oagent = json.get("agent");
-		Object oplacements = json.get("paths");
+		Object oplacements = json.get("placements");
 
 		if (okind == null) throw new ProtocolException("Missing effect type");
 		if (oagent == null) throw new ProtocolException("Missing effect agent");

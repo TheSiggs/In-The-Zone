@@ -36,9 +36,9 @@ public class Character extends Targetable {
 
 	private Optional<StatusEffect> statusBuff = Optional.empty();
 	private Optional<StatusEffect> statusDebuff = Optional.empty();
-	private boolean hasCover = false;
 
 	private boolean hasMana = false;
+	private boolean hasCover = false;
 	private MapPoint pos = new MapPoint(0, 0);
 	private int ap = 0;
 	private int mp = 0;
@@ -55,6 +55,7 @@ public class Character extends Targetable {
 		Optional<StatusEffect> statusBuff,
 		Optional<StatusEffect> statusDebuff,
 		boolean hasMana,
+		boolean hasCover,
 		MapPoint pos,
 		int ap,
 		int mp,
@@ -70,6 +71,7 @@ public class Character extends Targetable {
 		this.statusBuff = statusBuff;
 		this.statusDebuff = statusDebuff;
 		this.hasMana = hasMana;
+		this.hasCover = hasCover;
 		this.pos = pos;
 		this.ap = ap;
 		this.mp = mp;
@@ -91,6 +93,7 @@ public class Character extends Targetable {
 			statusBuff,
 			statusDebuff,
 			hasMana,
+			hasCover,
 			pos,
 			ap,
 			mp,

@@ -41,11 +41,24 @@ public class UseAbilityCommand extends Command {
 		Collection<DamageToTarget> targets,
 		int subsequentLevel
 	) {
+		this(agent, agentType, ability, targetSquares,
+			targets, new ArrayList<>(), subsequentLevel);
+	}
+
+	public UseAbilityCommand(
+		MapPoint agent, AbilityAgentType agentType,
+		String ability,
+		Collection<MapPoint> targetSquares,
+		Collection<DamageToTarget> targets,
+		Collection<MapPoint> constructed,
+		int subsequentLevel
+	) {
 		this.agent = agent;
 		this.agentType = agentType;
 		this.ability = ability;
 		this.targetSquares = targetSquares;
 		this.targets = targets;
+		this.constructed.addAll(constructed);
 		this.subsequentLevel = subsequentLevel;
 	}
 
@@ -65,6 +78,10 @@ public class UseAbilityCommand extends Command {
 		JSONArray tsa = new JSONArray();
 		for (MapPoint p : targetSquares) tsa.add(p.getJSON());
 		r.put("targetSquares", tsa);
+
+		JSONArray cs = new JSONArray();
+		for (MapPoint p : constructed) cs.add(p.getJSON());
+		r.put("constructed", cs);
 		return r;
 	}
 
@@ -77,6 +94,7 @@ public class UseAbilityCommand extends Command {
 		Object oability = json.get("ability");
 		Object otargets = json.get("targets");
 		Object otargetSquares = json.get("targetSquares");
+		Object oconstructed = json.get("constructed");
 		Object osubsequentLevel = json.get("subsequentLevel");
 
 		if (okind == null) throw new ProtocolException("Missing command type");
@@ -84,7 +102,8 @@ public class UseAbilityCommand extends Command {
 		if (oagentType == null) throw new ProtocolException("Missing ability agent type");
 		if (oability == null) throw new ProtocolException("Missing ability");
 		if (otargets == null) throw new ProtocolException("Missing ability targets");
-		if (otargets == null) throw new ProtocolException("Missing ability targetSqaures");
+		if (otargetSquares == null) throw new ProtocolException("Missing ability targetSquares");
+		if (oconstructed == null) throw new ProtocolException("Missing ability constructed");
 		if (osubsequentLevel == null) throw new ProtocolException("Missing ability subsequent level");
 
 		if (CommandKind.fromString((String) okind) != CommandKind.ABILITY)
@@ -109,9 +128,16 @@ public class UseAbilityCommand extends Command {
 				targetSquares.add(MapPoint.fromJSON((JSONObject) rawTargetSquares.get(i)));
 			}
 
+			JSONArray rawConstructed = (JSONArray) oconstructed;
+			Collection<MapPoint> constructed = new ArrayList<>();
+			for (int i = 0; i < rawConstructed.size(); i++) {
+				constructed.add(MapPoint.fromJSON((JSONObject) rawConstructed.get(i)));
+			}
+
 			return new UseAbilityCommand(
 				agent, agentType, ability, targetSquares, targets,
-				subsequentLevel.intValue());
+				constructed, subsequentLevel.intValue());
+
 		} catch (ClassCastException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing ability command", e);
 		}

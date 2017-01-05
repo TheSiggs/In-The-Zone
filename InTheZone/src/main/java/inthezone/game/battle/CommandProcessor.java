@@ -55,7 +55,7 @@ public class CommandProcessor {
 	 * @return true if an animation was started, otherwise false
 	 * */
 	public boolean doNextCommand() {
-		ExecutedCommand ec = commandQueue.poll();
+		final ExecutedCommand ec = commandQueue.poll();
 		if (ec == null) return false;
 
 		final boolean registeredAnimations;
@@ -63,9 +63,14 @@ public class CommandProcessor {
 		if (ec.cmd instanceof UseAbilityCommand && !view.isMyTurn.getValue()) {
 			switch (((UseAbilityCommand) ec.cmd).agentType) {
 				case CHARACTER:
-					UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
-					Targetable agent = ec.affected.get(0);
-					view.hud.writeMessage(((Character) agent).name + " uses " + ua.ability + "!");
+					final UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
+					final Targetable agent = ec.affected.get(0);
+					final String name = ((Character) agent).name;
+
+					if (ua.placedTraps) view.hud.writeMessage(name + " sets a trap!");
+					else if (ua.placedZones) view.hud.writeMessage(name + " places a zone!");
+					else view.hud.writeMessage(name + " uses " + ua.ability + "!");
+
 					break;
 				case ZONE:
 					view.hud.writeMessage("A zone is triggered!");

@@ -34,6 +34,11 @@ public class UseAbilityCommand extends Command {
 
 	public Collection<DamageToTarget> getTargets() {return targets;}
 
+	// These are set when the command is executed so they can be available to the
+	// GUI layer.
+	public boolean placedTraps = false;
+	public boolean placedZones = false;
+
 	public UseAbilityCommand(
 		MapPoint agent, AbilityAgentType agentType,
 		String ability,
@@ -158,6 +163,7 @@ public class UseAbilityCommand extends Command {
 		final List<Targetable> r = new ArrayList<>();
 
 		if (agentType == AbilityAgentType.CHARACTER && abilityData.info.trap) {
+			placedTraps = true;
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			r.addAll(battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, targetSquares))
@@ -188,6 +194,7 @@ public class UseAbilityCommand extends Command {
 					.filter(t -> t instanceof RoadBlock).findFirst().map(t -> (RoadBlock) t);
 
 				if (o.isPresent()) {
+					placedZones = true;
 					r.addAll(battle.battleState.getCharacterAt(agent)
 						.map(c -> battle.createZone(abilityData, c, o, targetSquares))
 						.orElseThrow(() -> new CommandException("54: Invalid ability command")));
@@ -198,6 +205,7 @@ public class UseAbilityCommand extends Command {
 				agentType == AbilityAgentType.CHARACTER &&
 				abilityData.info.zone == AbilityZoneType.ZONE
 			) {
+				placedZones = true;
 				r.addAll(battle.battleState.getCharacterAt(agent)
 					.map(c -> battle.createZone(
 						abilityData, c, Optional.empty(), targetSquares))

@@ -174,13 +174,17 @@ public class ModeTarget extends Mode {
 					retargetedFrom.addAll(affected.stream().map(t ->
 						t.getPos()).collect(Collectors.toList()));
 				});
+			recastFrom.add(subsequentLevelMarker);
 
 			thisRoundCastings.clear();
 
 			castFrom = recastFrom.poll();
 			if (castFrom.equals(subsequentLevelMarker)) castFrom = recastFrom.poll();
 			remainingTargets = targetingAbility.info.range.nTargets;
-			if (castFrom != null) return this; else recastFrom.clear();
+			if (castFrom != null) return this; else {
+				recastFrom.clear();
+				recastFrom.add(subsequentLevelMarker);
+			}
 		}
 
 		// Get the recast points for subsequent abilities.  This may not work
@@ -191,7 +195,6 @@ public class ModeTarget extends Mode {
 
 		canCancel = false;
 		view.multiTargeting.setValue(false);
-		System.err.println("Retargeted from " + retargetedFrom);
 		view.battle.requestCommand(new UseAbilityCommandRequest(
 			selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
 			targetingAbility,

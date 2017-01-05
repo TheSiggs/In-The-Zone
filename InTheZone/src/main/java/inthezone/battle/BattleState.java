@@ -357,7 +357,7 @@ public class BattleState {
 		if (!ability.info.range.los) {
 			return diamond;
 		} else {
-			Set<MapPoint> obstacles = getCharacterAt(agent)
+			Set<MapPoint> obstacles = getCharacterAt(castFrom)
 				.map(c -> movementObstacles(c.player))
 				.orElse(allObstacles());
 			

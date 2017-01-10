@@ -192,12 +192,19 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 	}
 
 	@Override public void decrement(int steps) {
-		final int v1 = getValue() - steps;
-		setValue(v1 < 0? 0 : v1);
+		int v0 = getValue() - steps;
+		int v1 = getValue() - steps - 1;
+		while (v1 >= 0 && values[v0] == values[v1]) {
+			v0 -= 1;
+			v1 -= 1;
+		}
+		setValue(v0 < 0? 0 : v0);
 	}
 
 	@Override public void increment(int steps) {
-		final int v1 = getValue() + steps;
+		final int v0 = getValue();
+		int v1 = getValue() + steps;
+		while (v1 < (values.length - 1) && values[v0] == values[v1]) v1 += 1;
 		setValue(v1 >= values.length? (values.length - 1) : v1);
 	}
 }

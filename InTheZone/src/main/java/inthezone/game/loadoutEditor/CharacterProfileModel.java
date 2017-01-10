@@ -59,6 +59,9 @@ public class CharacterProfileModel {
 		basicAbility.setValue(c.basicAbility);
 		abilities.clear();
 		for (AbilityInfo a : c.abilities) abilities.add(a);
+		hpPP.setValue(c.hpPP);
+		attackPP.setValue(c.attackPP);
+		defencePP.setValue(c.defencePP);
 
 		CharacterProfile newProfile = encodeProfile();
 		cost.setValue(newProfile.computeCost());

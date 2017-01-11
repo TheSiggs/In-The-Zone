@@ -22,7 +22,7 @@ public class MessageChannel {
 
 	private final Queue<SendState> sendQueue = new LinkedList<>();
 	
-	private final ByteBuffer sndBuffer = ByteBuffer.allocate(256 * 1024);
+	private final ByteBuffer sndBuffer = ByteBuffer.allocate(8 * 1024);
 	private final ByteBuffer recBuffer = ByteBuffer.allocate(32 * 1024);
 	private final CharBuffer msgBuffer = CharBuffer.allocate(8 * 1024);
 
@@ -138,6 +138,10 @@ public class MessageChannel {
 		sndBuffer.flip();
 		channel.write(sndBuffer);
 		sndBuffer.compact();
+
+		if (sndBuffer.position() == 0 && sendQueue.isEmpty()) {
+			skey.interestOps(skey.interestOps() & ~SelectionKey.OP_WRITE);
+		}
 	}
 
 	/**
@@ -145,19 +149,13 @@ public class MessageChannel {
 	 * @return true if there is more data to write, false otherwise.
 	 * */
 	private boolean writeMessage() throws IOException {
-		System.err.println("Buffer capacity: " + sndBuffer.capacity() + ", position: " + sndBuffer.position() + ", limit: " + sndBuffer.limit() + ", remaining: " + sndBuffer.remaining());
-
-		if (sendQueue.isEmpty()) {
-			skey.interestOps(skey.interestOps() & ~SelectionKey.OP_WRITE);
-			return false;
-		}
+		if (sendQueue.isEmpty()) return false;
 
 		boolean moreToWrite = false;
 		SendState sending = sendQueue.element();
 
 		if (sending.doEncode) {
 			CoderResult r = encoder.encode(sending.buffer, sndBuffer, false);
-			System.err.println("encode_result: " + r.toString());
 			if (r.isUnderflow()) {
 				moreToWrite = true;
 				sending.doEncode = false;
@@ -169,7 +167,6 @@ public class MessageChannel {
 
 		if (sending.doFinalEncode) {
 			CoderResult r = encoder.encode(sending.buffer, sndBuffer, true);
-			System.err.println("encode_final: " + r.toString());
 			if (r.isUnderflow()) {
 				moreToWrite = true;
 				sending.doFinalEncode = false;
@@ -181,7 +178,6 @@ public class MessageChannel {
 
 		if (sending.doFlush) {
 			CoderResult r = encoder.flush(sndBuffer);
-			System.err.println("encode_flush: " + r.toString());
 			if (r.isUnderflow()) {
 				moreToWrite = true;
 				sending.doFlush = false;
@@ -191,8 +187,6 @@ public class MessageChannel {
 				throw new IOException("Error flushing output message buffer");
 			}
 		}
-
-		System.err.println("Buffer capacity: " + sndBuffer.capacity() + ", position: " + sndBuffer.position() + ", limit: " + sndBuffer.limit() + ", remaining: " + sndBuffer.remaining());
 
 		return moreToWrite;
 	}
@@ -207,9 +201,6 @@ class SendState {
 
 	public SendState(CharBuffer buffer) {
 		this.buffer = buffer;
-		System.err.println("Sending: " + buffer.capacity() + ", limit: " + buffer.limit());
-		System.err.println("Sending Contents: " + buffer.toString());
-		System.err.println("Sending Length: " + buffer.toString().length());
 	}
 }
 

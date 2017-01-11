@@ -15,6 +15,7 @@ public class Loadout implements HasJSONRepresentation {
 	public final List<CharacterProfile> characters = new ArrayList<>();
 
 	public final static int maxPP = 30;
+	public final static int maxCharacters = 4;
 
 	public Loadout(
 		String name,
@@ -30,6 +31,7 @@ public class Loadout implements HasJSONRepresentation {
 	 * */
 	public boolean isLegitimate() {
 		return
+			characters.size() > 0 && characters.size() <= maxCharacters &&
 			!characters.stream().flatMap(c -> c.abilities.stream())
 				.anyMatch(a -> a.banned) &&
 			characters.stream().map(c -> c.computeCost()).collect(

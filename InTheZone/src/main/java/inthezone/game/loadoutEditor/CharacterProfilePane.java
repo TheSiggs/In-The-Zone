@@ -56,7 +56,13 @@ public class CharacterProfilePane extends VBox {
 		allAbilities.setEditable(false);
 		allAbilitiesPane.getChildren().addAll(addAbility, allAbilities);
 
+		allAbilities.setPlaceholder(new Label("No character selected"));
+		selectedAbilities.setPlaceholder(new Label("No abilities chosen"));
+
 		addAbility.setOnAction(event -> addAbility());
+
+		addAbility.disableProperty().bind(allAbilities.getSelectionModel()
+			.selectedItemProperty().isNull());
 
 		allAbilities.setOnMouseClicked(event -> {
 			if (event.getClickCount() > 1) addAbility();
@@ -85,40 +91,48 @@ public class CharacterProfilePane extends VBox {
 
 		this.profile = profile;
 
-		allAbilities.setItems(FXCollections.observableArrayList(
-			profile.rootCharacter.abilities.stream()
-				.filter(a -> !a.banned && a.type != AbilityType.BASIC)
-				.collect(Collectors.toList())));
+		if (profile == null) {
+			allAbilities.setItems(null);
+		} else {
+			allAbilities.setItems(FXCollections.observableArrayList(
+				profile.rootCharacter.abilities.stream()
+					.filter(a -> !a.banned && a.type != AbilityType.BASIC)
+					.collect(Collectors.toList())));
+		}
 
 		basicAbilitiesModel.clear();
-		for (AbilityInfo a : profile.rootCharacter.abilities)
-			if (a.type == AbilityType.BASIC) basicAbilitiesModel.add(a);
-		basicAbilities.getSelectionModel().select(profile.basicAbility.getValue());
-		profile.basicAbility.bind(
-			basicAbilities.getSelectionModel().selectedItemProperty());
+		selectedAbilities.setItems(null);
 
-		selectedAbilities.setItems(profile.abilities);
-		selectedAbilities.setCellFactory(
-			RemovableAbilityCell.forListView(profile.abilities));
+		if (profile != null) {
+			for (AbilityInfo a : profile.rootCharacter.abilities)
+				if (a.type == AbilityType.BASIC) basicAbilitiesModel.add(a);
+			basicAbilities.getSelectionModel().select(profile.basicAbility.getValue());
+			profile.basicAbility.bind(
+				basicAbilities.getSelectionModel().selectedItemProperty());
 
-		hp.setValueFactory(new PPSpinnerFactory(profile.hpPP.getValue(),
-			profile.rootCharacter.stats.hp, profile.rootCharacter.hpCurve));
-		attack.setValueFactory(new PPSpinnerFactory(profile.attackPP.getValue(),
-			profile.rootCharacter.stats.attack, profile.rootCharacter.attackCurve));
-		defence.setValueFactory(new PPSpinnerFactory(profile.defencePP.getValue(),
-			profile.rootCharacter.stats.defence, profile.rootCharacter.defenceCurve));
+			selectedAbilities.setItems(profile.abilities);
+			selectedAbilities.setCellFactory(
+				RemovableAbilityCell.forListView(profile.abilities));
 
-		// Force the spinners to update the display area
-		hp.getEditor().setText(
-			hp.getValueFactory().getConverter().toString(profile.hpPP.getValue()));
-		attack.getEditor().setText(
-			attack.getValueFactory().getConverter().toString(profile.attackPP.getValue()));
-		defence.getEditor().setText(
-			defence.getValueFactory().getConverter().toString(profile.defencePP.getValue()));
+			hp.setValueFactory(new PPSpinnerFactory(profile.hpPP.getValue(),
+				profile.rootCharacter.stats.hp, profile.rootCharacter.hpCurve));
+			attack.setValueFactory(new PPSpinnerFactory(profile.attackPP.getValue(),
+				profile.rootCharacter.stats.attack, profile.rootCharacter.attackCurve));
+			defence.setValueFactory(new PPSpinnerFactory(profile.defencePP.getValue(),
+				profile.rootCharacter.stats.defence, profile.rootCharacter.defenceCurve));
 
-		profile.hpPP.bind(hp.valueProperty());
-		profile.attackPP.bind(attack.valueProperty());
-		profile.defencePP.bind(defence.valueProperty());
+			// Force the spinners to update the display area
+			hp.getEditor().setText(
+				hp.getValueFactory().getConverter().toString(profile.hpPP.getValue()));
+			attack.getEditor().setText(
+				attack.getValueFactory().getConverter().toString(profile.attackPP.getValue()));
+			defence.getEditor().setText(
+				defence.getValueFactory().getConverter().toString(profile.defencePP.getValue()));
+
+			profile.hpPP.bind(hp.valueProperty());
+			profile.attackPP.bind(attack.valueProperty());
+			profile.defencePP.bind(defence.valueProperty());
+		}
 	}
 }
 

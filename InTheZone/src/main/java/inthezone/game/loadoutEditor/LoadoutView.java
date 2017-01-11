@@ -8,7 +8,9 @@ import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
 import javafx.beans.binding.NumberExpression;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -24,6 +26,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +35,9 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final ObservableList<LoadoutModel> loadoutsModel =
 		FXCollections.observableArrayList();
 
+	private final ObservableList<CharacterInfo> charactersModel =
+		FXCollections.observableArrayList();
+	
 	private final CharacterProfilePane cp = new CharacterProfilePane();
 	private final HBox content = new HBox();
 	private final GridPane rightPane = new GridPane();
@@ -39,13 +46,26 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final Button newLoadout = new Button("+");
 	private final TextField loadoutName = new TextField("<loadout name>");
 	private final ListView<CharacterProfileModel> profiles = new ListView<>();
+	private final Button addCharacter = new Button("Add Character");
+	private final Button removeCharacter = new Button("Remove Character");
+	private final ListView<CharacterInfo> characters = new ListView<>(charactersModel);
 	private final Button done = new Button("Done");
 	private final Button delete = new Button("Delete this loadout");
 
 	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
+	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
 	private final Label costLabel = new Label("Cost: ");
 
+	private final Paint goodCostColor = Color.GREEN;
+	private final Paint badCostColor = Color.RED;
+
 	private final ClientConfig config;
+
+	private void rebindTotalCost(LoadoutModel l) {
+		if (l != null) totalCost.bind(l.profiles.stream()
+			.map(pr -> (NumberExpression) pr.costProperty())
+			.reduce(new SimpleIntegerProperty(0), (x, y) -> x.add(y)));
+	}
 
 	public LoadoutView(ClientConfig config, GameDataFactory gameData) {
 		this.config = config;
@@ -57,6 +77,16 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		if (loadoutsModel.isEmpty())
 			loadoutsModel.add(emptyLoadout(config, gameData));
+
+		for (CharacterInfo c : gameData.getCharacters()) {
+			if (c.playable) charactersModel.add(c);
+		}
+
+		costLabel.setTextFill(goodCostColor);
+		isLegitimate.addListener((o, v0, v1) -> {
+			if (v1) costLabel.setTextFill(goodCostColor);
+			else costLabel.setTextFill(badCostColor);
+		});
 
 		loadout.getSelectionModel().selectedItemProperty()
 			.addListener((p, s0, s1) -> {
@@ -70,9 +100,9 @@ public class LoadoutView extends DialogScreen<Void> {
 					profiles.setItems(s1.profiles);
 					profiles.getSelectionModel().select(0);
 
-					totalCost.bind(s1.profiles.stream()
-						.map(pr -> (NumberExpression) pr.costProperty())
-						.reduce(new SimpleIntegerProperty(0), (x, y) -> x.add(y)));
+					rebindTotalCost(s1);
+
+					isLegitimate.setValue(s1.encodeLoadout().isLegitimate());
 				}
 			});
 
@@ -94,21 +124,64 @@ public class LoadoutView extends DialogScreen<Void> {
 		rightPane.add(loadoutName, 1, 1);
 		rightPane.add(costLabel, 2, 1);
 		rightPane.add(profiles, 0, 2, 3, 1);
-		rightPane.add(toolbar, 0, 3, 3, 1);
+		rightPane.add(addCharacter, 0, 3, 1, 1);
+		rightPane.add(removeCharacter, 1, 3, 1, 1);
+		rightPane.add(characters, 0, 4, 3, 1);
+		rightPane.add(toolbar, 0, 5, 3, 1);
 
 		costLabel.textProperty().bind(
 			(new SimpleStringProperty(" Total cost: "))
 				.concat(totalCost).concat(" / " + Loadout.maxPP));
 
+		totalCost.addListener(o -> {
+			LoadoutModel m = loadout.getSelectionModel().getSelectedItem();
+			if (m != null) isLegitimate.setValue(m.encodeLoadout().isLegitimate());
+		});
+
+		characters.setPlaceholder(new Label("All characters chosen"));
+		profiles.setPlaceholder(new Label("You must add at least one character"));
+
 		profiles.setCellFactory(CharacterIndicatorCell.forListView());
 
 		profiles.getSelectionModel().selectedItemProperty()
 			.addListener((p, s0, s1) -> {
-				if (s1 != null) cp.setCharacterProfile(s1);
+				cp.setCharacterProfile(s1);
 			});
 
 		profiles.getSelectionModel().select(null);
 		profiles.getSelectionModel().select(0);
+
+		addCharacter.disableProperty().bind(characters.getSelectionModel()
+			.selectedItemProperty().isNull());
+		removeCharacter.disableProperty().bind(profiles.getSelectionModel()
+			.selectedItemProperty().isNull());
+
+		addCharacter.setOnAction(event -> {
+			CharacterInfo c = characters.getSelectionModel().getSelectedItem();
+			if (c == null) return;
+			try {
+				if (!profiles.getItems().stream().anyMatch(p -> p.rootCharacter.name.equals(c.name))) {
+					profiles.getItems().add(new CharacterProfileModel(new CharacterProfile(c)));
+					rebindTotalCost(loadout.getSelectionModel().getSelectedItem());
+				}
+
+			} catch (CorruptDataException e) {
+				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				a.setHeaderText("Error in game data");
+				a.showAndWait();
+				config.writeConfig();
+
+				System.exit(1);
+			}
+		});
+
+		removeCharacter.setOnAction(event -> {
+			CharacterProfileModel profile = profiles.getSelectionModel().getSelectedItem();
+			if (profile == null) return;
+
+			profiles.getItems().remove(profile);
+			rebindTotalCost(loadout.getSelectionModel().getSelectedItem());
+		});
 
 		// The delete button
 		delete.setOnAction(event -> {
@@ -150,21 +223,8 @@ public class LoadoutView extends DialogScreen<Void> {
 	private static LoadoutModel emptyLoadout(
 		ClientConfig config, GameDataFactory gameData
 	) {
-		try {
-			List<CharacterProfile> profiles = new ArrayList<>();
-			for (CharacterInfo c : gameData.getCharacters()) {
-				if (c.playable) profiles.add(new CharacterProfile(c));
-			}
-			return new LoadoutModel(new Loadout("<new loadout>", profiles));
-		} catch (CorruptDataException e) {
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-			a.setHeaderText("Game data corrupt");
-			a.showAndWait();
-			config.writeConfig();
-
-			System.exit(1);
-			return null;
-		}
+		List<CharacterProfile> profiles = new ArrayList<>();
+		return new LoadoutModel(new Loadout("<new loadout>", profiles));
 	}
 }
 

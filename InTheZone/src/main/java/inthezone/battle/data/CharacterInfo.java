@@ -29,6 +29,10 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public final List<Integer> attackCurve;
 	public final List<Integer> defenceCurve;
 
+	@Override public String toString() {
+		return name;
+	}
+
 	private final Map<String, AbilityInfo> abilitiesIndex = new HashMap<>();
 
 	public CharacterInfo(

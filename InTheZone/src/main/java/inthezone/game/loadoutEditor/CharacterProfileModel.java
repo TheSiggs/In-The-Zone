@@ -41,10 +41,9 @@ public class CharacterProfileModel {
 	public CharacterProfileModel(CharacterProfile c) {
 		init(c);
 		InvalidationListener update = v -> {
-			System.err.println("Updating profile: " + abilities.toString());
 			CharacterProfile newProfile = encodeProfile();
-			cost.setValue(newProfile.computeCost());
 			profile.setValue(newProfile);
+			cost.setValue(newProfile.computeCost());
 		};
 
 		basicAbility.addListener(update);

@@ -7,8 +7,11 @@ import isogame.engine.Sprite;
 import isogame.engine.SpriteDecalRenderer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import static isogame.GlobalConstants.TILEH;
 import static isogame.GlobalConstants.TILEW;
 
@@ -17,7 +20,9 @@ import static isogame.GlobalConstants.TILEW;
  * */
 public class DecalRenderer implements SpriteDecalRenderer {
 	private final BattleView view;
-	private Map<Integer, HealthBar> healthBars = new HashMap<>();
+	private final Map<Integer, HealthBar> healthBars = new HashMap<>();
+	private final Set<Integer> covered = new HashSet<>();
+	private final Set<Integer> enemies = new HashSet<>();
 
 	public DecalRenderer(BattleView view) {
 		this.view = view;
@@ -25,11 +30,13 @@ public class DecalRenderer implements SpriteDecalRenderer {
 
 	public void registerCharacter(Character c) {
 		healthBars.put(c.id, new HealthBar(c.getHP(), c.getMaxHP()));
+		if (c.player != view.player) enemies.add(c.id);
 	}
 
 	public void updateCharacter(Character c) {
-		HealthBar h = healthBars.get(c.id);
+		final HealthBar h = healthBars.get(c.id);
 		if (h != null) h.updateHP(c.getHP(), c.getMaxHP());
+		if (c.hasCover()) covered.add(c.id); else covered.remove(c.id);
 	}
 
 	// The selection arrow
@@ -38,6 +45,11 @@ public class DecalRenderer implements SpriteDecalRenderer {
 		TILEW * 3.0/8.0, TILEW * 5.0/8.0, TILEW / 2.0};
 	private final double[] sarrowy = new double[] {
 		TILEH * -0.2, TILEH * -0.2, TILEH * -0.06};
+
+	private final static double X = TILEW * 0.45;
+	private final static double Y = TILEH * 0.25;
+
+	private static final Font markFont = new Font(48d);
 	
 	@Override public void render(
 		GraphicsContext cx, Sprite s, long t, CameraAngle angle
@@ -51,6 +63,13 @@ public class DecalRenderer implements SpriteDecalRenderer {
 
 		HealthBar h = healthBars.get(s.userData);
 		if (h != null) h.render(cx, s, t);
+
+		if (enemies.contains(s.userData)) {
+			String m = covered.contains(s.userData)? "E(C)" : "E";
+			cx.setFill(Color.RED);
+			cx.setFont(markFont);
+			cx.fillText(m, X, Y);
+		}
 	}
 
 	public void handleMouseOver(MapPoint p) {

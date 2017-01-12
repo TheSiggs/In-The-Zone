@@ -156,32 +156,11 @@ public class LoadoutView extends DialogScreen<Void> {
 		removeCharacter.disableProperty().bind(profiles.getSelectionModel()
 			.selectedItemProperty().isNull());
 
-		addCharacter.setOnAction(event -> {
-			CharacterInfo c = characters.getSelectionModel().getSelectedItem();
-			if (c == null) return;
-			try {
-				if (!profiles.getItems().stream().anyMatch(p -> p.rootCharacter.name.equals(c.name))) {
-					profiles.getItems().add(new CharacterProfileModel(new CharacterProfile(c)));
-					rebindTotalCost(loadout.getSelectionModel().getSelectedItem());
-				}
-
-			} catch (CorruptDataException e) {
-				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-				a.setHeaderText("Error in game data");
-				a.showAndWait();
-				config.writeConfig();
-
-				System.exit(1);
-			}
+		characters.setOnMouseClicked(event -> {
+			if (event.getClickCount() > 1) addCharacter();
 		});
-
-		removeCharacter.setOnAction(event -> {
-			CharacterProfileModel profile = profiles.getSelectionModel().getSelectedItem();
-			if (profile == null) return;
-
-			profiles.getItems().remove(profile);
-			rebindTotalCost(loadout.getSelectionModel().getSelectedItem());
-		});
+		addCharacter.setOnAction(event -> addCharacter());
+		removeCharacter.setOnAction(event -> removeCharacter());
 
 		// The delete button
 		delete.setOnAction(event -> {
@@ -211,6 +190,33 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		content.getChildren().addAll(cp, rightPane);
 		this.getChildren().add(content);
+	}
+
+	private void addCharacter() {
+		CharacterInfo c = characters.getSelectionModel().getSelectedItem();
+		if (c == null) return;
+		try {
+			if (!profiles.getItems().stream().anyMatch(p -> p.rootCharacter.name.equals(c.name))) {
+				profiles.getItems().add(new CharacterProfileModel(new CharacterProfile(c)));
+				rebindTotalCost(loadout.getSelectionModel().getSelectedItem());
+			}
+
+		} catch (CorruptDataException e) {
+			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			a.setHeaderText("Error in game data");
+			a.showAndWait();
+			config.writeConfig();
+
+			System.exit(1);
+		}
+	}
+
+	private void removeCharacter() {
+		CharacterProfileModel profile = profiles.getSelectionModel().getSelectedItem();
+		if (profile == null) return;
+
+		profiles.getItems().remove(profile);
+		rebindTotalCost(loadout.getSelectionModel().getSelectedItem());
 	}
 
 	private void saveLoadouts() {

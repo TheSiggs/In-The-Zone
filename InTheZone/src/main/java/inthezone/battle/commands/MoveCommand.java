@@ -98,6 +98,8 @@ public class MoveCommand extends Command {
 		List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
 		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
 
+		agent.currentZone = turn.battleState.getZoneAt(loc);
+
 		if (isPanic && !triggers.isEmpty()) {
 			Optional<Character> oc = turn.battleState.getCharacterAt(loc);
 			if (oc.isPresent()) {

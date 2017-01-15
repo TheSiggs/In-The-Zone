@@ -18,12 +18,12 @@ public class StatusEffectFactory {
 			case STRENGTHENED: return new BasicStatusEffect(info, 0.20, 0.0, 0.0);
 			case WEAKENED: return new BasicStatusEffect(info, 0.20, 0.0, 0.0);
 			case PRECISE: return new BasicStatusEffect(info, 0.0, 0.0, 0.30);
-			case ACCELERATED: return new PointStatusEffect(info, 0, 1, 0);
-			case ENERGIZED: return new PointStatusEffect(info, 1, 0, 0);
-			case DAZED: return new PointStatusEffect(info, -1, 0, 0);
-			case SLOWED: return new PointStatusEffect(info, 0, -1, 0);
-			case ONGOING: return new PointStatusEffect(info, 0, 0, -(Math.abs(initialDamage) / 2));
-			case REGENERATION: return new PointStatusEffect(info, 0, 0, Math.abs(initialDamage) / 2);
+			case ACCELERATED: return new PointStatusEffect(info, 0, 1);
+			case ENERGIZED: return new PointStatusEffect(info, 1, 0);
+			case DAZED: return new PointStatusEffect(info, -1, 0);
+			case SLOWED: return new PointStatusEffect(info, 0, -1);
+			case ONGOING: return new HPStatusEffect(info, -(Math.abs(initialDamage) / 2));
+			case REGENERATION: return new HPStatusEffect(info, Math.abs(initialDamage) / 2);
 			case DEBILITATED: return new Debilitated(info);
 			case SILENCED: return new Silenced(info);
 			case STUNNED: return new Stunned(info);

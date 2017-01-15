@@ -3,6 +3,7 @@ package inthezone.battle.status;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
+import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
@@ -13,14 +14,12 @@ import org.json.simple.JSONObject;
 public class PointStatusEffect extends StatusEffect {
 	private final int ap;
 	private final int mp;
-	private final int hp;
 
-	public PointStatusEffect(StatusEffectInfo info, int ap, int mp, int hp) {
+	public PointStatusEffect(StatusEffectInfo info, int ap, int mp) {
 		super(info);
 
 		this.ap = ap;
 		this.mp = mp;
-		this.hp = hp;
 	}
 
 	@Override 
@@ -30,7 +29,6 @@ public class PointStatusEffect extends StatusEffect {
 		r.put("info", info.toString());
 		r.put("ap", ap);
 		r.put("mp", mp);
-		r.put("hp", hp);
 		return r;
 	}
 
@@ -40,35 +38,32 @@ public class PointStatusEffect extends StatusEffect {
 		Object oinfo = o.get("info");
 		Object oap = o.get("ap");
 		Object omp = o.get("mp");
-		Object ohp = o.get("hp");
 
 		if (oinfo == null) throw new ProtocolException("Missing status effect type");
 		if (oap == null) throw new ProtocolException("Missing ap buff");
 		if (omp == null) throw new ProtocolException("Missing mp buff");
-		if (ohp == null) throw new ProtocolException("Missing hp buff");
 
 		try {
 			StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
 
 			return new PointStatusEffect(info,
 				((Number) oap).intValue(),
-				((Number) omp).intValue(),
-				((Number) ohp).intValue());
+				((Number) omp).intValue());
 		} catch (ClassCastException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing basic status effect", e);
+			throw new ProtocolException("Error parsing point status effect", e);
 		}
 	}
 
-	@Override public List<Command> doBeforeTurn(Battle battle, Character c) {
-		c.pointsBuff(ap, mp, hp);
+	@Override public Stats getBaseStatsBuff() {
+		return new Stats(ap, mp, 0, 0, 0, 0);
+	}
+
+	@Override public List<Command> doNow(Character c) {
+		c.pointsBuff(ap, mp, 0);
 		return new ArrayList<>();
 	}
 
-	@Override public List<Command> doNow(Battle battle, Character c) {
-		return doBeforeTurn(battle, c);
-	}
-
-	@Override public List<Command> undoNow(Battle battle, Character c) {
+	@Override public List<Command> undoNow(Character c) {
 		c.pointsBuff(-ap, -mp, 0);
 		return new ArrayList<>();
 	}

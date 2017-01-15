@@ -153,16 +153,16 @@ public class Character extends Targetable {
 	public Optional<StatusEffect> getStatusDebuff() { return statusDebuff; }
 
 	/**
-	 * Buff or debuff this character's points. Should be done after the turn reset.
+	 * Buff or debuff this character's points.
 	 * */
 	public void pointsBuff(int ap, int mp, int hp) {
 		this.ap += ap;
 		this.mp += mp;
 		this.hp += hp;
 		if (this.hp > baseStats.hp) this.hp = baseStats.hp;
-		if (this.ap < 0) ap = 0;
-		if (this.mp < 0) mp = 0;
-		if (this.hp < 0) hp = 0;
+		if (this.ap < 0) this.ap = 0;
+		if (this.mp < 0) this.mp = 0;
+		if (this.hp < 0) this.hp = 0;
 	}
 
 	/**
@@ -236,11 +236,17 @@ public class Character extends Targetable {
 		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 
 		statusBuff.ifPresent(s -> {
-			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
+			if (s.canRemoveNow()) {
+				s.undoNow(this);
+				this.statusBuff = Optional.empty();
+			}
 		});
 		statusDebuff.ifPresent(s -> {
 			lastDebuff = s;
-			if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
+			if (s.canRemoveNow()) {
+				s.undoNow(this);
+				this.statusDebuff = Optional.empty();
+			}
 		});
 
 		return r;
@@ -269,7 +275,11 @@ public class Character extends Targetable {
 	/**
 	 * Remove all status effects
 	 * */
-	@Override public Stats getStats() { return baseStats; }
+	@Override public Stats getStats() {
+		Stats b = statusBuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
+		Stats d = statusDebuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
+		return baseStats.add(b).add(d);
+	}
 
 	@Override public MapPoint getPos() { return pos; }
 
@@ -298,6 +308,9 @@ public class Character extends Targetable {
 	@Override public void defuse() { return; }
 
 	@Override public void cleanse() {
+		lastDebuff = null;
+		statusBuff.ifPresent(s -> s.undoNow(this));
+		statusDebuff.ifPresent(s -> s.undoNow(this));
 		statusBuff = Optional.empty();
 		statusDebuff = Optional.empty();
 	}
@@ -311,13 +324,13 @@ public class Character extends Targetable {
 			hasCover = true;
 
 		} else if (info.kind == StatusEffectKind.BUFF) {
-			statusBuff.ifPresent(s -> s.undoNow(battle, this));
-			status.doNow(battle, this);
+			statusBuff.ifPresent(s -> s.undoNow(this));
+			status.doNow(this);
 			statusBuff = Optional.of(status);
 
 		} else {
-			statusDebuff.ifPresent(s -> s.undoNow(battle, this));
-			status.doNow(battle, this);
+			statusDebuff.ifPresent(s -> s.undoNow(this));
+			status.doNow(this);
 			statusDebuff = Optional.of(status);
 		}
 	}

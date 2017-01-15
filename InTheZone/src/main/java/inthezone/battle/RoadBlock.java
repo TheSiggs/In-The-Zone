@@ -14,7 +14,7 @@ import java.util.Optional;
 public class RoadBlock extends Targetable {
 	private final static int HITS_TO_DESTROY = 2;
 	private final MapPoint pos;
-	private int hits;
+	public int hits;
 	private final SpriteInfo sprite;
 
 	private Optional<Zone> boundZone;

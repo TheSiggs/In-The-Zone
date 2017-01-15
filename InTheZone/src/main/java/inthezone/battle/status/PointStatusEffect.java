@@ -65,7 +65,11 @@ public class PointStatusEffect extends StatusEffect {
 	}
 
 	@Override public List<Command> doNow(Battle battle, Character c) {
-		c.pointsBuff(ap, mp, 0);
+		return doBeforeTurn(battle, c);
+	}
+
+	@Override public List<Command> undoNow(Battle battle, Character c) {
+		c.pointsBuff(-ap, -mp, 0);
 		return new ArrayList<>();
 	}
 }

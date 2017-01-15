@@ -306,12 +306,18 @@ public class Character extends Targetable {
 
 	@Override public void applyStatus(Battle battle, StatusEffect status) {
 		final StatusEffectInfo info = status.getInfo();
-		status.doNow(battle, this);
+
 		if (info.type == StatusEffectType.COVER) {
 			hasCover = true;
+
 		} else if (info.kind == StatusEffectKind.BUFF) {
+			statusBuff.ifPresent(s -> s.undoNow(battle, this));
+			status.doNow(battle, this);
 			statusBuff = Optional.of(status);
+
 		} else {
+			statusDebuff.ifPresent(s -> s.undoNow(battle, this));
+			status.doNow(battle, this);
 			statusDebuff = Optional.of(status);
 		}
 	}

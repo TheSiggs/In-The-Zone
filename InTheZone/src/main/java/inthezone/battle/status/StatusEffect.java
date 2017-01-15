@@ -40,6 +40,10 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 		return new ArrayList<>();
 	}
 
+	public List<Command> undoNow(Battle battle, Character c) {
+		return new ArrayList<>();
+	}
+
 	public boolean isBeforeTurnExhaustive() {return false;}
 
 	/**

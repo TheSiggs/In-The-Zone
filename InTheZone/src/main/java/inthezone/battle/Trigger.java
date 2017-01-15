@@ -57,8 +57,9 @@ public class Trigger {
 			Optional<Trap> t = battle.getTrapAt(p);
 			boolean triggerTrap = t.map(tt ->
 				tt.ability.canTarget(tt.parent, agent)).orElse(false);
-			boolean triggerZone = !currentZone.equals(newZone) &&
-				currentZone.map(z ->
+			boolean triggerZone = newZone.isPresent() &&
+				!currentZone.equals(newZone) &&
+				newZone.map(z ->
 					z.ability.canTarget(z.parent, agent)).orElse(false);
 
 			if ((triggerTrap || triggerZone) && battle.isSpaceFree(p)) {

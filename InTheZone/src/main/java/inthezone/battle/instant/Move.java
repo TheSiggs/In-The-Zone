@@ -117,7 +117,7 @@ public class Move extends InstantEffect {
 
 		for (List<MapPoint> path : paths) {
 			battle.battleState.getCharacterAt(path.get(0)).ifPresent(c -> affected.add(c));
-			battle.doMove(path);
+			battle.doMove(path, false);
 		}
 
 		return affected;

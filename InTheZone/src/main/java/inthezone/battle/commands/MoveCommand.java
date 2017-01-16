@@ -72,7 +72,7 @@ public class MoveCommand extends Command {
 		if (!battle.battleState.canMove(path)) throw new CommandException("21: Invalid move command");
 		Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
 
-		battle.doMove(path);
+		battle.doMove(path, true);
 
 		List<Targetable> r = new ArrayList<>();
 		oc.ifPresent(c -> r.add(c));

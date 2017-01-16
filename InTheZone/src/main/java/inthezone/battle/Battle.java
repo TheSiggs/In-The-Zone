@@ -81,10 +81,11 @@ public class Battle {
 	 * Perform a move operation on a character.  Assumes the path has been fully
 	 * validated.
 	 * */
-	public void doMove(List<MapPoint> path) {
+	public void doMove(List<MapPoint> path, boolean useMP) {
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
 			MapPoint target = path.get(path.size() - 1);
-			c.moveTo(target, battleState.hasMana(target));
+			if (useMP) c.moveTo(target, battleState.hasMana(target));
+			else c.teleport(target, battleState.hasMana(target));
 		});
 	}
 

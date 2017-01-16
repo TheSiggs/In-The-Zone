@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HUD extends AnchorPane {
 	private final FlowPane characterInfoBoxes = new FlowPane();
@@ -96,9 +97,9 @@ public class HUD extends AnchorPane {
 		messageLine.writeMessage(message);
 	}
 
-	public void selectCharacter(Character c) {
-		int id = c == null? -1 : c.id;
-		if (c != null) updateAbilities(c, c.hasMana());
+	public void selectCharacter(Optional<Character> oc) {
+		final int id = oc.map(c -> c.id).orElse(-1);
+		oc.ifPresent(c -> updateAbilities(c, c.hasMana()));
 
 		for (CharacterInfoBox box : characters.values())
 			box.setSelected(box.id == id);

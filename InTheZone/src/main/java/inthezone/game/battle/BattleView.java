@@ -168,16 +168,9 @@ public class BattleView
 	 * */
 	public void selectCharacter(Optional<Character> c) {
 		if (mode.isInteractive()) {
-			if (c.isPresent() && !c.get().isDead()) {
-				selectedCharacter = c;
-				isCharacterSelected.setValue(true);
-				setMode(new ModeMove(this, c.get()));
-			} else {
-				selectedCharacter = Optional.empty();
-				isCharacterSelected.setValue(false);
-				setMode(new ModeSelect(this));
-			}
-			hud.selectCharacter(c.orElse(null));
+			selectedCharacter = c;
+			isCharacterSelected.setValue(c.isPresent());
+			setMode(new ModeSelect(this));
 		}
 	}
 
@@ -220,7 +213,7 @@ public class BattleView
 	public void sendEndTurn() {
 		selectedCharacter = Optional.empty();
 		isCharacterSelected.setValue(false);
-		hud.selectCharacter(null);
+		hud.selectCharacter(Optional.empty());
 		battle.requestCommand(new EndTurnCommandRequest(player));
 		setMode(new ModeAnimating(this));
 	}
@@ -231,7 +224,7 @@ public class BattleView
 	public void sendResign() {
 		selectedCharacter = Optional.empty();
 		isCharacterSelected.setValue(false);
-		hud.selectCharacter(null);
+		hud.selectCharacter(Optional.empty());
 		battle.requestCommand(new ResignCommandRequest(player));
 		setMode(new ModeAnimating(this));
 	}

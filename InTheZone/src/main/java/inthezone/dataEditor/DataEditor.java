@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import java.io.File;
+import java.util.Map;
 import java.util.Optional;
  
 public class DataEditor extends Application {
@@ -20,20 +21,27 @@ public class DataEditor extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		Map<String, String> args = getParameters().getNamed();
+
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root, 960, 540);
 
 		try {
-			File dataDir = getDataDir(primaryStage);
-			if (dataDir == null) System.exit(1);
-			GameDataFactory factory = new GameDataFactory(Optional.of(dataDir), false);
+			Optional<File> dataDir;
+			dataDir = Optional.ofNullable(args.get("basedir")).map(s -> new File(s));
+			if (!dataDir.isPresent()) {
+				dataDir = Optional.ofNullable(getDataDir(primaryStage));
+			}
+
+			if (!dataDir.isPresent()) System.exit(1);
+			GameDataFactory factory = new GameDataFactory(dataDir, false);
 
 			// used to detect changes in the data so we know if it is necessary to save
 			final SimpleBooleanProperty changed = new SimpleBooleanProperty(false);
 
 			AbilitiesPane abilitiesPane = new AbilitiesPane(changed);
 			CharactersPane charactersPane = new CharactersPane(
-				factory, dataDir, changed, abilitiesPane);
+				factory, dataDir.get(), changed, abilitiesPane);
 
 			root.setLeft(charactersPane);
 			root.setCenter(abilitiesPane);

@@ -1,6 +1,7 @@
 target
 jenv.sh
 *.swp
+*.jar
 
 ### GRADLE GITIGNORE FROM https://raw.githubusercontent.com/github/gitignore/master/Gradle.gitignore
 .gradle

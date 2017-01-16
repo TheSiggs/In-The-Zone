@@ -11,7 +11,7 @@ classpath = allJars.join ' '
 define 'dataeditor' do
 	compile.using(:lint => 'all').with(allJars)
 	project.version = '0.0.1'
-	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.dataEditor.DataEditor'})
+	package(:jar).with(:manifest=>{'Main-Class'=>'inthezone.dataEditor.DataEditor', 'Class-Path'=>classpath})
 	run.using(:main => 'inthezone.dataEditor.DataEditor')
 end
 

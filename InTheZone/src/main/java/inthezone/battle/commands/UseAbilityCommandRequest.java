@@ -57,7 +57,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		final Collection<DamageToTarget> r = new ArrayList<>();
 		final Set<MapPoint> targeted = new HashSet<>();
 		for (Casting casting : castings) {
-			Set<MapPoint> area = battleState.getAffectedArea(agent, agentType, ability, casting);
+			final Set<MapPoint> area = battleState.getAffectedArea(agent, agentType, ability, casting);
 
 			Collection<Targetable> targets = battleState.getAbilityTargets(agent, agentType, ability, area)
 				.stream().filter(t -> !targeted.contains(t.getPos()) && !ineligible.contains(t.getPos()))
@@ -93,6 +93,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					.orElseThrow(() ->
 						new CommandException("60: Invalid ability command request"));
 
+			System.err.println("All targets: " + allTargets);
+
 			// get the instant effect targets
 			final List<Casting> preTargets = new ArrayList<>();
 			final List<Casting> postTargets = new ArrayList<>();
@@ -116,6 +118,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 			// deal with vampirism
 			if (agentType == AbilityAgentType.CHARACTER) {
+				System.err.println("Doing vampirism");
 				battleState.getCharacterAt(agent).ifPresent(a -> {
 					if (a.isVampiric()) allTargets.add(ability.computeVampirismEffect(
 						battleState, a, allTargets));
@@ -138,8 +141,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			// pre instant effect
 			if (preTargets.size() > 0 && ability.info.instantBefore.isPresent()) {
 				preEffect = makeInstantEffect(
-					battleState, preTargets, ability.info.instantBefore.get(),
-					Optional.of(mainEffect), Optional.ofNullable(postEffect));
+						battleState, preTargets, ability.info.instantBefore.get(),
+						Optional.of(mainEffect), Optional.ofNullable(postEffect));
 			}
 
 			if (preEffect != null) commands.add(preEffect);

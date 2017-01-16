@@ -187,7 +187,7 @@ public class SpriteManager {
 
 			} else if (t instanceof RoadBlock) {
 				Sprite s = temporaryImmobileObjects.get(t.getPos());
-				if (s != null && ((RoadBlock) t).hits > 0) {
+				if (s != null && ((RoadBlock) t).hasBeenHit()) {
 					s.setAnimation("hit");
 				}
 			}

@@ -90,5 +90,12 @@ public class DamageToTarget implements HasJSONRepresentation {
 			return new DamageToTarget(to, false, false, damage, statusEffect, pre, post);
 		}
 	}
+
+	@Override public String toString() {
+		return "Damage " + damage + " " + target +
+			(isTargetATrap? " (trap) " : "") +
+			(isTargetAZone? " (zone) " : "") +
+			" " + statusEffect;
+	}
 }
 

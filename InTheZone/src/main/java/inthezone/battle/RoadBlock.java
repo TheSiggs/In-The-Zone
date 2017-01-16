@@ -14,7 +14,7 @@ import java.util.Optional;
 public class RoadBlock extends Targetable {
 	private final static int HITS_TO_DESTROY = 2;
 	private final MapPoint pos;
-	public int hits;
+	private int hits;
 	private final SpriteInfo sprite;
 
 	private Optional<Zone> boundZone;
@@ -59,6 +59,7 @@ public class RoadBlock extends Targetable {
 		if (hits < 0) hits = 0;
 		if (isDead()) boundZone.ifPresent(z -> z.purge());
 	}
+	public boolean hasBeenHit() {return hits < HITS_TO_DESTROY;}
 	@Override public void defuse() {return;}
 	@Override public void cleanse() {return;}
 	@Override public void purge() {return;}

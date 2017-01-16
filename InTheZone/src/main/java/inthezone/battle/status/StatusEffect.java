@@ -4,6 +4,7 @@ import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
+import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
@@ -36,7 +37,15 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 		return new ArrayList<>();
 	}
 
-	public List<Command> doNow(Battle battle, Character c) {
+	public Stats getBaseStatsBuff() {
+		return new Stats();
+	}
+
+	public List<Command> doNow(Character c) {
+		return new ArrayList<>();
+	}
+
+	public List<Command> undoNow(Character c) {
 		return new ArrayList<>();
 	}
 

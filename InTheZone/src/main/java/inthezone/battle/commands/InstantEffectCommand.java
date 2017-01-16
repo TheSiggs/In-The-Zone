@@ -109,6 +109,11 @@ public class InstantEffectCommand extends Command {
 
 		if (postAbility.isPresent() || postEffect.isPresent()) {
 			Map<MapPoint, MapPoint> retarget = effect.getRetargeting();
+
+			retarget.values().stream()
+				.flatMap(p -> turn.battleState.getTargetableAt(p).stream())
+				.forEach(t -> t.currentZone = turn.battleState.getZoneAt(t.getPos()));
+
 			postAbility.ifPresent(a -> {
 				a.registerConstructedObjects(effect.getConstructed());
 				a.retarget(retarget);

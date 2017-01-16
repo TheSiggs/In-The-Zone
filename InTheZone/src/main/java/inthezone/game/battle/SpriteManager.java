@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
+import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.battle.Zone;
 import isogame.engine.AnimationChain;
@@ -173,7 +174,7 @@ public class SpriteManager {
 					zones.addAll(((Zone) t).range);
 					view.resetHighlighting();
 				}
-				
+
 			} else if (t.reap()) {
 				Sprite s = temporaryImmobileObjects.remove(t.getPos());
 				if (s != null) view.getStage().removeSprite(s);
@@ -183,6 +184,12 @@ public class SpriteManager {
 				s.pos = t.getPos();
 				view.getStage().addSprite(s);
 				temporaryImmobileObjects.put(t.getPos(), s);
+
+			} else if (t instanceof RoadBlock) {
+				Sprite s = temporaryImmobileObjects.get(t.getPos());
+				if (s != null && ((RoadBlock) t).hits > 0) {
+					s.setAnimation("hit");
+				}
 			}
 		}
 	}

@@ -387,7 +387,8 @@ public class BattleState {
 					"Attempted to get targeting information for a non-existent character"));
 
 			Set<MapPoint> pr = new HashSet<>(r);
-			Collection<MapPoint> los = getLOS(casting.castFrom, casting.target, movementObstacles(player));
+			Collection<MapPoint> los =
+				LineOfSight.getLOS(casting.castFrom, casting.target, true);
 			if (los != null) pr.addAll(los);
 			return pr;
 		}

@@ -112,14 +112,14 @@ public class Battle {
 		for (DamageToTarget d : targets) {
 			final Targetable t;
 			if (d.isTargetATrap) {
-				t = battleState.getTrapAt(d.target.target).orElseThrow(() ->
-					new CommandException("Expected trap at " +
-						d.target.toString() + " but there was none"));
+				Optional<Trap> mt = battleState.getTrapAt(d.target.target);
+				if (!mt.isPresent()) continue;
+				t = mt.get();
 
 			} else if (d.isTargetAZone) {
-				t = battleState.getZoneAt(d.target.target).orElseThrow(() ->
-					new CommandException("Expected zone at " +
-						d.target.toString() + " but there was none"));
+				Optional<Zone> mt = battleState.getZoneAt(d.target.target);
+				if (!mt.isPresent()) continue;
+				t = mt.get();
 
 			} else {
 				t = battleState.getTargetableAt(d.target.target).stream()

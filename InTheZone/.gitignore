@@ -1,4 +1,5 @@
 target
+reports
 jenv.sh
 *.swp
 *.jar

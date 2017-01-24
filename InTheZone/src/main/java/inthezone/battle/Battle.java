@@ -148,6 +148,7 @@ public class Battle {
 	public List<Trap> createTrap(
 		Ability ability, Character agent, Collection<MapPoint> ps
 	) {
+		agent.useAbility(ability);
 		List<Trap> r = new ArrayList<>();
 		for (MapPoint p : ps) {
 			r.add(battleState.placeTrap(p, ability, agent, sprites));
@@ -163,6 +164,7 @@ public class Battle {
 	public List<Zone> createZone(
 		Ability ability, Character agent, Optional<RoadBlock> bind, Collection<MapPoint> ps
 	) {
+		agent.useAbility(ability);
 		Set<MapPoint> range = new HashSet<>();
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
 			p, AbilityAgentType.CHARACTER, ability, new Casting(p, p)));

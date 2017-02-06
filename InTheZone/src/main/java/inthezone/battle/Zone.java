@@ -6,11 +6,13 @@ import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class Zone extends Targetable implements HasParentAgent {
 	public final MapPoint centre;
-	public final Collection<MapPoint> range;
+	public final Set<MapPoint> range = new HashSet<>();
 	public final Ability ability;
 	public final Character parent;
 
@@ -34,7 +36,7 @@ public class Zone extends Targetable implements HasParentAgent {
 		Character agent
 	) {
 		this.centre = centre;
-		this.range = range;
+		this.range.addAll(range);
 		this.hasMana = hasMana;
 		this.ability = ability;
 		this.parent = agent;
@@ -61,7 +63,7 @@ public class Zone extends Targetable implements HasParentAgent {
 		boolean purged
 	) {
 		this.centre = centre;
-		this.range = range;
+		this.range.addAll(range);
 		this.ability = ability;
 		this.parent = parent;
 		this.turnsRemaining = turns;

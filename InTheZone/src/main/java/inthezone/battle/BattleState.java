@@ -25,12 +25,12 @@ public class BattleState {
 	public final Trigger trigger;
 
 	public final Stage terrain;
-	public final Collection<Character> characters;
+	public final Collection<Character> characters = new ArrayList<>();
 
 	private final double[] revengeBonus = {0, 0.2, 0.4, 0.9};
 
 	// superlist of all targetables (including characters and obstacles)
-	public final Collection<Targetable> targetable;
+	public final Collection<Targetable> targetable = new ArrayList<>();
 
 	// zone mapping
 	private final Map<MapPoint, Zone> zoneMap = new HashMap<>();
@@ -41,8 +41,7 @@ public class BattleState {
 	public BattleState(Stage terrain, Collection<Character> characters) {
 		this.trigger = new Trigger(this);
 		this.terrain = terrain;
-		this.characters = characters;
-		this.targetable = new ArrayList<>();
+		this.characters.addAll(characters);
 		this.targetable.addAll(characters);
 
 		terrainObstacles = new HashSet<>(terrain.allSprites.stream()

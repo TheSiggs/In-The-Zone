@@ -30,7 +30,7 @@ public class Character extends Targetable {
 	public final String name;
  	public final Player player;
 	public final SpriteInfo sprite;
-	public final Collection<Ability> abilities;
+	public final Collection<Ability> abilities = new ArrayList<>();
 	public final Ability basicAbility;
 	private final Stats baseStats;
 
@@ -65,7 +65,7 @@ public class Character extends Targetable {
 		this.name = name;
 		this.player = player;
 		this.sprite = sprite;
-		this.abilities = abilities;
+		this.abilities.addAll(abilities);
 		this.basicAbility = basicAbility;
 		this.baseStats = baseStats;
 		this.statusBuff = statusBuff;
@@ -113,8 +113,8 @@ public class Character extends Targetable {
 		this.player = player;
 		this.sprite = profile.rootCharacter.sprite;
 		this.baseStats = profile.getBaseStats();
-		this.abilities = profile.abilities.stream()
-			.map(i -> new Ability(i)).collect(Collectors.toList());
+		this.abilities.addAll(profile.abilities.stream()
+			.map(i -> new Ability(i)).collect(Collectors.toList()));
 		this.basicAbility = new Ability(profile.basicAbility);
 		this.hasMana = hasMana;
 		this.pos = pos;

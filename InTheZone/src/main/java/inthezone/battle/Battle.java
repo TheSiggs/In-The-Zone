@@ -164,7 +164,6 @@ public class Battle {
 	public List<Zone> createZone(
 		Ability ability, Character agent, Optional<RoadBlock> bind, Collection<MapPoint> ps
 	) {
-		agent.useAbility(ability);
 		Set<MapPoint> range = new HashSet<>();
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
 			p, AbilityAgentType.CHARACTER, ability, new Casting(p, p)));

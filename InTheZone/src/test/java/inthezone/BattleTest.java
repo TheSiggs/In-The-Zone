@@ -30,6 +30,11 @@ public class BattleTest {
 	final CharacterProfile testKieren;
 	final CharacterProfile testNettis;
 
+	final MapPoint zanPos = new MapPoint(0, 3);
+	final MapPoint danPos = new MapPoint(0, 4);
+	final MapPoint kierenPos = new MapPoint(0, 5);
+	final MapPoint nettisPos = new MapPoint(0, 6);
+
 	public BattleTest() throws Exception {
 		testData = new GameDataFactory(Optional.of(new File("src/main/resources/testgamedata")), false, true);
 		checkers = testData.getStage("Checkerboard");
@@ -46,12 +51,12 @@ public class BattleTest {
 			i.abilities.stream().filter(a -> a.type == AbilityType.BASIC).findFirst().get(), 0, 0, 0);
 	}
 
-	private Battle simpleBattle() throws Exception {
+	public Battle simpleBattle() throws Exception {
 		final Collection<Character> cs = new ArrayList<>();
-		cs.add(new Character(testZan, Player.PLAYER_A, false, new MapPoint(0, 3), 0));
-		cs.add(new Character(testDan, Player.PLAYER_A, false, new MapPoint(0, 4), 1));
-		cs.add(new Character(testKieren, Player.PLAYER_A, false, new MapPoint(0, 5), 2));
-		cs.add(new Character(testNettis, Player.PLAYER_A, false, new MapPoint(0, 6), 3));
+		cs.add(new Character(testZan, Player.PLAYER_A, false, zanPos, 0));
+		cs.add(new Character(testDan, Player.PLAYER_A, false, danPos, 1));
+		cs.add(new Character(testKieren, Player.PLAYER_A, false, kierenPos, 2));
+		cs.add(new Character(testNettis, Player.PLAYER_A, false, nettisPos, 3));
 
 		cs.add(new Character(testZan, Player.PLAYER_B, false, new MapPoint(7, 3), 4));
 		cs.add(new Character(testDan, Player.PLAYER_B, false, new MapPoint(7, 4), 5));

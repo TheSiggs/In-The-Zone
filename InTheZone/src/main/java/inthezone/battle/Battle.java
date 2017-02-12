@@ -151,7 +151,8 @@ public class Battle {
 		agent.useAbility(ability);
 		List<Trap> r = new ArrayList<>();
 		for (MapPoint p : ps) {
-			r.add(battleState.placeTrap(p, ability, agent, sprites));
+			if (battleState.isSpaceFree(p) && !battleState.getTrapAt(p).isPresent())
+				r.add(battleState.placeTrap(p, ability, agent, sprites));
 		}
 		return r;
 	}

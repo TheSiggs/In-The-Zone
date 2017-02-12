@@ -9,7 +9,10 @@ import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
+import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.RoadBlock;
+import inthezone.battle.status.StatusEffect;
+import inthezone.battle.status.StatusEffectFactory;
 import inthezone.battle.Trap;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
@@ -116,6 +119,47 @@ public class BattleTest {
 
 		final Trap t = r1.get(0);
 		assertEquals(new MapPoint(2, 4), t.getPos());
+	}
+
+	@Test
+	public void acceleratedSlowed() throws Exception {
+		final Battle b = simpleBattle();
+		final Character dan = b.battleState.getCharacterAt(danPos).get();
+		assertNotNull(dan);
+
+		assertEquals(3, dan.getMP());
+		assertEquals(3, dan.getStats().mp);
+
+		final StatusEffect accelerated = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("accelerated"), 0, Optional.empty());
+		assertNotNull(accelerated);
+
+		dan.applyStatus(b, accelerated);
+		assertEquals(4, dan.getMP());
+		assertEquals(4, dan.getStats().mp);
+
+		dan.cleanse();
+		assertEquals(3, dan.getMP());
+		assertEquals(3, dan.getStats().mp);
+
+		dan.applyStatus(b, accelerated);
+		assertEquals(3, dan.getMP());
+		assertEquals(4, dan.getStats().mp);
+
+		// restart the turn and observe that accelerated has been correctly applied
+		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+		assertTrue(b.getTurnStart(Player.PLAYER_A).isEmpty());
+		assertEquals(4, dan.getMP());
+		assertEquals(4, dan.getStats().mp);
+
+		// reapply the status effect when the character has 0 mp
+		final MapPoint p2 = danPos.add(new MapPoint(2, 2));
+		dan.moveTo(p2, false);
+		assertEquals(p2, dan.getPos());
+		assertEquals(0, dan.getMP());
+		dan.applyStatus(b, accelerated);
+		assertEquals(0, dan.getMP());
+		assertEquals(4, dan.getStats().mp);
 	}
 }
 

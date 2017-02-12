@@ -62,10 +62,5 @@ public class PointStatusEffect extends StatusEffect {
 		c.pointsBuff(ap, mp, 0);
 		return new ArrayList<>();
 	}
-
-	@Override public List<Command> undoNow(Character c) {
-		c.pointsBuff(-ap, -mp, 0);
-		return new ArrayList<>();
-	}
 }
 

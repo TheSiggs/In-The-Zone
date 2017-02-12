@@ -8,6 +8,7 @@ import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.data.Player;
 import inthezone.battle.LineOfSight;
 import inthezone.battle.PathFinderNode;
 import inthezone.battle.Targetable;
@@ -201,23 +202,37 @@ public class PullPush extends InstantEffect {
 		BattleState battle, MapPoint from, MapPoint to,
 		Set<MapPoint> occupied, int limit, boolean bias
 	) {
-		List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
-		List<MapPoint> path = new ArrayList<>();
+		final List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
+		final List<MapPoint> path = new ArrayList<>();
 
-		if (los == null || los.size() < 1) return path;
+		if (los == null || los.isEmpty()) return path;
+
+		// Stop the path short at the first impassable object.
+		final Player player = battle.getCharacterAt(from).map(c -> c.player).get();
+		if (player == null)
+			throw new RuntimeException("Cannot find character to push/pull!");
 
 		MapPoint last = los.remove(0);
 		path.add(last);
 		while (
 			path.size() <= limit &&
 			los.size() > 0 &&
-			battle.isSpaceFree(los.get(0)) &&
 			!occupied.contains(los.get(0)) &&
+			battle.canMoveThrough(los.get(0), player) &&
 			PathFinderNode.canTraverseBoundary(
 				last, los.get(0), battle.terrain.terrain)
 		) {
 			last = los.remove(0);
 			path.add(last);
+		}
+
+		// Trim invalid destinations off the end of the path.
+		while (
+			path.size() > 0 && (
+				occupied.contains(path.get(path.size() - 1)) ||
+				!battle.isSpaceFree(path.get(path.size() - 1)))
+		) {
+			path.remove(path.size() - 1);
 		}
 
 		return path.size() >= 2? path : new ArrayList<>();

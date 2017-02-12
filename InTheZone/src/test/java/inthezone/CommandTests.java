@@ -178,5 +178,35 @@ public class CommandTests {
 		assertEquals(1, dan.getAP());
 	}
 
+	@Test
+	public void multiplePull() throws Exception {
+		final Battle b = bt.simpleBattle();
+
+		final Ability pull4 = getAbility(b, bt.danPos, "pull4");
+		assertNotNull(pull4);
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		final Character zan = b.battleState.getCharacterAt(bt.zanPos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(dan);
+		assertNotNull(zan);
+		assertNotNull(dan2);
+
+		final MapPoint targetPos = bt.danPos.add(new MapPoint(5, 0));
+		final MapPoint target2Pos = bt.danPos.add(new MapPoint(6, 0));
+
+		zan.teleport(targetPos, false);
+		dan2.teleport(target2Pos, false);
+
+		final CommandRequest requestPull = new UseAbilityCommandRequest(bt.danPos,
+			AbilityAgentType.CHARACTER, pull4, single(new Casting(bt.danPos, targetPos)));
+
+		final List<ExecutedCommand> rs = doCommand(requestPull, b);
+
+		assertEquals(targetPos.add(new MapPoint(-4, 0)), zan.getPos());
+		assertEquals(target2Pos.add(new MapPoint(-4, 0)), dan2.getPos());
+		assertEquals(1, dan.getAP());
+	}
+
 }
 

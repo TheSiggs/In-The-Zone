@@ -35,6 +35,11 @@ public class BattleTest {
 	final MapPoint kierenPos = new MapPoint(0, 5);
 	final MapPoint nettisPos = new MapPoint(0, 6);
 
+	final MapPoint zan2Pos = new MapPoint(7, 3);
+	final MapPoint dan2Pos = new MapPoint(7, 4);
+	final MapPoint kieren2Pos = new MapPoint(7, 5);
+	final MapPoint nettis2Pos = new MapPoint(7, 6);
+
 	public BattleTest() throws Exception {
 		testData = new GameDataFactory(Optional.of(new File("src/main/resources/testgamedata")), false, true);
 		checkers = testData.getStage("Checkerboard");
@@ -58,10 +63,10 @@ public class BattleTest {
 		cs.add(new Character(testKieren, Player.PLAYER_A, false, kierenPos, 2));
 		cs.add(new Character(testNettis, Player.PLAYER_A, false, nettisPos, 3));
 
-		cs.add(new Character(testZan, Player.PLAYER_B, false, new MapPoint(7, 3), 4));
-		cs.add(new Character(testDan, Player.PLAYER_B, false, new MapPoint(7, 4), 5));
-		cs.add(new Character(testKieren, Player.PLAYER_B, false, new MapPoint(7, 5), 5));
-		cs.add(new Character(testNettis, Player.PLAYER_B, false, new MapPoint(7, 6), 6));
+		cs.add(new Character(testZan, Player.PLAYER_B, false, zan2Pos, 4));
+		cs.add(new Character(testDan, Player.PLAYER_B, false, dan2Pos, 5));
+		cs.add(new Character(testKieren, Player.PLAYER_B, false, kieren2Pos, 5));
+		cs.add(new Character(testNettis, Player.PLAYER_B, false, nettis2Pos, 6));
 
 		final BattleState state = new BattleState(checkers, cs);
 		return new Battle(state, testData.getStandardSprites());

@@ -9,6 +9,7 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.battle.RoadBlock;
 import inthezone.battle.Trap;
 import inthezone.battle.Zone;
 import isogame.engine.MapPoint;
@@ -107,5 +108,75 @@ public class CommandTests {
 		assertNotNull(dan);
 		assertEquals(1, dan.getAP());
 	}
+
+	@Test
+	public void pullOverDeadCharacter() throws Exception {
+		final Battle b = bt.simpleBattle();
+
+		final Ability pull4 = getAbility(b, bt.danPos, "pull4");
+		assertNotNull(pull4);
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		final Character zan2 = b.battleState.getCharacterAt(bt.zan2Pos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(dan);
+		assertNotNull(zan2);
+		assertNotNull(dan2);
+
+		final MapPoint deadPos = bt.danPos.add(new MapPoint(4, 0));
+		final MapPoint targetPos = bt.danPos.add(new MapPoint(6, 0));
+
+		zan2.teleport(deadPos, false);
+		dan2.teleport(targetPos, false);
+		zan2.dealDamage(1000);
+
+		final CommandRequest requestPull = new UseAbilityCommandRequest(bt.danPos,
+			AbilityAgentType.CHARACTER, pull4, single(new Casting(bt.danPos, targetPos)));
+
+		final List<ExecutedCommand> rs = doCommand(requestPull, b);
+
+		assertEquals(targetPos.add(new MapPoint(-4, 0)), dan2.getPos());
+		assertNotNull(b.battleState.getCharacterAt(deadPos).get());
+		assertEquals(1, dan.getAP());
+	}
+
+	@Test
+	public void shortenedPull() throws Exception {
+		final Battle b = bt.simpleBattle();
+
+		final Ability pull4 = getAbility(b, bt.danPos, "pull4");
+		assertNotNull(pull4);
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		final Character zan2 = b.battleState.getCharacterAt(bt.zan2Pos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(dan);
+		assertNotNull(zan2);
+		assertNotNull(dan2);
+
+		final MapPoint obstaclePos = bt.danPos.add(new MapPoint(2, 0));
+		final MapPoint deadPos = bt.danPos.add(new MapPoint(3, 0));
+		final MapPoint targetPos = bt.danPos.add(new MapPoint(6, 0));
+
+		zan2.teleport(deadPos, false);
+		dan2.teleport(targetPos, false);
+		zan2.dealDamage(1000);
+
+		final RoadBlock obstacle = b.battleState.placeObstacle(
+			obstaclePos, bt.testData.getStandardSprites());
+
+		assertNotNull(obstacle);
+		assertEquals(obstaclePos, obstacle.getPos());
+
+		final CommandRequest requestPull = new UseAbilityCommandRequest(bt.danPos,
+			AbilityAgentType.CHARACTER, pull4, single(new Casting(bt.danPos, targetPos)));
+
+		final List<ExecutedCommand> rs = doCommand(requestPull, b);
+
+		assertEquals(targetPos.add(new MapPoint(-2, 0)), dan2.getPos());
+		assertNotNull(b.battleState.getCharacterAt(deadPos).get());
+		assertEquals(1, dan.getAP());
+	}
+
 }
 

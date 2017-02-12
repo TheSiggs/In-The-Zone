@@ -15,7 +15,7 @@ import org.json.simple.JSONObject;
 public abstract class StatusEffect implements HasJSONRepresentation {
 	private static final int TOTAL_ROUNDS = 2;
 	private int remainingTurns = TOTAL_ROUNDS;
-	protected StatusEffectInfo info;
+	public StatusEffectInfo info;
 
 	public StatusEffect(StatusEffectInfo info) {
 		this.info = info;
@@ -42,10 +42,6 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	}
 
 	public List<Command> doNow(Character c) {
-		return new ArrayList<>();
-	}
-
-	public List<Command> undoNow(Character c) {
 		return new ArrayList<>();
 	}
 

@@ -126,7 +126,7 @@ public class Character extends Targetable {
 	public int getAP() { return ap; }
 	public int getMP() { return mp; }
 	public int getHP() { return hp; }
-	public int getMaxHP() { return baseStats.hp; }
+	public int getMaxHP() { return getStats().hp; }
 	public boolean hasCover() { return hasCover; }
 	@Override public boolean hasMana() { return hasMana; }
 
@@ -152,17 +152,44 @@ public class Character extends Targetable {
 
 	public Optional<StatusEffect> getStatusDebuff() { return statusDebuff; }
 
+	// Points can only be buffed/debuffed once per turn, so we need to track
+	// whether or not that's happened.
+	private boolean buffedAP = false;
+	private boolean buffedMP = false;
+	private boolean debuffedAP = false;
+	private boolean debuffedMP = false;
+
 	/**
 	 * Buff or debuff this character's points.
 	 * */
 	public void pointsBuff(int ap, int mp, int hp) {
+		if (buffedAP && ap > 0) ap = 0;
+		if (buffedMP && mp > 0) mp = 0;
+		if (debuffedAP && ap < 0) ap = 0;
+		if (debuffedMP && mp < 0) mp = 0;
+
+		if (ap > 0) buffedAP = true;
+		if (mp > 0) buffedMP = true;
+		if (ap < 0) debuffedAP = true;
+		if (mp < 0) debuffedMP = true;
+
 		this.ap += ap;
 		this.mp += mp;
 		this.hp += hp;
-		if (this.hp > baseStats.hp) this.hp = baseStats.hp;
+		if (this.hp > getStats().hp) this.hp = getStats().hp;
 		if (this.ap < 0) this.ap = 0;
 		if (this.mp < 0) this.mp = 0;
 		if (this.hp < 0) this.hp = 0;
+	}
+
+	private void clampPoints() {
+		final Stats stats = getStats();
+		if (this.ap < 0) this.ap = 0;
+		if (this.mp < 0) this.mp = 0;
+		if (this.hp < 0) this.hp = 0;
+		if (this.ap > stats.ap) this.ap = stats.ap;
+		if (this.mp > stats.mp) this.mp = stats.mp;
+		if (this.hp > stats.hp) this.hp = stats.hp;
 	}
 
 	/**
@@ -219,16 +246,18 @@ public class Character extends Targetable {
 	 * @param player The player who's turn is starting
 	 * */
 	public List<Command> turnReset(Battle battle, Player player) {
-		List<Command> r = new ArrayList<>();
+		final List<Command> r = new ArrayList<>();
 		if (this.player != player) return r;
 
-		Stats stats = getStats();
+		final Stats stats = getStats();
 		ap = stats.ap;
 		mp = stats.mp;
 
-		// trigger the current zone (if there is one)
-		currentZone = Optional.empty();
-		r.addAll(triggerZone(battle.battleState));
+		// reset the point buff/debuff checks
+		buffedAP = false;
+		buffedMP = false;
+		debuffedAP = false;
+		debuffedMP = false;
 
 		// handle status effects
 		hasCover = false;
@@ -236,18 +265,18 @@ public class Character extends Targetable {
 		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
 
 		statusBuff.ifPresent(s -> {
-			if (s.canRemoveNow()) {
-				s.undoNow(this);
-				this.statusBuff = Optional.empty();
-			}
+			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
 		});
 		statusDebuff.ifPresent(s -> {
 			lastDebuff = s;
-			if (s.canRemoveNow()) {
-				s.undoNow(this);
-				this.statusDebuff = Optional.empty();
-			}
+			if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
 		});
+
+		clampPoints();
+
+		// trigger the current zone (if there is one)
+		currentZone = Optional.empty();
+		r.addAll(triggerZone(battle.battleState));
 
 		return r;
 	}
@@ -260,7 +289,7 @@ public class Character extends Targetable {
 	 * Continue the turn reset, after it was interrupted by a trigger.
 	 * */
 	public List<Command> continueTurnReset(Battle battle) {
-		List<Command> r = new ArrayList<>();
+		final List<Command> r = new ArrayList<>();
 		statusDebuff.ifPresent(s -> {
 			if (s.isBeforeTurnExhaustive()) r.addAll(s.doBeforeTurn(battle, this));
 		});
@@ -276,22 +305,22 @@ public class Character extends Targetable {
 	 * Remove all status effects
 	 * */
 	@Override public Stats getStats() {
-		Stats b = statusBuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
-		Stats d = statusDebuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
+		final Stats b = statusBuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
+		final Stats d = statusDebuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
 		return baseStats.add(b).add(d);
 	}
 
 	@Override public MapPoint getPos() { return pos; }
 
 	@Override public double getAttackBuff() {
-		double buff = statusBuff.map(s -> s.getAttackBuff()).orElse(0.0);
-		double debuff = statusDebuff.map(s -> s.getAttackBuff()).orElse(0.0);
+		final double buff = statusBuff.map(s -> s.getAttackBuff()).orElse(0.0);
+		final double debuff = statusDebuff.map(s -> s.getAttackBuff()).orElse(0.0);
 		return buff - debuff;
 	}
 
 	@Override public double getDefenceBuff() {
-		double buff = statusBuff.map(s -> s.getDefenceBuff()).orElse(0.0);
-		double debuff = statusDebuff.map(s -> s.getDefenceBuff()).orElse(0.0);
+		final double buff = statusBuff.map(s -> s.getDefenceBuff()).orElse(0.0);
+		final double debuff = statusDebuff.map(s -> s.getDefenceBuff()).orElse(0.0);
 		return buff - debuff;
 	}
 
@@ -301,7 +330,7 @@ public class Character extends Targetable {
 
 	@Override public void dealDamage(int damage) {
 		if (hasCover) return;
-		hp = Math.min(baseStats.hp, Math.max(0, hp - damage));
+		hp = Math.min(getStats().hp, Math.max(0, hp - damage));
 		System.err.println("HP: " + hp + " after damage " + damage);
 	}
 
@@ -309,10 +338,9 @@ public class Character extends Targetable {
 
 	@Override public void cleanse() {
 		lastDebuff = null;
-		statusBuff.ifPresent(s -> s.undoNow(this));
-		statusDebuff.ifPresent(s -> s.undoNow(this));
 		statusBuff = Optional.empty();
 		statusDebuff = Optional.empty();
+		clampPoints();
 	}
 
 	@Override public void purge() { return; }
@@ -324,14 +352,20 @@ public class Character extends Targetable {
 			hasCover = true;
 
 		} else if (info.kind == StatusEffectKind.BUFF) {
-			statusBuff.ifPresent(s -> s.undoNow(this));
-			status.doNow(this);
-			statusBuff = Optional.of(status);
+			if (!statusBuff.map(s -> s.info.equals(status.info)).orElse(false)) {
+				statusBuff = Optional.empty();
+				clampPoints();
+				status.doNow(this);
+				statusBuff = Optional.of(status);
+			}
 
 		} else {
-			statusDebuff.ifPresent(s -> s.undoNow(this));
-			status.doNow(this);
-			statusDebuff = Optional.of(status);
+			if (!statusDebuff.map(s -> s.info.equals(status.info)).orElse(false)) {
+				statusDebuff = Optional.empty();
+				clampPoints();
+				status.doNow(this);
+				statusDebuff = Optional.of(status);
+			}
 		}
 	}
 

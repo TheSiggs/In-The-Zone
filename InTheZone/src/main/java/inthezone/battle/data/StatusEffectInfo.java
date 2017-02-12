@@ -29,6 +29,24 @@ public class StatusEffectInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (obj instanceof StatusEffectInfo) {
+			StatusEffectInfo x = (StatusEffectInfo) obj;
+			return
+				this.type == x.type &&
+				this.kind == x.kind &&
+				this.param == x.param;
+		} else return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return type.hashCode() + kind.hashCode() + param;
+	}
+
+	@Override
 	public String toString() {
 		if (param == DEFAULT_PARAMETER) {
 			return type.toString();

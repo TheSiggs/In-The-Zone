@@ -9,6 +9,7 @@ import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
+import inthezone.battle.RoadBlock;
 import inthezone.battle.Trap;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
@@ -89,21 +90,32 @@ public class BattleTest {
 	}
 
 	@Test
-	public void testTrapsCostAP() throws Exception {
+	public void validTrapPlacement() throws Exception {
 		final Battle b = simpleBattle();
-		final Character dan = b.battleState.getCharacterAt(new MapPoint(0, 4)).get();
-		assertNotNull("Couldn't find character Dan", dan);
-		assertEquals("Wrong character at (0,4)", "Daniel", dan.name);
+		final Character dan = b.battleState.getCharacterAt(danPos).get();
+		assertNotNull(dan);
+		assertEquals("Daniel", dan.name);
 
-		final Ability trap1 = dan.abilities.stream().filter(a -> a.info.name.equals("Trap1")).findFirst().get();
-		assertNotNull("Cannot find trap ability on Dan", trap1);
+		final Ability trap1 =
+			dan.abilities.stream().filter(a -> a.info.name.equals("Trap1")).findFirst().get();
+		assertNotNull(trap1);
 
-		final List<Trap> r = b.createTrap(trap1, dan, single(new MapPoint(2, 4)));
-		assertEquals("Wrong number of traps", 1, r.size());
-		final Trap t = r.get(0);
+		final List<Trap> r1 = b.createTrap(trap1, dan, single(new MapPoint(2, 4)));
+		assertEquals(1, r1.size());
 
-		assertEquals("Misplaced trap", new MapPoint(2, 4), t.getPos());
-		assertEquals("Trap cost wrong AP", 1, dan.getAP());
+		final List<Trap> r2 = b.createTrap(trap1, dan, single(new MapPoint(2, 4)));
+		assertTrue(r2.isEmpty());
+
+		final List<Trap> r3 = b.createTrap(trap1, dan, single(zanPos));
+		assertTrue(r3.isEmpty());
+
+		final RoadBlock obstacle = b.battleState.placeObstacle(
+			new MapPoint(3, 4), testData.getStandardSprites());
+		final List<Trap> r4 = b.createTrap(trap1, dan, single(new MapPoint(3, 4)));
+		assertTrue(r4.isEmpty());
+
+		final Trap t = r1.get(0);
+		assertEquals(new MapPoint(2, 4), t.getPos());
 	}
 }
 

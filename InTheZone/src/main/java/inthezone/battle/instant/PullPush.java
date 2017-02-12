@@ -139,20 +139,24 @@ public class PullPush extends InstantEffect {
 		Collection<MapPoint> targets,
 		boolean isFear
 	) {
-		List<List<MapPoint>> paths = new ArrayList<>();
+		final List<List<MapPoint>> paths = new ArrayList<>();
 
-		List<MapPoint> sortedTargets = new ArrayList<>(targets);
+		final List<MapPoint> sortedTargets = new ArrayList<>(targets);
 		sortedTargets.sort(Comparator.comparingInt(x -> castFrom.distance(x)));
 
-		Set<MapPoint> occupied = new HashSet<>();
+		final Set<MapPoint> cleared = new HashSet<>();
+		final Set<MapPoint> occupied = new HashSet<>();
 
 		for (MapPoint t : sortedTargets) {
-			List<MapPoint> path1 = getPullPath(battle, t, castFrom, occupied, info.param, true);
-			List<MapPoint> path2 = getPullPath(battle, t, castFrom, occupied, info.param, false);
+			final List<MapPoint> path1 =
+				getPullPath(battle, t, castFrom, occupied, cleared, info.param, true);
+			final List<MapPoint> path2 =
+				getPullPath(battle, t, castFrom, occupied, cleared, info.param, false);
 
-			List<MapPoint> path = path1.size() > path2.size()?  path1 : path2; 
+			final List<MapPoint> path = path1.size() > path2.size()?  path1 : path2; 
 			if (path.size() > 0) {
 				paths.add(path);
+				cleared.add(path.get(0));
 				occupied.add(path.get(path.size() - 1));
 			}
 		}
@@ -200,7 +204,8 @@ public class PullPush extends InstantEffect {
 
 	private static List<MapPoint> getPullPath(
 		BattleState battle, MapPoint from, MapPoint to,
-		Set<MapPoint> occupied, int limit, boolean bias
+		Set<MapPoint> occupied, Set<MapPoint> cleared,
+		int limit, boolean bias
 	) {
 		final List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
 		final List<MapPoint> path = new ArrayList<>();
@@ -218,7 +223,7 @@ public class PullPush extends InstantEffect {
 			path.size() <= limit &&
 			los.size() > 0 &&
 			!occupied.contains(los.get(0)) &&
-			battle.canMoveThrough(los.get(0), player) &&
+			(battle.canMoveThrough(los.get(0), player) || cleared.contains(los.get(0))) &&
 			PathFinderNode.canTraverseBoundary(
 				last, los.get(0), battle.terrain.terrain)
 		) {
@@ -228,9 +233,10 @@ public class PullPush extends InstantEffect {
 
 		// Trim invalid destinations off the end of the path.
 		while (
-			path.size() > 0 && (
-				occupied.contains(path.get(path.size() - 1)) ||
-				!battle.isSpaceFree(path.get(path.size() - 1)))
+			path.size() > 0 &&
+				(occupied.contains(path.get(path.size() - 1)) ||
+					!(battle.isSpaceFree(path.get(path.size() - 1)) ||
+						cleared.contains(path.get(path.size() - 1))))
 		) {
 			path.remove(path.size() - 1);
 		}

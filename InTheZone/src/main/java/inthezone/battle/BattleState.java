@@ -246,7 +246,10 @@ public class BattleState {
 	public boolean canMove(List<MapPoint> path) {
 		if (path.size() < 2) return false;
 		return getCharacterAt(path.get(0))
-			.map(c -> canMoveRange(c.getMP(), path)).orElse(false);
+			.map(c ->
+				canMoveRange(c.getMP(), path) &&
+				path.stream().allMatch(p -> canMoveThrough(p, c.player))
+			).orElse(false);
 	}
 
 	/**
@@ -267,6 +270,13 @@ public class BattleState {
 				targetable.stream()
 					.filter(t -> t.blocksSpace())
 					.anyMatch(t -> t.getPos().equals(p)));
+	}
+
+	/**
+	 * Determine if a player can move through a particular point.
+	 * */
+	public boolean canMoveThrough(MapPoint p, Player player) {
+		return terrain.terrain.hasTile(p) && !movementObstacles(player).contains(p);
 	}
 
 	/**

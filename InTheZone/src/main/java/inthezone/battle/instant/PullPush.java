@@ -119,26 +119,6 @@ public class PullPush extends InstantEffect {
 		Collection<MapPoint> targets,
 		boolean isFear
 	) {
-		if (info.type == InstantEffectType.PULL) {
-			return getPullEffect(battle, info, castFrom, targets, isFear);
-		} else if (info.type == InstantEffectType.PUSH) {
-			return getPushEffect(battle, info, castFrom, targets, isFear);
-		} else {
-			throw new RuntimeException(
-				"Attempted to build " + info.toString() + " effect with PullPush class");
-		}
-	}
-
-	/**
-	 * @param isFear Same as for the constructor
-	 * */
-	public static PullPush getPullEffect(
-		BattleState battle,
-		InstantEffectInfo info,
-		MapPoint castFrom,
-		Collection<MapPoint> targets,
-		boolean isFear
-	) {
 		final List<List<MapPoint>> paths = new ArrayList<>();
 
 		final List<MapPoint> sortedTargets = new ArrayList<>(targets);
@@ -148,10 +128,9 @@ public class PullPush extends InstantEffect {
 		final Set<MapPoint> occupied = new HashSet<>();
 
 		for (MapPoint t : sortedTargets) {
-			final List<MapPoint> path1 =
-				getPullPath(battle, t, castFrom, occupied, cleared, info.param, true);
-			final List<MapPoint> path2 =
-				getPullPath(battle, t, castFrom, occupied, cleared, info.param, false);
+			final MapPoint to = getTo(info.type, t, castFrom, info.param);
+			final List<MapPoint> path1 = getPullPath(battle, t, to, occupied, cleared, info.param, true);
+			final List<MapPoint> path2 = getPullPath(battle, t, to, occupied, cleared, info.param, false);
 
 			final List<MapPoint> path = path1.size() > path2.size()?  path1 : path2; 
 			if (path.size() > 0) {
@@ -164,42 +143,16 @@ public class PullPush extends InstantEffect {
 		return new PullPush(info, castFrom, paths, isFear);
 	}
 
-	/**
-	 * @param isFear Same as for the constructor
-	 * */
-	public static PullPush getPushEffect(
-		BattleState battle,
-		InstantEffectInfo info,
-		MapPoint castFrom,
-		Collection<MapPoint> targets,
-		boolean isFear
+	private static MapPoint getTo(
+		InstantEffectType type, MapPoint from, MapPoint castFrom, int range
 	) {
-		List<List<MapPoint>> paths = new ArrayList<>();
-
-		List<MapPoint> sortedTargets = new ArrayList<>(targets);
-		sortedTargets.sort(Collections.reverseOrder(
-			Comparator.comparingInt(x -> castFrom.distance(x))));
-
-		for (MapPoint t : sortedTargets) {
-			if (castFrom.x == t.x || castFrom.y == t.y) {
-				MapPoint dp = t.subtract(castFrom).normalise();
-				List<MapPoint> path = new ArrayList<>();
-
-				MapPoint x = t;
-				path.add(x);
-				for (int i = 0; i < info.param; i++) {
-					MapPoint z = x.add(dp);
-					if (!battle.isSpaceFree(z)) break; else {
-						x = z;
-						path.add(x);
-					}
-				}
-
-				if (path.size() >= 2) paths.add(path);
-			}
+		if (type == InstantEffectType.PULL) {
+			return castFrom;
+		} else if (type == InstantEffectType.PUSH) {
+			return from.addScale(from.subtract(castFrom), range);
+		} else {
+			throw new RuntimeException("Invalid effect type, expected PUSH or PULL");
 		}
-
-		return new PullPush(info, castFrom, paths, isFear);
 	}
 
 	private static List<MapPoint> getPullPath(

@@ -152,6 +152,7 @@ public class CommandProcessor {
 		view.retargetMode(effect.getRetargeting());
 		if (effect instanceof PullPush) {
 			PullPush pullpush = (PullPush) effect;
+
 			if (pullpush.paths.size() != affectedCharacters.size()) {
 				throw new RuntimeException("Invalid pull or push, this cannot happen");
 			}
@@ -160,7 +161,8 @@ public class CommandProcessor {
 				view.sprites.scheduleMovement("idle", pushSpeed,
 					pullpush.paths.get(i), (Character) affectedCharacters.get(i));
 			}
-			return true;
+
+			return !pullpush.paths.isEmpty();
 
 		} else if (effect instanceof Teleport) {
 			Teleport teleport = (Teleport) effect;
@@ -174,7 +176,7 @@ public class CommandProcessor {
 				view.sprites.scheduleTeleport(
 					view.sprites.getCharacterById(id), destinations.get(i));
 			}
-			return true;
+			return !destinations.isEmpty();
 
 		} else if (effect instanceof Move) {
 			Move move = (Move) effect;
@@ -187,7 +189,7 @@ public class CommandProcessor {
 				view.sprites.scheduleMovement("walk", walkSpeed,
 					move.paths.get(i), (Character) affectedCharacters.get(i));
 			}
-			return true;
+			return !move.paths.isEmpty();
 
 		} else {
 			return false;

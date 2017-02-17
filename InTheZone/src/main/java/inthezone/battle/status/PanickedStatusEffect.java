@@ -8,6 +8,7 @@ import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.PathFinderNode;
 import isogame.engine.MapPoint;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -19,26 +20,27 @@ public class PanickedStatusEffect extends StatusEffect {
 	}
 
 	public List<Command> doBeforeTurn(Battle battle, Character c) {
+		if (c.isDead()) return new LinkedList<>();
+
 		final Set<MapPoint> obstacles = battle.battleState.spaceObstacles();
 
 		Node<MapPoint> p = new PathFinderNode(
 			null, battle.battleState.terrain.terrain, obstacles,
 			c.getPos(), c.getPos());
 
-		@SuppressWarnings("unchecked")
-		Node<MapPoint>[] ns = new Node[0];
+		Object[] ns;
 		for (int i = 0; i < c.getMP(); i++) {
-			ns = p.getAdjacentNodes().toArray(ns);
-			p = ns[(int) (Math.random() * ((double) ns.length))];
+			ns = p.getAdjacentNodes().toArray();
+			p = (Node<MapPoint>) ns[(int) (Math.random() * ((double) ns.length))];
 		}
 
-		List<MapPoint> r = new LinkedList<>();
+		final List<MapPoint> r = new LinkedList<>();
 		while (p != null) {
 			r.add(0, p.getPosition());
 			p = p.getParent();
 		}
 
-		List<Command> cmds = new LinkedList<>();
+		final List<Command> cmds = new LinkedList<>();
 		try {
 			if (r.size() >= 2) cmds.add(new MoveCommand(r, true));
 		} catch (CommandException e) {

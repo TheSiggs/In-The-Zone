@@ -195,14 +195,14 @@ public class Character extends Targetable {
 	/**
 	 * Move the character spending movement points
 	 * */
-	public void moveTo(MapPoint p, boolean hasMana) {
+	public void moveTo(MapPoint p, int mp, boolean hasMana) {
 		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
 			return;
 		}
 
 		this.hasMana = hasMana;
-		mp -= Math.abs(pos.x - p.x) + Math.abs(pos.y - p.y);
-		if (mp < 0) mp = 0;
+		this.mp -= mp;
+		if (this.mp < 0) this.mp = 0;
 		this.pos = p;
 	}
 

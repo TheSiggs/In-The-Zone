@@ -239,6 +239,19 @@ public class BattleState {
 	}
 
 	/**
+	 * Get a valid prefix of a potentially invalid path.
+	 * */
+	public List<MapPoint> reduceToValidPath(List<MapPoint> path) {
+		final List<MapPoint> r = new ArrayList<>();
+		r.addAll(path);
+
+		while (r.size() > 0 && !(isSpaceFree(r.get(r.size() - 1))))
+			r.remove(r.size() - 1);
+
+		return r;
+	}
+
+	/**
 	 * Determine if a move path is valid.  A path is valid if it takes a
 	 * character to an unoccupied square and isn't longer than the character's
 	 * mp.

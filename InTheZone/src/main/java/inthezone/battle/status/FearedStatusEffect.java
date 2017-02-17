@@ -52,15 +52,15 @@ public class FearedStatusEffect extends StatusEffect {
 	public static FearedStatusEffect fromJSON(JSONObject o)
 		throws ProtocolException
 	{
-		Object oagent = o.get("agent");
-		Object oinfo = o.get("info");
+		final Object oagent = o.get("agent");
+		final Object oinfo = o.get("info");
 
 		if (oinfo == null) throw new ProtocolException("Missing status effect type");
 		if (oagent == null) throw new ProtocolException("Missing agent");
 
 		try {
-			StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
-			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
+			final StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
+			final MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
 			return new FearedStatusEffect(info, agent);
 		} catch (ClassCastException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing feared status effect", e);
@@ -77,15 +77,17 @@ public class FearedStatusEffect extends StatusEffect {
 	}
 
 	public List<Command> doBeforeTurn(Battle battle, Character c) {
-		Collection<MapPoint> targets = new ArrayList<>();
+		if (c.isDead()) return new ArrayList<>();
+
+		final Collection<MapPoint> targets = new ArrayList<>();
 		targets.add(c.getPos());
 
-		PullPush p = PullPush.getEffect(
+		final PullPush p = PullPush.getEffect(
 			battle.battleState,
 			new InstantEffectInfo(InstantEffectType.PUSH, g),
 			agent.getPos(), targets, true);
 
-		List<Command> r = new ArrayList<>();
+		final List<Command> r = new ArrayList<>();
 		r.add(new InstantEffectCommand(p, Optional.empty(), Optional.empty()));
 		return r;
 	}

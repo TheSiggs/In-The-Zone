@@ -58,7 +58,7 @@ public class Battle {
 	 * @param player The player who's turn is starting
 	 * */
 	public List<Command> getTurnStart(Player player) {
-		List<Command> r = battleState.characters.stream()
+		final List<Command> r = battleState.characters.stream()
 			.flatMap(c -> c.turnReset(this, player).stream())
 			.collect(Collectors.toList());
 
@@ -84,7 +84,7 @@ public class Battle {
 	public void doMove(List<MapPoint> path, boolean useMP) {
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
 			MapPoint target = path.get(path.size() - 1);
-			if (useMP) c.moveTo(target, battleState.hasMana(target));
+			if (useMP) c.moveTo(target, path.size() - 1, battleState.hasMana(target));
 			else c.teleport(target, battleState.hasMana(target));
 		});
 	}

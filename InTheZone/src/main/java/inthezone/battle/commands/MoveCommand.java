@@ -32,8 +32,8 @@ public class MoveCommand extends Command {
 	@Override 
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
-		JSONArray a = new JSONArray();
+		final JSONObject r = new JSONObject();
+		final JSONArray a = new JSONArray();
 		r.put("kind", CommandKind.MOVE.toString());
 		for (MapPoint p : path) a.add(p.getJSON());
 		r.put("path", a);
@@ -43,8 +43,8 @@ public class MoveCommand extends Command {
 	public static MoveCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object opath = json.get("path");
+		final Object okind = json.get("kind");
+		final Object opath = json.get("path");
 
 		if (okind == null) throw new ProtocolException("Missing command type");
 		if (opath == null) throw new ProtocolException("Missing move path");
@@ -53,8 +53,8 @@ public class MoveCommand extends Command {
 			throw new ProtocolException("Expected move command");
 
 		try {
-			JSONArray rawPath = (JSONArray) opath;
-			List<MapPoint> path = new ArrayList<>();
+			final JSONArray rawPath = (JSONArray) opath;
+			final List<MapPoint> path = new ArrayList<>();
 			for (int i = 0; i < rawPath.size(); i++) {
 				path.add(MapPoint.fromJSON((JSONObject) rawPath.get(i)));
 			}
@@ -70,11 +70,11 @@ public class MoveCommand extends Command {
 	@Override
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
 		if (!battle.battleState.canMove(path)) throw new CommandException("21: Invalid move command");
-		Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
+		final Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
 
 		battle.doMove(path, true);
 
-		List<Targetable> r = new ArrayList<>();
+		final List<Targetable> r = new ArrayList<>();
 		oc.ifPresent(c -> r.add(c));
 		return r;
 	}
@@ -83,27 +83,29 @@ public class MoveCommand extends Command {
 	public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
 		throws CommandException
 	{
-		List<ExecutedCommand> r = new ArrayList<>();
+		final List<ExecutedCommand> r = new ArrayList<>();
 
-		Character agent = turn.battleState.getCharacterAt(path.get(0)).orElseThrow(() ->
+		final Character agent = turn.battleState.getCharacterAt(path.get(0)).orElseThrow(() ->
 			new CommandException("MV1: No character at start of path"));
-		List<MapPoint> path1 = turn.battleState.trigger.shrinkPath(agent, path);
+
+		final List<MapPoint> path1 =
+			turn.battleState.reduceToValidPath(turn.battleState.trigger.shrinkPath(agent, path));
 		
 		if (path1.size() >= 2) {
-			Command move1 = new MoveCommand(path1, false);
+			final Command move1 = new MoveCommand(path1, false);
 			r.add(new ExecutedCommand(move1, move1.doCmd(turn)));
 		}
 
-		MapPoint loc = path1.get(path1.size() - 1);
-		List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
+		final MapPoint loc = path1.isEmpty()? path.get(0) : path1.get(path1.size() - 1);
+		final List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
 		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
 
 		agent.currentZone = turn.battleState.getZoneAt(loc);
 
-		if (isPanic && !triggers.isEmpty()) {
-			Optional<Character> oc = turn.battleState.getCharacterAt(loc);
+		if (isPanic && path.size() != path1.size()) {
+			final Optional<Character> oc = turn.battleState.getCharacterAt(loc);
 			if (oc.isPresent()) {
-				List<Command> cont = oc.get().continueTurnReset(turn);
+				final List<Command> cont = oc.get().continueTurnReset(turn);
 				for (Command c : cont) r.addAll(c.doCmdComputingTriggers(turn));
 			}
 		}

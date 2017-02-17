@@ -10,6 +10,7 @@ import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.Player;
+import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.status.StatusEffect;
@@ -242,6 +243,7 @@ public class CommandTests {
 	@Test
 	public void panicTraps() throws Exception {
 		// Panic is stochastic, so we have to repeat the test many times.
+		StandardSprites stdSprites = bt.testData.getStandardSprites();
 		for (int i = 0; i < 100; i++) {
 			final Battle b = bt.simpleBattle();
 
@@ -256,14 +258,14 @@ public class CommandTests {
 			final MapPoint targetPos = new MapPoint(5, 5);
 			dan.teleport(targetPos, false);
 
-			b.battleState.placeTrap(new MapPoint(4, 5), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(5, 4), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(6, 5), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(5, 6), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(4, 4), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(4, 6), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(6, 4), trap1, dan2, bt.testData.getStandardSprites());
-			b.battleState.placeTrap(new MapPoint(6, 6), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(4, 5), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(5, 4), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(6, 5), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(5, 6), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(4, 4), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(4, 6), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(6, 4), trap1, dan2, stdSprites);
+			b.battleState.placeTrap(new MapPoint(6, 6), trap1, dan2, stdSprites);
 
 			final StatusEffect panicked = StatusEffectFactory.getEffect(
 				new StatusEffectInfo("panicked"), 0, Optional.empty());

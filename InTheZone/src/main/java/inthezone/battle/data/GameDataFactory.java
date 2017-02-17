@@ -31,6 +31,7 @@ import org.json.simple.parser.ParseException;
 
 public class GameDataFactory implements HasJSONRepresentation {
 	private final Library globalLibrary;
+	private final StandardSprites standardSprites;
 	private final ResourceLocator loc;
 	public static final String globalLibraryName = "global_library.json";
 	public static final String gameDataName = "game_data.json";
@@ -63,6 +64,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 		this.globalLibrary = Library.fromFile(
 			loc.globalLibrary(), loc.globalLibraryFilename(), loc, null, nofx);
+
+		this.standardSprites = new StandardSprites(globalLibrary, loc);
 
 		// load the game data
 		try (BufferedReader in =
@@ -175,8 +178,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 	/**
 	 * Get the standard sprites.
 	 * */
-	public StandardSprites getStandardSprites() throws CorruptDataException {
-		return new StandardSprites(globalLibrary, loc);
+	public StandardSprites getStandardSprites() {
+		return standardSprites;
 	}
 
 	/**

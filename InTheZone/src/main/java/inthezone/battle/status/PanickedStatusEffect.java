@@ -31,7 +31,7 @@ public class PanickedStatusEffect extends StatusEffect {
 		Object[] ns;
 		for (int i = 0; i < c.getMP(); i++) {
 			ns = p.getAdjacentNodes().toArray();
-			p = (Node<MapPoint>) ns[(int) (Math.random() * ((double) ns.length))];
+			p = randomNode(ns);
 		}
 
 		final List<MapPoint> r = new LinkedList<>();
@@ -49,6 +49,12 @@ public class PanickedStatusEffect extends StatusEffect {
 
 		return cmds;
 	}
+
+	@SuppressWarnings("unchecked")
+	private static final Node<MapPoint> randomNode(Object[] ns) {
+		return (Node<MapPoint>) ns[(int) (Math.random() * ((double) ns.length))];
+	}
+
 
 	@Override public boolean isBeforeTurnExhaustive() {return true;}
 }

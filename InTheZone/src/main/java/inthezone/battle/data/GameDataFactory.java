@@ -52,9 +52,6 @@ public class GameDataFactory implements HasJSONRepresentation {
 	)
 		throws IOException, CorruptDataException
 	{
-		InputStream gameData;
-		File gameDataFile;
-
 		if (baseDir.isPresent()) {
 			this.loc = new DevelopmentResourceLocator(baseDir.get());
 			this.updateCache = false;
@@ -67,11 +64,9 @@ public class GameDataFactory implements HasJSONRepresentation {
 		this.globalLibrary = Library.fromFile(
 			loc.globalLibrary(), loc.globalLibraryFilename(), loc, null, nofx);
 
-		gameData = loc.gameData();
-
 		// load the game data
 		try (BufferedReader in =
-			new BufferedReader(new InputStreamReader(gameData, "UTF-8"))
+			new BufferedReader(new InputStreamReader(loc.gameData(), "UTF-8"))
 		) {
 			if (in == null) throw new FileNotFoundException(
 				"File not found " + loc.gameDataFilename().toString());

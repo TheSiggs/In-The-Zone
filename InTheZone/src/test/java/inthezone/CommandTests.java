@@ -9,13 +9,18 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.battle.data.Player;
+import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.RoadBlock;
+import inthezone.battle.status.StatusEffect;
+import inthezone.battle.status.StatusEffectFactory;
 import inthezone.battle.Trap;
 import inthezone.battle.Zone;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -58,7 +63,10 @@ public class CommandTests {
 	}
 
 	public List<ExecutedCommand> doCommand(CommandRequest crq, Battle b) throws Exception {
-		final List<Command> cmds = crq.makeCommand(b.battleState);
+		return doCommands(crq.makeCommand(b.battleState), b);
+	}
+
+	public List<ExecutedCommand> doCommands(List<Command> cmds, Battle b) throws Exception {
 		final List<ExecutedCommand> r = new ArrayList<>();
 
 		for (Command cmd : cmds) {
@@ -206,6 +214,29 @@ public class CommandTests {
 		assertEquals(targetPos.add(new MapPoint(-4, 0)), zan.getPos());
 		assertEquals(target2Pos.add(new MapPoint(-4, 0)), dan2.getPos());
 		assertEquals(1, dan.getAP());
+	}
+
+	@Test
+	public void fearedBasic() throws Exception {
+		final Battle b = bt.simpleBattle();
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(dan);
+		assertNotNull(dan2);
+
+		final MapPoint targetPos = bt.danPos.add(new MapPoint(3, 0));
+		dan2.teleport(targetPos, false);
+
+		final StatusEffect feared = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("feared 3"), 0, Optional.of(dan));
+		dan2.applyStatus(b, feared);
+
+		assertTrue(b.doTurnStart(Player.PLAYER_B).isEmpty());
+		List<ExecutedCommand> rs = doCommands(b.getTurnStart(Player.PLAYER_B), b);
+
+		assertEquals(targetPos.add(new MapPoint(3, 0)), dan2.getPos());
+		assertEquals(3, dan2.getMP());
 	}
 
 }

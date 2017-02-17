@@ -236,8 +236,46 @@ public class CommandTests {
 		List<ExecutedCommand> rs = doCommands(b.getTurnStart(Player.PLAYER_B), b);
 
 		assertEquals(targetPos.add(new MapPoint(3, 0)), dan2.getPos());
-		assertEquals(3, dan2.getMP());
+		assertEquals(6, dan2.getMP());
 	}
 
+	@Test
+	public void panicTraps() throws Exception {
+		// Panic is stochastic, so we have to repeat the test many times.
+		for (int i = 0; i < 100; i++) {
+			final Battle b = bt.simpleBattle();
+
+			final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+			final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+			assertNotNull(dan);
+			assertNotNull(dan2);
+
+			final Ability trap1 = getAbility(b, bt.danPos, "Trap1");
+			assertNotNull(trap1);
+
+			final MapPoint targetPos = new MapPoint(5, 5);
+			dan.teleport(targetPos, false);
+
+			b.battleState.placeTrap(new MapPoint(4, 5), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(5, 4), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(6, 5), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(5, 6), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(4, 4), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(4, 6), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(6, 4), trap1, dan2, bt.testData.getStandardSprites());
+			b.battleState.placeTrap(new MapPoint(6, 6), trap1, dan2, bt.testData.getStandardSprites());
+
+			final StatusEffect panicked = StatusEffectFactory.getEffect(
+				new StatusEffectInfo("panicked"), 0, Optional.empty());
+			dan.applyStatus(b, panicked);
+
+			assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+			final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
+			assertFalse(cmds.isEmpty());
+			List<ExecutedCommand> rs = doCommands(cmds, b);
+
+			assertEquals(0, dan.getMP());
+		}
+	}
 }
 

@@ -127,39 +127,39 @@ public class BattleTest {
 		final Character dan = b.battleState.getCharacterAt(danPos).get();
 		assertNotNull(dan);
 
-		assertEquals(3, dan.getMP());
-		assertEquals(3, dan.getStats().mp);
+		assertEquals(6, dan.getMP());
+		assertEquals(6, dan.getStats().mp);
 
 		final StatusEffect accelerated = StatusEffectFactory.getEffect(
 			new StatusEffectInfo("accelerated"), 0, Optional.empty());
 		assertNotNull(accelerated);
 
 		dan.applyStatus(b, accelerated);
-		assertEquals(4, dan.getMP());
-		assertEquals(4, dan.getStats().mp);
+		assertEquals(7, dan.getMP());
+		assertEquals(7, dan.getStats().mp);
 
 		dan.cleanse();
-		assertEquals(3, dan.getMP());
-		assertEquals(3, dan.getStats().mp);
+		assertEquals(6, dan.getMP());
+		assertEquals(6, dan.getStats().mp);
 
 		dan.applyStatus(b, accelerated);
-		assertEquals(3, dan.getMP());
-		assertEquals(4, dan.getStats().mp);
+		assertEquals(6, dan.getMP());
+		assertEquals(7, dan.getStats().mp);
 
 		// restart the turn and observe that accelerated has been correctly applied
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
 		assertTrue(b.getTurnStart(Player.PLAYER_A).isEmpty());
-		assertEquals(4, dan.getMP());
-		assertEquals(4, dan.getStats().mp);
+		assertEquals(7, dan.getMP());
+		assertEquals(7, dan.getStats().mp);
 
 		// reapply the status effect when the character has 0 mp
-		final MapPoint p2 = danPos.add(new MapPoint(2, 2));
-		dan.moveTo(p2, false);
+		final MapPoint p2 = danPos.add(new MapPoint(5, 2));
+		dan.moveTo(p2, 7, false);
 		assertEquals(p2, dan.getPos());
 		assertEquals(0, dan.getMP());
 		dan.applyStatus(b, accelerated);
 		assertEquals(0, dan.getMP());
-		assertEquals(4, dan.getStats().mp);
+		assertEquals(7, dan.getStats().mp);
 	}
 }
 

@@ -9,6 +9,7 @@ import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
+import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartTurnCommand;
 import inthezone.battle.data.GameDataFactory;
@@ -141,6 +142,8 @@ public class BattleInProgress implements Runnable {
 
 				// handle a command request
 				if (crq.isPresent()) {
+					// If we're resigning, cancel any incomplete commands first.
+					if (crq.get() instanceof ResignCommandRequest) commandQueue.clear(); 
 					commandQueue.addAll(crq.get().makeCommand(battle.battleState));
 					if (doCommands()) return;
 				}
@@ -160,6 +163,17 @@ public class BattleInProgress implements Runnable {
 					}
 
 				}
+
+				// handle command cancellation
+				if (a instanceof ActionCancel) {
+					Command cmd = commandQueue.peek();
+					if (cmd != null) {
+						if (!cmd.canCancel())
+							throw new CommandException("Cannot cancel command");
+						commandQueue.clear();
+					}
+				}
+
 			} catch (InterruptedException e) {
 				// Do nothing
 			} catch (CommandException e) {
@@ -277,6 +291,13 @@ public class BattleInProgress implements Runnable {
 		if (accepting) {
 			queueActionWithRetry(new ActionComplete(battle.battleState, completion));
 		}
+	}
+
+	/**
+	 * Cancel any incomplete commands.
+	 * */
+	public synchronized void cancel() {
+		if (accepting) queueActionWithRetry(new ActionCancel());
 	}
 }
 

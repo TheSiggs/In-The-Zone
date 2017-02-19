@@ -65,6 +65,15 @@ public class UseAbilityCommand extends Command {
 		this.targets = targets;
 		this.constructed.addAll(constructed);
 		this.subsequentLevel = subsequentLevel;
+		canCancel = subsequentLevel == 0;
+	}
+
+	/**
+	 * A hack to mark that this command has a pre-effect, and therefore cannot be
+	 * cancelled after all.
+	 * */
+	void notifyHasPreEffect() {
+		canCancel = false;
 	}
 
 	@Override 

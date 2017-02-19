@@ -145,7 +145,10 @@ public class UseAbilityCommandRequest extends CommandRequest {
 						Optional.of(mainEffect), Optional.ofNullable(postEffect));
 			}
 
-			if (preEffect != null) commands.add(preEffect);
+			if (preEffect != null) {
+				mainEffect.notifyHasPreEffect();
+				commands.add(preEffect);
+			}
 			commands.add(mainEffect);
 			if (postEffect != null) commands.add(postEffect);
 		}

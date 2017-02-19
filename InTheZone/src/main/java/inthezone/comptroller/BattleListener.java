@@ -32,6 +32,6 @@ public interface BattleListener {
 	/**
 	 * Complete an instant effect with extra targeting information
 	 * */
-	public void completeEffect(InstantEffect e);
+	public void completeEffect(InstantEffect e, boolean canCancel);
 }
 

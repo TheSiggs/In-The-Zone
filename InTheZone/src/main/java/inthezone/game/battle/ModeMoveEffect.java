@@ -18,26 +18,28 @@ public class ModeMoveEffect extends ModeMove {
 	private final Queue<Character> moveQueue = new LinkedList<>();
 	private final List<MapPoint> moveDestinations = new ArrayList<>();
 	private final int moveRange;
+	private boolean canCancel;
 
 	private Character moving = null;
 
 	public ModeMoveEffect(
 		BattleView view, ModeAnimating lastMode,
-		Collection<Character> moveQueue, int moveRange
+		Collection<Character> moveQueue, int moveRange, boolean canCancel
 	) {
 		super(view, null);
 		this.lastMode = lastMode;
 		this.moveQueue.addAll(moveQueue);
 		this.moveRange = moveRange;
+		this.canCancel = canCancel;
 	}
 
 	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
 		return new ModeMoveEffect(view,
 			lastMode.updateSelectedCharacter(selectedCharacter),
-			moveQueue, moveRange);
+			moveQueue, moveRange, canCancel);
 	}
 
-	@Override public boolean canCancel() {return false;}
+	@Override public boolean canCancel() {return canCancel;}
 
 	@Override public Mode setupMode() {
 		moving = moveQueue.peek();

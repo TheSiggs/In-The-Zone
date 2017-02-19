@@ -57,6 +57,7 @@ public class BattleView
 	public final BooleanProperty multiTargeting = new SimpleBooleanProperty(false);
 	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
 	public final BooleanProperty areAllItemsUsed = new SimpleBooleanProperty(false);
+	public final BooleanProperty cannotCancel = new SimpleBooleanProperty(false);
 
 	// Are we expecting an animation completion event from the game engine.
 	private boolean inAnimation = false;
@@ -134,20 +135,25 @@ public class BattleView
 	 * */
 	public void setMode(Mode mode) {
 		this.mode = mode.setupMode();
+		this.cannotCancel.setValue(!mode.canCancel());
 		System.err.println("Set mode " + mode + " transforming to " + this.mode);
 		Stage stage = getStage();
 		for (MapPoint p : sprites.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
 
+	/**
+	 * Update the UI mode to reflect characters moving around.
+	 * */
 	public void retargetMode(Map<MapPoint, MapPoint> retargeting) {
 		this.mode = this.mode.retarget(retargeting);
+		this.cannotCancel.setValue(!mode.canCancel());
 	}
 
 	/**
 	 * Restore the highlighting.
 	 * */
 	public void resetHighlighting() {
-		setMode(mode);
+		setMode(this.mode);
 	}
 
 	/**
@@ -168,6 +174,7 @@ public class BattleView
 	 * */
 	public void selectCharacter(Optional<Character> c) {
 		if (mode.isInteractive()) {
+			battle.cancel();
 			selectedCharacter = c;
 			isCharacterSelected.setValue(c.isPresent());
 			setMode(new ModeSelect(this));
@@ -211,6 +218,7 @@ public class BattleView
 	 * Send the end turn message.
 	 * */
 	public void sendEndTurn() {
+		battle.cancel();
 		selectedCharacter = Optional.empty();
 		isCharacterSelected.setValue(false);
 		hud.selectCharacter(Optional.empty());
@@ -234,6 +242,7 @@ public class BattleView
 	 * */
 	public void useItem() {
 		try {
+			battle.cancel();
 			setMode(new ModeTargetItem(this, selectedCharacter.get()));
 		} catch (NoSuchElementException e) {
 			throw new RuntimeException(
@@ -246,6 +255,7 @@ public class BattleView
 	 * */
 	public void useAbility(Ability ability) {
 		try {
+			battle.cancel();
 			setMode(new ModeTarget(this, selectedCharacter.get(), ability));
 		} catch (NoSuchElementException e) {
 			throw new RuntimeException(
@@ -267,6 +277,7 @@ public class BattleView
 	 * */
 	public void usePush() {
 		try {
+			battle.cancel();
 			setMode(new ModePush(this, selectedCharacter.get()));
 		} catch (NoSuchElementException e) {
 			throw new RuntimeException(

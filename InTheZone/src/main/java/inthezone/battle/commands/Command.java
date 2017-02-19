@@ -29,6 +29,12 @@ public abstract class Command implements HasJSONRepresentation {
 		return r;
 	}
 
+	protected boolean canCancel = true;
+
+	public boolean canCancel() {
+		return this.canCancel;
+	}
+
 	/**
 	 * Parse a command.
 	 * */

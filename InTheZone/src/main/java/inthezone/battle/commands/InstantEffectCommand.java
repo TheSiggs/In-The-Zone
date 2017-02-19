@@ -33,6 +33,7 @@ public class InstantEffectCommand extends Command {
 		this.postAbility = postAbility;
 		this.postEffect = postEffect;
 		isComplete = effect.isComplete();
+		canCancel = postAbility.map(a -> a.subsequentLevel == 0).orElse(false);
 	}
 
 	/**

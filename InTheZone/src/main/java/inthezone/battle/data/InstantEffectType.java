@@ -3,7 +3,7 @@ package inthezone.battle.data;
 import isogame.engine.CorruptDataException;
 
 public enum InstantEffectType {
-	CLEANSE, DEFUSE, PURGE, PUSH, PULL, SCAN, TELEPORT, OBSTACLES, MOVE;
+	CLEANSE, DEFUSE, PURGE, PUSH, PULL, SCAN, TELEPORT, OBSTACLES, MOVE, REVIVE;
 
 	public static InstantEffectType fromString(String s)
 		throws CorruptDataException
@@ -18,6 +18,7 @@ public enum InstantEffectType {
 			case "teleport": return TELEPORT;
 			case "obstacles": return OBSTACLES;
 			case "move": return MOVE;
+			case "revive": return REVIVE;
 			default:
 				throw new CorruptDataException("Invalid instant effect " + s);
 		}

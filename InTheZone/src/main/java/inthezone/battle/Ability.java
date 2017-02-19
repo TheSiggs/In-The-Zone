@@ -131,7 +131,7 @@ public class Ability {
 	 * @param r Revenge bonus
 	 * */
 	public DamageToTarget computeDamageToTarget(
-		Targetable a, Targetable t, MapPoint castFrom, double r
+		Targetable a, Targetable t, MapPoint castFrom, boolean withRevive, double r
 	) {
 		Stats aStats = a.getStats();
 		Stats tStats = t.getStats();
@@ -139,6 +139,7 @@ public class Ability {
 		double damage = info.heal?
 			healingFormula(a.hasMana(), info.eff, tStats) :
 			damageFormula(a.hasMana(), r, a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats);
+		if (t.isDead() && info.heal && !withRevive) damage = 0; // healing doesn't affect the dead
 		int rdamage = ((int) Math.ceil(damage)) * (info.heal? -1 : 1);
 
 		double chance = info.chance + a.getChanceBuff();

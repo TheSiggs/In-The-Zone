@@ -68,7 +68,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			targeted.addAll(targets.stream()
 				.map(t -> t.getPos()).collect(Collectors.toList()));
 			for (Targetable t : targets) r.add(
-				ability.computeDamageToTarget(a, t, casting.castFrom, false, revengeBonus));
+				ability.computeDamageToTarget(a, t, casting.castFrom, revengeBonus));
 		}
 
 		return r;

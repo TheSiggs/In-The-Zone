@@ -18,21 +18,23 @@ public class ModeTeleport extends Mode {
 	private final Queue<Character> teleportQueue = new LinkedList<>();
 	private final List<MapPoint> teleportDestinations = new ArrayList<>();
 	private final int teleportRange;
+	private final boolean canCancel;
 
 	public ModeTeleport(
 		BattleView view, ModeAnimating lastMode,
-		Collection<Character> teleportQueue, int teleportRange
+		Collection<Character> teleportQueue, int teleportRange, boolean canCancel
 	) {
 		super(view);
 		this.lastMode = lastMode;
 		this.teleportQueue.addAll(teleportQueue);
 		this.teleportRange = teleportRange;
+		this.canCancel = canCancel;
 	}
 
 	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
 		return new ModeTeleport(view,
 			lastMode.updateSelectedCharacter(selectedCharacter),
-			teleportQueue, teleportRange);
+			teleportQueue, teleportRange, canCancel);
 	}
 
 	@Override public Mode setupMode() {
@@ -55,7 +57,7 @@ public class ModeTeleport extends Mode {
 		}
 	}
 
-	@Override public boolean canCancel() {return false;}
+	@Override public boolean canCancel() {return canCancel;}
 
 	@Override public void handleSelection(MapPoint p) {
 		if (view.isSelectable(p)) {

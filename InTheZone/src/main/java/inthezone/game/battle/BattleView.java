@@ -302,7 +302,7 @@ public class BattleView
 	}
 
 	@Override
-	public void completeEffect(InstantEffect e) {
+	public void completeEffect(InstantEffect e, boolean canCancel) {
 		if (instantEffectCompletion.isPresent()) throw new RuntimeException(
 			"Invalid UI state.  Attempted to complete an instant effect, but we're already completing a different instant effect");
 
@@ -313,7 +313,7 @@ public class BattleView
 
 				try {
 					setMode(new ModeTeleport(this, (ModeAnimating) this.mode,
-						teleport.affectedCharacters, teleport.range));
+						teleport.affectedCharacters, teleport.range, canCancel));
 				} catch (ClassCastException ee) {
 					throw new RuntimeException(
 						"Invalid UI state.  Attempted to teleport from a non-animating mode.");
@@ -325,7 +325,7 @@ public class BattleView
 
 				try {
 					setMode(new ModeMoveEffect(this, (ModeAnimating) this.mode,
-						move.affectedCharacters, move.range));
+						move.affectedCharacters, move.range, canCancel));
 				} catch (ClassCastException ee) {
 					throw new RuntimeException(
 						"Invalid UI state.  Attempted to do move effect from a non-animating mode.");

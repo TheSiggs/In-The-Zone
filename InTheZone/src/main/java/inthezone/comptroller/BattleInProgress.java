@@ -178,7 +178,7 @@ public class BattleInProgress implements Runnable {
 			if (cmd instanceof InstantEffectCommand) {
 				InstantEffectCommand i = (InstantEffectCommand) cmd;
 				if (!i.isCompletedOrRequestCompletion()) {
-					Platform.runLater(() -> listener.completeEffect(i.getEffect()));
+					Platform.runLater(() -> listener.completeEffect(i.getEffect(), i.canCancel()));
 					return false;
 				}
 			}

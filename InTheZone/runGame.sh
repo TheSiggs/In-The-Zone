@@ -17,6 +17,6 @@ for p in lib/*.jar; do
 done
 
 cp target/game-0.0.1.jar .
-java -jar game-0.0.1.jar "$@"
+java -Dprism.order=sw -Xmx500m -jar game-0.0.1.jar "$@"
 
 

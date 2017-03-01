@@ -146,7 +146,7 @@ public class SpriteManager {
 						decals.updateCharacter(c);
 					}
 
-					final Sprite characterSprite = view.getStage().getSpritesByTile(c.getPos()).stream()
+					final Sprite characterSprite = view.getStage().getSpritesByTile(old.getPos()).stream()
 						.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
 
 					if (c.isDead()) {

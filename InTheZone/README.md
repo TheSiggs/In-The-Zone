@@ -2,6 +2,13 @@ In The Zone
 ===========
 
 
+To build JavaFX on Ubuntu:
+
+```
+sudo apt install openjfx
+```
+
+
 To build with gradle, run:
 
 ```bash

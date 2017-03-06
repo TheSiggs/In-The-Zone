@@ -13,16 +13,24 @@ repositories {
 
 dependencies {
 	compile fileTree(dir: '../lib', include: '*.jar')
+	testCompile fileTree(dir: '../lib', include: '*.jar')
+	testCompile 'junit:junit:4.12'
 }
 
 sourceSets {
 	main {
 		java {
-			srcDir '../src'
+			srcDir '../src/main/java'
 				include '**'
 		}
 		resources {
 			srcDir '../src/main/resources'
+				include '**'
+		}
+	}
+	test {
+		java {
+			srcDir '../src/test/java'
 				include '**'
 		}
 	}
@@ -36,10 +44,7 @@ version = vVersion.substring(1, vVersion.length() - 1)
 def postFix="-server"
 def packageName="$baseName$postFix"
 def shadowJarName = "${project.name}-$version-all.jar"
-//println "VERSION: $version"
-println "PN: $packageName"
 
-//def "ls".execute().text
 task packageNative(type: Exec, dependsOn:shadowJar) {
 	def mainArgs = [project.version, shadowJar.archivePath, mainClassName, baseName, postFix]
 	if (Os.isFamily(Os.FAMILY_MAC))
@@ -76,3 +81,4 @@ distributions {
 			}
 	}
 }
+shadowJar.dependsOn test

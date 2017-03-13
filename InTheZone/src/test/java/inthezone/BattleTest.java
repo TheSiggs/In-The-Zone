@@ -45,7 +45,8 @@ public class BattleTest {
 	final MapPoint nettis2Pos = new MapPoint(7, 6);
 
 	public BattleTest() throws Exception {
-		testData = new GameDataFactory(Optional.of(new File("src/main/resources/testgamedata")), false, true);
+		testData = new GameDataFactory(Optional.of((
+			new File("build/resources/main/testgamedata")).getAbsoluteFile()), false, true);
 		checkers = testData.getStage("Checkerboard");
 		characters = testData.getCharacters();
 

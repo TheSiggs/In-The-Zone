@@ -53,6 +53,23 @@ public class ElevationTests {
 	}
 
 	@Test public void downCliffs() {
+		BattleState battle = simpleBattle();
+		final MapPoint destination = up1.add(new MapPoint(-1, 0));
+
+		final Character zan = battle.getCharacterAt(bt.zanPos).get();
+		assertNotNull(zan);
+		zan.teleport(up1, false);
+
+		final List<MapPoint> path =
+			battle.findValidPath(up1, destination, Player.PLAYER_A, 1);
+		System.err.println(path);
+		assertEquals(2, path.size());
+
+		zan.teleport(destination, false);
+		final List<MapPoint> path2 =
+			battle.findValidPath(destination, up1, Player.PLAYER_A, 1);
+		System.err.println(path2);
+		assertTrue(path2.isEmpty());
 	}
 
 	@Test public void slopeCost() {

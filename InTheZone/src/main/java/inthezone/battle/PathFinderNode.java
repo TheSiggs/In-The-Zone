@@ -109,7 +109,7 @@ public class PathFinderNode extends Node<MapPoint> {
 		} else if (tfrom.elevation == tto.elevation) {
 			return tto.slope == SlopeType.NONE || tto.slope == slope;
 		} else if (tfrom.elevation - tto.elevation == 1) {
-			return tto.slope == slope.opposite();
+			return tto.slope == slope.opposite() || tto.slope == SlopeType.NONE;
 		} else if (tfrom.elevation - tto.elevation == -1) {
 			return tto.slope == slope;
 		} else return false;

@@ -173,7 +173,7 @@ public class PullPush extends InstantEffect {
 		MapPoint last = los.remove(0);
 		path.add(last);
 		while (
-			path.size() <= limit &&
+			battle.pathCost(path) < limit &&
 			los.size() > 0 &&
 			!occupied.contains(los.get(0)) &&
 			(battle.canMoveThrough(los.get(0), player) || cleared.contains(los.get(0))) &&

@@ -97,18 +97,14 @@ public class SpriteManager {
 		final Stage stage = view.getStage();
 		MapPoint start = path.get(0);
 		MapPoint end = path.get(1);
-		MapPoint v = end.subtract(start);
 
 		final int id = affected.id;
 		final Sprite s = stage.getSpritesByTile(start).stream()
 			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
 
 		for (MapPoint p : path.subList(2, path.size())) {
-			if (!end.add(v).equals(p)) {
-				stage.queueMoveSprite(s, start, end, animation, speed);
-				start = end;
-				v = p.subtract(start);
-			}
+			stage.queueMoveSprite(s, start, end, animation, speed);
+			start = end;
 			end = p;
 		}
 

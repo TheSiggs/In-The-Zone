@@ -4,7 +4,9 @@ import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
+import isogame.engine.SlopeType;
 import isogame.engine.Stage;
+import isogame.engine.Tile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -266,12 +268,41 @@ public class BattleState {
 	}
 
 	/**
+	 * Calculate the mp cost of a valid path.
+	 * */
+	public int pathCost(List<MapPoint> path) {
+		if (path.size() < 2) return 0;
+
+		int totalCost = 0;
+
+		MapPoint p0 = path.get(0);
+		for (MapPoint p : path.subList(1, path.size())) {
+			final MapPoint dp = p.subtract(p0);
+			final Tile tile = terrain.terrain.getTile(p);
+			if (dp.y == 0 && dp.x == 1) {
+				totalCost += (tile.slope == SlopeType.E)? 2 : 1;
+			} else if (dp.y == 0 && dp.x == -1) {
+				totalCost += (tile.slope == SlopeType.W)? 2 : 1;
+			} else if (dp.x == 0 && dp.y == 1)  {
+				totalCost += (tile.slope == SlopeType.S)? 2 : 1;
+			} else if (dp.x == 0 && dp.y == -1) {
+				totalCost += (tile.slope == SlopeType.N)? 2 : 1;
+			} else {
+				totalCost += 1;
+			}
+			p0 = p;
+		}
+
+		return totalCost;
+	}
+
+	/**
 	 * Determine if a move path is valid, using a fixed range instead of mp.
 	 * */
 	public boolean canMoveRange(int range, List<MapPoint> path) {
 		if (path.size() < 2) return false;
 		MapPoint target = path.get(path.size() - 1);
-		return !spaceObstacles().contains(target) && path.size() - 1 <= range;
+		return !spaceObstacles().contains(target) && pathCost(path) <= range;
 	}
 
 	/**

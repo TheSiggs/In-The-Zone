@@ -73,6 +73,35 @@ public class ElevationTests {
 	}
 
 	@Test public void slopeCost() {
+		BattleState battle = simpleBattle();
+		final MapPoint start = slope1.add(new MapPoint(0, 1));
+
+		final Character zan = battle.getCharacterAt(bt.zanPos).get();
+		assertNotNull(zan);
+		zan.teleport(start, false);
+
+		final List<MapPoint> path =
+			battle.findValidPath(start, slope1, Player.PLAYER_A, 2);
+		assertEquals(2, path.size());
+		assertEquals(2, battle.pathCost(path));
+
+		zan.teleport(slope1, false);
+		final List<MapPoint> path2 =
+			battle.findValidPath(slope1, up1, Player.PLAYER_A, 1);
+		assertEquals(2, path2.size());
+		assertEquals(1, battle.pathCost(path2));
+
+		zan.teleport(up1, false);
+		final List<MapPoint> path3 =
+			battle.findValidPath(up1, start, Player.PLAYER_A, 2);
+		assertEquals(3, path3.size());
+		assertEquals(2, battle.pathCost(path3));
+
+		zan.teleport(up1, false);
+		final List<MapPoint> path4 =
+			battle.findValidPath(up1, up3, Player.PLAYER_A, 2);
+		assertEquals(3, path4.size());
+		assertEquals(2, battle.pathCost(path4));
 	}
 }
 

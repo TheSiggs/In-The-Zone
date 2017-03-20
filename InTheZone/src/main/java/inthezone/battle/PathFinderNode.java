@@ -100,7 +100,9 @@ public class PathFinderNode extends Node<MapPoint> {
 		Tile tfrom = terrain.getTile(from);
 		Tile tto = terrain.getTile(to);
 
-		if (tfrom.slope != SlopeType.NONE) {
+		if (tfrom.slope == tto.slope && tfrom.elevation == tto.elevation) {
+			return true;
+		} else if (tfrom.slope != SlopeType.NONE) {
 			return
 				(slope == tfrom.slope && tto.elevation - tfrom.elevation == 1) ||
 				(slope == tfrom.slope.opposite() && tto.elevation == tfrom.elevation);

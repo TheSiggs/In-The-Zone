@@ -1,12 +1,16 @@
 package inthezone.test;
 
+import inthezone.battle.Ability;
 import inthezone.battle.BattleState;
+import inthezone.battle.Casting;
 import inthezone.battle.Character;
+import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -62,13 +66,11 @@ public class ElevationTests {
 
 		final List<MapPoint> path =
 			battle.findValidPath(up1, destination, Player.PLAYER_A, 1);
-		System.err.println(path);
 		assertEquals(2, path.size());
 
 		zan.teleport(destination, false);
 		final List<MapPoint> path2 =
 			battle.findValidPath(destination, up1, Player.PLAYER_A, 1);
-		System.err.println(path2);
 		assertTrue(path2.isEmpty());
 	}
 
@@ -102,6 +104,32 @@ public class ElevationTests {
 			battle.findValidPath(up1, up3, Player.PLAYER_A, 2);
 		assertEquals(3, path4.size());
 		assertEquals(2, battle.pathCost(path4));
+	}
+
+	@Test public void aoeTest() {
+		BattleState battle = simpleBattle();
+		final Character zan = battle.getCharacterAt(bt.zanPos).get();
+		assertNotNull(zan);
+
+		final Ability aoe = zan.abilities.stream()
+			.filter(a -> a.info.name.equals("AOEtest")).findFirst().get();
+		assertNotNull(aoe);
+
+		final Set<MapPoint> area =
+			battle.getAffectedArea(zan.getPos(), AbilityAgentType.CHARACTER,
+				aoe, new Casting(zan.getPos(), slope2.add(new MapPoint(0, 1))));
+
+		assertEquals(10, area.size());
+		assertTrue(area.contains(slope2));
+		assertTrue(area.contains(slope2.add(new MapPoint(0, 1))));
+		assertTrue(area.contains(slope2.add(new MapPoint(-1, 1))));
+		assertTrue(area.contains(slope2.add(new MapPoint(-2, 1))));
+		assertTrue(area.contains(slope2.add(new MapPoint(1, 1))));
+		assertTrue(area.contains(slope2.add(new MapPoint(2, 1))));
+		assertTrue(area.contains(slope2.add(new MapPoint(-1, 2))));
+		assertTrue(area.contains(slope2.add(new MapPoint(0, 2))));
+		assertTrue(area.contains(slope2.add(new MapPoint(1, 2))));
+		assertTrue(area.contains(slope2.add(new MapPoint(0, 3))));
 	}
 }
 

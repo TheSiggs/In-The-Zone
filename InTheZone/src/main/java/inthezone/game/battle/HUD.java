@@ -19,19 +19,20 @@ import java.util.Optional;
 
 public class HUD extends AnchorPane {
 	private final FlowPane characterInfoBoxes = new FlowPane();
-	private final VBox endButtons = new VBox();
 	private final Button endTurnButton = new Button("End turn");
 	private final Button resignButton = new Button("Resign");
-	private final Button itemsButton = new Button("Use potion");
 	private final Button abilitiesButton = new Button("Abilities");
 
 	private final MultiTargetAssistant multiTargetAssistant;
 	private final MessageLine messageLine = new MessageLine();
 	private final VBox assistanceLine = new VBox();
 
+	private final FlowPane actionButtons = new FlowPane();
+
 	private final ContextMenu abilitiesMenu = new ContextMenu();
 	private final MenuItem attackItem = new MenuItem("Attack");
 	private final MenuItem pushItem = new MenuItem("Push");
+	private final MenuItem potionItem = new MenuItem("Use potion");
 
 	private final BattleView view;
 
@@ -48,24 +49,17 @@ public class HUD extends AnchorPane {
 		this.multiTargetAssistant = new MultiTargetAssistant(view);
 
 		pushItem.setOnAction(event -> view.usePush());
+		potionItem.setOnAction(event -> view.useItem());
 
 		endTurnButton.setOnAction(event -> view.sendEndTurn());
 		resignButton.setOnAction(event -> view.sendResign());
 
-		endButtons.getChildren().addAll(endTurnButton, resignButton);
-
 		abilitiesButton.setOnAction(event ->
 			abilitiesMenu.show(abilitiesButton, Side.TOP, 0, 0));
-
-		itemsButton.setOnAction(event -> view.useItem());
 
 		endTurnButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.cannotCancel));
 		resignButton.disableProperty().bind(view.isMyTurn.not());
-		itemsButton.disableProperty().bind(view.isMyTurn.not()
-			.or(view.isCharacterSelected.not())
-			.or(view.areAllItemsUsed)
-			.or(view.cannotCancel));
 		abilitiesButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.isCharacterSelected.not())
 			.or(view.cannotCancel));
@@ -74,25 +68,30 @@ public class HUD extends AnchorPane {
 		assistanceLine.setFillWidth(false);
 		assistanceLine.getChildren().addAll(messageLine, multiTargetAssistant);
 
+		actionButtons.setAlignment(Pos.CENTER);
+		actionButtons.setMaxHeight(actionButtons.getPrefHeight());
+		actionButtons.getChildren().addAll(abilitiesButton);
+
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
 
-		AnchorPane.setTopAnchor(endButtons, 0d);
-		AnchorPane.setRightAnchor(endButtons, 0d);
+		AnchorPane.setBottomAnchor(endTurnButton, 0d);
+		AnchorPane.setLeftAnchor(endTurnButton, 0d);
 
-		AnchorPane.setBottomAnchor(abilitiesButton, 0d);
-		AnchorPane.setRightAnchor(abilitiesButton, 0d);
+		AnchorPane.setBottomAnchor(resignButton, 0d);
+		AnchorPane.setRightAnchor(resignButton, 0d);
 
-		AnchorPane.setBottomAnchor(itemsButton, 0d);
-		AnchorPane.setLeftAnchor(itemsButton, 0d);
+		AnchorPane.setBottomAnchor(actionButtons, 0d);
+		AnchorPane.setLeftAnchor(actionButtons, 0d);
+		AnchorPane.setRightAnchor(actionButtons, 0d);
 
-		AnchorPane.setBottomAnchor(assistanceLine, 0d);
+		AnchorPane.setBottomAnchor(assistanceLine, 30d);
 		AnchorPane.setLeftAnchor(assistanceLine, 0d);
 		AnchorPane.setRightAnchor(assistanceLine, 0d);
 
 		this.getChildren().addAll(
-			assistanceLine, characterInfoBoxes,  endButtons,
-			abilitiesButton, itemsButton
+			assistanceLine, characterInfoBoxes, endTurnButton, resignButton,
+			actionButtons
 		);
 	}
 
@@ -115,20 +114,19 @@ public class HUD extends AnchorPane {
 	 * */
 	public void doEndMode(BattleOutcome outcome) {
 		characterInfoBoxes.disableProperty().unbind();
-		endButtons.disableProperty().unbind();
+		endTurnButton.disableProperty().unbind();
+		resignButton.disableProperty().unbind();
 		abilitiesButton.disableProperty().unbind();
-		itemsButton.disableProperty().unbind();
 
 		characterInfoBoxes.setDisable(true);
-		endButtons.setDisable(true);
-		abilitiesButton.setDisable(true);
-		itemsButton.setDisable(true);
+		endTurnButton.setDisable(true);
+		resignButton.setDisable(true);
 		assistanceLine.getChildren().add(new EndManager(view, outcome));
 	}
 
 	public void updateAbilities(Character c, boolean mana) {
 		abilitiesMenu.getItems().clear();
-		abilitiesMenu.getItems().addAll(attackItem, pushItem);
+		abilitiesMenu.getItems().addAll(attackItem, pushItem, potionItem);
 
 		attackItem.setOnAction(event ->
 			view.useAbility(mana ? c.basicAbility.getMana() : c.basicAbility));

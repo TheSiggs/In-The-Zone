@@ -51,8 +51,11 @@ public class HUD extends AnchorPane {
 		pushItem.setOnAction(event -> view.usePush());
 		potionItem.setOnAction(event -> view.useItem());
 
-		endTurnButton.setOnAction(event -> view.sendEndTurn());
+		endTurnButton.setOnAction(event -> {System.err.println("hello"); view.sendEndTurn();});
 		resignButton.setOnAction(event -> view.sendResign());
+
+		endTurnButton.getStyleClass().add("gui_button");
+		resignButton.getStyleClass().add("gui_button");
 
 		abilitiesButton.setOnAction(event ->
 			abilitiesMenu.show(abilitiesButton, Side.TOP, 0, 0));
@@ -90,8 +93,8 @@ public class HUD extends AnchorPane {
 		AnchorPane.setRightAnchor(assistanceLine, 0d);
 
 		this.getChildren().addAll(
-			assistanceLine, characterInfoBoxes, endTurnButton, resignButton,
-			actionButtons
+			assistanceLine, characterInfoBoxes, actionButtons,
+			endTurnButton, resignButton
 		);
 	}
 

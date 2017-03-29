@@ -431,7 +431,8 @@ public class BattleState {
 
 		final Set<MapPoint> r =
 			LineOfSight.getDiamond(casting.target, radius).stream()
-				.filter(p -> terrain.terrain.hasTile(p))
+				.filter(p -> terrain.terrain.hasTile(p) &&
+					aoeMinimalPointCost(casting.target, p) <= radius)
 				.collect(Collectors.toSet());
 
 		if (agentType == AbilityAgentType.CHARACTER && ability.info.range.piercing) {
@@ -448,6 +449,33 @@ public class BattleState {
 
 		return r;
 	}
+
+	public int aoeMinimalPointCost(MapPoint castFrom, MapPoint target) {
+		return Math.min(aoePointCost(castFrom, target, true),
+			aoePointCost(castFrom, target, false));
+	}
+
+	/**
+	 * The cost in range points to reach a particular point using are area of
+	 * affect.
+	 * */
+	public int aoePointCost(MapPoint castFrom, MapPoint target, boolean bias) {
+		if (castFrom.equals(target)) return 0;
+		List<MapPoint> path = LineOfSight.getLOS(castFrom, target, bias);
+		if (path.size() < 2) return Integer.MAX_VALUE;
+
+		int totalCost = 0;
+		Tile tile0 = terrain.terrain.getTile(path.get(0));
+		for (MapPoint p : path.subList(1, path.size())) {
+			final Tile tile = terrain.terrain.getTile(p);
+			final int elevation0 = tile0.elevation + (tile0.slope == SlopeType.NONE? 0 : 1);
+			final int elevation = tile.elevation + (tile.slope == SlopeType.NONE? 0 : 1);
+			if (elevation > elevation0) totalCost += 2; else totalCost += 1;
+			tile0 = tile;
+		}
+		return totalCost;
+	}
+
 
 	public Collection<Targetable> getAbilityTargets(
 		MapPoint agent, AbilityAgentType agentType,

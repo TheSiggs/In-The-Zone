@@ -19,6 +19,7 @@ import inthezone.battle.status.Stunned;
 import inthezone.battle.status.Vampirism;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
+import javafx.scene.image.Image;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +31,7 @@ public class Character extends Targetable {
 	public final String name;
  	public final Player player;
 	public final SpriteInfo sprite;
+	public final Image portrait;
 	public final Collection<Ability> abilities = new ArrayList<>();
 	public final Ability basicAbility;
 	private final Stats baseStats;
@@ -49,6 +51,7 @@ public class Character extends Targetable {
 		String name,
 		Player player,
 		SpriteInfo sprite,
+		Image portrait,
 		Collection<Ability> abilities,
 		Ability basicAbility,
 		Stats baseStats,
@@ -65,6 +68,7 @@ public class Character extends Targetable {
 		this.name = name;
 		this.player = player;
 		this.sprite = sprite;
+		this.portrait = portrait;
 		this.abilities.addAll(abilities);
 		this.basicAbility = basicAbility;
 		this.baseStats = baseStats;
@@ -87,6 +91,7 @@ public class Character extends Targetable {
 			name,
 			player,
 			sprite,
+			portrait,
 			abilities,
 			basicAbility,
 			baseStats,
@@ -112,6 +117,7 @@ public class Character extends Targetable {
 		this.name = profile.rootCharacter.name;
 		this.player = player;
 		this.sprite = profile.rootCharacter.sprite;
+		this.portrait = profile.rootCharacter.portrait;
 		this.baseStats = profile.getBaseStats();
 		this.abilities.addAll(profile.abilities.stream()
 			.map(i -> new Ability(i)).collect(Collectors.toList()));

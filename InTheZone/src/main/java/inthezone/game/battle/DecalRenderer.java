@@ -29,7 +29,9 @@ public class DecalRenderer implements SpriteDecalRenderer {
 	}
 
 	public void registerCharacter(Character c) {
-		healthBars.put(c.id, new HealthBar(c.getHP(), c.getMaxHP()));
+		final HealthBar healthBar = new HealthBar(c.getHP(), c.getMaxHP());
+		healthBar.show();
+		healthBars.put(c.id, healthBar);
 		if (c.player != view.player) enemies.add(c.id);
 	}
 
@@ -80,7 +82,7 @@ public class DecalRenderer implements SpriteDecalRenderer {
 	}
 
 	public void handleMouseOut() {
-		for (HealthBar h : healthBars.values()) h.hide();
+		//for (HealthBar h : healthBars.values()) h.hide();
 	}
 }
 

@@ -82,3 +82,16 @@ distributions {
 	}
 }
 shadowJar.dependsOn test
+
+// java -Dprism.order=sw -Xmx500m -jar client-0.0.10-all.jar "$@"
+task debug(type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = mainClassName
+  debug = true
+  jvmArgs = ['-Dprism.order=sw', '-Xmx500m']
+
+  // arguments to pass to the application
+  //args 'appArg1'
+}
+

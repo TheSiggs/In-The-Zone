@@ -7,6 +7,7 @@ import inthezone.battle.status.StatusEffect;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -15,7 +16,7 @@ import java.util.Optional;
 /**
  * Displays information about a character during battle.
  * */
-public class CharacterInfoBox extends StackPane {
+public class CharacterInfoBox extends AnchorPane {
 	public final int id;
 
 	private final ImageView portrait;
@@ -49,6 +50,14 @@ public class CharacterInfoBox extends StackPane {
 		this.setPrefHeight(274);
 		this.setMaxWidth(this.getPrefWidth());
 		this.setMaxHeight(this.getPrefHeight());
+
+		AnchorPane.setTopAnchor(portrait, 0d);
+		AnchorPane.setLeftAnchor(portrait, 0d);
+		AnchorPane.setRightAnchor(portrait, 0d);
+
+		AnchorPane.setBottomAnchor(grid, 0d);
+		AnchorPane.setLeftAnchor(grid, 0d);
+		AnchorPane.setRightAnchor(grid, 0d);
 
 		grid.addRow(0, new Label("ap"), new StackPane(ap, nap));
 		grid.addRow(1, new Label("mp"), new StackPane(mp, nmp));

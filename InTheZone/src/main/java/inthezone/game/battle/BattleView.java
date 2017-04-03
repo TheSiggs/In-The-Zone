@@ -76,7 +76,7 @@ public class BattleView
 		this.commands = new CommandProcessor(this);
 		this.hud = new HUD(this, gameData.getStandardSprites());
 
-		final DecalRenderer decals = new DecalRenderer(this);
+		final DecalRenderer decals = new DecalRenderer(this, gameData.getStandardSprites());
 
 		this.canvas = new MapView(this,
 			gameData.getStage(startBattle.stage), true, false, Highlighters.highlights);

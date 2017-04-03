@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
+import inthezone.battle.data.StandardSprites;
 import isogame.engine.CameraAngle;
 import isogame.engine.MapPoint;
 import isogame.engine.Sprite;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import static isogame.GlobalConstants.TILEH;
 import static isogame.GlobalConstants.TILEW;
+import javafx.scene.image.Image;
 
 /**
  * Render extra informational elements associated with characters.
@@ -23,9 +25,14 @@ public class DecalRenderer implements SpriteDecalRenderer {
 	private final Map<Integer, HealthBar> healthBars = new HashMap<>();
 	private final Set<Integer> covered = new HashSet<>();
 	private final Set<Integer> enemies = new HashSet<>();
+	private final StandardSprites sprites;
+	private static final double BUFF_FACTOR = 4.0;
+	private static final double BUFF_X_OFFSET = -80.0;
+	private static final double DEBUFF_X_OFFSET = 50.0;
 
-	public DecalRenderer(BattleView view) {
+	public DecalRenderer(BattleView view, StandardSprites sprites) {
 		this.view = view;
+		this.sprites = sprites;
 	}
 
 	public void registerCharacter(Character c) {
@@ -66,6 +73,17 @@ public class DecalRenderer implements SpriteDecalRenderer {
 		HealthBar h = healthBars.get(s.userData);
 		if (h != null) h.render(cx, s, t);
 
+		final Character character = view.sprites.getCharacterById((int) s.userData);
+		if (!character.hasCover()) { // @callum1: See comment @ https://gitlab.com/inthezone/in-the-zone/issues/102
+			character.getStatusBuff().ifPresent((buff) -> {
+				final Image effect = sprites.statusEffects.get(buff.info.type);
+				cx.drawImage(effect, X + BUFF_X_OFFSET, Y, effect.getWidth() * BUFF_FACTOR, effect.getHeight() * BUFF_FACTOR);
+			});
+			character.getStatusDebuff().ifPresent((buff) -> {
+				final Image effect = sprites.statusEffects.get(buff.info.type);
+				cx.drawImage(effect, X + DEBUFF_X_OFFSET, Y, effect.getWidth() * BUFF_FACTOR, effect.getHeight() * BUFF_FACTOR);
+			});
+		}
 		if (enemies.contains(s.userData)) {
 			String m = covered.contains(s.userData)? "E(C)" : "E";
 			cx.setFill(Color.RED);

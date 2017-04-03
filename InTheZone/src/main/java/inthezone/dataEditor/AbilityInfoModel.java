@@ -1,12 +1,15 @@
 package inthezone.dataEditor;
 
 import inthezone.battle.data.AbilityInfo;
+import isogame.engine.SpriteInfo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -16,6 +19,7 @@ public class AbilityInfoModel {
 	private final StringProperty type;
 	private final BooleanProperty trap;
 	private final StringProperty zone;
+	private final ObjectProperty<SpriteInfo> zoneTrapSprite;
 	private final IntegerProperty ap;
 	private final IntegerProperty mp;
 	private final IntegerProperty pp;
@@ -44,6 +48,7 @@ public class AbilityInfoModel {
 		this.type = new SimpleStringProperty("skill");
 		this.trap = new SimpleBooleanProperty(false);
 		this.zone = new SimpleStringProperty("None");
+		this.zoneTrapSprite = new SimpleObjectProperty(null);
 		this.ap = new SimpleIntegerProperty(2);
 		this.mp = new SimpleIntegerProperty(0);
 		this.pp = new SimpleIntegerProperty(1);
@@ -70,6 +75,7 @@ public class AbilityInfoModel {
 		this.type.setValue(i.type.toString().toLowerCase());
 		this.trap.setValue(i.trap);
 		this.zone.setValue(i.zone.toString().toLowerCase());
+		this.zoneTrapSprite.setValue(i.zoneTrapSprite.orElse(null));
 		this.ap.setValue(i.ap);
 		this.mp.setValue(i.mp);
 		this.pp.setValue(i.pp);
@@ -114,6 +120,7 @@ public class AbilityInfoModel {
 		r.type.setValue(type.getValue());
 		r.trap.setValue(trap.getValue());
 		r.zone.setValue(zone.getValue());
+		r.zoneTrapSprite.setValue(zoneTrapSprite.getValue());
 		r.ap.setValue(ap.getValue());
 		r.mp.setValue(mp.getValue());
 		r.pp.setValue(pp.getValue());
@@ -146,6 +153,9 @@ public class AbilityInfoModel {
 
 	public StringProperty zoneProperty() { return zone; }
 	public String getZone() { return zone.getValue(); }
+
+	public ObjectProperty<SpriteInfo> zoneTrapSpriteProperty() { return zoneTrapSprite; }
+	public SpriteInfo getZoneTrapSprite() { return zoneTrapSprite.getValue(); }
 
 	public IntegerProperty apProperty() { return ap; }
 	public int getAP() { return ap.getValue(); }

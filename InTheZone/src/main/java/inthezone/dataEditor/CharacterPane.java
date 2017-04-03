@@ -120,6 +120,7 @@ public class CharacterPane extends TitledPane {
 			AbilityType.parse(a.getType()),
 			a.getTrap(),
 			AbilityZoneType.fromString(a.getZone()),
+			Optional.ofNullable(a.getZoneTrapSprite()),
 			a.getAP(),
 			a.getMP(),
 			a.getPP(),

@@ -3,10 +3,12 @@ package inthezone.dataEditor;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.AbilityZoneType;
+import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.StatusEffectType;
+import isogame.engine.SpriteInfo;
 import isogame.gui.FloatingField;
 import isogame.gui.PositiveIntegerField;
 import isogame.gui.StringField;
@@ -56,6 +58,7 @@ public class AbilitiesPane extends VBox {
 	private final TreeTableColumn<AbilityInfoModel, String> type = new TreeTableColumn<>("Type");
 	private final TreeTableColumn<AbilityInfoModel, Boolean> trap = new TreeTableColumn<>("Trap");
 	private final TreeTableColumn<AbilityInfoModel, String> zone = new TreeTableColumn<>("Zone");
+	private final TreeTableColumn<AbilityInfoModel, SpriteInfo> zoneTrapSprite = new TreeTableColumn<>("T/S Sprite");
 	private final TreeTableColumn<AbilityInfoModel, Integer> ap = new TreeTableColumn<>("AP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> mp = new TreeTableColumn<>("MP cost");
 	private final TreeTableColumn<AbilityInfoModel, Integer> pp = new TreeTableColumn<>("PP cost");
@@ -81,6 +84,8 @@ public class AbilitiesPane extends VBox {
 
 	private final ObservableList<String> zoneTypes =
 		FXCollections.observableArrayList(enumValues(AbilityZoneType.class));
+	
+	private final ObservableList<SpriteInfo> spriteList = FXCollections.observableArrayList();
 
 	private final ObservableList<String> targetModes =
 		FXCollections.observableArrayList("E", "A", "S", "EA", "ES", "AS", "EAS");
@@ -131,8 +136,10 @@ public class AbilitiesPane extends VBox {
 		table.setPlaceholder(noCharacterSelectedMessage);
 	}
 
-	public AbilitiesPane(WritableValue<Boolean> changed) {
+	public AbilitiesPane(WritableValue<Boolean> changed, GameDataFactory gameData) {
 		super();
+
+		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i);
 
 		tableRoot = new TreeItem<>(new AbilityInfoModel(false, false));
 		tableRoot.setExpanded(true);
@@ -281,6 +288,7 @@ public class AbilitiesPane extends VBox {
 		type.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("type"));
 		trap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Boolean>("trap"));
 		zone.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, String>("zone"));
+		zoneTrapSprite.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, SpriteInfo>("zoneTrapSprite"));
 		ap.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("ap"));
 		mp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("mp"));
 		pp.setCellValueFactory(new TreeItemPropertyValueFactory<AbilityInfoModel, Integer>("pp"));
@@ -304,6 +312,7 @@ public class AbilitiesPane extends VBox {
 		type.setSortable(false);
 		trap.setSortable(false);
 		zone.setSortable(false);
+		zoneTrapSprite.setSortable(false);
 		ap.setSortable(false);
 		mp.setSortable(false);
 		pp.setSortable(false);
@@ -336,6 +345,8 @@ public class AbilitiesPane extends VBox {
 			forTreeTableColumn(trap));
 		zone.setCellFactory(ChoiceBoxTreeTableCell.<AbilityInfoModel, String>
 			forTreeTableColumn(zoneTypes));
+		zoneTrapSprite.setCellFactory(ChoiceBoxTreeTableCell.<AbilityInfoModel, SpriteInfo>
+			forTreeTableColumn(spriteList));
 		ap.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
 			forTreeTableColumn(PositiveIntegerField::new, selection));
 		mp.setCellFactory(TypedTextFieldTreeTableCell.<AbilityInfoModel, Integer>
@@ -374,6 +385,7 @@ public class AbilitiesPane extends VBox {
 		hookOnEditCommit(type, changed);
 		hookOnEditCommit(trap, changed);
 		hookOnEditCommit(zone, changed);
+		hookOnEditCommit(zoneTrapSprite, changed);
 		hookOnEditCommit(ap, changed);
 		hookOnEditCommit(mp, changed);
 		hookOnEditCommit(pp, changed);
@@ -394,7 +406,7 @@ public class AbilitiesPane extends VBox {
 
 		@SuppressWarnings("unchecked")
 		boolean v = table.getColumns().setAll(
-			banned, name, type, trap, zone,
+			banned, name, type, trap, zone, zoneTrapSprite,
 			ap, mp, pp, eff, chance, heal, range, radius,
 			piercing, targetMode, nTargets, los,
 			recursion, instantBefore, instantAfter, statusEffect);

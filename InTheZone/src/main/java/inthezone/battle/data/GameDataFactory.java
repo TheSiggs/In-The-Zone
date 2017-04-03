@@ -78,7 +78,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 			JSONObject json = (JSONObject) parser.parse(in);
 			loadGameData(json);
 		} catch (ParseException e) {
-			throw new CorruptDataException("game data is corrupted");
+			throw new CorruptDataException("game data is corrupted", e);
 		}
 	}
 

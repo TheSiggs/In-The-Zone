@@ -154,7 +154,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 
 			Collection<AbilityInfo> allAbilities = new LinkedList<>();
 			for (Object a : abilities) {
-				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a));
+				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a, lib));
 			}
 
 			List<Integer> hpCurve = rhpCurve == null?

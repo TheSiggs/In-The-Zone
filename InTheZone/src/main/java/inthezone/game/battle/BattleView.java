@@ -71,6 +71,7 @@ public class BattleView
 		Network network, GameDataFactory gameData
 	) throws CorruptDataException {
 		super();
+		this.setMinSize(0, 0);
 
 		this.player = player;
 		this.commands = new CommandProcessor(this);

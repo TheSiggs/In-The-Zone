@@ -4,13 +4,14 @@ import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.StatusEffect;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import java.util.Optional;
 
 /**
@@ -20,14 +21,11 @@ public class CharacterInfoBox extends AnchorPane {
 	public final int id;
 
 	private final ImageView portrait;
-	private final GridPane grid = new GridPane();
-	private final ProgressBar ap = new ProgressBar(1);
-	private final ProgressBar mp = new ProgressBar(1);
-	private final ProgressBar hp = new ProgressBar(1);
-
-	private final Label nap = new Label("/");
-	private final Label nmp = new Label("/");
-	private final Label nhp = new Label("/");
+	private final ImageView selectedImage = new ImageView();
+	private final VBox grid = new VBox(4);
+	private final StatBar ap = new StatBar("ap", false);
+	private final StatBar mp = new StatBar("mp", false);
+	private final StatBar hp = new StatBar("hp", true);
 
 	private final HBox statusLine = new HBox();
 
@@ -44,12 +42,18 @@ public class CharacterInfoBox extends AnchorPane {
 
 		portrait = new ImageView(character.portrait);
 
+		selectedImage.setId("selectedCharacterImage");
+		selectedImage.setVisible(false);
+
 		this.getStyleClass().add("character-info-box");
-		this.getChildren().addAll(portrait, grid);
+		this.getChildren().addAll(portrait, grid, selectedImage);
 		this.setPrefWidth(162);
 		this.setPrefHeight(274);
 		this.setMaxWidth(this.getPrefWidth());
 		this.setMaxHeight(this.getPrefHeight());
+
+		AnchorPane.setTopAnchor(selectedImage, 4d);
+		AnchorPane.setRightAnchor(selectedImage, 4d);
 
 		AnchorPane.setTopAnchor(portrait, 0d);
 		AnchorPane.setLeftAnchor(portrait, 0d);
@@ -59,33 +63,16 @@ public class CharacterInfoBox extends AnchorPane {
 		AnchorPane.setLeftAnchor(grid, 0d);
 		AnchorPane.setRightAnchor(grid, 0d);
 
-		grid.addRow(0, new Label("ap"), new StackPane(ap, nap));
-		grid.addRow(1, new Label("mp"), new StackPane(mp, nmp));
-		grid.addRow(2, new Label("hp"), new StackPane(hp, nhp));
-		grid.add(statusLine, 3, 0, 2, 1);
+		grid.setAlignment(Pos.CENTER);
+		grid.getChildren().addAll(ap, mp, hp, statusLine);
 
 		ap.setMouseTransparent(true);
 		mp.setMouseTransparent(true);
 		hp.setMouseTransparent(true);
 
-		updateAP(character.getAP(), character.getStats().ap);
-		updateMP(character.getMP(), character.getStats().mp);
-		updateHP(character.getHP(), character.getMaxHP());
-	}
-
-	private void updateAP(int ap, int max) {
-		this.ap.setProgress((double) ap / (double) max);
-		this.nap.setText(ap + " / " + max);
-	}
-
-	private void updateMP(int mp, int max) {
-		this.mp.setProgress((double) mp / (double) max);
-		this.nmp.setText(mp + " / " + max);
-	}
-
-	private void updateHP(int hp, int max) {
-		this.hp.setProgress((double) hp / (double) max);
-		this.nhp.setText(hp + " / " + max);
+		ap.update(character.getAP(), character.getStats().ap);
+		mp.update(character.getMP(), character.getStats().mp);
+		hp.update(character.getHP(), character.getMaxHP());
 	}
 
 	private void updateStatus(
@@ -101,15 +88,16 @@ public class CharacterInfoBox extends AnchorPane {
 	}
 
 	public void updateCharacter(Character c) {
-		updateAP(c.getAP(), c.getStats().ap);
-		updateMP(c.getMP(), c.getStats().mp);
-		updateHP(c.getHP(), c.getMaxHP());
+		ap.update(c.getAP(), c.getStats().ap);
+		mp.update(c.getMP(), c.getStats().mp);
+		hp.update(c.getHP(), c.getMaxHP());
 		updateStatus(c.getStatusBuff(), c.getStatusDebuff(), c.hasCover());
 	}
 
 	public void setSelected(boolean isSelected) {
 		if (this.isSelected != isSelected) {
 			this.isSelected = isSelected;
+			selectedImage.setVisible(isSelected);
 			if (isSelected) {
 				this.getStyleClass().add("character-info-box-selected");
 			} else {

@@ -42,6 +42,7 @@ public class HUD extends AnchorPane {
 
 	public HUD(BattleView view, StandardSprites sprites) {
 		super();
+		this.setMinSize(0, 0);
 
 		this.sprites = sprites;
 
@@ -66,6 +67,8 @@ public class HUD extends AnchorPane {
 		abilitiesButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.isCharacterSelected.not())
 			.or(view.cannotCancel));
+
+		characterInfoBoxes.setPrefWrapLength(1000);
 
 		assistanceLine.setAlignment(Pos.CENTER);
 		assistanceLine.setFillWidth(false);

@@ -15,9 +15,11 @@
 	-fx-border-style:solid;
 }
 
-.character-info-box-selected {
-	-fx-background-color:yellow;
+#selectedCharacterImage {
+	-fx-image:url(gui_assets/selected.png);
 }
+
+.character-info-box-selected { }
 
 .message-line {
 	-fx-background-color:white;
@@ -35,4 +37,29 @@
 	-fx-font-size:20px;
 	-fx-font-weight:bold;
 }
+
+.statBar {
+	-fx-border-color:black;
+	-fx-border-style:solid;
+	-fx-border-width:2px;
+}
+
+.statBar Label {
+	-fx-text-fill:white;
+	-fx-font-weight:bold;
+}
+
+.statBar Line {
+	-fx-stroke:black;
+	-fx-stroke-width:2px;
+}
+
+#ap { -fx-background-image:url(gui_assets/ap_background.png); }
+#ap ImageView { -fx-image:url(gui_assets/ap.png); }
+
+#mp { -fx-background-image:url(gui_assets/mp_background.png); }
+#mp ImageView { -fx-image:url(gui_assets/mp.png); }
+
+#hp { -fx-background-image:url(gui_assets/hp_background.png); }
+#hp ImageView { -fx-image:url(gui_assets/hp.png); }
 

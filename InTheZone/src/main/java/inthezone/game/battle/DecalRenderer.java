@@ -74,7 +74,7 @@ public class DecalRenderer implements SpriteDecalRenderer {
 		if (h != null) h.render(cx, s, t);
 
 		final Character character = view.sprites.getCharacterById((int) s.userData);
-		if (!character.hasCover()) { // @callum1: See comment @ https://gitlab.com/inthezone/in-the-zone/issues/102
+		if (character != null) {
 			character.getStatusBuff().ifPresent((buff) -> {
 				final Image effect = sprites.statusEffects.get(buff.info.type);
 				cx.drawImage(effect, X + BUFF_X_OFFSET, Y, effect.getWidth() * BUFF_FACTOR, effect.getHeight() * BUFF_FACTOR);

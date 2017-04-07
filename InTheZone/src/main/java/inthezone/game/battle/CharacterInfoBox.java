@@ -70,28 +70,26 @@ public class CharacterInfoBox extends AnchorPane {
 		mp.setMouseTransparent(true);
 		hp.setMouseTransparent(true);
 
-		ap.update(character.getAP(), character.getStats().ap);
-		mp.update(character.getMP(), character.getStats().mp);
-		hp.update(character.getHP(), character.getMaxHP());
+		ap.update(character.hasMana()? "ap_mana" : "ap", character.getAP(), character.getStats().ap, false);
+		mp.update("mp", character.getMP(), character.getStats().mp, false);
+		hp.update(character.hasCover()? "hp_cover" : "hp", character.getHP(), character.getMaxHP(), character.hasCover());
 	}
 
 	private void updateStatus(
-		Optional<StatusEffect> buff, Optional<StatusEffect> debuff, boolean cover
+		Optional<StatusEffect> buff, Optional<StatusEffect> debuff
 	) {
 		statusLine.getChildren().clear();
 		buff.ifPresent(s -> statusLine.getChildren().add(
 			new ImageView(sprites.statusEffects.get(s.getInfo().type))));
 		debuff.ifPresent(s -> statusLine.getChildren().add(
 			new ImageView(sprites.statusEffects.get(s.getInfo().type))));
-		if (cover) statusLine.getChildren().add(
-			new ImageView(sprites.statusEffects.get(StatusEffectType.COVER)));
 	}
 
 	public void updateCharacter(Character c) {
-		ap.update(c.getAP(), c.getStats().ap);
-		mp.update(c.getMP(), c.getStats().mp);
-		hp.update(c.getHP(), c.getMaxHP());
-		updateStatus(c.getStatusBuff(), c.getStatusDebuff(), c.hasCover());
+		ap.update(c.hasMana()? "ap_mana" : "ap", c.getAP(), c.getStats().ap, false);
+		mp.update("mp", c.getMP(), c.getStats().mp, false);
+		hp.update(c.hasCover()? "hp_cover" : "hp", c.getHP(), c.getMaxHP(), c.hasCover());
+		updateStatus(c.getStatusBuff(), c.getStatusDebuff());
 	}
 
 	public void setSelected(boolean isSelected) {

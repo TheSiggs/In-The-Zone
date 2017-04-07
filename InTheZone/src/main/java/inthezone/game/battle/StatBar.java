@@ -42,7 +42,9 @@ public class StatBar extends StackPane {
 		}
 	}
 
-	public void update(int val, int max) {
+	public void update(String id, int val, int max, boolean infinite) {
+		this.setId(id);
+
 		if (val == 0) {
 			bar.setVisible(false);
 		} else {
@@ -54,7 +56,7 @@ public class StatBar extends StackPane {
 		}
 
 		if (label != null) {
-			label.setText(val + " / " + max);
+			label.setText(val + " / " + (infinite? "∞" : ("" + max)));
 		} else {
 			if (linesPane.getChildren().size() + 1 != max) {
 				linesPane.getChildren().removeAll();

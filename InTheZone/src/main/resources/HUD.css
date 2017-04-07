@@ -57,9 +57,15 @@
 #ap { -fx-background-image:url(gui_assets/ap_background.png); }
 #ap ImageView { -fx-image:url(gui_assets/ap.png); }
 
+#ap_mana { -fx-background-image:url(gui_assets/ap_background_mana.png); }
+#ap_mana ImageView { -fx-image:url(gui_assets/ap_mana.png); }
+
 #mp { -fx-background-image:url(gui_assets/mp_background.png); }
 #mp ImageView { -fx-image:url(gui_assets/mp.png); }
 
 #hp { -fx-background-image:url(gui_assets/hp_background.png); }
 #hp ImageView { -fx-image:url(gui_assets/hp.png); }
+
+#hp_cover { -fx-background-image:url(gui_assets/hp_background_cover.png); }
+#hp_cover ImageView { -fx-image:url(gui_assets/hp_cover.png); }
 

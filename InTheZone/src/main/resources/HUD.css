@@ -40,13 +40,20 @@
 
 #rounds {
 	-fx-background-image:url(/gui_assets/rounds.png);
+}
+
+#rounds_fatigue {
+	-fx-background-image:url(/gui_assets/rounds_fatigue.png);
+}
+
+.rounds_indicator {
 	-fx-background-repeat:no-repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
 	-fx-border-style:solid;
 }
 
-#rounds Label {
+.rounds_indicator Label {
 	-fx-text-fill:white;
 	-fx-font-family:'Impact';
 	-fx-font-size:20px;

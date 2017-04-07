@@ -11,6 +11,7 @@ public class RoundCounter extends StackPane {
 
 	public RoundCounter() {
 		this.setId("rounds");
+		this.getStyleClass().add("rounds_indicator");
 		this.getChildren().add(label);
 		this.setPrefWidth(114);
 		this.setPrefHeight(40);
@@ -18,11 +19,11 @@ public class RoundCounter extends StackPane {
 
 	public void increment() {
 		round += 1;
-		label.setText("Round: " + round);
+		label.setText("Round: " + ((round + 1) / 2));
 	}
 
 	public void setFatigue() {
-		fatigue = true;
+		this.setId("rounds_fatigue");
 	}
 }
 

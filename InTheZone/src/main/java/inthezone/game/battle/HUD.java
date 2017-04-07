@@ -21,6 +21,7 @@ public class HUD extends AnchorPane {
 	private final FlowPane characterInfoBoxes = new FlowPane();
 	private final Button endTurnButton = new Button("End turn");
 	private final Button resignButton = new Button("Resign");
+	private final RoundCounter roundCounter = new RoundCounter();
 	private final Button abilitiesButton = new Button("Abilities");
 
 	private final MultiTargetAssistant multiTargetAssistant;
@@ -87,6 +88,9 @@ public class HUD extends AnchorPane {
 		AnchorPane.setBottomAnchor(resignButton, 0d);
 		AnchorPane.setRightAnchor(resignButton, 0d);
 
+		AnchorPane.setTopAnchor(roundCounter, 0d);
+		AnchorPane.setRightAnchor(roundCounter, 0d);
+
 		AnchorPane.setBottomAnchor(actionButtons, 0d);
 		AnchorPane.setLeftAnchor(actionButtons, 0d);
 		AnchorPane.setRightAnchor(actionButtons, 0d);
@@ -97,8 +101,16 @@ public class HUD extends AnchorPane {
 
 		this.getChildren().addAll(
 			assistanceLine, characterInfoBoxes, actionButtons,
-			endTurnButton, resignButton
+			endTurnButton, resignButton, roundCounter
 		);
+	}
+
+	public void notifyRound() {
+		roundCounter.increment();
+	}
+
+	public void notifyFatigue() {
+		roundCounter.setFatigue();
 	}
 
 	public void writeMessage(String message) {

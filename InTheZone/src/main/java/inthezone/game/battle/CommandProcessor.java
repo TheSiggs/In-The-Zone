@@ -3,6 +3,7 @@ package inthezone.game.battle;
 import inthezone.battle.Character;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.commands.FatigueCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.PushCommand;
@@ -114,8 +115,13 @@ public class CommandProcessor {
 			}
 			registeredAnimations = false;
 
+		} else if (ec.cmd instanceof FatigueCommand) {
+			view.hud.notifyFatigue();
+			registeredAnimations = false;
+
 		} else if (ec.cmd instanceof StartTurnCommand) {
 			StartTurnCommand cmd = (StartTurnCommand) ec.cmd;
+			view.hud.notifyRound();
 
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(true);

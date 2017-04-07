@@ -28,10 +28,25 @@
 
 .gui_button {
 	-fx-background-image:url(/gui_assets/button_tex.png);
-	-fx-background-repeat:repeat;
+	-fx-background-repeat:no-repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
 	-fx-border-style:solid;
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:20px;
+	-fx-font-weight:bold;
+}
+
+#rounds {
+	-fx-background-image:url(/gui_assets/rounds.png);
+	-fx-background-repeat:no-repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+}
+
+#rounds Label {
 	-fx-text-fill:white;
 	-fx-font-family:'Impact';
 	-fx-font-size:20px;

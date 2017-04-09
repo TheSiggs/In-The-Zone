@@ -26,9 +26,6 @@ public class DecalRenderer implements SpriteDecalRenderer {
 	private final Set<Integer> covered = new HashSet<>();
 	private final Set<Integer> enemies = new HashSet<>();
 	private final StandardSprites sprites;
-	private static final double BUFF_FACTOR = 4.0;
-	private static final double BUFF_X_OFFSET = -80.0;
-	private static final double DEBUFF_X_OFFSET = 50.0;
 
 	public DecalRenderer(BattleView view, StandardSprites sprites) {
 		this.view = view;
@@ -58,6 +55,14 @@ public class DecalRenderer implements SpriteDecalRenderer {
 	private final static double X = TILEW * 0.45;
 	private final static double Y = TILEH * 0.25;
 
+	private static final double BUFF_SCALE = 2.0;
+	private static final double BUFF_X_OFFSET = -40.0;
+	private static final double DEBUFF_X_OFFSET = 25.0;
+
+	private final static double BUFF_Y = Y - 20;
+	private final static double BUFF_X = X + BUFF_X_OFFSET;
+	private final static double DEBUFF_X = X + DEBUFF_X_OFFSET;
+
 	private static final Font markFont = new Font(48d);
 	
 	@Override public void render(
@@ -70,18 +75,21 @@ public class DecalRenderer implements SpriteDecalRenderer {
 			}
 		});
 
-		HealthBar h = healthBars.get(s.userData);
-		if (h != null) h.render(cx, s, t);
-
 		final Character character = view.sprites.getCharacterById((int) s.userData);
+
+		HealthBar h = healthBars.get(s.userData);
+		if (h != null) h.render(cx, s, t, character != null && character.hasCover());
+
 		if (character != null) {
 			character.getStatusBuff().ifPresent((buff) -> {
 				final Image effect = sprites.statusEffects.get(buff.info.type);
-				cx.drawImage(effect, X + BUFF_X_OFFSET, Y, effect.getWidth() * BUFF_FACTOR, effect.getHeight() * BUFF_FACTOR);
+				cx.drawImage(effect, BUFF_X, BUFF_Y,
+					effect.getWidth() * BUFF_SCALE, effect.getHeight() * BUFF_SCALE);
 			});
 			character.getStatusDebuff().ifPresent((buff) -> {
 				final Image effect = sprites.statusEffects.get(buff.info.type);
-				cx.drawImage(effect, X + DEBUFF_X_OFFSET, Y, effect.getWidth() * BUFF_FACTOR, effect.getHeight() * BUFF_FACTOR);
+				cx.drawImage(effect, DEBUFF_X, BUFF_Y,
+					effect.getWidth() * BUFF_SCALE, effect.getHeight() * BUFF_SCALE);
 			});
 		}
 		if (enemies.contains(s.userData)) {

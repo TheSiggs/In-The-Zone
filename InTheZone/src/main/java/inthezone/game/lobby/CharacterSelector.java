@@ -22,7 +22,7 @@ public class CharacterSelector extends Canvas {
 	private int w = 0;
 	private int h = 0;
 
-	final double scaleFactor = 4;
+	final double scaleFactor = 2;
 
 	public CharacterSelector() {
 		this(new ArrayList<>());

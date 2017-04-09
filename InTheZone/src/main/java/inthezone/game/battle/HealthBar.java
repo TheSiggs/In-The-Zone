@@ -32,6 +32,8 @@ public class HealthBar {
 
 	private final static Paint background = Color.color(1.0f, 0.0f, 0.0f);
 	private final static Paint health = Color.color(0.0f, 1.0f, 0.0f);
+	private final static Paint cover_background = Color.color(1.0f, 0.65f, 0.0f);
+	private final static Paint cover_health = Color.color(1.0f, 1.00f, 0.0f);
 
 	private final static double X = TILEW * 0.35;
 	private final static double Y = 0;
@@ -65,7 +67,7 @@ public class HealthBar {
 	 * Render a health bar
 	 * @param t The timestamp of the current frame in nanoseconds
 	 * */
-	public void render(GraphicsContext cx, Sprite s, long t) {
+	public void render(GraphicsContext cx, Sprite s, long t, boolean cover) {
 		updateAnimations(t);
 		if (alpha == 0) return;
 
@@ -73,9 +75,9 @@ public class HealthBar {
 
 		cx.save();
 		cx.setGlobalAlpha(alpha);
-		cx.setFill(background);
+		cx.setFill(cover? cover_background : background);
 		cx.fillRect(X + d, Y, W - d, H);
-		cx.setFill(health);
+		cx.setFill(cover? cover_health : health);
 		cx.fillRect(X, Y, d, H);
 		cx.restore();
 

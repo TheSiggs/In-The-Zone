@@ -22,6 +22,7 @@ public class Zone extends Targetable implements HasParentAgent {
 	private final double defenceBuff;
 	private final Stats stats;
 
+	private final Optional<SpriteInfo> sprite;
 	private boolean purged = false;
 	private Optional<Integer> turnsRemaining;
 
@@ -43,6 +44,8 @@ public class Zone extends Targetable implements HasParentAgent {
 
 		this.turnsRemaining = turns;
 
+		this.sprite = ability.info.zoneTrapSprite;
+
 		this.chanceBuff = agent.getChanceBuff();
 		this.attackBuff = agent.getAttackBuff();
 		this.defenceBuff = agent.getDefenceBuff();
@@ -55,6 +58,7 @@ public class Zone extends Targetable implements HasParentAgent {
 		Optional<Integer> turns,
 		Ability ability,
 		Character parent,
+		Optional<SpriteInfo> sprite,
 		boolean hasMana,
 		double chanceBuff,
 		double attackBuff,
@@ -66,6 +70,7 @@ public class Zone extends Targetable implements HasParentAgent {
 		this.range.addAll(range);
 		this.ability = ability;
 		this.parent = parent;
+		this.sprite = sprite;
 		this.turnsRemaining = turns;
 		this.hasMana = hasMana;
 		this.chanceBuff = chanceBuff;
@@ -99,7 +104,7 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public boolean isDead() {
 		return purged || turnsRemaining.map(t -> t <= 0).orElse(false);
 	}
-	@Override public SpriteInfo getSprite() {return null;}
+	@Override public SpriteInfo getSprite() {return sprite.orElse(null);}
 	@Override public boolean reap() {return isDead();}
 
 	@Override public boolean hasMana() {return hasMana;}
@@ -108,7 +113,7 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public Zone clone() {
 		return new Zone(
 			centre, range, turnsRemaining, ability, parent,
-			hasMana, chanceBuff, attackBuff, defenceBuff,
+			sprite, hasMana, chanceBuff, attackBuff, defenceBuff,
 			stats, purged);
 	}
 }

@@ -48,7 +48,7 @@ public class AbilityInfoModel {
 		this.type = new SimpleStringProperty("skill");
 		this.trap = new SimpleBooleanProperty(false);
 		this.zone = new SimpleStringProperty("None");
-		this.zoneTrapSprite = new SimpleObjectProperty(null);
+		this.zoneTrapSprite = new SimpleObjectProperty<>(null);
 		this.ap = new SimpleIntegerProperty(2);
 		this.mp = new SimpleIntegerProperty(0);
 		this.pp = new SimpleIntegerProperty(1);

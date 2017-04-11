@@ -4,6 +4,7 @@ import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.StatusEffect;
+import javafx.animation.RotateTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -12,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import java.util.Optional;
 
 /**
@@ -98,6 +100,13 @@ public class CharacterInfoBox extends AnchorPane {
 			selectedImage.setVisible(isSelected);
 			if (isSelected) {
 				this.getStyleClass().add("character-info-box-selected");
+
+				RotateTransition rt = new RotateTransition(Duration.millis(1000), selectedImage);
+				rt.setFromAngle(0);
+				rt.setByAngle(-360);
+				rt.setCycleCount(1);
+				rt.setAutoReverse(false);
+				rt.play();
 			} else {
 				this.getStyleClass().remove("character-info-box-selected");
 			}

@@ -5,6 +5,12 @@
 	-fx-border-style:solid;
 }
 
+#statusLine {
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid none none none;
+}
+
 .multitarget-assistant {
 	-fx-background-color:white;
 }
@@ -84,6 +90,7 @@
 	-fx-border-color:#0000FF;
 }
 #ap_mana ImageView { -fx-image:url(gui_assets/ap_mana.png); }
+#ap_mana Line {-fx-stroke:#0000FF}
 
 #mp { -fx-background-image:url(gui_assets/mp_background.png); }
 #mp ImageView { -fx-image:url(gui_assets/mp.png); }

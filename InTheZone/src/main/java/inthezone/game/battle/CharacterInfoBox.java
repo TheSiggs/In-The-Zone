@@ -20,6 +20,7 @@ import java.util.Optional;
  * Displays information about a character during battle.
  * */
 public class CharacterInfoBox extends AnchorPane {
+	private static final double STATUS_LINE_HEIGHT = 32;
 	public final int id;
 
 	private final ImageView portrait;
@@ -65,8 +66,13 @@ public class CharacterInfoBox extends AnchorPane {
 		AnchorPane.setLeftAnchor(grid, 0d);
 		AnchorPane.setRightAnchor(grid, 0d);
 
+		statusLine.setId("statusLine");
+		statusLine.setMinHeight(STATUS_LINE_HEIGHT);
+		statusLine.setAlignment(Pos.CENTER);
+		statusLine.setFillHeight(false);
+
 		grid.setAlignment(Pos.CENTER);
-		grid.getChildren().addAll(ap, mp, hp, statusLine);
+		grid.getChildren().addAll(hp, ap, mp, statusLine);
 
 		ap.setMouseTransparent(true);
 		mp.setMouseTransparent(true);

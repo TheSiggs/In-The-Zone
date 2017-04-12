@@ -59,7 +59,7 @@ public class StatBar extends StackPane {
 			label.setText(val + " / " + (infinite? "∞" : ("" + max)));
 		} else {
 			if (linesPane.getChildren().size() + 1 != max) {
-				linesPane.getChildren().removeAll();
+				linesPane.getChildren().clear();
 				double stride = WIDTH / (double) max;
 				for (int i = 1; i < max; i++) {
 					double x = ((double) i) * stride;

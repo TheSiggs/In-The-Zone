@@ -138,8 +138,6 @@ public class BattleView
 		this.mode = mode.setupMode();
 		this.cannotCancel.setValue(!mode.canCancel());
 		System.err.println("Set mode " + mode + " transforming to " + this.mode);
-		Stage stage = getStage();
-		for (MapPoint p : sprites.zones) stage.setHighlight(p, HIGHLIGHT_ZONE);
 	}
 
 	/**

@@ -16,14 +16,17 @@ import java.util.Map;
 public class StandardSprites {
 	public final SpriteInfo roadBlock;
 	public final SpriteInfo trap;
+	public final SpriteInfo zone;
 	public final Map<StatusEffectType, Image> statusEffects = new HashMap<>();
 
 	public StandardSprites(Library l, ResourceLocator loc) throws CorruptDataException {
 		System.err.println("Make standard sprites");
 		this.roadBlock = l.getSprite("roadblock");
 		this.trap = l.getSprite("trap");
+		this.zone = l.getSprite("zone");
 		if (roadBlock == null) throw new CorruptDataException("Missing roadblock sprite");
 		if (trap == null) throw new CorruptDataException("Missing trap sprite");
+		if (zone == null) throw new CorruptDataException("Missing zone sprite");
 		Arrays.stream(StatusEffectType.class.getEnumConstants()).forEach(t -> {
 			try {
 				statusEffects.put(t, new Image(loc.gfx(t.getIconName())));

@@ -11,7 +11,6 @@ import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,8 +23,12 @@ public class SpriteManager {
 	private final BattleView view;
 
 	private final Map<Integer, Character> characters = new HashMap<>();
+
+	// includes roadblocks and traps, but no zones
 	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
-	public final Collection<MapPoint> zones = new HashSet<>();
+
+	public final Map<MapPoint, Sprite> zones = new HashMap<>();
+
 	private final Collection<Sprite> sprites = new ArrayList<>();
 
 	private int spritesInMotion = 0;
@@ -165,13 +168,22 @@ public class SpriteManager {
 				continue;
 
 			} else if (t instanceof Zone) {
-				if (t.reap()) {
-					zones.removeAll(((Zone) t).range);
-					view.resetHighlighting();
+				final Zone z = (Zone) t;
+				final Stage stage = view.getStage();
+
+				if (z.reap()) {
+					for (MapPoint p : z.range) {
+						final Sprite s = zones.remove(p);
+						if (s != null) stage.removeSprite(s);
+					}
 
 				} else {
-					zones.addAll(((Zone) t).range);
-					view.resetHighlighting();
+					for (MapPoint p : z.range) {
+						final Sprite s = new Sprite(z.getSprite());
+						s.pos = p;
+						zones.put(p, s);
+						stage.addSprite(s);
+					}
 				}
 
 			} else if (t.reap()) {

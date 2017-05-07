@@ -10,6 +10,7 @@ import inthezone.protocol.ProtocolException;
 import java.io.IOException;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 public class Client {
 	public static final int MAX_CHALLENGES = 5;
-	public static final long DISCONNECTION_TIMEOUT_MILLIS = 5 * 60 * 1000;
+	public static final long DISCONNECTION_TIMEOUT_MILLIS = 30 * 1000;
 
 	private ClientState state = ClientState.HANDSHAKE;
 	private SocketChannel connection;
@@ -36,6 +37,8 @@ public class Client {
 	private Set<Client> challenges = new HashSet<>();
 	private Set<Client> challenged = new HashSet<>();
 	private Optional<Client> inGameWith = Optional.empty();
+
+	private final List<Message> messages = new ArrayList<>();
 
 	// If we are in the disconnected state, then this tells us when the
 	// disconnection happened
@@ -99,6 +102,8 @@ public class Client {
 		}
 	}
 
+	boolean recursiveCloseConnection = false;
+
 	/**
 	 * Close the connection used by this client.  All other clients are notified
 	 * that this client has left the lobby.
@@ -106,9 +111,18 @@ public class Client {
 	 * caused by an IO error.
 	 * */
 	public void closeConnection(boolean intentional) {
+		if (recursiveCloseConnection) return;
+
 		pendingClients.remove(this);
-		if (intentional) {
+		if (intentional || state != ClientState.GAME) {
+
+			// otherGuyLoggedOff may call closeConnection, which could lead to an
+			// infinite loop.  So we need to be careful here.  Doing it this way is
+			// ugly, but it guarantees that both sides get closed, no matter which
+			// side gets closed first.
+			recursiveCloseConnection = true;
 			inGameWith.ifPresent(x -> x.otherGuyLoggedOff());
+			recursiveCloseConnection = false;
 			sessions.remove(sessionKey);
 			if (name.isPresent()) {
 				namedClients.remove(name.get());
@@ -133,10 +147,16 @@ public class Client {
 		}
 	}
 
+	/**
+	 * Is the connection to this client open
+	 * */
 	public boolean isConnected() {
 		return connection.isOpen();
 	}
 
+	/**
+	 * Is the client in the disconnected state
+	 * */
 	public boolean isDisconnected() {
 		return state == ClientState.DISCONNECTED;
 	}
@@ -150,16 +170,17 @@ public class Client {
 	 * Some other player leaves the lobby, i.e. disconnects from the server.
 	 * */
 	public void leftLobby(Client client) throws ProtocolException {
+		if (!isConnected()) return;
 		channel.requestSend(Message.PLAYER_LEAVES(client.name.orElseThrow(() ->
 			new ProtocolException("Unnamed client attempted to leave lobby"))));
 		challenges.remove(client);
-		challenged.remove(client);
 	}
 
 	/**
 	 * Some other player enters the lobby.
 	 * */
 	public void enteredLobby(Client client) throws ProtocolException {
+		if (!isConnected()) return;
 		channel.requestSend(Message.PLAYER_JOINS(client.name.orElseThrow(() ->
 			new ProtocolException("Unnamed client attempted to enter lobby"))));
 	}
@@ -169,6 +190,7 @@ public class Client {
 	 * challenges).
 	 * */
 	public void enteredGame(Client client) throws ProtocolException {
+		if (!isConnected()) return;
 		channel.requestSend(Message.PLAYER_STARTS_GAME(client.name.orElseThrow(() ->
 			new ProtocolException("Unnamed client attempted to start game"))));
 	}
@@ -177,6 +199,7 @@ public class Client {
 	 * Begin a game with another client.
 	 * */
 	public void startGameWith(Client client) {
+		messages.clear();
 		state = ClientState.GAME;
 		challenges.remove(client);
 		inGameWith = Optional.of(client);
@@ -196,11 +219,29 @@ public class Client {
 		challenges.add(client);
 	}
 
+	private int seq = 0;
+
 	/**
 	 * Forward a message on to this client.
 	 * */
-	public void forwardMessage(Message msg) {
-		channel.requestSend(msg);
+	public void forwardMessage(Message msg) throws ProtocolException {
+		msg.setSequenceNumber(seq++);
+		messages.add(msg);
+		if (messages.size() > Protocol.MAX_GAME_MESSAGES)
+			throw new ProtocolException("Too many game messages");
+
+		if (isConnected()) channel.requestSend(msg);
+	}
+
+	/**
+	 * Replay all messages that came after the provided sequence number.
+	 * */
+	public void replayMessagesFrom(int lastSequenceNumber) {
+		for (Message m : messages) {
+			if (m.getSequenceNumber() > lastSequenceNumber) {
+				channel.requestSend(m);
+			}
+		}
 	}
 
 	/**
@@ -216,17 +257,24 @@ public class Client {
 	public void gameOver() {
 		state = ClientState.LOBBY;
 		inGameWith = Optional.empty();
+		messages.clear();
 	}
 
 	/**
 	 * The other player logged off
 	 * */
 	public void otherGuyLoggedOff() {
-		inGameWith = Optional.empty();
-		channel.requestSend(Message.LOGOFF());
-		if (state == ClientState.GAME) {
-			state = ClientState.LOBBY;
+		if (state == ClientState.DISCONNECTED) {
+			closeConnection(true);
+		} else {
+			inGameWith = Optional.empty();
+			messages.clear();
+			channel.requestSend(Message.LOGOFF());
+			if (state == ClientState.GAME) {
+				state = ClientState.LOBBY;
+			}
 		}
+
 	}
 
 	/**
@@ -240,12 +288,14 @@ public class Client {
 	 * The other player has reconnected
 	 * */
 	public void otherGuyReconnected() {
-		channel.requestSend(Message.RECONNECT());
+		channel.requestSend(Message.RECONNECT(sessionKey, 0));
 	}
 
 	/**
 	 * */
-	public void reconnect(SocketChannel connection, MessageChannel channel)
+	public void reconnect(
+		SocketChannel connection, MessageChannel channel, int lastSequenceNumber
+	)
 		throws ProtocolException
 	{
 		if (connection.isOpen()) throw new ProtocolException(
@@ -257,6 +307,7 @@ public class Client {
 		if (inGameWith.isPresent()) {
 			this.state = ClientState.GAME;
 			inGameWith.get().otherGuyReconnected();
+			replayMessagesFrom(lastSequenceNumber);
 		} else {
 			this.state = ClientState.LOBBY;
 		}
@@ -295,7 +346,7 @@ public class Client {
 					if (old == null) {
 						channel.requestSend(Message.NOK("Cannot reconnect"));
 					} else {
-						old.reconnect(connection, channel);
+						old.reconnect(connection, channel, msg.parseLastSequenceNumber());
 						channel.requestSend(Message.OK());
 						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
 
@@ -370,7 +421,9 @@ public class Client {
 		}
 	}
 
-	private void doChallenge(Message msg, Client client) {
+	private void doChallenge(Message msg, Client client)
+		throws ProtocolException
+	{
 		if (challenged.size() < MAX_CHALLENGES && client.name.isPresent()) {
 			challenged.add(client);
 			client.challenge(this);
@@ -383,7 +436,9 @@ public class Client {
 		}
 	}
 
-	private void doRejectChallenge(Message msg, Client client) {
+	private void doRejectChallenge(Message msg, Client client)
+		throws ProtocolException
+	{
 		if (challenges.contains(client)) {
 			challenges.remove(client);
 			client.challengeRejected(this);

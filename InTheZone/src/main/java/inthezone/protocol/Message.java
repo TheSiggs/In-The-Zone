@@ -11,13 +11,30 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * A message to be transmitted across the network.
+ * */
 public class Message {
 	public final MessageKind kind;
 	public final JSONObject payload;
 
+	private int sequenceNumber = 0;
+
 	public Message(MessageKind kind, JSONObject payload) {
 		this.kind = kind;
 		this.payload = payload;
+	}
+
+	/**
+	 * Add a sequence number to this message
+	 * */
+	public void setSequenceNumber(int sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
+		this.payload.put("sequenceNumber", sequenceNumber);
+	}
+
+	public int getSequenceNumber() {
+		return sequenceNumber;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -176,8 +193,16 @@ public class Message {
 		return new Message(MessageKind.WAIT_FOR_RECONNECT, new JSONObject());
 	}
 
-	public static Message RECONNECT() {
-		return new Message(MessageKind.RECONNECT, new JSONObject());
+	/**
+	 * @param sessionKey the session to reconnect to
+	 * @param sequenceNumber the sequence number of the last message received
+	 * */
+	@SuppressWarnings("unchecked")
+	public static Message RECONNECT(UUID sessionKey, int sequenceNumber) {
+		JSONObject o = new JSONObject();
+		o.put("session", sessionKey);
+		o.put("lastSequenceNumber", sequenceNumber);
+		return new Message(MessageKind.RECONNECT, o);
 	}
 
 	public String parseName() throws ProtocolException {
@@ -304,6 +329,17 @@ public class Message {
 		}
 	}
 
+	public int parseLastSequenceNumber() throws ProtocolException {
+		if (kind != MessageKind.RECONNECT)
+			throw new ProtocolException("Expected reconnect");
+
+		try {
+			return ((Number) payload.get("lastSequenceNumber")).intValue();
+		} catch (ClassCastException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
 	public String parseMessage() throws ProtocolException {
 		if (kind != MessageKind.NOK)
 			throw new ProtocolException("Expected message");
@@ -324,7 +360,10 @@ public class Message {
 		try {
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(data);
-			return new Message(MessageKind.fromString(id), json);
+			Message r = new Message(MessageKind.fromString(id), json);
+			Object sn = json.get("sequenceNumber");
+			if (sn != null) r.sequenceNumber = ((Number) sn).intValue();
+			return r;
 		} catch (ParseException e) {
 			throw new ProtocolException("Malformed JSON " + data, e);
 		}

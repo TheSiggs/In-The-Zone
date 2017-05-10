@@ -19,7 +19,7 @@ public class AbilityDescription {
 	private static String generateDescription(AbilityInfo a) {
 		StringBuilder s = new StringBuilder();
 		s.append(a.name).append(" (").append(a.type.toString()).append(")");
-		s.append(a.ap).append(" AP");
+		s.append(" -- ").append(a.ap).append(" AP");
 		if (a.mp > 0) {
 			s.append(", ").append(a.mp).append(" MP");
 		}
@@ -37,9 +37,12 @@ public class AbilityDescription {
 			s.append("\n");
 		}
 
+		final String p1 = s.toString();
+		s = new StringBuilder();
 		generateTopLevelAbility(s, a);
+		final String p2 = s.toString();
 
-		return s.toString();
+		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
 	}
 
 	private static void generateTopLevelAbility(StringBuilder s, AbilityInfo a) {
@@ -53,7 +56,10 @@ public class AbilityDescription {
 
 		Optional<AbilityInfo> next = a.subsequent;
 		if (next.isPresent()) {
-			s.append("Next, from each of the previous targets, ");
+			s.append(" Next, ");
+			if (a.range.range > 0 && next.get().range.range > 0) {
+				s.append("from each of the previous targets, ");
+			}
 			generateTopLevelAbility(s, next.get());
 		}
 	}
@@ -105,63 +111,82 @@ public class AbilityDescription {
 	}
 
 	private static void generateAbility(StringBuilder s, AbilityInfo a) {
+		final InstantEffectInfo obstacles;
+		try {
+			obstacles = new InstantEffectInfo("obstacles");
+		} catch (Exception e) {
+			throw new RuntimeException("obstacles type is invalid.  This cannot happen");
+		}
+
 		boolean isSecondary = false;
 		if (a.instantBefore.isPresent()) {
-			generateInstantEffect(s, a, a.instantBefore.get(), isSecondary);
+			if (!(a.zone == AbilityZoneType.BOUND_ZONE && a.instantBefore.get().equals(obstacles))) {
+				generateInstantEffect(s, a, a.instantBefore.get(), isSecondary);
+				isSecondary = true;
+			}
+		}
+
+		boolean noDamage = false;
+		if (a.eff == 0) {
+			noDamage = true;
+
+		} else if (a.heal) {
+			if (isSecondary) s.append(", then ");
+
+			s.append("heal");
+			generateTargetMode(s, a, isSecondary, false);
+			s.append(" for ").append(formatDouble(a.eff, 2)).append("x heal");
+			isSecondary = true;
+
+		} else {
+			if (isSecondary) s.append(", then ");
+
+			s.append("attack");
+			generateTargetMode(s, a, isSecondary, false);
+			s.append(" for ").append(formatDouble(a.eff, 2)).append("x damage");
 			isSecondary = true;
 		}
 
-		if (a.eff != 0) {
-			if (isSecondary) s.append(", then ");
-			boolean noDamage = false;
-			if (a.eff == 0) {
-				noDamage = true;
-			} else if (a.heal) {
-				s.append("heal");
-				generateTargetMode(s, a, isSecondary, false);
-				s.append(" for ").append(formatDouble(a.eff, 2)).append("x heal");
-			} else {
-				s.append("attack");
-				generateTargetMode(s, a, isSecondary, false);
-				s.append(" for ").append(formatDouble(a.eff, 2)).append("x damage");
-			}
+		if (a.statusEffect.isPresent()) {
+			if (noDamage) {
+				if (isSecondary) s.append(", then ");
 
-			if (a.statusEffect.isPresent()) {
-				if (noDamage) {
-					if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
-						s.append("give ");
-					} else {
-						s.append("inflict ");
-					}
-
-					s.append(a.statusEffect.get().toString());
-
-					if (a.chance < 1f) {
-						s.append(" with a ").append(formatPercent(a.chance)).append(" chance of success");
-					}
-
-				} else if (a.chance < 1f) {
-					s.append(" with a ").append(formatPercent(a.chance)).append(" chance to");
-					if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
-						s.append(" give ");
-					} else {
-						s.append(" inflict ");
-					}
+				if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
+					s.append("give ");
 				} else {
-					if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
-						s.append(", giving ");
-					} else {
-						s.append(", inflicting ");
-					}
+					s.append("inflict ");
 				}
 
+				s.append(a.statusEffect.get().toString());
+
+				if (a.chance < 1f) {
+					s.append(" with a ").append(formatPercent(a.chance)).append(" chance of success");
+				}
+
+			} else if (a.chance < 1f) {
+				s.append(" with a ").append(formatPercent(a.chance)).append(" chance to");
+				if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
+					s.append(" give ");
+				} else {
+					s.append(" inflict ");
+				}
+				s.append(a.statusEffect.get().toString());
+
+			} else {
+				if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
+					s.append(", giving ");
+				} else {
+					s.append(", inflicting ");
+				}
 				s.append(a.statusEffect.get().toString());
 			}
 
 			isSecondary = true;
 		}
 
+
 		if (a.instantAfter.isPresent()) {
+			if (isSecondary) s.append(", then ");
 			generateInstantEffect(s, a, a.instantAfter.get(), isSecondary);
 		}
 
@@ -187,7 +212,9 @@ public class AbilityDescription {
 	private static String formatDouble(double d, int decimalPlaces) {
 		String r = "" + Math.round(d * (Math.pow(10, decimalPlaces)));
 		while (r.length() < (decimalPlaces + 1)) r = "0" + r;
-		return r.substring(0, 1) + "." + r.substring(1);
+		while (r.endsWith("0")) r = r.substring(0, r.length() - 1);
+		r = r.substring(0, 1) + "." + r.substring(1);
+		if (r.endsWith(".")) return r.substring(0, r.length() - 1); else return r;
 	}
 
 	private static String formatPercent(double d) {
@@ -267,21 +294,30 @@ public class AbilityDescription {
 	private static void generateSecondaryTargetMode(
 		StringBuilder s, AbilityInfo a, boolean noTargetCharacters
 	) {
-			if (noTargetCharacters) {
-				s.append(" all targeted squares");
-			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
-				s.append(" all targeted characters");
-			} else if (a.range.targetMode.enemies) {
-				s.append(" all targeted enemies");
-			} else if (a.range.targetMode.allies) {
-				s.append(" all targeted allies");
-			} else if (a.range.targetMode.self){
-				s.append(" yourself (only if you targeted yourself)");
-			}
+		boolean trapZone = a.trap || a.zone == AbilityZoneType.BOUND_ZONE;
 
-			if (a.range.targetMode.self && !noTargetCharacters) {
+		if (noTargetCharacters) {
+			s.append(" all targeted squares");
+		} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
+			s.append(" all targeted characters");
+		} else if (a.range.targetMode.enemies) {
+			s.append(" all targeted enemies");
+		} else if (a.range.targetMode.allies) {
+			s.append(" all targeted allies");
+		} if (a.range.targetMode.self) {
+			s.append(" yourself");
+			if (!trapZone) {
+				s.append(" (only if you targeted yourself)");
+			}
+		}
+
+		if (a.range.targetMode.self && !noTargetCharacters) {
+			if (trapZone) {
+				s.append(" (including yourself)");
+			} else {
 				s.append(" (including yourself if you targeted yourself)");
 			}
+		}
 	}
 
 	private static void generateTargetMode(
@@ -295,15 +331,10 @@ public class AbilityDescription {
 		boolean trapZone = a.trap || a.zone == AbilityZoneType.BOUND_ZONE;
 
 		if (a.range.range == 0 || trapZone) {
-			if (a.range.radius > 0) {
-				if (a.range.targetMode.self && !noTargetCharacters && !a.trap) {
-					s.append(" yourself");
-					if (a.range.targetMode.enemies || a.range.targetMode.allies) {
-						if (!trapZone) s.append(" and"); else s.append(" or");
-					}
-				}
-
-				if (!trapZone) s.append(" all"); else s.append(" any");
+			if (a.range.radius > 0 && a.zone != AbilityZoneType.BOUND_ZONE) {
+				if (a.trap) s.append(" the target and");
+				
+				s.append(" all");
 				if (a.range.radius == 1) s.append(" adjacent");
 
 				final String cont;
@@ -321,6 +352,10 @@ public class AbilityDescription {
 					cont = "allies";
 				}
 
+				if (a.range.targetMode.self) {
+					s.append(" (including yourself)");
+				}
+
 				if (a.range.radius > 1 && !trapZone) {
 					s.append(" within range ").append(a.range.radius);
 				}
@@ -336,7 +371,7 @@ public class AbilityDescription {
 			} else {
 				if (noTargetCharacters) {
 					s.append(" your square");
-				} else if (trapZone) {
+				} else if (a.zone == AbilityZoneType.BOUND_ZONE) {
 					if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 						s.append(" any character");
 					} else if (a.range.targetMode.enemies) {
@@ -344,12 +379,17 @@ public class AbilityDescription {
 					} else {
 						s.append(" any ally");
 					}
+					if (a.range.targetMode.self) {
+						s.append(" (including yourself)");
+					}
+				} else if (a.trap) {
+					s.append(" the target");
 				} else {
 					s.append(a.range.targetMode.toString())
 						.append(" (but this is range 0 so enemies and allies cannot be affected)");
 				}
 			}
-		} else {
+		} else if (a.range.radius == 0) {
 			if (a.range.nTargets == 0) {
 				s.append(" NO");
 			} else if (a.range.nTargets == 1) {
@@ -358,18 +398,13 @@ public class AbilityDescription {
 
 			if (a.range.range == 1) s.append(" adjacent");
 
-			final String cont;
 			if (noTargetCharacters) {
-				cont = "squares";
 				s.append(a.range.nTargets == 1? " square" : " squares");
 			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
-				cont = "characters";
 				s.append(a.range.nTargets == 1? " character" : " characters");
 			} else if (a.range.targetMode.enemies) {
-				cont = "enemies";
 				s.append(a.range.nTargets == 1? " enemy" : " enemies");
 			} else {
-				cont = "allies";
 				s.append(a.range.nTargets == 1? " ally" : " allies");
 			}
 
@@ -377,14 +412,31 @@ public class AbilityDescription {
 				s.append(" (you can also target yourself)");
 			}
 
-			if (a.range.radius > 0) {
-				s.append(" and all ").append(cont).append(" within ");
-				if (a.range.radius == 1) {
-					s.append("one square");
-				} else {
-					s.append(a.range.radius).append(" squares");
-				}
-				s.append(" of the targeted squares");
+		} else {
+			s.append(" all");
+
+			if (noTargetCharacters) {
+				s.append(" squares");
+			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
+				s.append(" characters");
+			} else if (a.range.targetMode.enemies) {
+				s.append(" enemies");
+			} else {
+				s.append(" allies");
+			}
+
+			s.append(" within");
+
+			if (a.range.radius == 1) {
+				s.append(" one square");
+			} else {
+				s.append(" ").append(a.range.radius).append(" squares");
+			}
+
+			if (a.range.nTargets == 1) {
+				s.append(" of the targeted square");
+			} else {
+				s.append(" of any of the ").append(a.range.nTargets).append(" targeted squares");
 			}
 		}
 	}

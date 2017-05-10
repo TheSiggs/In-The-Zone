@@ -34,6 +34,18 @@ public class InstantEffectInfo {
 		this.param = paramv;
 	}
 
+	@Override public int hashCode() {
+		return type.hashCode() * param;
+	}
+
+	@Override public boolean equals(Object b) {
+		if (b == null) return false;
+		else if (b instanceof InstantEffectInfo) {
+			final InstantEffectInfo i = (InstantEffectInfo) b;
+			return i.type == this.type && i.param == this.param;
+		} else return false;
+	}
+
 	/**
 	 * Determine if this instant effect is a field effect (i.e. it doesn't need
 	 * an explicit target).

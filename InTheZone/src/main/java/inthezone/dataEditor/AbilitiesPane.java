@@ -58,7 +58,7 @@ public class AbilitiesPane extends VBox {
 	private final Button addMana = new Button("Add mana ability");
 	private final Button up = new Button("Up");
 	private final Button down = new Button("Down");
-	private final TextArea description = new TextArea();
+	private final TextArea description = new TextArea("<Select ability>");
 	
 	private final TreeTableColumn<AbilityInfoModel, Boolean> banned = new TreeTableColumn<>("Banned");
 	private final TreeTableColumn<AbilityInfoModel, String> name = new TreeTableColumn<>("Name");
@@ -164,8 +164,12 @@ public class AbilitiesPane extends VBox {
 
 		selection.selectedItemProperty().addListener((v, o, n) -> {
 			try {
-				description.setText((
-					new AbilityDescription(encodeAbility(n, false))).toString());
+				if (n == null) {
+					description.setText("<Select ability>");
+				} else {
+					description.setText((
+						new AbilityDescription(encodeAbility(n, false))).toString());
+				}
 			} catch (CorruptDataException e) {
 				description.setText(e.getMessage());
 			}

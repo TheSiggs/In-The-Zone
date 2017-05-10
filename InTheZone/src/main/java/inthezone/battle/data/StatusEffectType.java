@@ -87,5 +87,31 @@ public enum StatusEffectType {
 				throw new CorruptDataException("Invalid status effect " + s);
 		}
 	}
+
+	@Override public String toString() {
+		switch (this) {
+			case ACCELERATED: return "accelerated";
+			case DAZED: return "dazed";
+			case DEBILITATED: return "debilitated";
+			case ENERGIZED: return "energized";
+			case FEARED: return "feared";
+			case IMPRISONED: return "imprisoned";
+			case PRECISE: return "precise";
+			case RESISTANT: return "resistant";
+			case VULNERABLE: return "vulnerable";
+			case ONGOING: return "ongoing";
+			case PANICKED: return "panicked";
+			case REGENERATION: return "regeneration";
+			case SILENCED: return "silenced";
+			case SLOWED: return "slowed";
+			case STRENGTHENED: return "strengthened";
+			case STUNNED: return "stunned";
+			case VAMPIRISM: return "vampirism";
+			case WEAKENED: return "weakened";
+			case COVER: return "cover";
+			default:
+				throw new RuntimeException("This cannot happen");
+		}
+	}
 }
 

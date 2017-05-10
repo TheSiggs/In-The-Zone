@@ -16,5 +16,16 @@ public enum AbilityType {
 			default: throw new CorruptDataException("Unknown ability type " + s);
 		}
 	}
+
+	@Override public String toString() {
+		switch (this) {
+			case BASIC: return "basic";
+			case SPECIAL: return "special";
+			case SKILL: return "skill";
+			case SPELL: return "spell";
+			default:
+				throw new RuntimeException("This cannot happen");
+		}
+	}
 }
 

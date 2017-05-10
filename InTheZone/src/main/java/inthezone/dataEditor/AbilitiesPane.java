@@ -1,13 +1,18 @@
 package inthezone.dataEditor;
 
+import com.diffplug.common.base.Errors;
+import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.data.Range;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.StatusEffectType;
+import inthezone.battle.data.TargetMode;
+import isogame.engine.CorruptDataException;
 import isogame.engine.SpriteInfo;
 import isogame.gui.FloatingField;
 import isogame.gui.PositiveIntegerField;
@@ -28,6 +33,7 @@ import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.control.cell.ChoiceBoxTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
@@ -37,8 +43,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AbilitiesPane extends VBox {
@@ -52,6 +58,7 @@ public class AbilitiesPane extends VBox {
 	private final Button addMana = new Button("Add mana ability");
 	private final Button up = new Button("Up");
 	private final Button down = new Button("Down");
+	private final TextArea description = new TextArea();
 	
 	private final TreeTableColumn<AbilityInfoModel, Boolean> banned = new TreeTableColumn<>("Banned");
 	private final TreeTableColumn<AbilityInfoModel, String> name = new TreeTableColumn<>("Name");
@@ -139,6 +146,10 @@ public class AbilitiesPane extends VBox {
 	public AbilitiesPane(WritableValue<Boolean> changed, GameDataFactory gameData) {
 		super();
 
+		description.setEditable(false);
+		description.setWrapText(true);
+		description.setPrefRowCount(3);
+
 		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i);
 
 		tableRoot = new TreeItem<>(new AbilityInfoModel(false, false));
@@ -151,9 +162,18 @@ public class AbilitiesPane extends VBox {
 			table.getSelectionModel();
 		selected = selection.getSelectedIndices();
 
+		selection.selectedItemProperty().addListener((v, o, n) -> {
+			try {
+				description.setText((
+					new AbilityDescription(encodeAbility(n, false))).toString());
+			} catch (CorruptDataException e) {
+				description.setText(e.getMessage());
+			}
+		});
+
 		tools.getChildren().addAll(add, remove, addSubsequent, addMana, up, down);
 		VBox.setVgrow(table, Priority.ALWAYS);
-		this.getChildren().addAll(tools, table);
+		this.getChildren().addAll(tools, table, description);
 
 		add.disableProperty().bind(isCharacterLoaded.not());
 		remove.disableProperty().bind(Bindings.isEmpty(selected));
@@ -412,14 +432,102 @@ public class AbilitiesPane extends VBox {
 			recursion, instantBefore, instantAfter, statusEffect);
 	}
 
-	private static <S, T> void hookOnEditCommit(
-		TreeTableColumn<S, T> column, WritableValue<Boolean> changed
+	private <S, T> void hookOnEditCommit(
+		TreeTableColumn<S, T> column,
+		WritableValue<Boolean> changed
 	) {
 		EventHandler<TreeTableColumn.CellEditEvent<S,T>> oldHandler = column.getOnEditCommit();
+
+		TreeItem<AbilityInfoModel> i = table.getSelectionModel().getSelectedItem();
+		if (i != null) {
+			try {
+				description.setText((
+					new AbilityDescription(encodeAbility(i, false))).toString());
+			} catch (CorruptDataException e) {
+				description.setText(e.getMessage());
+			}
+		}
+
 		column.setOnEditCommit(e -> {
 			changed.setValue(true);
 			oldHandler.handle(e);
 		});
 	}
+
+	static AbilityInfo encodeAbility(
+		TreeItem<AbilityInfoModel> item, boolean isMana
+	) throws CorruptDataException
+	{
+		try {
+			Optional<AbilityInfo> mana;
+			if (isMana) mana = Optional.empty(); else {
+				mana = item.getChildren().stream()
+					.filter(i -> i.getValue().getIsMana()).findAny()
+					.map(Errors.rethrow().wrapFunction(i -> encodeAbility(i, true)));
+			}
+			List<TreeItem<AbilityInfoModel>> subs =
+				item.getChildren().stream()
+					.filter(i -> i.getValue().getIsSubsequent())
+					.collect(Collectors.toList());
+			Optional<AbilityInfo> subsequent = Optional.empty();
+			for (int i = subs.size() - 1; i >= 0; i--) {
+				subsequent = Optional.of(encodeAbility0(
+					subs.get(i).getValue(), Optional.empty(), subsequent));
+			}
+			return encodeAbility0(item.getValue(), mana, subsequent);
+		} catch (RuntimeException e) {
+			if (e.getCause() instanceof CorruptDataException) {
+				throw (CorruptDataException) e.getCause();
+			} else throw e;
+		}
+	}
+
+	static AbilityInfo encodeAbility0(
+		AbilityInfoModel a,
+		Optional<AbilityInfo> mana,
+		Optional<AbilityInfo> subsequent
+	) throws CorruptDataException
+	{
+		Optional<InstantEffectInfo> ib = Optional.empty();
+		Optional<InstantEffectInfo> ia = Optional.empty();
+		Optional<StatusEffectInfo> se = Optional.empty();
+
+		try {
+			ib = Optional.of(new InstantEffectInfo(a.getInstantBefore()));
+		} catch (CorruptDataException e) { /* IGNORE */ }
+		try {
+			ia = Optional.of(new InstantEffectInfo(a.getInstantAfter()));
+		} catch (CorruptDataException e) { /* IGNORE */ }
+		try {
+			se = Optional.of(new StatusEffectInfo(a.getStatusEffect()));
+		} catch (CorruptDataException e) { /* IGNORE */ }
+
+		return new AbilityInfo(
+			a.getBanned(),
+			a.getName(),
+			AbilityType.parse(a.getType()),
+			a.getTrap(),
+			AbilityZoneType.fromString(a.getZone()),
+			Optional.ofNullable(a.getZoneTrapSprite()),
+			a.getAP(),
+			a.getMP(),
+			a.getPP(),
+			a.getEff(),
+			a.getChance(),
+			a.getHeal(),
+			new Range(
+				a.getRange(),
+				a.getRadius(),
+				a.getPiercing(),
+				new TargetMode(a.getTargetMode()),
+				a.getnTargets(),
+				a.getLOS()
+			),
+			mana,
+			subsequent,
+			a.getRecursion(),
+			ib, ia, se);
+	}
+
 }
 

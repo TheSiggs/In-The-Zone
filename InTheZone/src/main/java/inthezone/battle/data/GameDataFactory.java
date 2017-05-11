@@ -168,6 +168,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 		return stages.values();
 	}
 
+	public int getPriorityLevel(String l) {
+		return globalLibrary.priorities.indexOf(l);
+	}
+
 	/**
 	 * Get all the sprites in the global library.
 	 * */
@@ -219,7 +223,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 			o.put("versionNumber", ++versionNumber);
 			o.put("stages", s);
 			o.put("characters", c);
-			out.print(o);
+			out.print(o.toJSONString());
 		}
 	}
 

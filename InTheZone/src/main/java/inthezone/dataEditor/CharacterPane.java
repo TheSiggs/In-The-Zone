@@ -213,7 +213,10 @@ public class CharacterPane extends TitledPane {
 		this.setContent(grid);
 		this.textProperty().bind(name.textProperty());
 
-		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i);
+		final int CHARACTER = gameData.getPriorityLevel("CHARACTER");
+		for (SpriteInfo i : gameData.getGlobalSprites()) {
+			if (i.priority == CHARACTER) spriteList.add(i);
+		}
 		sprite.getSelectionModel().select(character.sprite);
 
 		this.expandedProperty().addListener((v, oldv, newv) -> {

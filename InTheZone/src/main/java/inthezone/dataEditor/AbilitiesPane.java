@@ -150,7 +150,11 @@ public class AbilitiesPane extends VBox {
 		description.setWrapText(true);
 		description.setPrefRowCount(3);
 
-		for (SpriteInfo i : gameData.getGlobalSprites()) spriteList.add(i);
+		final int TRAP = gameData.getPriorityLevel("TRAP");
+		final int ZONE = gameData.getPriorityLevel("ZONE");
+		for (SpriteInfo i : gameData.getGlobalSprites()) {
+			if (i.priority == ZONE || i.priority == TRAP) spriteList.add(i);
+		}
 
 		tableRoot = new TreeItem<>(new AbilityInfoModel(false, false));
 		tableRoot.setExpanded(true);

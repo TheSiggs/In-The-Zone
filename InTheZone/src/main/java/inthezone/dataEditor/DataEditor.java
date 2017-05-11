@@ -24,7 +24,7 @@ public class DataEditor extends Application {
 		Map<String, String> args = getParameters().getNamed();
 
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 960, 540);
+		Scene scene = new Scene(root, 960, 640);
 
 		try {
 			Optional<File> dataDir;

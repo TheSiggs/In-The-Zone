@@ -2,11 +2,11 @@ package inthezone.dataEditor;
 
 import inthezone.battle.data.GameDataFactory;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -47,11 +47,33 @@ public class DataEditor extends Application {
 			root.setCenter(abilitiesPane);
 			root.setBottom(null);
 
+			primaryStage.setOnCloseRequest(event -> {
+				if (charactersPane != null && !charactersPane.gameDataSaved()) {
+					final Alert save = new Alert(Alert.AlertType.CONFIRMATION,
+						"Save before closing?", ButtonType.YES, ButtonType.NO);
+					final Optional<ButtonType> r = save.showAndWait();
+
+					if (!r.isPresent()) {
+						event.consume();
+					} else {
+						ButtonType rr = r.get();
+						if (rr.equals(ButtonType.YES)) {
+							charactersPane.saveGameData();
+							if (!charactersPane.gameDataSaved()) event.consume();
+						}
+					}
+				}
+			});
+
 			primaryStage.setTitle("Data editor");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch (Exception e) {
 			e.printStackTrace();
+			Alert error = new Alert(Alert.AlertType.ERROR);
+			error.setTitle("Unexpected error");
+			error.setHeaderText(e.toString());
+			error.showAndWait();
 			System.exit(1);
 		}
 	}
@@ -59,8 +81,7 @@ public class DataEditor extends Application {
 	public File getDataDir(Stage primaryStage) {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Select data directory...");
-		File dataDir = directoryChooser.showDialog(primaryStage);
-		return dataDir;
+		return directoryChooser.showDialog(primaryStage);
 	}
 }
 

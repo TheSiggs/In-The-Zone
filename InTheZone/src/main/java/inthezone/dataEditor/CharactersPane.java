@@ -29,6 +29,10 @@ public class CharactersPane extends VBox {
 	private final Button remove = new Button("Remove");
 	private final Accordion characters;
 
+	private final BooleanProperty changed;
+	private final File dataDir;
+	private final GameDataFactory gameData;
+
 	private List<File> getStages(File baseDir) {
 		List<File> r = Arrays.stream(baseDir.listFiles())
 			.filter(f -> f.getName().endsWith(".map"))
@@ -48,6 +52,10 @@ public class CharactersPane extends VBox {
 	) {
 		super();
 
+		this.gameData = gameData;
+		this.dataDir = dataDir;
+		this.changed = changed;
+
 		this.tools.getChildren().addAll(save, add, remove);
 
 		save.disableProperty().bind(changed.not());
@@ -61,33 +69,7 @@ public class CharactersPane extends VBox {
 
 		this.getChildren().addAll(tools, characters);
 
-		save.setOnAction(event -> {
-			try {
-				List<File> stages = getStages(dataDir);
-				List<CharacterInfo> cdata = characters.getPanes().stream()
-					.map(Errors.rethrow().wrapFunction(
-						c -> ((CharacterPane) c).getCharacter()))
-					.collect(Collectors.toList());
-
-				gameData.writeToStream(
-					new FileOutputStream(new File(dataDir, GameDataFactory.gameDataName)),
-					stages, cdata
-				);
-				changed.setValue(false);
-			} catch (IOException e) {
-				Alert error = new Alert(Alert.AlertType.ERROR);
-				error.setTitle("Error saving game data");
-				error.setHeaderText(e.toString());
-				error.showAndWait();
-			} catch (RuntimeException e) {
-				if (e.getCause() instanceof CorruptDataException) {  
-					Alert error = new Alert(Alert.AlertType.ERROR);
-					error.setTitle("Error in data");
-					error.setHeaderText(e.toString());
-					error.showAndWait();
-				}
-			}
-		});
+		save.setOnAction(event -> saveGameData());
 
 		add.setOnAction(event -> {
 			Stats s = new Stats(3, 3, 1, 1, 1, 1);
@@ -126,6 +108,46 @@ public class CharactersPane extends VBox {
 			}
 			changed.setValue(true);
 		});
+	}
+
+	public boolean gameDataSaved() {
+		return !changed.getValue();
+	}
+
+	/**
+	 * Best effort save game data.
+	 * */
+	public void saveGameData() {
+		try {
+			final List<File> stages = getStages(dataDir);
+			final List<CharacterInfo> cdata = characters.getPanes().stream()
+				.map(Errors.rethrow().wrapFunction(
+					c -> ((CharacterPane) c).getCharacter()))
+				.collect(Collectors.toList());
+
+			gameData.writeToStream(
+				new FileOutputStream(new File(dataDir, GameDataFactory.gameDataName)),
+				stages, cdata
+			);
+			changed.setValue(false);
+		} catch (IOException e) {
+			final Alert error = new Alert(Alert.AlertType.ERROR);
+			error.setTitle("Error saving game data");
+			error.setHeaderText(e.toString());
+			error.showAndWait();
+		} catch (Exception e) {
+			if (e.getCause() instanceof CorruptDataException) {  
+				final Alert error = new Alert(Alert.AlertType.ERROR);
+				error.setTitle("Error in data");
+				error.setHeaderText(e.toString());
+				error.showAndWait();
+			} else {
+				final Alert error = new Alert(Alert.AlertType.ERROR);
+				error.setTitle("Unexpected error");
+				error.setHeaderText(e.toString());
+				error.showAndWait();
+			}
+		}
 	}
 }
 

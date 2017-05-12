@@ -19,8 +19,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class UseAbilityCommand extends Command {
 	private MapPoint agent;
@@ -77,24 +78,23 @@ public class UseAbilityCommand extends Command {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.ABILITY.toString());
 		r.put("agent", agent.getJSON());
 		r.put("agentType", agentType.toString());
 		r.put("ability", ability);
 		r.put("subsequentLevel", subsequentLevel);
-		JSONArray ta = new JSONArray();
-		for (DamageToTarget d : targets) ta.add(d.getJSON());
+		final JSONArray ta = new JSONArray();
+		for (DamageToTarget d : targets) ta.put(d.getJSON());
 		r.put("targets", ta);
 
-		JSONArray tsa = new JSONArray();
-		for (MapPoint p : targetSquares) tsa.add(p.getJSON());
+		final JSONArray tsa = new JSONArray();
+		for (MapPoint p : targetSquares) tsa.put(p.getJSON());
 		r.put("targetSquares", tsa);
 
-		JSONArray cs = new JSONArray();
-		for (MapPoint p : constructed) cs.add(p.getJSON());
+		final JSONArray cs = new JSONArray();
+		for (MapPoint p : constructed) cs.put(p.getJSON());
 		r.put("constructed", cs);
 		return r;
 	}
@@ -102,57 +102,39 @@ public class UseAbilityCommand extends Command {
 	public static UseAbilityCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object oagent = json.get("agent");
-		Object oagentType = json.get("agentType");
-		Object oability = json.get("ability");
-		Object otargets = json.get("targets");
-		Object otargetSquares = json.get("targetSquares");
-		Object oconstructed = json.get("constructed");
-		Object osubsequentLevel = json.get("subsequentLevel");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (oagent == null) throw new ProtocolException("Missing ability agent");
-		if (oagentType == null) throw new ProtocolException("Missing ability agent type");
-		if (oability == null) throw new ProtocolException("Missing ability");
-		if (otargets == null) throw new ProtocolException("Missing ability targets");
-		if (otargetSquares == null) throw new ProtocolException("Missing ability targetSquares");
-		if (oconstructed == null) throw new ProtocolException("Missing ability constructed");
-		if (osubsequentLevel == null) throw new ProtocolException("Missing ability subsequent level");
-
-		if (CommandKind.fromString((String) okind) != CommandKind.ABILITY)
-			throw new ProtocolException("Expected ability command");
-
 		try {
-			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			AbilityAgentType agentType =
-				AbilityAgentType.fromString((String) oagentType);
-			String ability = (String) oability;
-			Number subsequentLevel = (Number) osubsequentLevel;
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final AbilityAgentType agentType = AbilityAgentType.fromString(json.getString("agentType"));
+			final String ability = json.getString("ability");
+			final JSONArray rawTargets = json.getJSONArray("targets");
+			final JSONArray rawTargetSquares = json.getJSONArray("targetSquares");
+			final JSONArray rawConstructed = json.getJSONArray("constructed");
+			int subsequentLevel = json.getInt("subsequentLevel");
 
-			JSONArray rawTargets = (JSONArray) otargets;
-			Collection<DamageToTarget> targets = new ArrayList<>();
-			for (int i = 0; i < rawTargets.size(); i++) {
-				targets.add(DamageToTarget.fromJSON((JSONObject) rawTargets.get(i)));
+			if (kind != CommandKind.ABILITY)
+				throw new ProtocolException("Expected ability command");
+
+			final Collection<DamageToTarget> targets = new ArrayList<>();
+			for (int i = 0; i < rawTargets.length(); i++) {
+				targets.add(DamageToTarget.fromJSON(rawTargets.getJSONObject(i)));
 			}
 
-			JSONArray rawTargetSquares = (JSONArray) otargetSquares;
-			Collection<MapPoint> targetSquares = new ArrayList<>();
-			for (int i = 0; i < rawTargetSquares.size(); i++) {
-				targetSquares.add(MapPoint.fromJSON((JSONObject) rawTargetSquares.get(i)));
+			final Collection<MapPoint> targetSquares = new ArrayList<>();
+			for (int i = 0; i < rawTargetSquares.length(); i++) {
+				targetSquares.add(MapPoint.fromJSON(rawTargetSquares.getJSONObject(i)));
 			}
 
-			JSONArray rawConstructed = (JSONArray) oconstructed;
-			Collection<MapPoint> constructed = new ArrayList<>();
-			for (int i = 0; i < rawConstructed.size(); i++) {
-				constructed.add(MapPoint.fromJSON((JSONObject) rawConstructed.get(i)));
+			final Collection<MapPoint> constructed = new ArrayList<>();
+			for (int i = 0; i < rawConstructed.length(); i++) {
+				constructed.add(MapPoint.fromJSON(rawConstructed.getJSONObject(i)));
 			}
 
 			return new UseAbilityCommand(
 				agent, agentType, ability, targetSquares, targets,
-				constructed, subsequentLevel.intValue());
+				constructed, subsequentLevel);
 
-		} catch (ClassCastException|CorruptDataException  e) {
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing ability command", e);
 		}
 	}

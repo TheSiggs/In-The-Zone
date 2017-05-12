@@ -2,7 +2,8 @@ package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Range implements HasJSONRepresentation {
 	public final int range;
@@ -27,9 +28,8 @@ public class Range implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("range", range);
 		r.put("piercing", piercing);
 		r.put("radius", radius);
@@ -42,33 +42,19 @@ public class Range implements HasJSONRepresentation {
 	public static Range fromJSON(JSONObject json)
 		throws CorruptDataException
 	{
-		Object rrange = json.get("range");
-		Object rpiercing = json.get("piercing");
-		Object rradius = json.get("radius");
-		Object rtargetMode = json.get("targetMode");
-		Object rnTargets = json.get("nTargets");
-		Object rlos = json.get("los");
-
-		if (rrange == null) throw new CorruptDataException("Missing range range");
-		if (rpiercing == null) throw new CorruptDataException("Missing piercing");
-		if (rtargetMode == null) throw new CorruptDataException("Missing targetMode");
-		if (rnTargets == null) throw new CorruptDataException("Missing nTargets");
-		if (rlos == null) throw new CorruptDataException("Missing los");
-
 		try {
-			Number range = (Number) rrange;
-			Boolean piercing = (Boolean) rpiercing;
-			Number radius = (Number) rradius;
-			String targetMode = (String) rtargetMode;
-			Number nTargets = (Number) rnTargets;
-			Boolean los = (Boolean) rlos;
+			final int range = json.getInt("range");
+			final boolean piercing = json.getBoolean("piercing");
+			final int radius = json.getInt("radius");
+			final String targetMode = json.getString("targetMode");
+			final int nTargets = json.getInt("nTargets");
+			final boolean los = json.getBoolean("los");
 
-			return new Range(
-				range.intValue(), radius.intValue(), piercing,
-				new TargetMode(targetMode),
-				nTargets.intValue(), los);
-		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in range", e);
+			return new Range(range, radius, piercing,
+				new TargetMode(targetMode), nTargets, los);
+
+		} catch (JSONException e) {
+			throw new CorruptDataException("Error parsing range, " + e.getMessage(), e);
 		}
 	}
 }

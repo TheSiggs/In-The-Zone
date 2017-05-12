@@ -2,6 +2,7 @@ package inthezone.battle.instant;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
+import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
@@ -14,8 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SimpleInstantEffect extends InstantEffect {
 	private final Collection<MapPoint> targets;
@@ -29,13 +31,12 @@ public class SimpleInstantEffect extends InstantEffect {
 		this.type = type;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
 		o.put("kind", type.toString());
 		o.put("agent", agent.getJSON()); 
-		for (MapPoint t : targets) a.add(t.getJSON());
+		for (MapPoint t : targets) a.put(t.getJSON());
 		o.put("targets", a);
 		return o;
 	}
@@ -43,29 +44,24 @@ public class SimpleInstantEffect extends InstantEffect {
 	public static SimpleInstantEffect fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object oagent = json.get("agent");
-		Object otargets = json.get("targets");
-
-		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (oagent == null) throw new ProtocolException("Missing effect agent");
-		if (otargets == null) throw new ProtocolException("Missing effect targets");
-
 		try {
-			InstantEffectType type = InstantEffectType.fromString((String) okind);
-			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			if (!(type == InstantEffectType.CLEANSE ||
-				type == InstantEffectType.DEFUSE ||
-				type == InstantEffectType.PURGE)
+			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final JSONArray rawTargets = json.getJSONArray("targets");
+
+			if (!(kind == InstantEffectType.CLEANSE ||
+				kind == InstantEffectType.DEFUSE ||
+				kind == InstantEffectType.PURGE)
 			) throw new ProtocolException("Expected cleanse, defuse or purge effect");
 
-			JSONArray rawTargets = (JSONArray) otargets;
-			List<MapPoint> targets = new ArrayList<>();
-			for (int i = 0; i < rawTargets.size(); i++) {
-				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
+			final List<MapPoint> targets = new ArrayList<>();
+			for (int i = 0; i < rawTargets.length(); i++) {
+				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
 			}
-			return new SimpleInstantEffect(targets, agent, type);
-		} catch (ClassCastException|CorruptDataException  e) {
+
+			return new SimpleInstantEffect(targets, agent, kind);
+
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing cleanse/purge/defuse effect", e);
 		}
 	}

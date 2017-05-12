@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Client configuration.
@@ -38,11 +37,21 @@ public class ClientConfig implements HasJSONRepresentation {
 		) {
 			if (in == null) throw new FileNotFoundException(
 				"File not found " + configFile);
-			JSONParser parser = new JSONParser();
-			JSONObject json = (JSONObject) parser.parse(in);
-			loadConfig(json, gameData);
+
+			final StringBuilder raw = new StringBuilder();
+			String line = null;
+			while ((line = in.readLine()) != null) raw.append(line);
+
+			loadConfig(new JSONObject(raw.toString()), gameData);
+
 		} catch (Exception e) {
 			System.err.println("Error reading config file: " + e.getMessage());
+
+			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			a.setHeaderText("Error reading config file \"" + configFile.toString() + "\"");
+			a.setContentText(e.getMessage());
+			a.showAndWait();
+
 			resetConfigFile();
 		}
 	}
@@ -53,19 +62,21 @@ public class ClientConfig implements HasJSONRepresentation {
 	public void loadConfig(JSONObject json, GameDataFactory gameData)
 		throws CorruptDataException
 	{
-		defaultPlayerName = Optional.empty();
+		this.defaultPlayerName = Optional.empty();
 		loadouts.clear();
 
-		Object oname = json.get("name");
-		Object oloadouts = json.get("loadouts");
 		try {
-			defaultPlayerName = Optional.ofNullable(oname).map(x -> (String) x);
-			if (oloadouts != null) {
+			final String name = json.optString("name", null);
+			final JSONArray loadouts = json.optJSONArray("loadouts");
+
+			this.defaultPlayerName = Optional.ofNullable(name);
+			if (loadouts != null) {
 				final List<JSONObject> ls =
-					jsonArrayToList((JSONArray) oloadouts, JSONObject.class);
-				for (JSONObject l : ls) loadouts.add(Loadout.fromJSON(l, gameData));
+					jsonArrayToList(loadouts, JSONObject.class);
+				for (JSONObject l : ls) this.loadouts.add(Loadout.fromJSON(l, gameData));
 			}
-		} catch (ClassCastException e) {
+
+		} catch (JSONException|ClassCastException e) {
 			throw new CorruptDataException("Type error in config file");
 		}
 	}
@@ -77,12 +88,11 @@ public class ClientConfig implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		defaultPlayerName.ifPresent(n -> o.put("name", n));
-		JSONArray a = new JSONArray();
-		for (Loadout l : loadouts) a.add(l.getJSON());
+		final JSONArray a = new JSONArray();
+		for (Loadout l : loadouts) a.put(l.getJSON());
 		o.put("loadouts", a);
 		return o;
 	}
@@ -99,8 +109,9 @@ public class ClientConfig implements HasJSONRepresentation {
 			out.print(getJSON().toString());
 		} catch (IOException e) {
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-			a.setHeaderText("Cannot create configuration file " +
-				configFile.toString() + ".  Your loadouts cannot be saved.");
+			a.setHeaderText("Cannot create configuration file \"" +
+				configFile.toString() + "\".  Your loadouts cannot be saved.");
+			a.setContentText(e.getMessage());
 			a.showAndWait();
 		}
 	}
@@ -108,8 +119,8 @@ public class ClientConfig implements HasJSONRepresentation {
 	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
 		throws ClassCastException
 	{
-		List<T> r = new ArrayList<>();
-		int limit = a.size();
+		final List<T> r = new ArrayList<>();
+		int limit = a.length();
 		for (int i = 0; i < limit; i++) {
 			r.add(clazz.cast(a.get(i)));
 		}

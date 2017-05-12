@@ -15,8 +15,9 @@ import isogame.engine.Sprite;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Contains all the data needed to start a new battle.  When executed, this
@@ -70,14 +71,13 @@ public class StartBattleCommand implements HasJSONRepresentation {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
-		JSONArray a1 = new JSONArray();
-		JSONArray a2 = new JSONArray();
+		final JSONObject r = new JSONObject();
+		final JSONArray a1 = new JSONArray();
+		final JSONArray a2 = new JSONArray();
 
-		for (MapPoint p : p1start) a1.add(p.getJSON());
-		for (MapPoint p : p2start) a2.add(p.getJSON());
+		for (MapPoint p : p1start) a1.put(p.getJSON());
+		for (MapPoint p : p2start) a2.put(p.getJSON());
 
 		r.put("kind", "Start");
 		r.put("stage", stage);
@@ -93,46 +93,31 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		JSONObject json, GameDataFactory gameData
 	) throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object ostage = json.get("stage");
-		Object op1First = json.get("p1First");
-		Object op1 = json.get("p1");
-		Object op2 = json.get("p2");
-		Object op1Start = json.get("p1Start");
-		Object op2Start = json.get("p2Start");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (ostage == null) throw new ProtocolException("Missing stage");
-		if (op1First == null) throw new ProtocolException("Missing p1First");
-		if (op1 == null) throw new ProtocolException("Missing p1 loadout");
-		if (op2 == null) throw new ProtocolException("Missing p2 loadout");
-		if (op1Start == null) throw new ProtocolException("Missing p1 start positions");
-		if (op2Start == null) throw new ProtocolException("Missing p2 start positions");
-
-		if (!((String) okind).equals("Start"))
-			throw new ProtocolException("Expected start command");
-
 		try {
-			String stage = (String) ostage;
-			boolean p1First = (Boolean) op1First;
-			Loadout p1 = Loadout.fromJSON((JSONObject) op1, gameData);
-			Loadout p2 = Loadout.fromJSON((JSONObject) op2, gameData);
-			JSONArray rawp1Start = (JSONArray) op1Start;
-			JSONArray rawp2Start = (JSONArray) op2Start;
-			List<MapPoint> p1Start = new ArrayList<>();
-			List<MapPoint> p2Start = new ArrayList<>();
+			final String kind = json.getString("kind");
+			final String stage = json.getString("stage");
+			final boolean p1First = json.getBoolean("p1First");
+			final Loadout p1 = Loadout.fromJSON(json.getJSONObject("p1"), gameData);
+			final Loadout p2 = Loadout.fromJSON(json.getJSONObject("p2"), gameData);
+			final JSONArray rawp1Start = json.getJSONArray("p1Start");
+			final JSONArray rawp2Start = json.getJSONArray("p2Start");
 
-			for (int i = 0; i < rawp1Start.size(); i++) {
-				p1Start.add(MapPoint.fromJSON((JSONObject) rawp1Start.get(i)));
+			if (!kind.equals("Start"))
+				throw new ProtocolException("Expected start command");
+
+			final List<MapPoint> p1Start = new ArrayList<>();
+			final List<MapPoint> p2Start = new ArrayList<>();
+
+			for (int i = 0; i < rawp1Start.length(); i++) {
+				p1Start.add(MapPoint.fromJSON(rawp1Start.getJSONObject(i)));
 			}
-			for (int i = 0; i < rawp2Start.size(); i++) {
-				p2Start.add(MapPoint.fromJSON((JSONObject) rawp2Start.get(i)));
+			for (int i = 0; i < rawp2Start.length(); i++) {
+				p2Start.add(MapPoint.fromJSON(rawp2Start.getJSONObject(i)));
 			}
 
 			return new StartBattleCommand(stage, p1First, p1, p2, p1Start, p2Start);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing start command", e);
-		} catch (CorruptDataException e) {
+
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing start command", e);
 		}
 	}

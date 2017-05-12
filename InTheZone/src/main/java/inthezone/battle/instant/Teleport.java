@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Teleport extends InstantEffect {
 	public final int range;
@@ -49,58 +50,46 @@ public class Teleport extends InstantEffect {
 		return destinations;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("kind", InstantEffectType.TELEPORT.toString());
 		o.put("agent", agent.getJSON());
 		o.put("range", range);
 
-		JSONArray ts = new JSONArray();
-		JSONArray ds = new JSONArray();
-		for (MapPoint t : targets) ts.add(t.getJSON());
-		for (MapPoint d : destinations) ds.add(d.getJSON());
+		final JSONArray ts = new JSONArray();
+		final JSONArray ds = new JSONArray();
+		for (MapPoint t : targets) ts.put(t.getJSON());
+		for (MapPoint d : destinations) ds.put(d.getJSON());
 
 		o.put("targets", ts);
 		o.put("destinations", ds);
 		return o;
 	}
 
-	public static Teleport fromJSON(JSONObject json)
-		throws ProtocolException
-	{
-		Object okind = json.get("kind");
-		Object oagent = json.get("agent");
-		Object orange = json.get("range");
-		Object otargets = json.get("targets");
-		Object odestinations = json.get("destinations");
-
-		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (oagent == null) throw new ProtocolException("Missing effect agent");
-		if (orange == null) throw new ProtocolException("Missing effect range");
-		if (otargets == null) throw new ProtocolException("Missing effect targets");
-		if (odestinations == null) throw new ProtocolException("Missing effect destinations");
-
+	public static Teleport fromJSON(JSONObject json) throws ProtocolException {
 		try {
-			if (InstantEffectType.fromString((String) okind) != InstantEffectType.TELEPORT)
+			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final int range = json.getInt("range");
+			final JSONArray rawTargets = json.getJSONArray("targets");
+			final JSONArray rawDestinations = json.getJSONArray("destinations");
+
+			if (kind != InstantEffectType.TELEPORT)
 				throw new ProtocolException("Expected teleport effect");
 
-			List<MapPoint> targets = new ArrayList<>();
-			List<MapPoint> destinations = new ArrayList<>();
+			final List<MapPoint> targets = new ArrayList<>();
+			final List<MapPoint> destinations = new ArrayList<>();
 
-			JSONArray rawTargets = (JSONArray) otargets;
-			JSONArray rawDestinations = (JSONArray) odestinations;
-			for (int i = 0; i < rawTargets.size(); i++) {
-				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
+			for (int i = 0; i < rawTargets.length(); i++) {
+				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
 			}
-			for (int i = 0; i < rawDestinations.size(); i++) {
-				destinations.add(MapPoint.fromJSON((JSONObject) rawDestinations.get(i)));
+			for (int i = 0; i < rawDestinations.length(); i++) {
+				destinations.add(MapPoint.fromJSON(rawDestinations.getJSONObject(i)));
 			}
 
-			Number range = (Number) orange;
-			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			return new Teleport(null, range.intValue(), targets, destinations, agent);
-		} catch (ClassCastException|CorruptDataException  e) {
+			return new Teleport(null, range, targets, destinations, agent);
+
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing teleport effect", e);
 		}
 	}

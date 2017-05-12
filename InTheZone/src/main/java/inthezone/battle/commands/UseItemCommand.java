@@ -9,7 +9,8 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class UseItemCommand extends Command {
 	private final MapPoint agent;
@@ -21,9 +22,9 @@ public class UseItemCommand extends Command {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
+		r.put("kind", CommandKind.ITEM.toString());
 		r.put("agent", agent.getJSON());
 		r.put("target", target.getJSON());
 		return r;
@@ -32,17 +33,17 @@ public class UseItemCommand extends Command {
 	public static UseItemCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object ragent = json.get("agent");
-		Object rtarget = json.get("target");
-
-		if (ragent == null) throw new ProtocolException("Missing agent in item command");
-		if (rtarget == null) throw new ProtocolException("Missing target in item command");
-
 		try {
-			MapPoint agent = MapPoint.fromJSON((JSONObject) ragent);
-			MapPoint target = MapPoint.fromJSON((JSONObject) rtarget);
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+
+			if (kind != CommandKind.ITEM)
+				throw new ProtocolException("Expected move command");
+
+			MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			MapPoint target = MapPoint.fromJSON(json.getJSONObject("target"));
+
 			return new UseItemCommand(agent, target);
-		} catch (ClassCastException|CorruptDataException e) {
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing item command");
 		}
 	}

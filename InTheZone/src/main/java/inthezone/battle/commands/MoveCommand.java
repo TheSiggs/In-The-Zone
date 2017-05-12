@@ -9,8 +9,9 @@ import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MoveCommand extends Command {
 	public final List<MapPoint> path;
@@ -30,12 +31,11 @@ public class MoveCommand extends Command {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		final JSONArray a = new JSONArray();
 		r.put("kind", CommandKind.MOVE.toString());
-		for (MapPoint p : path) a.add(p.getJSON());
+		for (MapPoint p : path) a.put(p.getJSON());
 		r.put("path", a);
 		return r;
 	}
@@ -43,26 +43,23 @@ public class MoveCommand extends Command {
 	public static MoveCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		final Object okind = json.get("kind");
-		final Object opath = json.get("path");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (opath == null) throw new ProtocolException("Missing move path");
-
-		if (CommandKind.fromString((String) okind) != CommandKind.MOVE)
-			throw new ProtocolException("Expected move command");
-
 		try {
-			final JSONArray rawPath = (JSONArray) opath;
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+			final JSONArray rawPath = json.getJSONArray("path");
+
+			if (kind != CommandKind.MOVE)
+				throw new ProtocolException("Expected move command");
+
 			final List<MapPoint> path = new ArrayList<>();
-			for (int i = 0; i < rawPath.size(); i++) {
-				path.add(MapPoint.fromJSON((JSONObject) rawPath.get(i)));
+			for (int i = 0; i < rawPath.length(); i++) {
+				path.add(MapPoint.fromJSON(rawPath.getJSONObject(i)));
 			}
 
 			// isPanic is always false here, because at this point the triggers have
 			// been resolved
 			return new MoveCommand(path, false);
-		} catch (ClassCastException|CorruptDataException|CommandException e) {
+
+		} catch (CorruptDataException|CommandException|JSONException e) {
 			throw new ProtocolException("Error parsing move command", e);
 		}
 	}

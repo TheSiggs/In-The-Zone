@@ -6,7 +6,8 @@ import inthezone.battle.data.StatusEffectInfo;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import java.util.Optional;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class StatusEffectFactory {
 	public static StatusEffect getEffect(
@@ -42,18 +43,16 @@ public class StatusEffectFactory {
 	public static StatusEffect fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object oinfo = json.get("info");
-		if (oinfo == null) throw new ProtocolException("Missing status effect type");
-
 		try {
-			StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
+			final StatusEffectInfo info = new StatusEffectInfo(json.getString("info"));
+
 			switch (info.type) {
 				case ONGOING:
 				case REGENERATION: return PointStatusEffect.fromJSON(json);
 				case FEARED: return FearedStatusEffect.fromJSON(json);
 				default: return getEffect(info, 0, null);
 			}
-		} catch (CorruptDataException|ClassCastException e) {
+		} catch (CorruptDataException|JSONException e) {
 			throw new ProtocolException("Error parsing status effect");
 		}
 	}

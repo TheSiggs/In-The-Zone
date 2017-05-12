@@ -4,7 +4,7 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 /**
  * Represents a single casting or recasting of an ability.

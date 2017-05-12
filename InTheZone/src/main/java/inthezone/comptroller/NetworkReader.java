@@ -9,7 +9,7 @@ import inthezone.protocol.ProtocolException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 public class NetworkReader implements Runnable {
 	private final BufferedReader in;

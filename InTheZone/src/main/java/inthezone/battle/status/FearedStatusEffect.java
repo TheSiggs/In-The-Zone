@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class FearedStatusEffect extends StatusEffect {
 	private final MapPoint agentPos;
@@ -41,9 +42,8 @@ public class FearedStatusEffect extends StatusEffect {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("info", info.toString());
 		r.put("agent", agent.getPos().getJSON());
 		return r;
@@ -52,17 +52,13 @@ public class FearedStatusEffect extends StatusEffect {
 	public static FearedStatusEffect fromJSON(JSONObject o)
 		throws ProtocolException
 	{
-		final Object oagent = o.get("agent");
-		final Object oinfo = o.get("info");
-
-		if (oinfo == null) throw new ProtocolException("Missing status effect type");
-		if (oagent == null) throw new ProtocolException("Missing agent");
-
 		try {
-			final StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
-			final MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
+			final MapPoint agent = MapPoint.fromJSON(o.getJSONObject("agent"));
+			final StatusEffectInfo info = new StatusEffectInfo(o.getString("info"));
+
 			return new FearedStatusEffect(info, agent);
-		} catch (ClassCastException|CorruptDataException e) {
+
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing feared status effect", e);
 		}
 	}

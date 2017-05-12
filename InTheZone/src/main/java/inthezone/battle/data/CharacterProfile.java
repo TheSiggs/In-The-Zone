@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CharacterProfile implements HasJSONRepresentation {
 	public final CharacterInfo rootCharacter;
@@ -88,11 +89,10 @@ public class CharacterProfile implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
-		JSONArray a = new JSONArray();
-		abilities.stream().forEach(x -> a.add(x.name));
+		final JSONObject r = new JSONObject();
+		final JSONArray a = new JSONArray();
+		abilities.stream().forEach(x -> a.put(x.name));
 		r.put("for", rootCharacter.name);
 		r.put("abilities", a);
 		r.put("basicAbility", basicAbility.name);
@@ -105,41 +105,34 @@ public class CharacterProfile implements HasJSONRepresentation {
 	public static CharacterProfile fromJSON(
 		JSONObject json, GameDataFactory gameData
 	) throws CorruptDataException {
-		Object oroot = json.get("for");
-		Object oabilities = json.get("abilities");
-		Object obasicAbility = json.get("basicAbility");
-		Object oattack = json.get("attack");
-		Object odefence = json.get("defence");
-		Object ohp = json.get("HP");
-
-		if (oroot == null) throw new CorruptDataException("Missing root in character profile");
-		if (oabilities == null) throw new CorruptDataException("Missing abilities in character profile");
-		if (obasicAbility == null) throw new CorruptDataException("Missing basicAbility in character profile");
-		if (oattack == null) throw new CorruptDataException("Missing attack in character profile");
-		if (odefence == null) throw new CorruptDataException("Missing defence in character profile");
-		if (ohp == null) throw new CorruptDataException("Missing HP in character profile");
-
 		try {
-			final CharacterInfo root = gameData.getCharacter((String) oroot);
+			final CharacterInfo root = gameData.getCharacter(json.getString("for"));
 			if (root == null) throw new CorruptDataException(
-				"No such character " + (String) oroot + " in character profile");
+				"No such character \"" + json.getString("for") + "\" in character profile");
 
 			final Collection<AbilityInfo> abilities =
-				jsonArrayToList((JSONArray) oabilities, String.class).stream()
+				jsonArrayToList(json.getJSONArray("abilities"), String.class).stream()
 					.map(n -> root.lookupAbility(n))
 					.collect(Collectors.toList());
 
-			final AbilityInfo basicAbility = root.lookupAbility((String) obasicAbility);
+			final AbilityInfo basicAbility =
+				root.lookupAbility(json.getString("basicAbility"));
 
 			if (abilities.stream().anyMatch(x -> x == null) || basicAbility == null)
 				throw new CorruptDataException("No such ability error in character profile");
 
-			return new CharacterProfile(root, abilities, basicAbility,
-				((Number) oattack).intValue(),
-				((Number) odefence).intValue(),
-				((Number) ohp).intValue());
+			final int attack = json.getInt("attack");
+			final int defence = json.getInt("defence");
+			final int hp = json.getInt("HP");
+
+			return new CharacterProfile(
+				root, abilities, basicAbility, attack, defence, hp);
+
 		} catch (ClassCastException e) {
 			throw new CorruptDataException("Type error in character profile", e);
+
+		} catch (JSONException e) {
+			throw new CorruptDataException("Error parsing character profile, " + e.getMessage(), e);
 		}
 	}
 
@@ -147,7 +140,7 @@ public class CharacterProfile implements HasJSONRepresentation {
 		throws ClassCastException
 	{
 		List<T> r = new ArrayList<>();
-		int limit = a.size();
+		int limit = a.length();
 		for (int i = 0; i < limit; i++) {
 			r.add(clazz.cast(a.get(i)));
 		}

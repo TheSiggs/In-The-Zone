@@ -8,7 +8,8 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A status effect that does ongoing damage or healing before the players turn.
@@ -23,9 +24,8 @@ public class HPStatusEffect extends StatusEffect {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("info", info.toString());
 		r.put("hp", hp);
 		return r;
@@ -34,17 +34,13 @@ public class HPStatusEffect extends StatusEffect {
 	public static HPStatusEffect fromJSON(JSONObject o)
 		throws ProtocolException
 	{
-		Object oinfo = o.get("info");
-		Object ohp = o.get("hp");
-
-		if (oinfo == null) throw new ProtocolException("Missing status effect type");
-		if (ohp == null) throw new ProtocolException("Missing hp buff");
-
 		try {
-			StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
+			final StatusEffectInfo info = new StatusEffectInfo(o.getString("info"));
+			final int hp = o.getInt("hp");
 
-			return new HPStatusEffect(info, ((Number) ohp).intValue());
-		} catch (ClassCastException|CorruptDataException  e) {
+			return new HPStatusEffect(info, hp);
+
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing hp status effect", e);
 		}
 	}

@@ -5,7 +5,8 @@ import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
 import isogame.engine.SpriteInfo;
 import java.util.Optional;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 public class AbilityInfo implements HasJSONRepresentation {
 	public final boolean banned;
@@ -76,9 +77,8 @@ public class AbilityInfo implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("banned", banned);
 		r.put("name", name);
 		r.put("type", type.toString());
@@ -104,55 +104,27 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public static AbilityInfo fromJSON(JSONObject json, Library lib)
 		throws CorruptDataException
 	{
-		final Object rbanned = json.get("banned");
-		final Object rname = json.get("name");
-		final Object rtype = json.get("type");
-		final Object rtrap = json.get("trap");
-		final Object rzoneTrapSprite = json.get("zoneTrapSprite");
-		final Object rzoneTurns = json.get("zoneTurns"); // deprecated
-		final Object rboundZone = json.get("boundZone"); // deprecated
-		final Object rzone = json.get("zone");
-		final Object rap = json.get("ap");
-		final Object rmp = json.get("mp");
-		final Object rpp = json.get("pp");
-		final Object reff = json.get("eff");
-		final Object rchance = json.get("chance");
-		final Object rheal = json.get("heal");
-		final Object rrange = json.get("range");
-		final Object rmana = json.get("mana");
-		final Object rsubsequent = json.get("subsequent");
-		final Object rrecursion = json.get("recursion");
-		final Object rinstantBefore = json.get("instantBefore");
-		final Object rinstantAfter = json.get("instantAfter");
-		final Object rstatusEffect = json.get("statusEffect");
-
 		try {
-			if (rname == null) throw new CorruptDataException("Missing name in ability");
-			final String name = (String) rname;
+			final boolean banned = json.optBoolean("banned", false);
+			final String name = json.getString("name");
+			final AbilityType type = AbilityType.parse(json.getString("type"));
+			final boolean trap = json.optBoolean("trap", false);
+			final String rzoneTrapSprite = json.optString("zoneTrapSprite", null);
+			final AbilityZoneType zone = AbilityZoneType.fromString(json.getString("zone"));
+			final int ap = json.getInt("ap");
+			final int mp = json.getInt("mp");
+			final int pp = json.getInt("pp");
+			final double eff = json.getDouble("eff");
+			final double chance = json.getDouble("chance");
+			final boolean heal = json.getBoolean("heal");
+			final Range range = Range.fromJSON(json.getJSONObject("range"));
+			final int recursion = json.getInt("recursion");
 
-			if (rtype == null) throw new CorruptDataException("Missing type in ability " + name);
-			if (rap == null) throw new CorruptDataException("Missing ap in ability " + name);
-			if (rmp == null) throw new CorruptDataException("Missing mp in ability " + name);
-			if (rpp == null) throw new CorruptDataException("Missing pp in ability " + name);
-			if (reff == null) throw new CorruptDataException("Missing eff in ability " + name);
-			if (rchance == null) throw new CorruptDataException("Missing chance in ability " + name);
-			if (rheal == null) throw new CorruptDataException("Missing heal in ability " + name);
-			if (rrange == null) throw new CorruptDataException("Missing range in ability " + name);
-			if (rrecursion == null) throw new CorruptDataException("Missing recursion in ability " + name);
-			if (rzone == null) throw new CorruptDataException("Missing zone type in ability " + name);
-
-			final boolean banned = rbanned == null? false : (Boolean) rbanned;
-			final AbilityType type = AbilityType.parse((String) rtype);
-			final boolean trap = rtrap == null? false : (Boolean) rtrap;
-			final Number ap = (Number) rap;
-			final Number mp = (Number) rmp;
-			final Number pp = (Number) rpp;
-			final Number eff = (Number) reff;
-			final Number chance = (Number) rchance;
-			final boolean heal = (Boolean) rheal;
-			final Range range = Range.fromJSON((JSONObject) rrange);
-			final Number recursion = (Number) rrecursion;
-			final AbilityZoneType zone = AbilityZoneType.fromString((String) rzone);
+			final JSONObject rmana = json.optJSONObject("mana");
+			final JSONObject rsubsequent = json.optJSONObject("subsequent");
+			final String rinstantBefore = json.optString("instantBefore", null);
+			final String rinstantAfter = json.optString("instantAfter", null);
+			final String rstatusEffect = json.optString("statusEffect", null);
 
 			final Optional<AbilityInfo> mana;
 			final Optional<AbilityInfo> subsequent;
@@ -161,19 +133,19 @@ public class AbilityInfo implements HasJSONRepresentation {
 			final Optional<StatusEffectInfo> statusEffect;
 
 			if (rmana == null) mana = Optional.empty(); else {
-				mana = Optional.of(AbilityInfo.fromJSON((JSONObject) rmana, lib));
+				mana = Optional.of(AbilityInfo.fromJSON(rmana, lib));
 			}
 			if (rsubsequent == null) subsequent = Optional.empty(); else {
-				subsequent = Optional.of(AbilityInfo.fromJSON((JSONObject) rsubsequent, lib));
+				subsequent = Optional.of(AbilityInfo.fromJSON(rsubsequent, lib));
 			}
 			if (rinstantBefore == null) instantBefore = Optional.empty(); else {
-				instantBefore = Optional.of(new InstantEffectInfo((String) rinstantBefore));
+				instantBefore = Optional.of(new InstantEffectInfo(rinstantBefore));
 			}
 			if (rinstantAfter == null) instantAfter = Optional.empty(); else {
-				instantAfter = Optional.of(new InstantEffectInfo((String) rinstantAfter));
+				instantAfter = Optional.of(new InstantEffectInfo(rinstantAfter));
 			}
 			if (rstatusEffect == null) statusEffect = Optional.empty(); else {
-				statusEffect = Optional.of(new StatusEffectInfo((String) rstatusEffect));
+				statusEffect = Optional.of(new StatusEffectInfo(rstatusEffect));
 			}
 
 			final Optional<SpriteInfo> zoneTrapSprite;
@@ -185,14 +157,11 @@ public class AbilityInfo implements HasJSONRepresentation {
 
 			return new AbilityInfo(
 				banned, name, type, trap, zone, zoneTrapSprite,
-				ap.intValue(), mp.intValue(),
-				pp.intValue(), eff.doubleValue(),
-				chance.doubleValue(), heal, range,
-				mana, subsequent, recursion.intValue(),
-				instantBefore, instantAfter, statusEffect);
+				ap, mp, pp, eff, chance, heal, range, mana,
+				subsequent, recursion, instantBefore, instantAfter, statusEffect);
 
-		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in ability", e);
+		} catch (JSONException e) {
+			throw new CorruptDataException("Error parsing ability info, " + e.getMessage(), e);
 		}
 	}
 }

@@ -24,10 +24,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.UUID;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class GameDataFactory implements HasJSONRepresentation {
 	private final Library globalLibrary;
@@ -74,19 +73,20 @@ public class GameDataFactory implements HasJSONRepresentation {
 			if (in == null) throw new FileNotFoundException(
 				"File not found " + loc.gameDataFilename().toString());
 			System.err.println(loc.gameDataFilename().toString());
-			JSONParser parser = new JSONParser();
-			JSONObject json = (JSONObject) parser.parse(in);
-			loadGameData(json);
-		} catch (ParseException e) {
+
+			final StringBuilder raw = new StringBuilder();
+			String line = null;
+			while ((line = in.readLine()) != null) raw.append(line);
+
+			loadGameData(new JSONObject(raw.toString()));
+
+		} catch (JSONException e) {
 			throw new CorruptDataException("game data is corrupted", e);
 		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public JSONObject getJSON() {
-		return json;
-	}
+	public JSONObject getJSON() {return json;}
 
 	public void update(JSONObject json) throws CorruptDataException {
 		stages.clear();
@@ -137,9 +137,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 			}
 
 		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in game data: ", e);
+			throw new CorruptDataException("Type error in game data: " + e.getMessage(), e);
+
 		} catch (IllegalArgumentException e) {
-			throw new CorruptDataException("Type error in game data: ", e);
+			throw new CorruptDataException("Type error in game data: " + e.getMessage(), e);
 		}
 	}
 
@@ -200,7 +201,6 @@ public class GameDataFactory implements HasJSONRepresentation {
 	/**
 	 * Write game data out to a file
 	 * */
-	@SuppressWarnings("unchecked")
 	public void writeToStream(
 		OutputStream outStream,
 		Collection<File> stages,
@@ -209,21 +209,20 @@ public class GameDataFactory implements HasJSONRepresentation {
 		try (PrintWriter out =
 			new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
 		) {
-			JSONObject o = new JSONObject();
-			JSONArray s = new JSONArray();
-			JSONArray c = new JSONArray();
-			JSONArray w = new JSONArray();
-			for (File stage : stages) {
-				s.add(parseStage(stage));
-			}
-			for (CharacterInfo character : characters) {
-				c.add(character.getJSON());
-			}
+			final JSONObject o = new JSONObject();
+			final JSONArray s = new JSONArray();
+			final JSONArray c = new JSONArray();
+			final JSONArray w = new JSONArray();
+
+			for (File stage : stages) s.put(parseStage(stage));
+			for (CharacterInfo character : characters) c.put(character.getJSON());
+
 			o.put("version", UUID.randomUUID().toString());
 			o.put("versionNumber", ++versionNumber);
 			o.put("stages", s);
 			o.put("characters", c);
-			out.print(o.toJSONString());
+
+			out.print(o.toString(2));
 		}
 	}
 
@@ -233,10 +232,14 @@ public class GameDataFactory implements HasJSONRepresentation {
 		) {
 			if (in == null) throw new FileNotFoundException(
 				"File not found " + stage.toString());
-			JSONParser parser = new JSONParser();
-			JSONObject json = (JSONObject) parser.parse(in);
-			return json;
-		} catch (ParseException e) {
+
+			final StringBuilder raw = new StringBuilder();
+			String line = null;
+			while ((line = in.readLine()) != null) raw.append(line);
+
+			return new JSONObject(raw.toString());
+
+		} catch (JSONException e) {
 			throw new IOException("stage file \"" + stage + "\" is corrupted");
 		}
 	}

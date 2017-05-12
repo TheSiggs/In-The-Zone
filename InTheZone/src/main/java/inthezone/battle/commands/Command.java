@@ -7,7 +7,7 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 public abstract class Command implements HasJSONRepresentation {
 	/**

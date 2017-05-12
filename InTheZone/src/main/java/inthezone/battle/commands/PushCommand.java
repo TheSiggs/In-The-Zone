@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PushCommand extends Command {
 	private final MapPoint agent;
@@ -25,9 +26,8 @@ public class PushCommand extends Command {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.PUSH.toString());
 		r.put("agent", agent.getJSON());
 		r.put("effect", effect.getJSON());
@@ -38,27 +38,18 @@ public class PushCommand extends Command {
 	public static PushCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object oagent = json.get("agent");
-		Object oeffect = json.get("effect");
-		Object oeffective = json.get("effective");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (oagent == null) throw new ProtocolException("Missing push agent");
-		if (oeffect == null) throw new ProtocolException("Missing push effect");
-		if (oeffective == null) throw new ProtocolException("Missing push effective");
-
-		if (CommandKind.fromString((String) okind) != CommandKind.PUSH)
-			throw new ProtocolException("Expected push command");
-
 		try {
-			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			PullPush effect = PullPush.fromJSON((JSONObject) oeffect);
-			boolean effective = (Boolean) oeffective;
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final PullPush effect = PullPush.fromJSON(json.getJSONObject("effect"));
+			final boolean effective = json.getBoolean("effective");
+
+			if (kind != CommandKind.PUSH)
+				throw new ProtocolException("Expected push command");
+
 			return new PushCommand(agent, effect, effective);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing push command", e);
-		} catch (CorruptDataException e) {
+
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing push command", e);
 		}
 	}

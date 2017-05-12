@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Obstacles extends InstantEffect {
 	private final Collection<MapPoint> placements;
@@ -28,14 +29,13 @@ public class Obstacles extends InstantEffect {
 		this.placements = placements;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("kind", InstantEffectType.OBSTACLES.toString());
 		o.put("agent", agent.getJSON());
 
-		JSONArray a = new JSONArray();
-		for (MapPoint p : placements) a.add(p.getJSON());
+		final JSONArray a = new JSONArray();
+		for (MapPoint p : placements) a.put(p.getJSON());
 		o.put("placements", a);
 		return o;
 	}
@@ -43,28 +43,22 @@ public class Obstacles extends InstantEffect {
 	public static Obstacles fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object oagent = json.get("agent");
-		Object oplacements = json.get("placements");
-
-		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (oagent == null) throw new ProtocolException("Missing effect agent");
-		if (oplacements == null) throw new ProtocolException("Missing effect placements");
-
 		try {
-			if (InstantEffectType.fromString((String) okind) != InstantEffectType.OBSTACLES)
+			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final JSONArray rawPlacements = json.getJSONArray("placements");
+
+			if (kind != InstantEffectType.OBSTACLES)
 				throw new ProtocolException("Expected obstacles effect");
 
-			Collection<MapPoint> placements = new ArrayList<>();
-			MapPoint agent = MapPoint.fromJSON((JSONObject) oagent);
-			JSONArray rawPlacements = (JSONArray) oplacements;
-			for (int i = 0; i < rawPlacements.size(); i++) {
-				placements.add(MapPoint.fromJSON((JSONObject) rawPlacements.get(i)));
+			final Collection<MapPoint> placements = new ArrayList<>();
+			for (int i = 0; i < rawPlacements.length(); i++) {
+				placements.add(MapPoint.fromJSON(rawPlacements.getJSONObject(i)));
 			}
+
 			return new Obstacles(placements, agent);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Error parsing obstacles effect", e);
-		} catch (CorruptDataException e) {
+
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing obstacles effect", e);
 		}
 	}

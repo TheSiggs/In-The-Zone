@@ -10,7 +10,8 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public abstract class StatusEffect implements HasJSONRepresentation {
 	private static final int TOTAL_ROUNDS = 2;
@@ -57,9 +58,8 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("info", info.toString());
 		return o;
 	}

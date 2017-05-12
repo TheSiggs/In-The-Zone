@@ -9,7 +9,8 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PointStatusEffect extends StatusEffect {
 	private final int ap;
@@ -23,9 +24,8 @@ public class PointStatusEffect extends StatusEffect {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("info", info.toString());
 		r.put("ap", ap);
 		r.put("mp", mp);
@@ -35,21 +35,14 @@ public class PointStatusEffect extends StatusEffect {
 	public static PointStatusEffect fromJSON(JSONObject o)
 		throws ProtocolException
 	{
-		Object oinfo = o.get("info");
-		Object oap = o.get("ap");
-		Object omp = o.get("mp");
-
-		if (oinfo == null) throw new ProtocolException("Missing status effect type");
-		if (oap == null) throw new ProtocolException("Missing ap buff");
-		if (omp == null) throw new ProtocolException("Missing mp buff");
-
 		try {
-			StatusEffectInfo info = new StatusEffectInfo((String) oinfo);
+			final StatusEffectInfo info = new StatusEffectInfo(o.getString("info"));
+			int ap = o.getInt("ap");
+			int mp = o.getInt("mp");
 
-			return new PointStatusEffect(info,
-				((Number) oap).intValue(),
-				((Number) omp).intValue());
-		} catch (ClassCastException|CorruptDataException  e) {
+			return new PointStatusEffect(info, ap, mp);
+
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing point status effect", e);
 		}
 	}

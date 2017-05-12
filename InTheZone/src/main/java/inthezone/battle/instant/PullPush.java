@@ -28,8 +28,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PullPush extends InstantEffect {
 	private final InstantEffectInfo type;
@@ -57,7 +58,6 @@ public class PullPush extends InstantEffect {
 		this.isFear = isFear;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
 		JSONObject o = new JSONObject();
 		JSONArray a = new JSONArray();
@@ -65,37 +65,28 @@ public class PullPush extends InstantEffect {
 		o.put("castFrom", castFrom.getJSON());
 		for (List<MapPoint> path : paths) {
 			JSONArray pp = new JSONArray();
-			for (MapPoint p : path) pp.add(p.getJSON());
-			a.add(pp);
+			for (MapPoint p : path) pp.put(p.getJSON());
+			a.put(pp);
 		}
 		o.put("paths", a);
 		return o;
 	}
 
-	public static PullPush fromJSON(JSONObject json)
-		throws ProtocolException
-	{
-		Object okind = json.get("kind");
-		Object ocastFrom = json.get("castFrom");
-		Object opaths = json.get("paths");
-
-		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (ocastFrom == null) throw new ProtocolException("Missing tile where effect acts from");
-		if (opaths == null) throw new ProtocolException("Missing effect paths");
-
+	public static PullPush fromJSON(JSONObject json) throws ProtocolException {
 		try {
-			InstantEffectInfo type = new InstantEffectInfo((String) okind);
-			if (!(type.type == InstantEffectType.PULL | type.type == InstantEffectType.PUSH))
+			final InstantEffectInfo kind = new InstantEffectInfo(json.getString("kind"));
+			final MapPoint castFrom = MapPoint.fromJSON(json.getJSONObject("castFrom"));
+			final JSONArray rawPaths = json.getJSONArray("paths");
+
+			if (!(kind.type == InstantEffectType.PULL || kind.type == InstantEffectType.PUSH))
 				throw new ProtocolException("Expected push or pull effect");
 
-			MapPoint castFrom = MapPoint.fromJSON((JSONObject) ocastFrom);
-			JSONArray rawPaths = (JSONArray) opaths;
-			List<List<MapPoint>> paths = new ArrayList<>();
-			for (int i = 0; i < rawPaths.size(); i++) {
-				List<MapPoint> path = new ArrayList<>();
-				JSONArray rawPath = (JSONArray) rawPaths.get(i);
-				for (int j = 0; j < rawPath.size(); j++) {
-					path.add(MapPoint.fromJSON((JSONObject) rawPath.get(j)));
+			final List<List<MapPoint>> paths = new ArrayList<>();
+			for (int i = 0; i < rawPaths.length(); i++) {
+				final List<MapPoint> path = new ArrayList<>();
+				final JSONArray rawPath = rawPaths.getJSONArray(i);
+				for (int j = 0; j < rawPath.length(); j++) {
+					path.add(MapPoint.fromJSON(rawPath.getJSONObject(j)));
 				}
 
 				paths.add(path);
@@ -103,8 +94,9 @@ public class PullPush extends InstantEffect {
 
 			// isFear is always false here because the triggers have been resolved at
 			// this point
-			return new PullPush(type, castFrom, paths, false);
-		} catch (ClassCastException|CorruptDataException  e) {
+			return new PullPush(kind, castFrom, paths, false);
+
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing push/pull effect", e);
 		}
 	}

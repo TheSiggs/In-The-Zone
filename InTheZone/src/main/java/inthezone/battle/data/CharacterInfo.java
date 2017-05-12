@@ -13,8 +13,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CharacterInfo implements HasJSONRepresentation {
 	public final String name;
@@ -70,18 +71,15 @@ public class CharacterInfo implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("name", name);
 		r.put("sprite", sprite.id);
 		r.put("portrait", portraitFile);
 		r.put("playable", playable);
 		r.put("stats", stats.getJSON());
-		JSONArray as = new JSONArray();
-		for (AbilityInfo a : abilities) {
-			as.add(a.getJSON());
-		}
+		final JSONArray as = new JSONArray();
+		for (AbilityInfo a : abilities) as.put(a.getJSON());
 		r.put("abilities", as);
 		r.put("hpCurve", makeCurve(hpCurve));
 		r.put("attackCurve", makeCurve(attackCurve));
@@ -89,16 +87,15 @@ public class CharacterInfo implements HasJSONRepresentation {
 		return r;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static JSONArray makeCurve(List<Integer> curve) {
-		JSONArray r = new JSONArray();
-		for (Integer i : curve) r.add(i);
+		final JSONArray r = new JSONArray();
+		for (Integer i : curve) r.put(i);
 		return r;
 	}
 
 	private static List<Integer> decodeCurve(JSONArray a) {
 		List<Integer> r = new ArrayList<>();
-		for (int i = 0; i < a.size(); i++) r.add(((Number) a.get(i)).intValue());
+		for (int i = 0; i < a.length(); i++) r.add(a.getInt(i));
 		return r;
 	}
 
@@ -106,69 +103,41 @@ public class CharacterInfo implements HasJSONRepresentation {
 		JSONObject json, ResourceLocator loc, Library lib
 	) throws CorruptDataException
 	{
-		Object rname = json.get("name");
-		Object rstats = json.get("stats");
-		Object rsprite = json.get("sprite");
-		Object rportrait = json.get("portrait");
-		Object rplayable = json.get("playable");
-		Object rabilities = json.get("abilities");
-		Object rhpCurve = json.get("hpCurve");
-		Object rattackCurve = json.get("attackCurve");
-		Object rdefenceCurve = json.get("defenceCurve");
-
 		try {
-			if (rname == null) throw new CorruptDataException("Missing character name");
-			String name = (String) rname;
-
-			if (rstats == null)
-				throw new CorruptDataException("Missing character stats");
-			Stats stats = Stats.fromJSON((JSONObject) rstats);
-
-			// If someone ever manages to leave the sprite for a new character null,
-			// then the game data won't load without some manual fixup.  Must be
-			// careful then about adding new characters.  (Or fix the data editor so
-			// that it won't save until all the character sprites are set).
-			if (rsprite == null)
-				throw new CorruptDataException("Missing character sprite");
-			SpriteInfo sprite = lib.getSprite((String) rsprite);
-
-			if (rportrait == null)
-				throw new CorruptDataException("Missing character portrait");
+			final String name = json.getString("name");
+			final Stats stats = Stats.fromJSON(json.getJSONObject("stats"));
+			final SpriteInfo sprite = lib.getSprite(json.getString("sprite"));
+			final String portraitFile = json.getString("portrait");
+			final boolean playable = json.getBoolean("playable");
+			final JSONArray abilities = json.getJSONArray("abilities");
+			final JSONArray rhpCurve = json.getJSONArray("hpCurve");
+			final JSONArray rattackCurve = json.getJSONArray("attackCurve");
+			final JSONArray rdefenceCurve = json.getJSONArray("defenceCurve");
 
 			Image portrait;
-			String portraitFile;
 			try {
-				portraitFile = (String) rportrait;
 				portrait = new Image(loc.gfx(portraitFile));
 			} catch (IOException e) {
 				throw new CorruptDataException("Cannot find character portrait");
 			}
 
-			if (rplayable == null)
-				throw new CorruptDataException("Missing character sprite");
-			boolean playable = (Boolean) rplayable;
-
-			if (rabilities == null)
-				throw new CorruptDataException("No abilities defined for character " + name);
-			JSONArray abilities = (JSONArray) rabilities;
-
-			Collection<AbilityInfo> allAbilities = new LinkedList<>();
+			final Collection<AbilityInfo> allAbilities = new LinkedList<>();
 			for (Object a : abilities) {
 				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a, lib));
 			}
 
-			List<Integer> hpCurve = rhpCurve == null?
-				new ArrayList<>() : decodeCurve((JSONArray) rhpCurve);
-			List<Integer> attackCurve = rhpCurve == null?
-				new ArrayList<>() : decodeCurve((JSONArray) rattackCurve);
-			List<Integer> defenceCurve = rhpCurve == null?
-				new ArrayList<>() : decodeCurve((JSONArray) rdefenceCurve);
+			final List<Integer> hpCurve = decodeCurve(rhpCurve);
+			final List<Integer> attackCurve = decodeCurve(rattackCurve);
+			final List<Integer> defenceCurve = decodeCurve(rdefenceCurve);
 
 			return new CharacterInfo(
 				name, sprite, portrait, portraitFile, stats, allAbilities, playable,
 				hpCurve, attackCurve, defenceCurve);
+
 		} catch(ClassCastException e) {
 			throw new CorruptDataException("Type error in character", e);
+		} catch(JSONException e) {
+			throw new CorruptDataException("Error parsing character info, " + e.getMessage(), e);
 		}
 	}
 }

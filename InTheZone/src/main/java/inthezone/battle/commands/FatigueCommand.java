@@ -16,8 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class FatigueCommand extends Command {
 	private Collection<DamageToTarget> targets;
@@ -27,12 +28,11 @@ public class FatigueCommand extends Command {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
-		JSONArray a = new JSONArray();
+		final JSONObject r = new JSONObject();
+		final JSONArray a = new JSONArray();
 		r.put("kind", CommandKind.FATIGUE.toString());
-		for (DamageToTarget d : targets) a.add(d.getJSON());
+		for (DamageToTarget d : targets) a.put(d.getJSON());
 		r.put("targets", a);
 		return r;
 	}
@@ -40,23 +40,20 @@ public class FatigueCommand extends Command {
 	public static FatigueCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object otargets = json.get("targets");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (otargets == null) throw new ProtocolException("Missing fatigue targets");
-
-		if (CommandKind.fromString((String) okind) != CommandKind.FATIGUE)
-			throw new ProtocolException("Expected ability command");
-
 		try {
-			JSONArray rawTargets = (JSONArray) otargets;
-			Collection<DamageToTarget> targets = new ArrayList<>();
-			for (int i = 0; i < rawTargets.size(); i++) {
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+			final JSONArray rawTargets = json.getJSONArray("targets");
+
+			if (kind != CommandKind.FATIGUE)
+				throw new ProtocolException("Expected ability command");
+
+			final Collection<DamageToTarget> targets = new ArrayList<>();
+			for (int i = 0; i < rawTargets.length(); i++) {
 				targets.add(DamageToTarget.fromJSON((JSONObject) rawTargets.get(i)));
 			}
 			return new FatigueCommand(targets);
-		} catch (ClassCastException e) {
+
+		} catch (ClassCastException|JSONException e) {
 			throw new ProtocolException("Error parsing fatigue command", e);
 		}
 	}

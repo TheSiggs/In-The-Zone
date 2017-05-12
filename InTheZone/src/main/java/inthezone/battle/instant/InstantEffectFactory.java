@@ -8,7 +8,8 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.Collection;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Construct instant effects
@@ -35,11 +36,9 @@ public class InstantEffectFactory {
 	}
 
 	public static InstantEffect fromJSON(JSONObject o) throws ProtocolException {
-		Object okind = o.get("kind");
-		if (okind == null) throw new ProtocolException("Missing effect kind");
-
 		try {
-			InstantEffectType kind = (new InstantEffectInfo((String) okind)).type;
+			final InstantEffectType kind = (new InstantEffectInfo(o.getString("kind"))).type;
+
 			switch (kind) {
 				case CLEANSE: /* fallthrough */
 				case DEFUSE: /* fallthrough */
@@ -51,7 +50,7 @@ public class InstantEffectFactory {
 				case MOVE: return Move.fromJSON(o);
 				default: throw new ProtocolException("Unimplemented effect " + kind);
 			}
-		} catch (ClassCastException|CorruptDataException  e) {
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing effect", e);
 		}
 	}

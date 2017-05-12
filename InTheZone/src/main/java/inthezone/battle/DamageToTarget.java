@@ -7,7 +7,7 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import java.util.Optional;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 public class DamageToTarget implements HasJSONRepresentation {
 	public final Casting target;

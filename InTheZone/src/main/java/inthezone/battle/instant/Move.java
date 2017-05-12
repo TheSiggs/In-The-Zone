@@ -26,8 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Move extends InstantEffect {
 	public List<List<MapPoint>> paths;
@@ -46,55 +47,44 @@ public class Move extends InstantEffect {
 		this.paths = paths;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
 		o.put("kind", InstantEffectType.MOVE.toString());
 		o.put("range", range);
 		o.put("agent", agent.getJSON());
 		for (List<MapPoint> path : paths) {
-			JSONArray pp = new JSONArray();
-			for (MapPoint p : path) pp.add(p.getJSON());
-			a.add(pp);
+			final JSONArray pp = new JSONArray();
+			for (MapPoint p : path) pp.put(p.getJSON());
+			a.put(pp);
 		}
 		o.put("paths", a);
 		return o;
 	}
 
-	public static Move fromJSON(JSONObject json)
-		throws ProtocolException
-	{
-		Object okind = json.get("kind");
-		Object orange = json.get("range");
-		Object oagent = json.get("agent");
-		Object opaths = json.get("paths");
-
-		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (orange == null) throw new ProtocolException("Missing effect range");
-		if (oagent == null) throw new ProtocolException("Missing effect agent");
-		if (opaths == null) throw new ProtocolException("Missing effect paths");
-
+	public static Move fromJSON(JSONObject json) throws ProtocolException {
 		try {
-			InstantEffectInfo type = new InstantEffectInfo((String) okind);
-			if (type.type != InstantEffectType.MOVE)
+			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
+			int range = json.getInt("range");
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final JSONArray rawPaths = json.getJSONArray("paths");
+
+			if (kind != InstantEffectType.MOVE)
 				throw new ProtocolException("Expected move effect");
 
-			JSONArray rawPaths = (JSONArray) opaths;
-			MapPoint agent = MapPoint.fromJSON(((JSONObject) oagent));
-			List<List<MapPoint>> paths = new ArrayList<>();
-			for (int i = 0; i < rawPaths.size(); i++) {
-				List<MapPoint> path = new ArrayList<>();
-				JSONArray rawPath = (JSONArray) rawPaths.get(i);
-				for (int j = 0; j < rawPath.size(); j++) {
-					path.add(MapPoint.fromJSON((JSONObject) rawPath.get(j)));
+			final List<List<MapPoint>> paths = new ArrayList<>();
+			for (int i = 0; i < rawPaths.length(); i++) {
+				final List<MapPoint> path = new ArrayList<>();
+				final JSONArray rawPath = rawPaths.getJSONArray(i);
+				for (int j = 0; j < rawPath.length(); j++) {
+					path.add(MapPoint.fromJSON(rawPath.getJSONObject(j)));
 				}
 
 				paths.add(path);
 			}
 
-			return new Move(null, ((Number) orange).intValue(), paths, agent);
-		} catch (ClassCastException|CorruptDataException  e) {
+			return new Move(null, range, paths, agent);
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing move effect", e);
 		}
 	}

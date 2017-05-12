@@ -2,7 +2,8 @@ package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Stats implements HasJSONRepresentation {
 	public final int ap;
@@ -45,9 +46,8 @@ public class Stats implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("ap", ap);
 		r.put("mp", mp);
 		r.put("power", power);
@@ -60,37 +60,17 @@ public class Stats implements HasJSONRepresentation {
 	public static Stats fromJSON(JSONObject json)
 		throws CorruptDataException
 	{
-		Object rap       = json.get("ap");
-		Object rmp       = json.get("mp");
-		Object rpower    = json.get("power");
-		Object rhp = json.get("hp");
-		Object rattack   = json.get("attack");
-		Object rdefence  = json.get("defence");
-
-		if (rap       == null) throw new CorruptDataException("Missing ap");
-		if (rmp       == null) throw new CorruptDataException("Missing mp");
-		if (rpower    == null) throw new CorruptDataException("Missing power");
-		if (rhp == null) throw new CorruptDataException("Missing hp");
-		if (rattack   == null) throw new CorruptDataException("Missing attack");
-		if (rdefence  == null) throw new CorruptDataException("Missing defence");
-
 		try {
-			Number ap = (Number) rap;
-			Number mp = (Number) rmp;
-			Number power = (Number) rpower;
-			Number hp = (Number) rhp;
-			Number attack = (Number) rattack;
-			Number defence = (Number) rdefence;
+			final int ap       = json.getInt("ap");
+			final int mp       = json.getInt("mp");
+			final int power    = json.getInt("power");
+			final int hp       = json.getInt("hp");
+			final int attack   = json.getInt("attack");
+			final int defence  = json.getInt("defence");
+			return new Stats(ap, mp, power, hp, attack, defence);
 
-			return new Stats(
-				ap.intValue(),
-				mp.intValue(),
-				power.intValue(),
-				hp.intValue(),
-				attack.intValue(),
-				defence.intValue());
-		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in stats", e);
+		} catch (JSONException e) {
+			throw new CorruptDataException("Error parsing stats, " + e.getMessage(), e);
 		}
 	}
 }

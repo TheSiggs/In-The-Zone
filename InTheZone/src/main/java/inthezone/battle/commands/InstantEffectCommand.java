@@ -10,7 +10,8 @@ import isogame.engine.MapPoint;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class InstantEffectCommand extends Command {
 	private InstantEffect effect;
@@ -63,9 +64,8 @@ public class InstantEffectCommand extends Command {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.INSTANT.toString());
 		r.put("effect", effect.getJSON());
 		return r;
@@ -74,20 +74,16 @@ public class InstantEffectCommand extends Command {
 	public static InstantEffectCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object oeffect = json.get("effect");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (oeffect == null) throw new ProtocolException("Missing effect");
-
-		if (CommandKind.fromString((String) okind) != CommandKind.INSTANT)
-			throw new ProtocolException("Expected effect command");
-
 		try {
-			return new InstantEffectCommand(
-				InstantEffectFactory.fromJSON((JSONObject) oeffect),
-				Optional.empty(), Optional.empty());
-		} catch (ClassCastException e) {
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+			final InstantEffect effect = InstantEffectFactory.fromJSON(json.getJSONObject("effect"));
+
+			if (kind != CommandKind.INSTANT)
+				throw new ProtocolException("Expected effect command");
+
+			return new InstantEffectCommand(effect, Optional.empty(), Optional.empty());
+
+		} catch (ClassCastException|JSONException e) {
 			throw new ProtocolException("Error parsing effect command", e);
 		}
 	}

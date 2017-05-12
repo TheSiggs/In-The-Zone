@@ -3,8 +3,8 @@ package inthezone.battle.instant;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.commands.CommandException;
-import inthezone.battle.data.InstantEffectInfo;;
-import inthezone.battle.data.InstantEffectType;;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Revive extends InstantEffect {
 	public final List<MapPoint> targets;
@@ -24,42 +25,34 @@ public class Revive extends InstantEffect {
 		this.targets = targets;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override public JSONObject getJSON() {
 		final JSONObject o = new JSONObject();
 		o.put("kind", InstantEffectType.REVIVE.toString());
 		o.put("agent", agent.getJSON());
 
 		final JSONArray a = new JSONArray();
-		for (MapPoint t : targets) a.add(t.getJSON());
+		for (MapPoint t : targets) a.put(t.getJSON());
 		o.put("targets", a);
 		return o;
 	}
 
 	public static Revive fromJSON(JSONObject json) throws ProtocolException {
-		final Object okind = json.get("kind");
-		final Object oagent = json.get("agent");
-		final Object otargets = json.get("targets");
-
-		if (okind == null) throw new ProtocolException("Missing effect type");
-		if (oagent == null) throw new ProtocolException("Missing effect agent");
-		if (otargets == null) throw new ProtocolException("Missing effect targets");
-
 		try {
-			final InstantEffectInfo type = new InstantEffectInfo((String) okind);
-			if (type.type != InstantEffectType.REVIVE)
+			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final JSONArray rawTargets = json.getJSONArray("targets");
+
+			if (kind != InstantEffectType.REVIVE)
 				throw new ProtocolException("Expected revive effect");
 
-			final MapPoint agent = MapPoint.fromJSON(((JSONObject) oagent));
-
-			final JSONArray rawTargets = (JSONArray) otargets;
-			List<MapPoint> targets = new ArrayList<>();
-			for (int i = 0; i < rawTargets.size(); i++) {
-				targets.add(MapPoint.fromJSON((JSONObject) rawTargets.get(i)));
+			final List<MapPoint> targets = new ArrayList<>();
+			for (int i = 0; i < rawTargets.length(); i++) {
+				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
 			}
 
 			return new Revive(agent, targets);
-		} catch (ClassCastException|CorruptDataException  e) {
+
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing revive effect", e);
 		}
 	}

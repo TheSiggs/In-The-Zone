@@ -7,8 +7,9 @@ import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Loadout implements HasJSONRepresentation {
 	public final String name;
@@ -39,11 +40,10 @@ public class Loadout implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
-		JSONArray cs = new JSONArray();
-		for (CharacterProfile p : characters) cs.add(p.getJSON());
+		final JSONObject o = new JSONObject();
+		final JSONArray cs = new JSONArray();
+		for (CharacterProfile p : characters) cs.put(p.getJSON());
 		o.put("name", name);
 		o.put("characters", cs);
 		return o;
@@ -52,20 +52,21 @@ public class Loadout implements HasJSONRepresentation {
 	public static Loadout fromJSON(
 		JSONObject json, GameDataFactory gameData
 	) throws CorruptDataException {
-		Object oname = json.get("name");
-		Object ocs = json.get("characters");
-		if (oname == null) throw new CorruptDataException("Unnamed loadout"); 
-		if (ocs == null) throw new CorruptDataException("Missing characters in loadout");
-
 		try {
+			final String name = json.getString("name");
 			final List<JSONObject> cs =
-				jsonArrayToList((JSONArray) ocs, JSONObject.class);
+				jsonArrayToList(json.getJSONArray("characters"), JSONObject.class);
+
 			final List<CharacterProfile> r = new ArrayList<>();
 			for (JSONObject c : cs) r.add(CharacterProfile.fromJSON(c, gameData));
 
-			return new Loadout((String) oname, r);
+			return new Loadout(name, r);
+
 		} catch (ClassCastException e) {
 			throw new CorruptDataException("Type error in loadout", e);
+
+		} catch (JSONException e) {
+			throw new CorruptDataException("Error parsing loadout, " + e.getMessage(), e);
 		}
 	}
 
@@ -73,7 +74,7 @@ public class Loadout implements HasJSONRepresentation {
 		throws ClassCastException
 	{
 		List<T> r = new ArrayList<>();
-		int limit = a.size();
+		int limit = a.length();
 		for (int i = 0; i < limit; i++) {
 			r.add(clazz.cast(a.get(i)));
 		}

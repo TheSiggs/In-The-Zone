@@ -12,8 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.List;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This one works a bit different.  Player 1 generates a
@@ -44,11 +45,10 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
-		JSONArray a = new JSONArray();
-		startTiles.stream().map(x -> x.getJSON()).forEach(x -> a.add(x));
+		final JSONObject r = new JSONObject();
+		final JSONArray a = new JSONArray();
+		startTiles.stream().map(x -> x.getJSON()).forEach(x -> a.put(x));
 		r.put("name", "startBattleReq");
 		r.put("stage", stage);
 		r.put("player", player.toString());
@@ -65,36 +65,24 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		JSONObject json, GameDataFactory gameData
 	) throws ProtocolException {
 
-		Object oname = json.get("name");
-		Object ostage = json.get("stage");
-		Object oplayer = json.get("player");
-		Object ostarts = json.get("starts");
-		Object oloadout = json.get("loadout");
-		if (oname == null) throw new ProtocolException("Missing name in start battle request");
-		if (ostage == null) throw new ProtocolException("Missing stage in start battle request");
-		if (oplayer == null) throw new ProtocolException("Missing player in start battle request");
-		if (ostarts == null) throw new ProtocolException("Missing start positions in battle request");
-		if (oloadout == null) throw new ProtocolException("Missing loadout in start battle request");
-
 		try {
-			String name = (String) oname;
-			String stage = (String) ostage;
-			Player player = Player.fromString((String) oplayer);
+			final String name = json.getString("name");
+			final String stage = json.getString("stage");
+			final Player player = Player.fromString(json.getString("player"));
+			final JSONArray rawStarts = json.getJSONArray("starts");
+			final Loadout loadout = Loadout.fromJSON(json.getJSONObject("loadout"), gameData);
 
-			JSONArray rawStarts = (JSONArray) ostarts;
-			List<MapPoint> starts = new ArrayList<>();
-			for (int i = 0; i < rawStarts.size(); i++) {
-				starts.add(MapPoint.fromJSON((JSONObject) rawStarts.get(i)));
+			final List<MapPoint> starts = new ArrayList<>();
+			for (int i = 0; i < rawStarts.length(); i++) {
+				starts.add(MapPoint.fromJSON(rawStarts.getJSONObject(i)));
 			}
 
-			Loadout loadout = Loadout.fromJSON((JSONObject) oloadout, gameData);
 			if (!name.equals("startBattleReq"))
 				throw new ProtocolException("Expected start battle request");
+
 			return new StartBattleCommandRequest(stage, player, loadout, starts);
 
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Type error in start battle request");
-		} catch (CorruptDataException e) {
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Parse error in start battle request", e);
 		}
 	}

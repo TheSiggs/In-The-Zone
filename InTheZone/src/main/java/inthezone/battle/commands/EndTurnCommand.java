@@ -7,7 +7,8 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class EndTurnCommand extends Command {
 	public final Player player;
@@ -19,7 +20,7 @@ public class EndTurnCommand extends Command {
 	@Override 
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
-		JSONObject r = new JSONObject();
+		final JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.ENDTURN.toString());
 		r.put("player", player.toString());
 		return r;
@@ -28,18 +29,15 @@ public class EndTurnCommand extends Command {
 	public static EndTurnCommand fromJSON(JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
-		Object oplayer = json.get("player");
-
-		if (okind == null) throw new ProtocolException("Missing command type");
-		if (oplayer == null) throw new ProtocolException("Missing resigning player");
-
-		if (CommandKind.fromString((String) okind) != CommandKind.ENDTURN)
-			throw new ProtocolException("Expected end turn command");
-
 		try {
-			return new EndTurnCommand(Player.fromString((String) oplayer));
-		} catch (ClassCastException|CorruptDataException  e) {
+			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
+			final String player = json.getString("player");
+
+			if (kind != CommandKind.ENDTURN)
+				throw new ProtocolException("Expected end turn command");
+
+			return new EndTurnCommand(Player.fromString(player));
+		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing end turn command", e);
 		}
 	}

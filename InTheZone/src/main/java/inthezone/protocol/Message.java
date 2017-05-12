@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A message to be transmitted across the network.
@@ -37,23 +36,20 @@ public class Message {
 		return sequenceNumber;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void substitute(String key, Object value) {
 		payload.put(key, value);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message SV(int v, UUID gameDataVersion, UUID sessionKey) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("version", v);
 		o.put("gdversion", gameDataVersion.toString());
 		o.put("session", sessionKey.toString());
 		return new Message(MessageKind.S_VERSION, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message CV(int v, UUID gameDataVersion) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("version", v);
 		o.put("gdversion", gameDataVersion.toString());
 		return new Message(MessageKind.C_VERSION, o);
@@ -63,9 +59,8 @@ public class Message {
 		return new Message(MessageKind.OK, new JSONObject());
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message NOK(String msg) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("m", msg);
 		return new Message(MessageKind.NOK, o);
 	}
@@ -78,74 +73,64 @@ public class Message {
 		return new Message(MessageKind.GAME_OVER, new JSONObject());
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message ISSUE_CHALLENGE(String name) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		return new Message(MessageKind.ISSUE_CHALLENGE, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message COMMAND(JSONObject cmd) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("cmd", cmd);
 		return new Message(MessageKind.COMMAND, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message NAME(String name) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("name" , name);
 		return new Message(MessageKind.REQUEST_NAME, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message PLAYERS_JOIN(Collection<String> players) {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
-		a.addAll(players);
-		o.put("add", a);
+		final JSONObject o = new JSONObject();
+		o.put("add", players);
 		o.put("leave", new JSONArray());
 		o.put("game", new JSONArray());
 		return new Message(MessageKind.PLAYERS_JOIN, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message PLAYER_JOINS(String name) {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
-		a.add(name);
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
+		a.put(name);
 		o.put("add", a);
 		o.put("leave", new JSONArray());
 		o.put("game", new JSONArray());
 		return new Message(MessageKind.PLAYERS_JOIN, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message PLAYER_LEAVES(String name) {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
-		a.add(name);
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
+		a.put(name);
 		o.put("add", new JSONArray());
 		o.put("leave", a);
 		o.put("game", new JSONArray());
 		return new Message(MessageKind.PLAYERS_JOIN, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message PLAYER_STARTS_GAME(String name) {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
-		a.add(name);
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
+		a.put(name);
 		o.put("add", new JSONArray());
 		o.put("leave", new JSONArray());
 		o.put("game", a);
 		return new Message(MessageKind.PLAYERS_JOIN, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message CHALLENGE_PLAYER(String name, JSONObject cmd) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		o.put("cmd", cmd);
 		return new Message(MessageKind.CHALLENGE_PLAYER, o);
@@ -155,20 +140,18 @@ public class Message {
 	 * @param name The name of the player who's challenge we're accepting
 	 * @param player The player accepting the challenge
 	 * */
-	@SuppressWarnings("unchecked")
 	public static Message ACCEPT_CHALLENGE(
 		String name, Player player, JSONObject cmd
 	) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		o.put("player", player.toString());
 		o.put("cmd", cmd);
 		return new Message(MessageKind.ACCEPT_CHALLENGE, o);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Message REJECT_CHALLENGE(String name) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		return new Message(MessageKind.REJECT_CHALLENGE, o);
 	}
@@ -176,9 +159,8 @@ public class Message {
 	/**
 	 * @param player The player that the recipient of this message should play.
 	 * */
-	@SuppressWarnings("unchecked")
 	public static Message START_BATTLE(JSONObject cmd, Player player, String otherPlayer) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("player", player.toString());
 		o.put("otherPlayer", otherPlayer);
 		o.put("cmd", cmd);
@@ -197,9 +179,8 @@ public class Message {
 	 * @param sessionKey the session to reconnect to
 	 * @param sequenceNumber the sequence number of the last message received
 	 * */
-	@SuppressWarnings("unchecked")
 	public static Message RECONNECT(UUID sessionKey, int sequenceNumber) {
-		JSONObject o = new JSONObject();
+		final JSONObject o = new JSONObject();
 		o.put("session", sessionKey);
 		o.put("lastSequenceNumber", sequenceNumber);
 		return new Message(MessageKind.RECONNECT, o);
@@ -213,10 +194,8 @@ public class Message {
 			kind != MessageKind.ISSUE_CHALLENGE)
 				throw new ProtocolException("Expected name");
 		try {
-			Object v = payload.get("name");
-			if (v == null) throw new ProtocolException("Malformed message");
-			return (String) v;
-		} catch (ClassCastException e) {
+			return payload.getString("name");
+		} catch (JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -227,12 +206,8 @@ public class Message {
 				throw new ProtocolException("Expected player");
 
 		try {
-			Object player = payload.get("player");
-			if (player == null) throw new ProtocolException("Malformed message");
-			return Player.fromString((String) player);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Malformed message");
-		} catch (CorruptDataException e) {
+			return Player.fromString(payload.getString("player"));
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -245,10 +220,8 @@ public class Message {
 				throw new ProtocolException("Expected command");
 
 		try {
-			Object cmd = payload.get("cmd");
-			if (cmd == null) throw new ProtocolException("Malformed message");
-			return (JSONObject) cmd;
-		} catch (ClassCastException e) {
+			return payload.getJSONObject("cmd");
+		} catch (JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -257,10 +230,8 @@ public class Message {
 		if (kind != MessageKind.C_VERSION && kind != MessageKind.S_VERSION)
 			throw new ProtocolException("Expected version");
 		try {
-			Object v = payload.get("version");
-			if (v == null) throw new ProtocolException("Malformed message");
-			return ((Number) v).intValue();
-		} catch (ClassCastException e) {
+			return payload.getInt("version");
+		} catch (JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -269,12 +240,8 @@ public class Message {
 		if (kind != MessageKind.C_VERSION && kind != MessageKind.S_VERSION)
 			throw new ProtocolException("Expected version");
 		try {
-			Object v = payload.get("gdversion");
-			if (v == null) throw new ProtocolException("Malformed message");
-			return UUID.fromString((String) v);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Malformed message");
-		} catch (IllegalArgumentException e) {
+			return UUID.fromString(payload.getString("gdversion"));
+		} catch (JSONException|IllegalArgumentException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -283,12 +250,8 @@ public class Message {
 		if (kind != MessageKind.S_VERSION && kind != MessageKind.RECONNECT)
 			throw new ProtocolException("Expected session key");
 		try {
-			Object v = payload.get("session");
-			if (v == null) throw new ProtocolException("Malformed message");
-			return UUID.fromString((String) v);
-		} catch (ClassCastException e) {
-			throw new ProtocolException("Malformed message");
-		} catch (IllegalArgumentException e) {
+			return UUID.fromString(payload.getString("session"));
+		} catch (JSONException|IllegalArgumentException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -297,10 +260,8 @@ public class Message {
 		if (kind != MessageKind.PLAYERS_JOIN)
 			throw new ProtocolException("Expected lobby players message");
 		try {
-			Object a = payload.get("add");
-			if (a == null) throw new ProtocolException("Malformed message");
-			return jsonArrayToList((JSONArray) a, String.class);
-		} catch (ClassCastException e) {
+			return jsonArrayToList(payload.getJSONArray("add"), String.class);
+		} catch (JSONException|ClassCastException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -309,10 +270,8 @@ public class Message {
 		if (kind != MessageKind.PLAYERS_JOIN)
 			throw new ProtocolException("Expected lobby players message");
 		try {
-			Object a = payload.get("leave");
-			if (a == null) throw new ProtocolException("Malformed message");
-			return jsonArrayToList((JSONArray) a, String.class);
-		} catch (ClassCastException e) {
+			return jsonArrayToList(payload.getJSONArray("leave"), String.class);
+		} catch (JSONException|ClassCastException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -321,10 +280,8 @@ public class Message {
 		if (kind != MessageKind.PLAYERS_JOIN)
 			throw new ProtocolException("Expected lobby players message");
 		try {
-			Object a = payload.get("game");
-			if (a == null) throw new ProtocolException("Malformed message");
-			return jsonArrayToList((JSONArray) a, String.class);
-		} catch (ClassCastException e) {
+			return jsonArrayToList(payload.getJSONArray("game"), String.class);
+		} catch (JSONException|ClassCastException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -334,8 +291,8 @@ public class Message {
 			throw new ProtocolException("Expected reconnect");
 
 		try {
-			return ((Number) payload.get("lastSequenceNumber")).intValue();
-		} catch (ClassCastException e) {
+			return payload.getInt("lastSequenceNumber");
+		} catch (JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
@@ -345,26 +302,23 @@ public class Message {
 			throw new ProtocolException("Expected message");
 
 		try {
-			Object m = payload.get("m");
-			if (m == null) throw new ProtocolException("Malformed message");
-			return (String) m;
-		} catch (ClassCastException e) {
+			return payload.getString("m");
+		} catch (JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}
 
 	public static Message fromString(String message) throws ProtocolException {
-		String id = message.substring(0, 2);
-		String data = message.substring(2);
+		final String id = message.substring(0, 2);
+		final String data = message.substring(2);
 
 		try {
-			JSONParser parser = new JSONParser();
-			JSONObject json = (JSONObject) parser.parse(data);
-			Message r = new Message(MessageKind.fromString(id), json);
-			Object sn = json.get("sequenceNumber");
-			if (sn != null) r.sequenceNumber = ((Number) sn).intValue();
+			final JSONObject json = new JSONObject(data);
+			final Message r = new Message(MessageKind.fromString(id), json);
+			r.sequenceNumber = json.optInt("sequenceNumber", 0);
 			return r;
-		} catch (ParseException e) {
+
+		} catch (JSONException e) {
 			throw new ProtocolException("Malformed JSON " + data, e);
 		}
 	}
@@ -378,7 +332,7 @@ public class Message {
 		throws ClassCastException
 	{
 		List<T> r = new ArrayList<>();
-		int limit = a.size();
+		int limit = a.length();
 		for (int i = 0; i < limit; i++) {
 			r.add(clazz.cast(a.get(i)));
 		}

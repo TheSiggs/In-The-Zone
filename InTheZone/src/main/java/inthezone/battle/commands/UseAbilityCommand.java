@@ -110,7 +110,7 @@ public class UseAbilityCommand extends Command {
 			final JSONArray rawTargets = json.getJSONArray("targets");
 			final JSONArray rawTargetSquares = json.getJSONArray("targetSquares");
 			final JSONArray rawConstructed = json.getJSONArray("constructed");
-			int subsequentLevel = json.getInt("subsequentLevel");
+			final int subsequentLevel = json.getInt("subsequentLevel");
 
 			if (kind != CommandKind.ABILITY)
 				throw new ProtocolException("Expected ability command");
@@ -135,7 +135,7 @@ public class UseAbilityCommand extends Command {
 				constructed, subsequentLevel);
 
 		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing ability command", e);
+			throw new ProtocolException("Error parsing ability command, " + e.getMessage(), e);
 		}
 	}
 

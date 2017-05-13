@@ -225,7 +225,7 @@ public class AbilitiesPane extends VBox {
 				.sorted((a, b) -> {if (b < a) return -1; else if (b > a) return 1; else return 0;})
 				.forEach(i -> {
 					TreeItem<AbilityInfoModel> item = table.getTreeItem(i);
-					item.getParent().getChildren().remove(item);
+					if (item != null) item.getParent().getChildren().remove(item);
 				});
 				changed.setValue(true);
 		});

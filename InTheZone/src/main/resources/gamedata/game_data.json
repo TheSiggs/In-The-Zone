@@ -35,6 +35,7 @@
               "nTargets": 1
             },
             "type": "special",
+            "zoneTrapSprite": "zoneiw",
             "ap": 0,
             "zone": "BoundZone",
             "instantBefore": "OBSTACLES",
@@ -129,6 +130,7 @@
             "nTargets": 1
           },
           "type": "skill",
+          "zoneTrapSprite": "zonezw",
           "ap": 2,
           "zone": "Zone",
           "name": "Zone of weakness",
@@ -334,7 +336,7 @@
         "ap": 2
       },
       "name": "Bridget",
-      "sprite": "kieren",
+      "sprite": "bridget",
       "hpCurve": [
         220,
         240,
@@ -524,6 +526,7 @@
             "nTargets": 1
           },
           "type": "spell",
+          "zoneTrapSprite": "sp",
           "ap": 1,
           "zone": "Zone",
           "instantBefore": "DEFUSE",
@@ -706,7 +709,7 @@
         "ap": 2
       },
       "name": "Eve",
-      "sprite": "nettis",
+      "sprite": "eve",
       "hpCurve": [
         105,
         125,
@@ -1012,7 +1015,7 @@
         "ap": 2
       },
       "name": "Sar",
-      "sprite": "daniel",
+      "sprite": "sar",
       "hpCurve": [
         125,
         145,
@@ -1803,6 +1806,7 @@
             "nTargets": 1
           },
           "type": "spell",
+          "zoneTrapSprite": "wg",
           "ap": 2,
           "zone": "Zone",
           "name": "Whisper of the Goddess",
@@ -1940,6 +1944,7 @@
             "nTargets": 1
           },
           "type": "skill",
+          "zoneTrapSprite": "spiketrap",
           "ap": 2,
           "zone": "None",
           "name": "Spike trap",
@@ -1963,6 +1968,7 @@
             "nTargets": 1
           },
           "type": "skill",
+          "zoneTrapSprite": "clawtrap",
           "ap": 2,
           "zone": "None",
           "name": "Claw trap",
@@ -2258,6 +2264,7 @@
             "nTargets": 1
           },
           "type": "skill",
+          "zoneTrapSprite": "beartrap",
           "ap": 2,
           "zone": "None",
           "name": "Bear trap",
@@ -2371,7 +2378,7 @@
         "ap": 2
       },
       "name": "Galen",
-      "sprite": "daniel",
+      "sprite": "galen",
       "hpCurve": [
         140,
         160,
@@ -8990,6 +8997,6 @@
       "sprites": []
     }
   ],
-  "version": "24b41bdf-4efa-466f-9b77-5d781ae8480f",
-  "versionNumber": 187
+  "version": "675c5a31-fdd3-45d4-9d42-c610b721b2a1",
+  "versionNumber": 188
 }

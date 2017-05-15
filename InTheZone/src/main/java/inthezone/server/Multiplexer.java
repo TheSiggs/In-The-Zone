@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Multiplexer implements Runnable {
+	private final static long timeout = 30 * 1000;
+
 	// Clients that are in the process of connecting to the server
 	private final Collection<Client> pendingClients = new LinkedList<>();
 	// Clients with names on the server
@@ -91,7 +93,7 @@ public class Multiplexer implements Runnable {
 	 * */
 	private void doSelect() throws IOException {
 		System.out.println("blocking " + (debugCounter++));
-		selector.select();
+		selector.select(timeout);
 		System.out.println("unblocked");
 
 		// do IO operations
@@ -136,9 +138,8 @@ public class Multiplexer implements Runnable {
 	}
 
 	private void removeClient(Client c) {
-		sessions.remove(c);
-		namedClients.remove(c);
-		pendingClients.remove(c);
+		System.err.println("Removing client " + c);
+		c.closeConnection(true);
 	}
 
 	private void newClient(SocketChannel connection) {

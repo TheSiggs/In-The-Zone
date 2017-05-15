@@ -17,9 +17,6 @@ import java.util.Optional;
 public class Game extends Application {
 	/* TODO: find a way to set these from the build system */
 	private final static boolean IS_DEVEL_BUILD = true;
-	private final static String DEFAULT_SERVER = "127.0.0.1"; // TODO: update with the ip of the real sever
-	// get the default port from the server!
-	//private final static int DEFAULT_PORT = 8000; // TODO: update this with the real default port
 
 	public static void main(final String[] arguments) {
 		Application.launch(arguments);
@@ -35,33 +32,36 @@ public class Game extends Application {
 		Map<String, String> args = getParameters().getNamed();
 		System.err.println("args: " + args.toString());
 
-		Optional<String> basedir;
-		String server;
-		int port;
-		if (IS_DEVEL_BUILD) {
-			basedir = Optional.ofNullable(args.get("basedir"));
-			if (!basedir.isPresent() && args.get("dev") != null) {
-				basedir = Optional.ofNullable(getDataDir(primaryStage));
-			}
-			server = args.getOrDefault("server", "127.0.0.1");
-			try {
-				port = Optional.ofNullable(args.get("port"))
-					.map(x -> Integer.parseInt(x)).orElse(Server.DEFAULT_PORT);
-			} catch (NumberFormatException e) {
-				port = 0; // need to set this to prevent compiler error
-				System.err.println("Port parameter must be a number");
-				System.exit(2);
-			}
-		} else {
-			basedir = Optional.empty();
-			server = DEFAULT_SERVER;
-			port = Server.DEFAULT_PORT;
-		}
-
 		try {
+
+			Optional<String> basedir;
+			Optional<String> serverOverride = Optional.empty();
+			Optional<Integer> portOverride = Optional.empty();
+
+			if (IS_DEVEL_BUILD) {
+				basedir = Optional.ofNullable(args.get("basedir"));
+				if (!basedir.isPresent() && args.get("dev") != null) {
+					basedir = Optional.ofNullable(getDataDir(primaryStage));
+				}
+				serverOverride = Optional.ofNullable(args.get("server"));
+				try {
+					portOverride = Optional.ofNullable(args.get("port"))
+						.map(x -> Integer.parseInt(x));
+				} catch (NumberFormatException e) {
+					System.err.println("Port parameter must be a number");
+					System.exit(2);
+				}
+			} else {
+				basedir = Optional.empty();
+			}
+
 			final GameDataFactory gameData =
 				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()), false);
 			final ClientConfig config = new ClientConfig(gameData);
+
+			final String server = serverOverride.orElse(config.server);
+			final int port = portOverride.orElse(config.port);
+
 			final ContentPane contentPane = new ContentPane(
 				config, gameData, server, port, config.defaultPlayerName);
 

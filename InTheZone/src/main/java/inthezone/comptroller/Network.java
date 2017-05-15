@@ -69,6 +69,7 @@ public class Network implements Runnable {
 						/* ignore */
 					}
 				}
+				connect.set(false);
 
 				try {
 					doConnect();

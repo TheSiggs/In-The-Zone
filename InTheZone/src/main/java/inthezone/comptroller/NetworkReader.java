@@ -114,19 +114,25 @@ public class NetworkReader implements Runnable {
 			}
 
 			// if we get to here, then the connection was closed.
-			lobbyListener.serverError(new ProtocolException("Server shut down"));
-			parent.interrupt();
+			try {
+				// Make sure the connection is fully closed (not just half-closed)
+				in.close();
+				parent.interrupt();
+			} catch (IOException e) {
+				/* Doesn't matter */
+			}
 
 		} catch (IOException e) {
 			// TODO: try to recover the situation
 		} catch (ProtocolException e) {
-			lobbyListener.serverError(e);
 			try {
 				in.close();
 				parent.interrupt();
 			} catch (IOException e2) {
 				/* Doesn't matter */
 			}
+
+			lobbyListener.serverError(e);
 		}
 	}
 }

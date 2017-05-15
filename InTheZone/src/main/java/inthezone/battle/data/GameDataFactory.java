@@ -106,23 +106,12 @@ public class GameDataFactory implements HasJSONRepresentation {
 	}
 
 	private void loadGameData(JSONObject json) throws CorruptDataException {
-		this.json = json;
-		Object oVersion = json.get("version");
-		Object oVersionNumber = json.get("versionNumber");
-		Object oStages = json.get("stages");
-		Object oCharacters = json.get("characters");
-
-		if (oVersion == null) throw new CorruptDataException("No version in game data");
-		if (oStages == null) throw new CorruptDataException("No stages in game data");
-		if (oCharacters == null) throw new CorruptDataException("No characters in game data");
-
 		try {
-			this.version = UUID.fromString((String) oVersion);
-			this.versionNumber = oVersionNumber == null?
-				0 : ((Number) oVersionNumber).intValue();
-
-			JSONArray aStages = (JSONArray) oStages;
-			JSONArray aCharacters = (JSONArray) oCharacters;
+			this.json = json;
+			this.version = UUID.fromString(json.getString("version"));
+			this.versionNumber = json.optInt("versionNumber", 0);
+			final JSONArray aStages = json.getJSONArray("stages");
+			final JSONArray aCharacters = json.getJSONArray("characters");
 
 			for (Object x : aStages) {
 				Stage i = Stage.fromJSON(
@@ -136,10 +125,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 				characters.put(i.name, i);
 			}
 
-		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in game data: " + e.getMessage(), e);
+		} catch (JSONException e) {
+			throw new CorruptDataException("Error in game data: " + e.getMessage(), e);
 
-		} catch (IllegalArgumentException e) {
+		} catch (ClassCastException|IllegalArgumentException e) {
 			throw new CorruptDataException("Type error in game data: " + e.getMessage(), e);
 		}
 	}

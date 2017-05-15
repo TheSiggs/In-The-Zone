@@ -1,14 +1,18 @@
 package inthezone.battle.data;
 
 import isogame.resource.ResourceLocator;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CompiledResourceLocator implements ResourceLocator {
 	private final Optional<File> gameDataCacheDir;
@@ -31,23 +35,51 @@ public class CompiledResourceLocator implements ResourceLocator {
 			throw new FileNotFoundException("Missing sfx resource " + file);
 	}
 
+	private int getStreamVersionNumber(InputStream s) {
+		try (BufferedReader in =
+			new BufferedReader(new InputStreamReader(s, "UTF-8"))
+		) {
+			if (in == null) return 0;
+
+			final StringBuilder raw = new StringBuilder();
+			String line = null;
+			while ((line = in.readLine()) != null) raw.append(line);
+
+			return (new JSONObject(raw.toString())).optInt("versionNumber", 0);
+
+		} catch (JSONException|IOException e) {
+			return 0;
+		}
+	}
+
+	private void copyGameData(File gameDataFile) throws IOException {
+		final File cache = gameDataCacheDir.get();
+		// copy the compiled-in version to make a new cached version
+		if (!cache.exists()) cache.mkdir();
+		final OutputStream fout = new FileOutputStream(gameDataFile);
+		final InputStream fin = internalGameData();
+		int b;
+		while ((b = fin.read()) != -1) fout.write(b);
+		fout.close();
+		fin.close();
+	}
+
 	@Override
 	public InputStream gameData() throws IOException {
 		if (!gameDataCacheDir.isPresent()) {
 			return internalGameData();
 		} else {
-			File gameDataFile = new File(gameDataFilename());
+			final File gameDataFile = new File(gameDataFilename());
 
 			if (!gameDataFile.exists()) {
-				File cache = gameDataCacheDir.get();
-				// copy the compiled-in version to make a new cached version
-				if (!cache.exists()) cache.mkdir();
-				OutputStream fout = new FileOutputStream(gameDataFile);
-				InputStream fin = internalGameData();
-				int b;
-				while ((b = fin.read()) != -1) fout.write(b);
-				fout.close();
-				fin.close();
+				copyGameData(gameDataFile);
+			} else {
+				final int internalVN = getStreamVersionNumber(internalGameData());
+				final int cachedVN = getStreamVersionNumber(
+					new FileInputStream(gameDataFile));
+				if (internalVN > cachedVN) {
+					copyGameData(gameDataFile);
+				}
 			}
 
 			return new FileInputStream(gameDataFile);

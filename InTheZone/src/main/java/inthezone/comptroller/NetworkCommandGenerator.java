@@ -6,14 +6,9 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
-import inthezone.battle.commands.ExecutedCommand;
-import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.data.Player;
-import inthezone.battle.Targetable;
 import javafx.application.Platform;
 import java.util.concurrent.BlockingQueue;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A bridge between the battle controller and the network code.

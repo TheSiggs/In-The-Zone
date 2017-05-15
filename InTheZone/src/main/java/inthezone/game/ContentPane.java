@@ -5,7 +5,6 @@ import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
-import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.LobbyListener;
 import inthezone.comptroller.Network;
 import inthezone.comptroller.NetworkCommandGenerator;
@@ -17,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.Optional;
@@ -38,6 +38,8 @@ public class ContentPane extends StackPane implements LobbyListener {
 	private Pane currentPane;
 
 	private boolean isConnected = false;
+
+	private Optional<BattleView> currentBattle = Optional.empty();
 
 	public ContentPane(
 		ClientConfig config,
@@ -197,15 +199,30 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 	@Override
+	public void otherClientDisconnects(boolean logoff) {
+		Platform.runLater(() -> {
+			currentBattle.ifPresent(bv -> {
+				if (logoff) {
+					bv.endBattle(BattleOutcome.OTHER_LOGGED_OUT);
+				}
+			});
+		});
+	}
+
+	@Override
 	public void startBattle(
 		StartBattleCommand ready, Player player, String playerName
 	) {
 		Platform.runLater(() -> {
 			try {
-				showScreen(new BattleView(
+				final BattleView newBattle = new BattleView(
 					ready, player,
 					new NetworkCommandGenerator(network.readCommandQueue),
-					network, gameData), oWinCond -> {});
+					network, gameData);
+				currentBattle = Optional.of(newBattle);
+				showScreen(newBattle, oWinCond -> {
+					currentBattle = Optional.empty();
+				});
 
 			} catch (CorruptDataException e) {
 				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);

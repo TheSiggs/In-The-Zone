@@ -92,10 +92,7 @@ public class Game extends Application {
 
 	@Override
 	public void stop() {
-		if (network != null) {
-			network.shutdown();
-			if (networkThread != null) networkThread.interrupt();
-		}
+		if (network != null) network.shutdown();
 
 		System.exit(0);
 	}

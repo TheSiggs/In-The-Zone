@@ -19,10 +19,14 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.Optional;
 import java.util.UUID;
 
 public class Network implements Runnable {
+	private final static long timeout = 20*1000;
+	private final TimeUnit timeoutUnit = TimeUnit.SECONDS;
+
 	private final GameDataFactory gameData;
 	private final LobbyListener lobbyListener;
 
@@ -46,30 +50,25 @@ public class Network implements Runnable {
 		this.lobbyListener = lobbyListener;
 	}
 
-	private boolean stayConnected = true;
+	private volatile boolean disconnectNow = false;
+
 	public synchronized void shutdown() {
-		stayConnected = false;
+		disconnectNow = true;
 		logout();
-		if (socket != null) try {
-			socket.close();
-		} catch (IOException e) {
-			/* Doesn't matter */
-		}
 	}
 
 	@Override
 	public void run() {
-		while (stayConnected) {
+		while (!disconnectNow) {
+
 			synchronized (connect) {
-				while (!connect.get() && stayConnected) {
+				while (!connect.get()) {
 					try {
 						connect.wait();
 					} catch (InterruptedException e) {
 						/* ignore */
 					}
 				}
-
-				if (!stayConnected) return;
 
 				try {
 					doConnect();
@@ -87,9 +86,11 @@ public class Network implements Runnable {
 				}
 			}
 
-			while (stayConnected) {
+			while (true) {
 				try {
-					Message msg = sendQueue.take();
+					Message msg = sendQueue.poll(timeout, timeoutUnit);
+					if (msg == null) throw new InterruptedException();
+
 					toServer.write(msg.toString());
 					toServer.flush();
 

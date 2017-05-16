@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public class Server {
 	public static final int DEFAULT_BACKLOG = 10;
+	public static final int DEFAULT_MAXCLIENTS = 1000;
 	public static final int DEFAULT_PORT = 8000; // for now!
 
 	public static void main(String args[]) {
@@ -37,13 +38,17 @@ public class Server {
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_BACKLOG);
 			final String name = Optional.ofNullable(parsedArgs.get("--name"))
 				.orElse(InetAddress.getLocalHost().getHostName());
+			final int maxClients = Optional.ofNullable(parsedArgs.get("--maxClients"))
+				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_MAXCLIENTS);
 
 			System.err.println("Starting server \"" + name + "\" on port " + port);
+			System.err.println("Maximum clients: " + maxClients);
 
-			GameDataFactory dataFactory = new GameDataFactory(baseDir, true, true);
-			Multiplexer multiplexer = new Multiplexer(name, port, backlog, dataFactory);
+			final GameDataFactory dataFactory = new GameDataFactory(baseDir, true, true);
+			final Multiplexer multiplexer = new Multiplexer(
+				name, port, backlog, maxClients, dataFactory);
 
-			Thread mplexerThread = new Thread(multiplexer);
+			final Thread mplexerThread = new Thread(multiplexer);
 			mplexerThread.start();
 
 			boolean again = true;
@@ -73,7 +78,7 @@ public class Server {
 
 	private static void commandLineError() {
 		System.out.println("Syntax: server (opt=value)*");
-		System.out.println("Valid options are: basedir, port, name, backlog");
+		System.out.println("Valid options are: basedir, port, name, backlog, maxClients");
 		System.exit(2);
 	}
 }

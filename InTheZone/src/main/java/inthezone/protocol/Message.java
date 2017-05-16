@@ -40,11 +40,14 @@ public class Message {
 		payload.put(key, value);
 	}
 
-	public static Message SV(int v, UUID gameDataVersion, UUID sessionKey) {
+	public static Message SV(
+		int v, UUID gameDataVersion, UUID sessionKey, String serverName
+	) {
 		final JSONObject o = new JSONObject();
 		o.put("version", v);
 		o.put("gdversion", gameDataVersion.toString());
 		o.put("session", sessionKey.toString());
+		o.put("serverName", serverName);
 		return new Message(MessageKind.S_VERSION, o);
 	}
 

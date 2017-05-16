@@ -4,6 +4,7 @@ import inthezone.battle.data.GameDataFactory;
 import isogame.engine.CorruptDataException;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,9 +35,13 @@ public class Server {
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_PORT);
 			final int backlog = Optional.ofNullable(parsedArgs.get("--backlog"))
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_BACKLOG);
+			final String name = Optional.ofNullable(parsedArgs.get("--name"))
+				.orElse(InetAddress.getLocalHost().getHostName());
+
+			System.err.println("Starting server \"" + name + "\" on port " + port);
 
 			GameDataFactory dataFactory = new GameDataFactory(baseDir, true, true);
-			Multiplexer multiplexer = new Multiplexer(port, backlog, dataFactory);
+			Multiplexer multiplexer = new Multiplexer(name, port, backlog, dataFactory);
 
 			Thread mplexerThread = new Thread(multiplexer);
 			mplexerThread.start();
@@ -68,7 +73,7 @@ public class Server {
 
 	private static void commandLineError() {
 		System.out.println("Syntax: server (opt=value)*");
-		System.out.println("Valid options are: basedir, port, backlog");
+		System.out.println("Valid options are: basedir, port, name, backlog");
 		System.exit(2);
 	}
 }

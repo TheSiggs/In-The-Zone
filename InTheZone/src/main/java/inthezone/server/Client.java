@@ -45,8 +45,9 @@ public class Client {
 	private long disconnectedAt = 0;
 
 	private final UUID sessionKey = UUID.randomUUID();
-	
+
 	public Client(
+		String serverName,
 		SocketChannel connection,
 		Selector sel,
 		Map<String, Client> namedClients,
@@ -54,6 +55,7 @@ public class Client {
 		Map<UUID, Client> sessions,
 		GameDataFactory dataFactory
 	) throws IOException {
+
 		this.namedClients = namedClients;
 		this.pendingClients = pendingClients;
 		this.sessions = sessions;
@@ -65,7 +67,7 @@ public class Client {
 
 		// Send the server version to get the ball rolling
 		channel.requestSend(Message.SV(
-			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey));
+			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey, serverName));
 	}
 
 	public void resetSelector(Selector sel) throws IOException {

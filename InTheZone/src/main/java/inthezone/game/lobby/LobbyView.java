@@ -125,7 +125,7 @@ public class LobbyView extends VBox {
 	}
 
 	public void playerLeaves(String player) {
-		ServerPlayer p = playerNames.get(player);
+		ServerPlayer p = playerNames.remove(player);
 		if (p != null) players.remove(p);
 	}
 

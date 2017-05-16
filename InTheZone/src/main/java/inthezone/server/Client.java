@@ -118,8 +118,6 @@ public class Client {
 
 		pendingClients.remove(this);
 		if (intentional || state != ClientState.GAME) {
-			System.err.println("Intentional or not not in game " + name);
-
 			// otherGuyLoggedOff may call closeConnection, which could lead to an
 			// infinite loop.  So we need to be careful here.  Doing it this way is
 			// ugly, but it guarantees that both sides get closed, no matter which
@@ -140,7 +138,6 @@ public class Client {
 				}
 			}
 		} else {
-			System.err.println("Not Intentional and not not in game " + name);
 			inGameWith.ifPresent(x -> x.waitForReconnect());
 			state = ClientState.DISCONNECTED;
 			disconnectedAt = System.currentTimeMillis();

@@ -30,11 +30,15 @@ public class DisconnectedView extends FlowPane {
 	private final Network network;
 
 	private final Button login = new Button("Connect to server");
+	private final Button setServer = new Button("Set server");
 	private final Button loadout = new Button("Edit loadouts offline");
 	private final Button sandpit = new Button("Sandpit mode");
 
 	private final GameDataFactory gameData;
 	private final ContentPane parent;
+
+	private String server;
+	private int port;
 
 	public DisconnectedView(
 		ContentPane parent,
@@ -47,6 +51,9 @@ public class DisconnectedView extends FlowPane {
 		this.network = parent.network;
 		this.gameData = gameData;
 		this.parent = parent;
+
+		this.server = server;
+		this.port = port;
 
 		login.setOnAction(event -> {
 			String playerName = "";
@@ -70,7 +77,31 @@ public class DisconnectedView extends FlowPane {
 				}
 			}
 			startConnecting();
-			network.connectToServer(server, port, playerName);
+			network.connectToServer(this.server, this.port, playerName);
+		});
+
+		setServer.setOnAction(event -> {
+			final TextInputDialog ti = new TextInputDialog(this.server + ":" + this.port);
+			ti.setTitle("Enter server name");
+			ti.setHeaderText("Enter server domain name or IP, and port");
+			ti.showAndWait().ifPresent(newServer -> {
+				final String[] r = newServer.split(":");
+				if (r.length == 1) {
+					this.server = r[0];
+					config.server = this.server;
+					config.writeConfig();
+				} else if (r.length == 2) {
+					this.server = r[0];
+					this.port = Integer.parseInt(r[1]);
+					config.server = this.server;
+					config.port = this.port;
+					config.writeConfig();
+				} else {
+					Alert a = new Alert(Alert.AlertType.INFORMATION, "Enter \"server:port\"");
+					a.setHeaderText("Invalid server name");
+					a.showAndWait();
+				}
+			});
 		});
 
 		loadout.setOnAction(event -> {
@@ -98,7 +129,7 @@ public class DisconnectedView extends FlowPane {
 			}
 		});
 
-		this.getChildren().addAll(login, loadout, sandpit);
+		this.getChildren().addAll(login, setServer, loadout, sandpit);
 	}
 
 	private Consumer<Optional<StartBattleCommandRequest>> getStartSandpitCont() {

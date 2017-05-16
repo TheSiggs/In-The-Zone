@@ -1,5 +1,6 @@
 package inthezone.game.loadoutEditor;
 
+import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterProfile;
@@ -13,6 +14,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -38,6 +40,7 @@ public class CharacterProfilePane extends VBox {
 	private final VBox allAbilitiesPane = new VBox();
 	private final VBox selectedPane = new VBox();
 	private final ListView<AbilityInfo> allAbilities = new ListView<>();
+	private final TextArea description = new TextArea("<no ability selected>");
 	private final ListView<AbilityInfo> selectedAbilities = new ListView<>();
 	private final ComboBox<AbilityInfo> basicAbilities = new ComboBox<>(basicAbilitiesModel);
 
@@ -54,10 +57,23 @@ public class CharacterProfilePane extends VBox {
 			new Label("Defence"), defence);
 
 		allAbilities.setEditable(false);
-		allAbilitiesPane.getChildren().addAll(addAbility, allAbilities);
+		allAbilitiesPane.getChildren().addAll(addAbility, allAbilities, description);
+
+		description.setEditable(false);
+		description.setWrapText(true);
+		description.setPrefRowCount(3);
+		description.setPrefWidth(280);
 
 		allAbilities.setPlaceholder(new Label("No character selected"));
 		selectedAbilities.setPlaceholder(new Label("No abilities chosen"));
+
+		allAbilities.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+			if (n == null) {
+				description.setText("<no ability selected>");
+			} else {
+				description.setText(new AbilityDescription(n).toString());
+			}
+		});
 
 		addAbility.setOnAction(event -> addAbility());
 

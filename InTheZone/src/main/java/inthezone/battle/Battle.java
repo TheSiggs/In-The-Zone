@@ -296,8 +296,8 @@ public class Battle {
 	/**
 	 * Handle the resign effect
 	 * */
-	public void doResign(Player player) {
-		battleState.resign(player);
+	public void doResign(Player player, boolean logoff) {
+		battleState.resign(player, logoff);
 	}
 }
 

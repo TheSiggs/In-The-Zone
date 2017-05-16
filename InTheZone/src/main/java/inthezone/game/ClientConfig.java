@@ -2,6 +2,7 @@ package inthezone.game;
 
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
+import inthezone.server.Server;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import javafx.scene.control.Alert;
@@ -27,6 +28,9 @@ import org.json.JSONObject;
  * Client configuration.
  * */
 public class ClientConfig implements HasJSONRepresentation {
+	private final static String DEFAULT_SERVER = "127.0.0.1"; // TODO: update with the ip of the real sever
+	private final static int DEFAULT_PORT = Server.DEFAULT_PORT;
+
 	private final File configFile =
 		new File(GameDataFactory.gameDataCacheDir, "client.json");
 
@@ -59,6 +63,9 @@ public class ClientConfig implements HasJSONRepresentation {
 	public Optional<String> defaultPlayerName = Optional.empty();
 	public final Collection<Loadout> loadouts = new ArrayList<>();
 
+	public String server = DEFAULT_SERVER;
+	public int port = DEFAULT_PORT;
+
 	public void loadConfig(JSONObject json, GameDataFactory gameData)
 		throws CorruptDataException
 	{
@@ -68,6 +75,8 @@ public class ClientConfig implements HasJSONRepresentation {
 		try {
 			final String name = json.optString("name", null);
 			final JSONArray loadouts = json.optJSONArray("loadouts");
+			this.server = json.optString("server", DEFAULT_SERVER);
+			this.port = json.optInt("port", DEFAULT_PORT);
 
 			this.defaultPlayerName = Optional.ofNullable(name);
 			if (loadouts != null) {
@@ -91,6 +100,8 @@ public class ClientConfig implements HasJSONRepresentation {
 	public JSONObject getJSON() {
 		final JSONObject o = new JSONObject();
 		defaultPlayerName.ifPresent(n -> o.put("name", n));
+		o.put("server", server);
+		o.put("port", port);
 		final JSONArray a = new JSONArray();
 		for (Loadout l : loadouts) a.put(l.getJSON());
 		o.put("loadouts", a);

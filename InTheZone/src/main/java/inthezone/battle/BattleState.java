@@ -137,12 +137,14 @@ public class BattleState {
 	}
 
 	private Optional<Player> resignedPlayer = Optional.empty();
+	private boolean logoff = false; // set to true when the other player disconnected
 
 	/**
 	 * Register a resignation.
 	 * */
-	public void resign(Player player) {
-		resignedPlayer = Optional.of(player);
+	public void resign(Player player, boolean logoff) {
+		this.resignedPlayer = Optional.of(player);
+		this.logoff = logoff;
 	}
 
 	/**
@@ -152,6 +154,8 @@ public class BattleState {
 		if (resignedPlayer.isPresent()) {
 			if (resignedPlayer.get() == player) {
 				return Optional.of(BattleOutcome.RESIGN);
+			} else if (logoff) {
+				return Optional.of(BattleOutcome.OTHER_LOGGED_OUT);
 			} else {
 				return Optional.of(BattleOutcome.OTHER_RESIGNED);
 			}

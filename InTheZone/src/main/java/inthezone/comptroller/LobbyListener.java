@@ -34,6 +34,12 @@ public interface LobbyListener {
 	 * */
 	public void challengeIssued(String player);
 
+	/**
+	 * The other client logged off.
+	 * @param logoff The other client is not coming back
+	 * */
+	public void otherClientDisconnects(boolean logoff);
+
 
 	/**
 	 * Start a battle.

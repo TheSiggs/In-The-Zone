@@ -113,10 +113,12 @@ public class Client {
 	 * caused by an IO error.
 	 * */
 	public void closeConnection(boolean intentional) {
+		System.err.println("Close connection " + name);
 		if (recursiveCloseConnection) return;
 
 		pendingClients.remove(this);
 		if (intentional || state != ClientState.GAME) {
+			System.err.println("Intentional or not not in game " + name);
 
 			// otherGuyLoggedOff may call closeConnection, which could lead to an
 			// infinite loop.  So we need to be careful here.  Doing it this way is
@@ -138,6 +140,7 @@ public class Client {
 				}
 			}
 		} else {
+			System.err.println("Not Intentional and not not in game " + name);
 			inGameWith.ifPresent(x -> x.waitForReconnect());
 			state = ClientState.DISCONNECTED;
 			disconnectedAt = System.currentTimeMillis();
@@ -240,7 +243,7 @@ public class Client {
 	 * */
 	public void replayMessagesFrom(int lastSequenceNumber) {
 		for (Message m : messages) {
-			if (m.getSequenceNumber() > lastSequenceNumber) {
+			if (m.getSequenceNumber() >= lastSequenceNumber) {
 				channel.requestSend(m);
 			}
 		}
@@ -269,6 +272,7 @@ public class Client {
 		if (state == ClientState.DISCONNECTED) {
 			closeConnection(true);
 		} else {
+			System.err.println("Other player logged off");
 			inGameWith = Optional.empty();
 			messages.clear();
 			channel.requestSend(Message.LOGOFF());
@@ -283,14 +287,14 @@ public class Client {
 	 * Wait for the other player to reconnect
 	 * */
 	public void waitForReconnect() {
-		channel.requestSend(Message.WAIT_FOR_RECONNECT());
+		if (isConnected()) channel.requestSend(Message.WAIT_FOR_RECONNECT());
 	}
 
 	/**
 	 * The other player has reconnected
 	 * */
 	public void otherGuyReconnected() {
-		channel.requestSend(Message.RECONNECT(sessionKey, 0));
+		if (isConnected()) channel.requestSend(Message.RECONNECT(sessionKey, 0));
 	}
 
 	/**
@@ -309,7 +313,6 @@ public class Client {
 		if (inGameWith.isPresent()) {
 			this.state = ClientState.GAME;
 			inGameWith.get().otherGuyReconnected();
-			replayMessagesFrom(lastSequenceNumber);
 		} else {
 			this.state = ClientState.LOBBY;
 		}
@@ -348,9 +351,14 @@ public class Client {
 					if (old == null) {
 						channel.requestSend(Message.NOK("Cannot reconnect"));
 					} else {
-						old.reconnect(connection, channel, msg.parseLastSequenceNumber());
+						final	int lastSequenceNumber = msg.parseLastSequenceNumber();
+						old.reconnect(connection, channel, lastSequenceNumber);
 						channel.requestSend(Message.OK());
 						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
+						old.replayMessagesFrom(lastSequenceNumber);
+						old.inGameWith.ifPresent(other -> {
+							if (!other.isConnected()) old.waitForReconnect();
+						});
 
 						// remove this client
 						pendingClients.remove(this);

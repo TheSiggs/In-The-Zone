@@ -12,9 +12,16 @@ import org.json.JSONObject;
 
 public class ResignCommand extends Command {
 	public final Player player;
+	public final boolean logoff;
 
 	public ResignCommand(Player player) {
 		this.player = player;
+		this.logoff = false;
+	}
+
+	public ResignCommand(Player player, boolean logoff) {
+		this.player = player;
+		this.logoff = logoff;
 	}
 
 	@Override 
@@ -22,6 +29,7 @@ public class ResignCommand extends Command {
 		final JSONObject r = new JSONObject();
 		r.put("kind", CommandKind.RESIGN.toString());
 		r.put("player", player.toString());
+		r.put("logoff", logoff);
 		return r;
 	}
 
@@ -31,11 +39,12 @@ public class ResignCommand extends Command {
 		try {
 			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
 			final Player player = Player.fromString(json.getString("player"));
+			final boolean logoff = json.getBoolean("logoff");
 
 			if (kind != CommandKind.RESIGN)
 				throw new ProtocolException("Expected resign command");
 
-			return new ResignCommand(player);
+			return new ResignCommand(player, logoff);
 
 		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing resign command", e);
@@ -44,7 +53,7 @@ public class ResignCommand extends Command {
 
 	@Override
 	public List<Targetable> doCmd(Battle turn) {
-		turn.doResign(player);
+		turn.doResign(player, logoff);
 		return new ArrayList<>();
 	}
 }

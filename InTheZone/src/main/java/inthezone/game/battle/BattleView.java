@@ -79,6 +79,8 @@ public class BattleView
 
 		final DecalRenderer decals = new DecalRenderer(this, gameData.getStandardSprites());
 
+		System.err.println("Playing as " + player);
+
 		this.canvas = new MapView(this,
 			gameData.getStage(startBattle.stage), true, false, Highlighters.highlights);
 		canvas.widthProperty().bind(this.widthProperty());

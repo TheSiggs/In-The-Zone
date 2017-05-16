@@ -3,10 +3,9 @@ package inthezone.battle;
 import inthezone.battle.status.StatusEffect;
 import inthezone.battle.status.StatusEffectFactory;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
-import isogame.engine.MapPoint;
 import java.util.Optional;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DamageToTarget implements HasJSONRepresentation {
@@ -37,7 +36,6 @@ public class DamageToTarget implements HasJSONRepresentation {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
 		r.put("target", target.getJSON());
@@ -48,34 +46,23 @@ public class DamageToTarget implements HasJSONRepresentation {
 		return r;
 	}
 
-	public static DamageToTarget fromJSON(JSONObject json)
-		throws ProtocolException
-	{
-		Object otarget = json.get("target");
-		Object otrap = json.get("trap");
-		Object ozone = json.get("zone");
-		Object odamage = json.get("damage");
-		Object ostatus = json.get("status");
-
-		if (otarget == null) throw new ProtocolException("Missing damage target");
-		if (otrap == null) throw new ProtocolException("Missing damage trap switch");
-		if (ozone == null) throw new ProtocolException("Missing damage zone switch");
-		if (odamage == null) throw new ProtocolException("Missing damage amount");
-
+	public static DamageToTarget fromJSON(JSONObject json) throws ProtocolException {
 		try {
-			Casting target = Casting.fromJSON((JSONObject) otarget);
-			Boolean trap = (Boolean) otrap;
-			Boolean zone = (Boolean) ozone;
-			Number damage = (Number) odamage;
+			final Casting target = Casting.fromJSON(json.getJSONObject("target"));
+			final boolean trap = json.getBoolean("trap");
+			final boolean zone = json.getBoolean("zone");
+			final int damage = json.getInt("damage");
+			final JSONObject ostatus = json.optJSONObject("status");
 
 			Optional<StatusEffect> effect = Optional.empty();
 			if (ostatus != null) {
-				effect = Optional.of(StatusEffectFactory.fromJSON((JSONObject) ostatus));
+				effect = Optional.of(StatusEffectFactory.fromJSON(ostatus));
 			}
 
 			return new DamageToTarget(target, trap, zone,
-				damage.intValue(), effect, false, false);
-		} catch (ClassCastException e) {
+				damage, effect, false, false);
+
+		} catch (JSONException e) {
 			throw new ProtocolException("Error parsing damage", e);
 		}
 	}

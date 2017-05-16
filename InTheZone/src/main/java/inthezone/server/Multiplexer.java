@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Multiplexer implements Runnable {
+	private final static long timeout = 30 * 1000;
+
 	// Clients that are in the process of connecting to the server
 	private final Collection<Client> pendingClients = new LinkedList<>();
 	// Clients with names on the server
@@ -87,14 +89,15 @@ public class Multiplexer implements Runnable {
 
 	int debugCounter = 0;
 
-	Collection<Client> expiredClients = new ArrayList<>();
+	final Collection<Client> expiredClients = new ArrayList<>();
+	final Collection<Client> disconnectedClients = new ArrayList<>();
 
 	/**
 	 * Block until an IO operation is ready to run.
 	 * */
 	private void doSelect() throws IOException {
 		System.out.println("blocking " + (debugCounter++));
-		selector.select();
+		selector.select(timeout);
 		System.out.println("unblocked");
 
 		// do IO operations
@@ -124,22 +127,23 @@ public class Multiplexer implements Runnable {
 
 		// clean up any clients which have quietly dropped their connections.
 		expiredClients.clear();
+		disconnectedClients.clear();
 		for (Client c : sessions.values()) {
 			if (c.isDisconnected()) {
 				if (c.isDisconnectedTimeout()) expiredClients.add(c);
 			} else if (!c.isConnected()) {
 				System.err.println("Dropped connection");
-				c.closeConnection(false);
+				disconnectedClients.add(c);
 			}
 		}
 
 		for (Client c : expiredClients) removeClient(c);
+		for (Client c : disconnectedClients) c.closeConnection(false);
 	}
 
 	private void removeClient(Client c) {
-		sessions.remove(c);
-		namedClients.remove(c);
-		pendingClients.remove(c);
+		System.err.println("Removing client " + c);
+		c.closeConnection(true);
 	}
 
 	private void newClient(SocketChannel connection) {

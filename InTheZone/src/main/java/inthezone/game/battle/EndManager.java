@@ -24,6 +24,7 @@ public class EndManager extends HBox {
 			case DRAW: m = "It's a draw."; break;
 			case RESIGN: m = "You resigned."; break;
 			case OTHER_RESIGNED: m = "Other player resigned."; break;
+			case OTHER_LOGGED_OUT: m = "Other player logged out or disconnected."; break;
 			default: throw new RuntimeException("This cannot happen");
 		}
 

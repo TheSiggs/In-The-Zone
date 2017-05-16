@@ -4,6 +4,7 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -19,7 +20,6 @@ public class Casting implements HasJSONRepresentation {
 	}
 
 	@Override 
-	@SuppressWarnings("unchecked")
 	public JSONObject getJSON() {
 		JSONObject r = new JSONObject();
 		r.put("castFrom", castFrom.getJSON());
@@ -28,17 +28,13 @@ public class Casting implements HasJSONRepresentation {
 	}
 
 	public static Casting fromJSON(JSONObject json) throws ProtocolException {
-		Object ocastFrom = json.get("castFrom");
-		Object otarget = json.get("target");
-
-		if (ocastFrom == null) throw new ProtocolException("Missing castFrom in casting");
-		if (otarget == null) throw new ProtocolException("Missing target in casting");
-
 		try {
-			return new Casting(
-				MapPoint.fromJSON((JSONObject) ocastFrom),
-				MapPoint.fromJSON((JSONObject) otarget));
-		} catch (ClassCastException|CorruptDataException e) {
+			final MapPoint castFrom = MapPoint.fromJSON(json.getJSONObject("castFrom"));
+			final MapPoint target = MapPoint.fromJSON(json.getJSONObject("target"));
+
+			return new Casting(castFrom, target);
+
+		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing casting");
 		}
 	}

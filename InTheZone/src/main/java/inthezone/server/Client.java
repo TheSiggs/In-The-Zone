@@ -240,7 +240,7 @@ public class Client {
 	 * */
 	public void replayMessagesFrom(int lastSequenceNumber) {
 		for (Message m : messages) {
-			if (m.getSequenceNumber() >= lastSequenceNumber) {
+			if (m.getSequenceNumber() > lastSequenceNumber) {
 				channel.requestSend(m);
 			}
 		}

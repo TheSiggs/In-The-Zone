@@ -27,6 +27,7 @@ import java.util.Optional;
 public class LobbyView extends VBox {
 	private final ObservableList<ServerPlayer> players =
 		FXCollections.observableArrayList();
+	final ListView<ServerPlayer> playerList = new ListView<>(players);
 	
 	private final Map<String, ServerPlayer>	playerNames = new HashMap<>();
 
@@ -53,7 +54,6 @@ public class LobbyView extends VBox {
 
 		final VBox mainPane = new VBox();
 
-		final ListView<ServerPlayer> playerList = new ListView<>(players);
 		mainPane.getChildren().addAll(new Label("Players on server"), playerList);
 
 		challenge.disableProperty().bind(
@@ -117,6 +117,7 @@ public class LobbyView extends VBox {
 		ServerPlayer p = playerNames.get(player);
 		if (p != null) {
 			p.reset();
+			playerList.refresh();
 		} else {
 			p = new ServerPlayer(player, false);
 			playerNames.put(player, p);
@@ -132,6 +133,7 @@ public class LobbyView extends VBox {
 	public void playerEntersGame(String player) {
 		ServerPlayer p = playerNames.get(player);
 		if (p != null) p.setInGame();
+		playerList.refresh();
 	}
 
 	public void challengeFrom(String player, StartBattleCommandRequest otherCmd) {

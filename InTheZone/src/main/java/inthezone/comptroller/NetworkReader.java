@@ -84,17 +84,11 @@ public class NetworkReader implements Runnable {
 
 					case COMMAND:
 						try {
-							if (sequenceNumber > lastSequenceNumber) {
-								recQueue.put(Command.fromJSON(msg.parseCommand()));
-								lastSequenceNumber = sequenceNumber;
-							}
+							recQueue.put(Command.fromJSON(msg.parseCommand()));
+							lastSequenceNumber = sequenceNumber;
 						} catch (InterruptedException e) {
 							/* ignore */
 						}
-						break;
-
-					case GAME_OVER:
-						// This can be safely ignored for now
 						break;
 
 					case LOGOFF:

@@ -21,6 +21,8 @@ public class NetworkReader implements Runnable {
 
 	private final BlockingQueue<Command> recQueue;
 
+	private int lastSequenceNumber = 0;
+
 	public NetworkReader(
 		BufferedReader in,
 		LobbyListener lobbyListener,
@@ -35,14 +37,19 @@ public class NetworkReader implements Runnable {
 		this.parent = parent;
 	}
 
+	public int getLastSequenceNumber() { return lastSequenceNumber; }
+
 	@Override
 	public void run() {
 		try {
+
 			for (
 				String inline = in.readLine();
 				inline != null; inline = in.readLine()
 			) {
-				Message msg = Message.fromString(inline);
+				final Message msg = Message.fromString(inline);
+				final int sequenceNumber = msg.getSequenceNumber();
+
 				switch (msg.kind) {
 					case PLAYERS_JOIN:
 						for (String p : msg.parseJoinedLobby()) lobbyListener.playerHasLoggedIn(p);
@@ -78,13 +85,10 @@ public class NetworkReader implements Runnable {
 					case COMMAND:
 						try {
 							recQueue.put(Command.fromJSON(msg.parseCommand()));
+							lastSequenceNumber = sequenceNumber;
 						} catch (InterruptedException e) {
 							/* ignore */
 						}
-						break;
-
-					case GAME_OVER:
-						// This can be safely ignored for now
 						break;
 
 					case LOGOFF:
@@ -92,11 +96,11 @@ public class NetworkReader implements Runnable {
 						break;
 
 					case RECONNECT:
-						// TODO: implement this
+						lobbyListener.otherClientReconnects();
 						break;
 
 					case WAIT_FOR_RECONNECT:
-						// TODO: implement this
+						lobbyListener.otherClientDisconnects(false);
 						break;
 
 					case ISSUE_CHALLENGE:

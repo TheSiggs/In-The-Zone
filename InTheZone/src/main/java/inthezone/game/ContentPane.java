@@ -211,7 +211,18 @@ public class ContentPane extends StackPane implements LobbyListener {
 			currentBattle.ifPresent(bv -> {
 				if (logoff) {
 					bv.endBattle(BattleOutcome.OTHER_LOGGED_OUT);
+				} else {
+					bv.waitForOtherClientToReconnect();
 				}
+			});
+		});
+	}
+
+	@Override
+	public void otherClientReconnects() {
+		Platform.runLater(() -> {
+			currentBattle.ifPresent(bv -> {
+				bv.otherClientReconnects();
 			});
 		});
 	}

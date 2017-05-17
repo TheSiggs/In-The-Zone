@@ -40,6 +40,10 @@ public interface LobbyListener {
 	 * */
 	public void otherClientDisconnects(boolean logoff);
 
+	/**
+	 * The other client reconnected
+	 * */
+	public void otherClientReconnects();
 
 	/**
 	 * Start a battle.

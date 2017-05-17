@@ -31,9 +31,17 @@ public class Multiplexer implements Runnable {
 	private final ServerSocketChannel serverSocket;
 	private final SelectionKey serverKey;
 
-	public Multiplexer(int port, int backlog, GameDataFactory dataFactory)
-		throws IOException
-	{
+	private final String name;
+
+	private final int maxClients;
+
+	public Multiplexer(
+		String name, int port, int backlog,
+		int maxClients, GameDataFactory dataFactory
+	) throws IOException {
+		this.name = name;
+		this.maxClients = maxClients;
+
 		this.dataFactory = dataFactory;
 		this.selector = Selector.open();
 
@@ -144,9 +152,17 @@ public class Multiplexer implements Runnable {
 
 	private void newClient(SocketChannel connection) {
 		try {
-			pendingClients.add(new Client(
-				connection, selector, namedClients,
-				pendingClients, sessions, dataFactory));
+			if (sessions.size() >= maxClients) {
+				// if this happens, assume we're under attack and just close the connection.
+				System.err.println("Refused connection to " +
+					connection.getRemoteAddress().toString() +
+					", max clients (" + maxClients + ") reached");
+				connection.close();
+			} else {
+				pendingClients.add(new Client(
+					name, connection, selector, namedClients,
+					pendingClients, sessions, dataFactory));
+			}
 		} catch (IOException e) {
 			try {
 				connection.close();

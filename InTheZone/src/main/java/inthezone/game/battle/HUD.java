@@ -4,6 +4,8 @@ import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -35,6 +37,8 @@ public class HUD extends AnchorPane {
 	private final MenuItem pushItem = new MenuItem("Push");
 	private final MenuItem potionItem = new MenuItem("Use potion");
 
+	private final BooleanProperty disableUI = new SimpleBooleanProperty(false);
+
 	private final BattleView view;
 
 	public final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
@@ -63,11 +67,11 @@ public class HUD extends AnchorPane {
 			abilitiesMenu.show(abilitiesButton, Side.TOP, 0, 0));
 
 		endTurnButton.disableProperty().bind(view.isMyTurn.not()
-			.or(view.cannotCancel));
-		resignButton.disableProperty().bind(view.isMyTurn.not());
+			.or(view.cannotCancel).or(disableUI));
+		resignButton.disableProperty().bind(view.isMyTurn.not().or(disableUI));
 		abilitiesButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.isCharacterSelected.not())
-			.or(view.cannotCancel));
+			.or(view.cannotCancel).or(disableUI));
 
 		characterInfoBoxes.setPrefWrapLength(1000);
 
@@ -131,15 +135,18 @@ public class HUD extends AnchorPane {
 	 * @param resigned True if this player resigned.
 	 * */
 	public void doEndMode(BattleOutcome outcome) {
-		characterInfoBoxes.disableProperty().unbind();
-		endTurnButton.disableProperty().unbind();
-		resignButton.disableProperty().unbind();
-		abilitiesButton.disableProperty().unbind();
-
-		characterInfoBoxes.setDisable(true);
-		endTurnButton.setDisable(true);
-		resignButton.setDisable(true);
+		disableUI.set(true);
 		assistanceLine.getChildren().add(new EndManager(view, outcome));
+	}
+
+	public void doReconnectMode(boolean thisClientReconnecting) {
+		disableUI.set(true);
+		assistanceLine.getChildren().add(new ReconnectManager(thisClientReconnecting));
+	}
+
+	public void endReconnectMode() {
+		disableUI.set(false);
+		assistanceLine.getChildren().clear();
 	}
 
 	public void updateAbilities(Character c, boolean mana) {

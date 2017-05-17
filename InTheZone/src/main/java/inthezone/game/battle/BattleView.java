@@ -297,6 +297,18 @@ public class BattleView
 		onDone.accept(outcome);
 	}
 
+	public void waitForOtherClientToReconnect() {
+		setMode(new ModeWaitForReconnect(this, mode));
+		hud.doReconnectMode(false);
+	}
+
+	public void otherClientReconnects() {
+		if (mode instanceof ModeWaitForReconnect) {
+			setMode(((ModeWaitForReconnect) mode).getPrevious());
+		}
+		hud.endReconnectMode();
+	}
+
 	@Override
 	public void badCommand(CommandException e) {
 		Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);

@@ -45,8 +45,9 @@ public class Client {
 	private long disconnectedAt = 0;
 
 	private final UUID sessionKey = UUID.randomUUID();
-	
+
 	public Client(
+		String serverName,
 		SocketChannel connection,
 		Selector sel,
 		Map<String, Client> namedClients,
@@ -54,6 +55,7 @@ public class Client {
 		Map<UUID, Client> sessions,
 		GameDataFactory dataFactory
 	) throws IOException {
+
 		this.namedClients = namedClients;
 		this.pendingClients = pendingClients;
 		this.sessions = sessions;
@@ -65,7 +67,7 @@ public class Client {
 
 		// Send the server version to get the ball rolling
 		channel.requestSend(Message.SV(
-			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey));
+			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey, serverName));
 	}
 
 	public void resetSelector(Selector sel) throws IOException {
@@ -116,8 +118,6 @@ public class Client {
 
 		pendingClients.remove(this);
 		if (intentional || state != ClientState.GAME) {
-			System.err.println("Intentional or not not in game " + name);
-
 			// otherGuyLoggedOff may call closeConnection, which could lead to an
 			// infinite loop.  So we need to be careful here.  Doing it this way is
 			// ugly, but it guarantees that both sides get closed, no matter which
@@ -138,7 +138,6 @@ public class Client {
 				}
 			}
 		} else {
-			System.err.println("Not Intentional and not not in game " + name);
 			inGameWith.ifPresent(x -> x.waitForReconnect());
 			state = ClientState.DISCONNECTED;
 			disconnectedAt = System.currentTimeMillis();
@@ -241,7 +240,7 @@ public class Client {
 	 * */
 	public void replayMessagesFrom(int lastSequenceNumber) {
 		for (Message m : messages) {
-			if (m.getSequenceNumber() >= lastSequenceNumber) {
+			if (m.getSequenceNumber() > lastSequenceNumber) {
 				channel.requestSend(m);
 			}
 		}

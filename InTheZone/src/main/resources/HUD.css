@@ -21,6 +21,12 @@
 	-fx-border-style:solid;
 }
 
+.reconnect-manager {
+	-fx-background-color:white;
+	-fx-border-color:black;
+	-fx-border-style:solid;
+}
+
 #selectedCharacterImage {
 	-fx-image:url(gui_assets/selected.png);
 }

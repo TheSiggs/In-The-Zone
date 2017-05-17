@@ -48,7 +48,7 @@ public class StatusEffectFactory {
 
 			switch (info.type) {
 				case ONGOING:
-				case REGENERATION: return PointStatusEffect.fromJSON(json);
+				case REGENERATION: return HPStatusEffect.fromJSON(json);
 				case FEARED: return FearedStatusEffect.fromJSON(json);
 				default: return getEffect(info, 0, null);
 			}

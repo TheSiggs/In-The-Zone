@@ -3,14 +3,14 @@ package inthezone.game.battle;
 import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
+import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.StandardSprites;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -24,7 +24,6 @@ public class HUD extends AnchorPane {
 	private final Button endTurnButton = new Button("End turn");
 	private final Button resignButton = new Button("Resign");
 	private final RoundCounter roundCounter = new RoundCounter();
-	private final Button abilitiesButton = new Button("Abilities");
 
 	private final MultiTargetAssistant multiTargetAssistant;
 	private final MessageLine messageLine = new MessageLine();
@@ -32,10 +31,10 @@ public class HUD extends AnchorPane {
 
 	private final FlowPane actionButtons = new FlowPane();
 
-	private final ContextMenu abilitiesMenu = new ContextMenu();
-	private final MenuItem attackItem = new MenuItem("Attack");
-	private final MenuItem pushItem = new MenuItem("Push");
-	private final MenuItem potionItem = new MenuItem("Use potion");
+	private final FlowPane abilitiesMenu = new FlowPane();
+	private final Button attackItem = new Button("Attack");
+	private final Button pushItem = new Button("Push");
+	private final Button potionItem = new Button("Use potion");
 
 	private final BooleanProperty disableUI = new SimpleBooleanProperty(false);
 
@@ -54,6 +53,13 @@ public class HUD extends AnchorPane {
 		this.view = view;
 		this.multiTargetAssistant = new MultiTargetAssistant(view);
 
+		endTurnButton.setTooltip(new Tooltip("End your turn"));
+		resignButton.setTooltip(new Tooltip("Resign from the game"));
+
+		attackItem.setTooltip(new Tooltip("Use your basic attack (1 AP)"));
+		pushItem.setTooltip(new Tooltip("Push a character (1 AP)"));
+		potionItem.setTooltip(new Tooltip("Use a healing potion (1 AP)"));
+
 		pushItem.setOnAction(event -> view.usePush());
 		potionItem.setOnAction(event -> view.useItem());
 
@@ -63,15 +69,13 @@ public class HUD extends AnchorPane {
 		endTurnButton.getStyleClass().add("gui_button");
 		resignButton.getStyleClass().add("gui_button");
 
-		abilitiesButton.setOnAction(event ->
-			abilitiesMenu.show(abilitiesButton, Side.TOP, 0, 0));
-
 		endTurnButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.cannotCancel).or(disableUI));
 		resignButton.disableProperty().bind(view.isMyTurn.not().or(disableUI));
-		abilitiesButton.disableProperty().bind(view.isMyTurn.not()
-			.or(view.isCharacterSelected.not())
-			.or(view.cannotCancel).or(disableUI));
+
+		actionButtons.visibleProperty().bind(view.isMyTurn
+			.and(view.isCharacterSelected)
+			.and(view.cannotCancel.not()).and(disableUI.not()));
 
 		characterInfoBoxes.setPrefWrapLength(1000);
 
@@ -81,7 +85,7 @@ public class HUD extends AnchorPane {
 
 		actionButtons.setAlignment(Pos.CENTER);
 		actionButtons.setMaxHeight(actionButtons.getPrefHeight());
-		actionButtons.getChildren().addAll(abilitiesButton);
+		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
 
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
@@ -150,8 +154,8 @@ public class HUD extends AnchorPane {
 	}
 
 	public void updateAbilities(Character c, boolean mana) {
-		abilitiesMenu.getItems().clear();
-		abilitiesMenu.getItems().addAll(attackItem, pushItem, potionItem);
+		actionButtons.getChildren().clear();
+		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
 
 		attackItem.setOnAction(event ->
 			view.useAbility(mana ? c.basicAbility.getMana() : c.basicAbility));
@@ -164,13 +168,19 @@ public class HUD extends AnchorPane {
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
-			MenuItem i = new MenuItem(ability.info.name);
+			final Button i = new Button(ability.info.name);
 			i.setDisable(
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));
 			i.setOnAction(event -> view.useAbility(ability));
-			abilitiesMenu.getItems().add(i);
+
+			final Tooltip t = new Tooltip((new AbilityDescription(ability.info)).toString());
+			t.setWrapText(true);
+			t.setPrefWidth(300);
+			i.setTooltip(t);
+
+			actionButtons.getChildren().add(i);
 		}
 	}
 

@@ -157,7 +157,7 @@ public class AbilityDescription {
 					s.append("inflict ");
 				}
 
-				s.append(a.statusEffect.get().toString());
+				s.append(a.statusEffect.get().toNiceString());
 
 				if (a.chance < 1f) {
 					s.append(" with a ").append(formatPercent(a.chance)).append(" chance of success");
@@ -170,7 +170,7 @@ public class AbilityDescription {
 				} else {
 					s.append(" inflict ");
 				}
-				s.append(a.statusEffect.get().toString());
+				s.append(a.statusEffect.get().toNiceString());
 
 			} else {
 				if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
@@ -178,7 +178,7 @@ public class AbilityDescription {
 				} else {
 					s.append(", inflicting ");
 				}
-				s.append(a.statusEffect.get().toString());
+				s.append(a.statusEffect.get().toNiceString());
 			}
 
 			isSecondary = true;

@@ -88,6 +88,10 @@ public enum StatusEffectType {
 		}
 	}
 
+	public String toNiceString() {
+		if (this == ONGOING) return "ongoing damage"; else return this.toString();
+	}
+
 	@Override public String toString() {
 		switch (this) {
 			case ACCELERATED: return "accelerated";

@@ -46,6 +46,14 @@ public class StatusEffectInfo {
 		return type.hashCode() + kind.hashCode() + param;
 	}
 
+	public String toNiceString() {
+		if (param == DEFAULT_PARAMETER) {
+			return type.toNiceString();
+		} else {
+			return type.toNiceString() + " " + (new Integer(param)).toString();
+		}
+	}
+
 	@Override
 	public String toString() {
 		if (param == DEFAULT_PARAMETER) {

@@ -2,12 +2,14 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.StatusEffectDescription;
 import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.StatusEffect;
 import javafx.animation.RotateTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -42,6 +44,10 @@ public class CharacterInfoBox extends AnchorPane {
 		this.sprites = sprites;
 
 		this.id = character.id;
+
+		Tooltip.install(ap, new Tooltip("Action points: you spend action points when you attack, push, use a potion, or do an ability"));
+		Tooltip.install(mp, new Tooltip("Movement points: every time you move one square, it costs you one movement point"));
+		Tooltip.install(hp, new Tooltip("Health points: when they get to zero your character faints"));
 
 		portrait = new ImageView(character.portrait);
 
@@ -87,10 +93,17 @@ public class CharacterInfoBox extends AnchorPane {
 		Optional<StatusEffect> buff, Optional<StatusEffect> debuff
 	) {
 		statusLine.getChildren().clear();
-		buff.ifPresent(s -> statusLine.getChildren().add(
-			new ImageView(sprites.statusEffects.get(s.getInfo().type))));
-		debuff.ifPresent(s -> statusLine.getChildren().add(
-			new ImageView(sprites.statusEffects.get(s.getInfo().type))));
+		buff.ifPresent(s -> statusLine.getChildren().add(statusEffectImage(s)));
+		debuff.ifPresent(s -> statusLine.getChildren().add(statusEffectImage(s)));
+	}
+
+	private ImageView statusEffectImage(StatusEffect s) {
+		final ImageView r = new ImageView(sprites.statusEffects.get(s.getInfo().type));
+		final Tooltip t = new Tooltip((new StatusEffectDescription(s.getInfo())).toString());
+		t.setWrapText(true);
+		t.setPrefWidth(300);
+		Tooltip.install(r, t);
+		return r;
 	}
 
 	public void updateCharacter(Character c) {

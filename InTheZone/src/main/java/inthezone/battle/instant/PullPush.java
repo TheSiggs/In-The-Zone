@@ -158,7 +158,7 @@ public class PullPush extends InstantEffect {
 		if (los == null || los.isEmpty()) return path;
 
 		// Stop the path short at the first impassable object.
-		final Player player = battle.getCharacterAt(from).map(c -> c.player).get();
+		final Player player = battle.getCharacterAt(from).map(c -> c.player).orElse(null);
 		if (player == null)
 			throw new RuntimeException("Cannot find character to push/pull!");
 

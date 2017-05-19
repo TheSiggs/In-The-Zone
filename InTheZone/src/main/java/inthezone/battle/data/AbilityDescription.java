@@ -39,28 +39,44 @@ public class AbilityDescription {
 
 		final String p1 = s.toString();
 		s = new StringBuilder();
-		generateTopLevelAbility(s, a);
+		generateTopLevelAbility(s, true, 0, a);
 		final String p2 = s.toString();
 
 		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
 	}
 
-	private static void generateTopLevelAbility(StringBuilder s, AbilityInfo a) {
+	private static void generateTopLevelAbility(
+		StringBuilder s, boolean doItOnce,
+		int maxDistanceFromSelf, AbilityInfo a
+	) {
 		if (a.trap) {
 			generateTrap(s, a);
 		} else if (a.zone == AbilityZoneType.BOUND_ZONE) {
 			generateBoundZone(s, a);
 		} else {
-			generateAbility(s, a);
+			generateAbility(s, maxDistanceFromSelf, a);
 		}
 
 		Optional<AbilityInfo> next = a.subsequent;
 		if (next.isPresent()) {
+			AbilityInfo n = next.get();
+			final boolean nextDoItOnce = doItOnce &&
+				((n.range.nTargets == 1 && n.range.radius == 0) ||
+					n.range.targetMode.equals(selfOnly));
+			final int nextMaxDistanceFromSelf = maxDistanceFromSelf + a.range.range;
+
 			s.append(" Next, ");
 			if (a.range.range > 0 && next.get().range.range > 0) {
-				s.append("from each of the previous targets, ");
+				if (doItOnce && n.range.targetMode.equals(selfOnly)) {
+					/* append nothing */
+				} else if (doItOnce) {
+					s.append("from each of the previous targets, ");
+				} else {
+					s.append("from the previous target, ");
+				}
 			}
-			generateTopLevelAbility(s, next.get());
+
+			generateTopLevelAbility(s, nextDoItOnce, nextMaxDistanceFromSelf, next.get());
 		}
 	}
 
@@ -84,7 +100,7 @@ public class AbilityDescription {
 			s.append(" with radius ").append(a.range.radius);
 			if (a.range.piercing) s.append(" including the attack path");
 			s.append(". The zone will ");
-			generateAbility(s, a);
+			generateAbility(s, 0, a);
 		}
 	}
 
@@ -93,24 +109,27 @@ public class AbilityDescription {
 		if (a.range.targetMode.enemies && a.range.targetMode.allies && a.range.targetMode.self) {
 			s.append("anyone");
 		} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
-			s.append("any other character (friend or foe)");
+			s.append("any character");
+			if (!a.range.targetMode.self) s.append(" (but not you)");
 		} else if (a.range.targetMode.enemies) {
 			s.append("enemies");
-			if (a.range.targetMode.self) {
-				s.append(" (or when you step on it)");
-			}
-		} else {
+			if (a.range.targetMode.self) s.append(" (also activated when you step on it)");
+		} else if (a.range.targetMode.allies) {
 			s.append("allies");
-			if (a.range.targetMode.self) {
-				s.append(" (including yourself)");
-			}
+			if (!a.range.targetMode.self) s.append(" (but not you)");
+		} else {
+			s.append("yourself only");
 		}
 
 		s.append(". When activated, the trap will ");
-		generateAbility(s, a);
+		generateAbility(s, 0, a);
 	}
 
-	private static void generateAbility(StringBuilder s, AbilityInfo a) {
+	private static void generateAbility(
+		StringBuilder s, int maxDistanceFromSelf, AbilityInfo a
+	) {
+		final int nextMaxDistanceFromSelf = maxDistanceFromSelf + a.range.range;
+
 		final InstantEffectInfo obstacles;
 		try {
 			obstacles = new InstantEffectInfo("obstacles");
@@ -121,7 +140,8 @@ public class AbilityDescription {
 		boolean isSecondary = false;
 		if (a.instantBefore.isPresent()) {
 			if (!(a.zone == AbilityZoneType.BOUND_ZONE && a.instantBefore.get().equals(obstacles))) {
-				generateInstantEffect(s, a, a.instantBefore.get(), isSecondary);
+				generateInstantEffect(s, a, nextMaxDistanceFromSelf,
+					a.instantBefore.get(), isSecondary);
 				isSecondary = true;
 			}
 		}
@@ -134,7 +154,7 @@ public class AbilityDescription {
 			if (isSecondary) s.append(", then ");
 
 			s.append("heal");
-			generateTargetMode(s, a, isSecondary, false);
+			generateTargetMode(s, a, nextMaxDistanceFromSelf, isSecondary, false);
 			s.append(" for ").append(formatDouble(a.eff, 2)).append("x heal");
 			isSecondary = true;
 
@@ -142,7 +162,7 @@ public class AbilityDescription {
 			if (isSecondary) s.append(", then ");
 
 			s.append("attack");
-			generateTargetMode(s, a, isSecondary, false);
+			generateTargetMode(s, a, nextMaxDistanceFromSelf, isSecondary, false);
 			s.append(" for ").append(formatDouble(a.eff, 2)).append("x damage");
 			isSecondary = true;
 		}
@@ -153,11 +173,15 @@ public class AbilityDescription {
 
 				if (a.statusEffect.get().kind == StatusEffectKind.BUFF) {
 					s.append("give ");
+					s.append(a.statusEffect.get().toNiceString());
+					s.append(" to");
 				} else {
 					s.append("inflict ");
+					s.append(a.statusEffect.get().toNiceString());
+					s.append(" on");
 				}
 
-				s.append(a.statusEffect.get().toNiceString());
+				generateTargetMode(s, a, nextMaxDistanceFromSelf, false, false);
 
 				if (a.chance < 1f) {
 					s.append(" with a ").append(formatPercent(a.chance)).append(" chance of success");
@@ -187,7 +211,14 @@ public class AbilityDescription {
 
 		if (a.instantAfter.isPresent()) {
 			if (isSecondary) s.append(", then ");
-			generateInstantEffect(s, a, a.instantAfter.get(), isSecondary);
+			generateInstantEffect(s, a, nextMaxDistanceFromSelf,
+				a.instantAfter.get(), isSecondary);
+		}
+
+		if (noDamage && !a.instantBefore.isPresent() &&
+			!a.instantAfter.isPresent() && !a.statusEffect.isPresent())
+		{
+			s.append("Do nothing");
 		}
 
 		s.append(".");
@@ -222,24 +253,26 @@ public class AbilityDescription {
 	}
 
 	private static void generateInstantEffect(
-		StringBuilder s, AbilityInfo a, InstantEffectInfo e, boolean isSecondaryEffect
+		StringBuilder s, AbilityInfo a,
+		int maxDistanceFromSelf, InstantEffectInfo e,
+		boolean isSecondaryEffect
 	) {
 		switch (e.type) {
 			case CLEANSE:
 				s.append("cleanse");
-				generateTargetMode(s, a, isSecondaryEffect, false);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, false);
 				break;
 			case DEFUSE:
 				s.append("defuse");
-				generateTargetMode(s, a, isSecondaryEffect, true);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, true);
 				break;
 			case PURGE:
 				s.append("purge");
-				generateTargetMode(s, a, isSecondaryEffect, true);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, true);
 				break;
 			case PUSH:
 				s.append("push");
-				generateTargetMode(s, a, isSecondaryEffect, false);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, false);
 				if (e.param == 1) {
 					s.append(" one square");
 				} else {
@@ -248,7 +281,7 @@ public class AbilityDescription {
 				break;
 			case PULL:
 				s.append("pull");
-				generateTargetMode(s, a, isSecondaryEffect, false);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, false);
 				if (e.param == 1) {
 					s.append(" one square");
 				} else {
@@ -260,7 +293,7 @@ public class AbilityDescription {
 				break;
 			case TELEPORT:
 				s.append("Teleport");
-				generateTargetMode(s, a, isSecondaryEffect, false);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, false);
 				if (e.param == 1) {
 					s.append(" to an adjacent square");
 				} else {
@@ -277,7 +310,7 @@ public class AbilityDescription {
 				break;
 			case MOVE:
 				s.append("move");
-				generateTargetMode(s, a, isSecondaryEffect, false);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, false);
 				if (e.param == 1) {
 					s.append(" to an adjacent square");
 				} else {
@@ -286,7 +319,7 @@ public class AbilityDescription {
 				break;
 			case REVIVE:
 				s.append("revive");
-				generateTargetMode(s, a, isSecondaryEffect, false);
+				generateTargetMode(s, a, maxDistanceFromSelf, isSecondaryEffect, false);
 				break;
 		}
 	}
@@ -304,24 +337,19 @@ public class AbilityDescription {
 			s.append(" all targeted enemies");
 		} else if (a.range.targetMode.allies) {
 			s.append(" all targeted allies");
-		} if (a.range.targetMode.self) {
+		} else {
 			s.append(" yourself");
 			if (!trapZone) {
 				s.append(" (only if you targeted yourself)");
 			}
 		}
-
-		if (a.range.targetMode.self && !noTargetCharacters) {
-			if (trapZone) {
-				s.append(" (including yourself)");
-			} else {
-				s.append(" (including yourself if you targeted yourself)");
-			}
-		}
 	}
 
+	private static final TargetMode selfOnly = new TargetMode("S");
+
 	private static void generateTargetMode(
-		StringBuilder s, AbilityInfo a, boolean isSecondary, boolean noTargetCharacters
+		StringBuilder s, AbilityInfo a, int maxDistanceFromSelf,
+		boolean isSecondary, boolean noTargetCharacters
 	) {
 		if (isSecondary) {
 			generateSecondaryTargetMode(s, a, noTargetCharacters);
@@ -334,8 +362,10 @@ public class AbilityDescription {
 			if (a.range.radius > 0 && a.zone != AbilityZoneType.BOUND_ZONE) {
 				if (a.trap) s.append(" the target and");
 				
-				s.append(" all");
-				if (a.range.radius == 1) s.append(" adjacent");
+				if (!(a.range.targetMode.equals(selfOnly))) {
+					s.append(" all");
+					if (a.range.radius == 1) s.append(" adjacent");
+				}
 
 				final String cont;
 				if (noTargetCharacters) {
@@ -343,44 +373,52 @@ public class AbilityDescription {
 					cont = "squares";
 				} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 					s.append(" characters");
+					if (!a.range.targetMode.self) s.append(" (but not you)");
 					cont = "characters";
 				} else if (a.range.targetMode.enemies) {
 					s.append(" enemies");
+					if (a.range.targetMode.self) s.append(" (also including yourself)");
 					cont = "enemies";
-				} else {
+				} else if (a.range.targetMode.allies) {
 					s.append(" allies");
+					if (!a.range.targetMode.self) s.append(" (but not you)");
 					cont = "allies";
+				} else {
+					cont = "";
+					s.append(" yourself");
 				}
 
-				if (a.range.targetMode.self) {
-					s.append(" (including yourself)");
-				}
-
-				if (a.range.radius > 1 && !trapZone) {
+				if (a.range.targetMode.equals(selfOnly) && a.range.radius >= maxDistanceFromSelf) {
+					/* append nothing */
+				} else if (a.range.radius > 1 && !trapZone) {
+					if (a.range.targetMode.equals(selfOnly)) {
+						s.append(" if you are");
+					}
 					s.append(" within range ").append(a.range.radius);
 				}
 
-				if (a.range.piercing && !trapZone) {
+				if (a.range.piercing && !trapZone && !a.range.targetMode.equals(selfOnly)) {
 					s.append(" including all ").append(cont).append(" on the attack path");
 				}
 
-			} else if (
-				a.range.targetMode.self && !a.range.targetMode.enemies && !a.range.targetMode.allies)
-			{
+			} else if (a.range.targetMode.equals(selfOnly)) {
 				if (noTargetCharacters) s.append(" your square"); else s.append(" yourself");
+
 			} else {
 				if (noTargetCharacters) {
 					s.append(" your square");
 				} else if (a.zone == AbilityZoneType.BOUND_ZONE) {
 					if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 						s.append(" any character");
+						if (!a.range.targetMode.self) s.append(" (but not you)");
 					} else if (a.range.targetMode.enemies) {
 						s.append(" any enemy");
-					} else {
+						if (a.range.targetMode.self) s.append(" (also including yourself)");
+					} else if (a.range.targetMode.allies) {
 						s.append(" any ally");
-					}
-					if (a.range.targetMode.self) {
-						s.append(" (including yourself)");
+						if (!a.range.targetMode.self) s.append(" (but not you)");
+					} else {
+						s.append(" yourself");
 					}
 				} else if (a.trap) {
 					s.append(" the target");
@@ -390,39 +428,47 @@ public class AbilityDescription {
 				}
 			}
 		} else if (a.range.radius == 0) {
-			if (a.range.nTargets == 0) {
-				s.append(" NO");
-			} else if (a.range.nTargets == 1) {
-				s.append(" one");
-			} else s.append(" ").append(a.range.nTargets);
+			if (!a.range.targetMode.equals(selfOnly)) {
+				if (a.range.nTargets == 0) {
+					s.append(" NO");
+				} else if (a.range.nTargets == 1) {
+					s.append(" one");
+				} else s.append(" ").append(a.range.nTargets);
 
-			if (a.range.range == 1) s.append(" adjacent");
+				if (a.range.range == 1) s.append(" adjacent");
+			}
 
 			if (noTargetCharacters) {
 				s.append(a.range.nTargets == 1? " square" : " squares");
 			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 				s.append(a.range.nTargets == 1? " character" : " characters");
+				if (!a.range.targetMode.self) s.append(" (but not you)");
 			} else if (a.range.targetMode.enemies) {
 				s.append(a.range.nTargets == 1? " enemy" : " enemies");
-			} else {
+				if (a.range.targetMode.self) s.append(" (also including yourself)");
+			} else if (a.range.targetMode.allies) {
 				s.append(a.range.nTargets == 1? " ally" : " allies");
-			}
-
-			if (a.range.targetMode.self && !noTargetCharacters) {
-				s.append(" (you can also target yourself)");
+				if (!a.range.targetMode.self) s.append(" (but not you)");
+			} else {
+				s.append(" yourself");
 			}
 
 		} else {
-			s.append(" all");
+			if (!a.range.targetMode.equals(selfOnly)) s.append(" all");
 
 			if (noTargetCharacters) {
 				s.append(" squares");
 			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 				s.append(" characters");
+				if (!a.range.targetMode.self) s.append(" (but not you)");
 			} else if (a.range.targetMode.enemies) {
 				s.append(" enemies");
-			} else {
+				if (a.range.targetMode.self) s.append(" (also including yourself)");
+			} else if (a.range.targetMode.allies) {
 				s.append(" allies");
+				if (!a.range.targetMode.self) s.append(" (but not you)");
+			} else {
+				s.append(" yourself if you are");
 			}
 
 			s.append(" within");

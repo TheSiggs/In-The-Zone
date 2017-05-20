@@ -75,7 +75,7 @@ public class Obstacles extends InstantEffect {
 	private final List<MapPoint> constructedObjects = new ArrayList<>();
 
 	@Override public List<Targetable> apply(Battle battle) throws CommandException {
-		List<Targetable> r = battle.doObstacles(placements.stream()
+		final List<Targetable> r = battle.doObstacles(placements.stream()
 			.filter(p -> battle.battleState.isSpaceFree(p))
 			.collect(Collectors.toList()));
 		constructedObjects.clear();

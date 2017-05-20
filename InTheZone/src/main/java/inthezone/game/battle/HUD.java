@@ -32,8 +32,6 @@ public class HUD extends AnchorPane {
 	private final FlowPane actionButtons = new FlowPane();
 
 	private final FlowPane abilitiesMenu = new FlowPane();
-	private final CommandButton attackItem =
-		new CommandButton("Attack", "Use your basic attack (1 AP)");
 	private final CommandButton pushItem =
 		new CommandButton("Push", "Push a character (1 AP)");
 	private final CommandButton potionItem =
@@ -82,8 +80,8 @@ public class HUD extends AnchorPane {
 		assistanceLine.getChildren().addAll(messageLine, multiTargetAssistant);
 
 		actionButtons.setAlignment(Pos.CENTER);
+		actionButtons.getChildren().addAll(pushItem, potionItem);
 		actionButtons.setMaxHeight(actionButtons.getPrefHeight());
-		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
 
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
@@ -152,11 +150,14 @@ public class HUD extends AnchorPane {
 	}
 
 	public void updateAbilities(Character c, boolean mana) {
+		final Ability basicAbility = mana ? c.basicAbility.getMana() : c.basicAbility;
+
+		final CommandButton attackItem = new CommandButton("Attack",
+			(new AbilityDescription(basicAbility.info)).toString());
+		attackItem.setButtonAction(event -> view.useAbility(basicAbility));
+
 		actionButtons.getChildren().clear();
 		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
-
-		attackItem.setButtonAction(event ->
-			view.useAbility(mana ? c.basicAbility.getMana() : c.basicAbility));
 
 		final boolean notMyTurn = !view.isMyTurn.get();
 

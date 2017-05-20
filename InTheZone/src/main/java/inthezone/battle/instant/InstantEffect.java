@@ -37,7 +37,7 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 		Battle battle, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<ExecutedCommand> r = new ArrayList<>();
+		final List<ExecutedCommand> r = new ArrayList<>();
 		r.add(new ExecutedCommand(cmd.apply(this), apply(battle)));
 		return r;
 	}

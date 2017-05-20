@@ -187,10 +187,10 @@ public class BattleInProgress implements Runnable {
 	 * */
 	private boolean doCommands() throws CommandException {
 		while (!commandQueue.isEmpty()) {
-			Command cmd = commandQueue.peek();
+			final Command cmd = commandQueue.peek();
 
 			if (cmd instanceof InstantEffectCommand) {
-				InstantEffectCommand i = (InstantEffectCommand) cmd;
+				final InstantEffectCommand i = (InstantEffectCommand) cmd;
 				if (!i.isCompletedOrRequestCompletion()) {
 					Platform.runLater(() -> listener.completeEffect(i.getEffect(), i.canCancel()));
 					return false;
@@ -201,11 +201,17 @@ public class BattleInProgress implements Runnable {
 
 			// A single command could get expanded into multiple commands if we
 			// trigger any traps or zones
-			List<ExecutedCommand> allCmds = cmd.doCmdComputingTriggers(battle);
+			final List<ExecutedCommand> allCmds = cmd.doCmdComputingTriggers(battle);
 
 			// mark the last command in the queue
 			if (commandQueue.isEmpty()) {
-				ExecutedCommand last = allCmds.remove(allCmds.size() - 1);
+				final ExecutedCommand last;
+				if (allCmds.isEmpty()) {
+					// cmd does nothing, so we can get away with this.
+					last = new ExecutedCommand(cmd, new ArrayList<>()); 
+				} else {
+					last = allCmds.remove(allCmds.size() - 1);
+				}
 				allCmds.add(last.markLastInSequence());
 			}
 

@@ -73,8 +73,7 @@ public class HUD extends AnchorPane {
 			.or(view.cannotCancel).or(disableUI));
 		resignButton.disableProperty().bind(view.isMyTurn.not().or(disableUI));
 
-		actionButtons.visibleProperty().bind(view.isMyTurn
-			.and(view.isCharacterSelected)
+		actionButtons.visibleProperty().bind(view.isCharacterSelected
 			.and(view.cannotCancel.not()).and(disableUI.not()));
 
 		characterInfoBoxes.setPrefWrapLength(1000);
@@ -162,14 +161,17 @@ public class HUD extends AnchorPane {
 
 		pushItem.setOnAction(event -> view.usePush());
 
-		attackItem.setDisable(c.isStunned() || c.getAP() < 1);
-		pushItem.setDisable(c.isStunned() || c.getAP() < 1);
+		final boolean notMyTurn = !view.isMyTurn.get();
+
+		attackItem.setDisable(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		potionItem.setDisable(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		pushItem.setDisable(c.isStunned() || c.getAP() < 1 || notMyTurn);
 
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
 			final Button i = new Button(ability.info.name);
-			i.setDisable(
+			i.setDisable(notMyTurn ||
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));

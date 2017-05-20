@@ -398,7 +398,7 @@ public class AbilityDescription {
 				}
 
 				if (a.range.piercing && !trapZone && !a.range.targetMode.equals(selfOnly)) {
-					s.append(" including all ").append(cont).append(" on the attack path");
+					s.append(", including all ").append(cont).append(" on the attack path,");
 				}
 
 			} else if (a.range.targetMode.equals(selfOnly)) {
@@ -438,37 +438,53 @@ public class AbilityDescription {
 				if (a.range.range == 1) s.append(" adjacent");
 			}
 
+			final String cont;
 			if (noTargetCharacters) {
 				s.append(a.range.nTargets == 1? " square" : " squares");
+				cont = "squares";
 			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 				s.append(a.range.nTargets == 1? " character" : " characters");
+				cont = "characters";
 				if (!a.range.targetMode.self) s.append(" (but not you)");
 			} else if (a.range.targetMode.enemies) {
 				s.append(a.range.nTargets == 1? " enemy" : " enemies");
+				cont = "enemies";
 				if (a.range.targetMode.self) s.append(" (also including yourself)");
 			} else if (a.range.targetMode.allies) {
 				s.append(a.range.nTargets == 1? " ally" : " allies");
+				cont = "allies";
 				if (!a.range.targetMode.self) s.append(" (but not you)");
 			} else {
 				s.append(" yourself");
+				cont = "<THIS IS SURELY AN ERROR>";
+			}
+
+			if (a.range.piercing && !trapZone && !a.range.targetMode.equals(selfOnly)) {
+				s.append(", including all ").append(cont).append(" on the attack path,");
 			}
 
 		} else {
 			if (!a.range.targetMode.equals(selfOnly)) s.append(" all");
 
+			final String cont;
 			if (noTargetCharacters) {
 				s.append(" squares");
+				cont = "squares";
 			} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 				s.append(" characters");
+				cont = "characters";
 				if (!a.range.targetMode.self) s.append(" (but not you)");
 			} else if (a.range.targetMode.enemies) {
 				s.append(" enemies");
+				cont = "enemies";
 				if (a.range.targetMode.self) s.append(" (also including yourself)");
 			} else if (a.range.targetMode.allies) {
 				s.append(" allies");
+				cont = "allies";
 				if (!a.range.targetMode.self) s.append(" (but not you)");
 			} else {
 				s.append(" yourself if you are");
+				cont = "<THIS IS SURELY AN ERROR>";
 			}
 
 			s.append(" within");
@@ -483,6 +499,10 @@ public class AbilityDescription {
 				s.append(" of the targeted square");
 			} else {
 				s.append(" of any of the ").append(a.range.nTargets).append(" targeted squares");
+			}
+
+			if (a.range.piercing && !trapZone && !a.range.targetMode.equals(selfOnly)) {
+				s.append(", including all ").append(cont).append(" on the attack path,");
 			}
 		}
 	}

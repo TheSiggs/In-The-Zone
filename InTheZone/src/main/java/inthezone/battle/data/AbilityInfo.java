@@ -29,6 +29,9 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public final Optional<InstantEffectInfo> instantAfter;
 	public final Optional<StatusEffectInfo> statusEffect;
 
+	public final boolean isMana;
+	public final boolean isSubsequent;
+
 	@Override
 	public String toString() {
 		return name;
@@ -53,7 +56,8 @@ public class AbilityInfo implements HasJSONRepresentation {
 		int recursion,
 		Optional<InstantEffectInfo> instantBefore,
 		Optional<InstantEffectInfo> instantAfter,
-		Optional<StatusEffectInfo> statusEffect
+		Optional<StatusEffectInfo> statusEffect,
+		boolean isMana, boolean isSubsequent
 	) {
 		this.banned = banned;
 		this.name = name;
@@ -74,6 +78,8 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.instantBefore = instantBefore;
 		this.instantAfter = instantAfter;
 		this.statusEffect = statusEffect;
+		this.isMana = isMana;
+		this.isSubsequent = isSubsequent;
 	}
 
 	@Override
@@ -104,6 +110,12 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public static AbilityInfo fromJSON(JSONObject json, Library lib)
 		throws CorruptDataException
 	{
+		return fromJSON(json, lib, false, false);
+	}
+
+	public static AbilityInfo fromJSON(
+		JSONObject json, Library lib, boolean isMana, boolean isSubsequent
+	) throws CorruptDataException {
 		try {
 			final boolean banned = json.optBoolean("banned", false);
 			final String name = json.getString("name");
@@ -133,10 +145,10 @@ public class AbilityInfo implements HasJSONRepresentation {
 			final Optional<StatusEffectInfo> statusEffect;
 
 			if (rmana == null) mana = Optional.empty(); else {
-				mana = Optional.of(AbilityInfo.fromJSON(rmana, lib));
+				mana = Optional.of(AbilityInfo.fromJSON(rmana, lib, true, false));
 			}
 			if (rsubsequent == null) subsequent = Optional.empty(); else {
-				subsequent = Optional.of(AbilityInfo.fromJSON(rsubsequent, lib));
+				subsequent = Optional.of(AbilityInfo.fromJSON(rsubsequent, lib, isMana, true));
 			}
 			if (rinstantBefore == null) instantBefore = Optional.empty(); else {
 				instantBefore = Optional.of(new InstantEffectInfo(rinstantBefore));
@@ -158,7 +170,9 @@ public class AbilityInfo implements HasJSONRepresentation {
 			return new AbilityInfo(
 				banned, name, type, trap, zone, zoneTrapSprite,
 				ap, mp, pp, eff, chance, heal, range, mana,
-				subsequent, recursion, instantBefore, instantAfter, statusEffect);
+				subsequent, recursion,
+				instantBefore, instantAfter, statusEffect,
+				isMana, isSubsequent);
 
 		} catch (JSONException e) {
 			throw new CorruptDataException("Error parsing ability info, " + e.getMessage(), e);

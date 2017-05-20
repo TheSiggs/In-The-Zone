@@ -480,9 +480,9 @@ public class AbilitiesPane extends VBox {
 			Optional<AbilityInfo> subsequent = Optional.empty();
 			for (int i = subs.size() - 1; i >= 0; i--) {
 				subsequent = Optional.of(encodeAbility0(
-					subs.get(i).getValue(), Optional.empty(), subsequent));
+					subs.get(i).getValue(), Optional.empty(), subsequent, isMana, true));
 			}
-			return encodeAbility0(item.getValue(), mana, subsequent);
+			return encodeAbility0(item.getValue(), mana, subsequent, isMana, false);
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof CorruptDataException) {
 				throw (CorruptDataException) e.getCause();
@@ -493,7 +493,8 @@ public class AbilitiesPane extends VBox {
 	static AbilityInfo encodeAbility0(
 		AbilityInfoModel a,
 		Optional<AbilityInfo> mana,
-		Optional<AbilityInfo> subsequent
+		Optional<AbilityInfo> subsequent,
+		boolean isMana, boolean isSubsequent
 	) throws CorruptDataException
 	{
 		Optional<InstantEffectInfo> ib = Optional.empty();
@@ -534,7 +535,7 @@ public class AbilitiesPane extends VBox {
 			mana,
 			subsequent,
 			a.getRecursion(),
-			ib, ia, se);
+			ib, ia, se, isMana, isSubsequent);
 	}
 
 }

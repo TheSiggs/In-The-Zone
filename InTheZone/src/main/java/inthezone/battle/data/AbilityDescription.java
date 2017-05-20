@@ -420,7 +420,7 @@ public class AbilityDescription {
 					} else {
 						s.append(" yourself");
 					}
-				} else if (a.trap) {
+				} else if (a.trap || a.isSubsequent) {
 					s.append(" the target");
 				} else {
 					s.append(a.range.targetMode.toString())

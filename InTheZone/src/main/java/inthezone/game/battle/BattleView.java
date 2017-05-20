@@ -125,6 +125,9 @@ public class BattleView
 		// init the mode
 		canvas.setSelectableSprites(allSprites);
 		canvas.setMouseOverSprites(allSprites);
+		if (allSprites.size() > 0) {
+			canvas.centreOnTile(allSprites.iterator().next().pos);
+		}
 		setMode(new ModeOtherTurn(this));
 		this.getChildren().addAll(canvas, hud);
 	}

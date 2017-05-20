@@ -32,9 +32,12 @@ public class HUD extends AnchorPane {
 	private final FlowPane actionButtons = new FlowPane();
 
 	private final FlowPane abilitiesMenu = new FlowPane();
-	private final Button attackItem = new Button("Attack");
-	private final Button pushItem = new Button("Push");
-	private final Button potionItem = new Button("Use potion");
+	private final CommandButton attackItem =
+		new CommandButton("Attack", "Use your basic attack (1 AP)");
+	private final CommandButton pushItem =
+		new CommandButton("Push", "Push a character (1 AP)");
+	private final CommandButton potionItem =
+		new CommandButton("Use potion", "Use a healing potion (1 AP)");
 
 	private final BooleanProperty disableUI = new SimpleBooleanProperty(false);
 
@@ -56,12 +59,8 @@ public class HUD extends AnchorPane {
 		endTurnButton.setTooltip(new Tooltip("End your turn"));
 		resignButton.setTooltip(new Tooltip("Resign from the game"));
 
-		attackItem.setTooltip(new Tooltip("Use your basic attack (1 AP)"));
-		pushItem.setTooltip(new Tooltip("Push a character (1 AP)"));
-		potionItem.setTooltip(new Tooltip("Use a healing potion (1 AP)"));
-
-		pushItem.setOnAction(event -> view.usePush());
-		potionItem.setOnAction(event -> view.useItem());
+		pushItem.setButtonAction(event -> view.usePush());
+		potionItem.setButtonAction(event -> view.useItem());
 
 		endTurnButton.setOnAction(event -> {System.err.println("hello"); view.sendEndTurn();});
 		resignButton.setOnAction(event -> view.sendResign());
@@ -156,31 +155,25 @@ public class HUD extends AnchorPane {
 		actionButtons.getChildren().clear();
 		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
 
-		attackItem.setOnAction(event ->
+		attackItem.setButtonAction(event ->
 			view.useAbility(mana ? c.basicAbility.getMana() : c.basicAbility));
-
-		pushItem.setOnAction(event -> view.usePush());
 
 		final boolean notMyTurn = !view.isMyTurn.get();
 
-		attackItem.setDisable(c.isStunned() || c.getAP() < 1 || notMyTurn);
-		potionItem.setDisable(c.isStunned() || c.getAP() < 1 || notMyTurn);
-		pushItem.setDisable(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		attackItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		potionItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		pushItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
 
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
-			final Button i = new Button(ability.info.name);
-			i.setDisable(notMyTurn ||
+			final CommandButton i = new CommandButton(ability.info.name,
+				(new AbilityDescription(ability.info)).toString());
+			i.cannotUseThis.set(notMyTurn ||
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));
-			i.setOnAction(event -> view.useAbility(ability));
-
-			final Tooltip t = new Tooltip((new AbilityDescription(ability.info)).toString());
-			t.setWrapText(true);
-			t.setPrefWidth(300);
-			i.setTooltip(t);
+			i.setButtonAction(event -> view.useAbility(ability));
 
 			actionButtons.getChildren().add(i);
 		}

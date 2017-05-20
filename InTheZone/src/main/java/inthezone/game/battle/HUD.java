@@ -32,9 +32,10 @@ public class HUD extends AnchorPane {
 	private final FlowPane actionButtons = new FlowPane();
 
 	private final FlowPane abilitiesMenu = new FlowPane();
-	private final Button attackItem = new Button("Attack");
-	private final Button pushItem = new Button("Push");
-	private final Button potionItem = new Button("Use potion");
+	private final CommandButton pushItem =
+		new CommandButton("Push", "Push a character (1 AP)");
+	private final CommandButton potionItem =
+		new CommandButton("Use potion", "Use a healing potion (1 AP)");
 
 	private final BooleanProperty disableUI = new SimpleBooleanProperty(false);
 
@@ -56,14 +57,10 @@ public class HUD extends AnchorPane {
 		endTurnButton.setTooltip(new Tooltip("End your turn"));
 		resignButton.setTooltip(new Tooltip("Resign from the game"));
 
-		attackItem.setTooltip(new Tooltip("Use your basic attack (1 AP)"));
-		pushItem.setTooltip(new Tooltip("Push a character (1 AP)"));
-		potionItem.setTooltip(new Tooltip("Use a healing potion (1 AP)"));
+		pushItem.setButtonAction(event -> view.usePush());
+		potionItem.setButtonAction(event -> view.useItem());
 
-		pushItem.setOnAction(event -> view.usePush());
-		potionItem.setOnAction(event -> view.useItem());
-
-		endTurnButton.setOnAction(event -> {System.err.println("hello"); view.sendEndTurn();});
+		endTurnButton.setOnAction(event -> {view.sendEndTurn();});
 		resignButton.setOnAction(event -> view.sendResign());
 
 		endTurnButton.getStyleClass().add("gui_button");
@@ -73,8 +70,7 @@ public class HUD extends AnchorPane {
 			.or(view.cannotCancel).or(disableUI));
 		resignButton.disableProperty().bind(view.isMyTurn.not().or(disableUI));
 
-		actionButtons.visibleProperty().bind(view.isMyTurn
-			.and(view.isCharacterSelected)
+		actionButtons.visibleProperty().bind(view.isCharacterSelected
 			.and(view.cannotCancel.not()).and(disableUI.not()));
 
 		characterInfoBoxes.setPrefWrapLength(1000);
@@ -84,8 +80,8 @@ public class HUD extends AnchorPane {
 		assistanceLine.getChildren().addAll(messageLine, multiTargetAssistant);
 
 		actionButtons.setAlignment(Pos.CENTER);
+		actionButtons.getChildren().addAll(pushItem, potionItem);
 		actionButtons.setMaxHeight(actionButtons.getPrefHeight());
-		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
 
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
@@ -154,31 +150,31 @@ public class HUD extends AnchorPane {
 	}
 
 	public void updateAbilities(Character c, boolean mana) {
+		final Ability basicAbility = mana ? c.basicAbility.getMana() : c.basicAbility;
+
+		final CommandButton attackItem = new CommandButton("Attack",
+			(new AbilityDescription(basicAbility.info)).toString());
+		attackItem.setButtonAction(event -> view.useAbility(basicAbility));
+
 		actionButtons.getChildren().clear();
 		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
 
-		attackItem.setOnAction(event ->
-			view.useAbility(mana ? c.basicAbility.getMana() : c.basicAbility));
+		final boolean notMyTurn = !view.isMyTurn.get();
 
-		pushItem.setOnAction(event -> view.usePush());
-
-		attackItem.setDisable(c.isStunned() || c.getAP() < 1);
-		pushItem.setDisable(c.isStunned() || c.getAP() < 1);
+		attackItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		potionItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		pushItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
 
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
-			final Button i = new Button(ability.info.name);
-			i.setDisable(
+			final CommandButton i = new CommandButton(ability.info.name,
+				(new AbilityDescription(ability.info)).toString());
+			i.cannotUseThis.set(notMyTurn ||
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));
-			i.setOnAction(event -> view.useAbility(ability));
-
-			final Tooltip t = new Tooltip((new AbilityDescription(ability.info)).toString());
-			t.setWrapText(true);
-			t.setPrefWidth(300);
-			i.setTooltip(t);
+			i.setButtonAction(event -> view.useAbility(ability));
 
 			actionButtons.getChildren().add(i);
 		}

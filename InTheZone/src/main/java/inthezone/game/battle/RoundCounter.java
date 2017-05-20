@@ -27,6 +27,7 @@ public class RoundCounter extends StackPane {
 	}
 
 	public void setFatigue() {
+		fatigue = true;
 		this.setId("rounds_fatigue");
 		updateTooltip();
 	}

@@ -125,7 +125,10 @@ public class BattleView
 		// init the mode
 		canvas.setSelectableSprites(allSprites);
 		canvas.setMouseOverSprites(allSprites);
-		setMode(new ModeAnimating(this));
+		if (allSprites.size() > 0) {
+			canvas.centreOnTile(allSprites.iterator().next().pos);
+		}
+		setMode(new ModeOtherTurn(this));
 		this.getChildren().addAll(canvas, hud);
 	}
 
@@ -174,12 +177,19 @@ public class BattleView
 	 * @param c If empty, then deselect all characters.
 	 * */
 	public void selectCharacter(Optional<Character> c) {
-		if (mode.isInteractive()) {
-			battle.cancel();
-			selectedCharacter = c;
-			isCharacterSelected.setValue(c.isPresent());
-			setMode(new ModeSelect(this));
-		}
+		outOfTurnSelect(c);
+		if (mode.isInteractive()) setMode(new ModeSelect(this));
+	}
+
+	/**
+	 * Select or deselect a character when it's not your turn.
+	 * @param c If empty, the deselect all characters.
+	 * */
+	public void outOfTurnSelect(Optional<Character> c) {
+		battle.cancel();
+		selectedCharacter = c;
+		isCharacterSelected.setValue(c.isPresent());
+		hud.selectCharacter(c);
 	}
 
 	/**
@@ -189,6 +199,7 @@ public class BattleView
 		selectedCharacter.ifPresent(sc -> {
 			if (sc.id == c.id) {
 				selectedCharacter = Optional.of(c);
+				hud.selectCharacter(selectedCharacter);
 				setMode(mode.updateSelectedCharacter(c));
 			}
 		});

@@ -129,6 +129,9 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 				Collection<MapPoint> tiles = player == Player.PLAYER_A?
 					currentStage.terrain.getPlayerStartTiles() :
 					currentStage.terrain.getAIStartTiles();
+				if (tiles.size() > 0) {
+					startPosChooser.centreOnTile(tiles.iterator().next());
+				}
 				startPosChooser.setSelectable(tiles);
 				startPosChooser.setHighlight(tiles, 0);
 			}

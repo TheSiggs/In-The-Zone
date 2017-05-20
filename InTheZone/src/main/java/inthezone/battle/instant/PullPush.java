@@ -59,8 +59,8 @@ public class PullPush extends InstantEffect {
 	}
 
 	@Override public JSONObject getJSON() {
-		JSONObject o = new JSONObject();
-		JSONArray a = new JSONArray();
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
 		o.put("kind", type.toString());
 		o.put("castFrom", castFrom.getJSON());
 		for (List<MapPoint> path : paths) {
@@ -160,7 +160,7 @@ public class PullPush extends InstantEffect {
 		// Stop the path short at the first impassable object.
 		final Player player = battle.getCharacterAt(from).map(c -> c.player).orElse(null);
 		if (player == null)
-			throw new RuntimeException("Cannot find character to push/pull!");
+			throw new RuntimeException("Cannot find character to push/pull at " + from + " with target " + to);
 
 		MapPoint last = los.remove(0);
 		path.add(last);
@@ -199,12 +199,12 @@ public class PullPush extends InstantEffect {
 		Battle battle, Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<ExecutedCommand> r = new ArrayList<>();
+		final List<ExecutedCommand> r = new ArrayList<>();
 
 		List<List<List<MapPoint>>> splitPaths = paths.stream()
 			.map(path -> {
 				if (path.size() == 0) return new ArrayList<List<MapPoint>>(); else {
-					Character agent =
+					final Character agent =
 						battle.battleState.getCharacterAt(path.get(0)).orElse(null);
 					if (agent == null) return new ArrayList<List<MapPoint>>(); else {
 						return battle.battleState.trigger.splitPath(agent, path);
@@ -213,19 +213,19 @@ public class PullPush extends InstantEffect {
 			}).collect(Collectors.toList());
 
 		while (!splitPaths.isEmpty()) {
-			List<List<MapPoint>> pathSections = new ArrayList<>();
+			final List<List<MapPoint>> pathSections = new ArrayList<>();
 			for (List<List<MapPoint>> sections : splitPaths) {
 				if (!sections.isEmpty()) pathSections.add(sections.remove(0));
 			}
 			splitPaths = splitPaths.stream()
 				.filter(x -> !x.isEmpty()).collect(Collectors.toList());
 
-			List<List<MapPoint>> validPathSections = pathSections.stream()
+			final List<List<MapPoint>> validPathSections = pathSections.stream()
 				.filter(x -> x.size() >= 2).collect(Collectors.toList());
 
 			// do the push/pull
 			if (!validPathSections.isEmpty()) {
-				InstantEffect eff = new PullPush(
+				final InstantEffect eff = new PullPush(
 					this.type, this.castFrom, validPathSections, false);
 				r.add(new ExecutedCommand(cmd.apply(eff), eff.apply(battle)));
 			}
@@ -233,14 +233,14 @@ public class PullPush extends InstantEffect {
 			// do the triggers
 			boolean doneContinueTurn = false;
 			for (List<MapPoint> path : pathSections) {
-				MapPoint loc = path.get(path.size() - 1);
-				List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
+				final MapPoint loc = path.get(path.size() - 1);
+				final List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
 				for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
 
 				if (isFear && !triggers.isEmpty()) {
-					Optional<Character> oc = battle.battleState.getCharacterAt(loc);
+					final Optional<Character> oc = battle.battleState.getCharacterAt(loc);
 					if (oc.isPresent()) {
-						List<Command> cont = oc.get().continueTurnReset(battle);
+						final List<Command> cont = oc.get().continueTurnReset(battle);
 						for (Command c : cont) r.addAll(c.doCmdComputingTriggers(battle));
 						doneContinueTurn = true;
 					}
@@ -254,7 +254,7 @@ public class PullPush extends InstantEffect {
 	}
 
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {
-		Map<MapPoint, MapPoint> r = new HashMap<>();
+		final Map<MapPoint, MapPoint> r = new HashMap<>();
 
 		for (List<MapPoint> path : paths) {
 			r.put(path.get(0), path.get(path.size() - 1));
@@ -265,7 +265,7 @@ public class PullPush extends InstantEffect {
 	@Override public InstantEffect retarget(
 		BattleState battle, Map<MapPoint, MapPoint> retarget
 	) {
-		Collection<MapPoint> targets =
+		final Collection<MapPoint> targets =
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
 			.collect(Collectors.toList());
 

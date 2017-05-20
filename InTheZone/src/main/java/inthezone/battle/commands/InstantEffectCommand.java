@@ -101,11 +101,11 @@ public class InstantEffectCommand extends Command {
 	@Override public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
 		throws CommandException
 	{
-		List<ExecutedCommand> r = effect.applyComputingTriggers(turn,
+		final List<ExecutedCommand> r = effect.applyComputingTriggers(turn,
 			eff -> new InstantEffectCommand(eff, Optional.empty(), Optional.empty()));
 
 		if (postAbility.isPresent() || postEffect.isPresent()) {
-			Map<MapPoint, MapPoint> retarget = effect.getRetargeting();
+			final Map<MapPoint, MapPoint> retarget = effect.getRetargeting();
 
 			retarget.values().stream()
 				.flatMap(p -> turn.battleState.getTargetableAt(p).stream())
@@ -121,5 +121,4 @@ public class InstantEffectCommand extends Command {
 		return r;
 	}
 }
-
 

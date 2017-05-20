@@ -12,7 +12,6 @@ public class ModeSelect extends Mode {
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 		Optional<Character> s = view.getSelectedCharacter();
-		view.hud.selectCharacter(s);
 		if (s.isPresent() && !s.get().isDead()) {
 			return (new ModeMove(view, s.get())).setupMode();
 		} else {

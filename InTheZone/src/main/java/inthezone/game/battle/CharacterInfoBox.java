@@ -80,10 +80,6 @@ public class CharacterInfoBox extends AnchorPane {
 		grid.setAlignment(Pos.CENTER);
 		grid.getChildren().addAll(hp, ap, mp, statusLine);
 
-		ap.setMouseTransparent(true);
-		mp.setMouseTransparent(true);
-		hp.setMouseTransparent(true);
-
 		ap.update(character.hasMana()? "ap_mana" : "ap", character.getAP(), character.getStats().ap, false);
 		mp.update("mp", character.getMP(), character.getStats().mp, false);
 		hp.update(character.hasCover()? "hp_cover" : "hp", character.getHP(), character.getMaxHP(), character.hasCover());

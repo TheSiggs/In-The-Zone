@@ -62,7 +62,7 @@ public class HUD extends AnchorPane {
 		pushItem.setButtonAction(event -> view.usePush());
 		potionItem.setButtonAction(event -> view.useItem());
 
-		endTurnButton.setOnAction(event -> {System.err.println("hello"); view.sendEndTurn();});
+		endTurnButton.setOnAction(event -> {view.sendEndTurn();});
 		resignButton.setOnAction(event -> view.sendResign());
 
 		endTurnButton.getStyleClass().add("gui_button");

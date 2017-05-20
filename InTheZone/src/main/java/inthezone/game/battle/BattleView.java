@@ -199,6 +199,7 @@ public class BattleView
 		selectedCharacter.ifPresent(sc -> {
 			if (sc.id == c.id) {
 				selectedCharacter = Optional.of(c);
+				hud.selectCharacter(selectedCharacter);
 				setMode(mode.updateSelectedCharacter(c));
 			}
 		});

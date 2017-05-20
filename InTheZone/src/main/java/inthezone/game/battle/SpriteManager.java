@@ -138,9 +138,7 @@ public class SpriteManager {
 					view.updateSelectedCharacter(c);
 
 					if (old != null) {
-						if (c.player == view.player) view.hud.updateAbilities(c, c.hasMana());
 						final CharacterInfoBox box = view.hud.characters.get(c.id);
-
 						if (box != null) box.updateCharacter(c);
 						decals.updateCharacter(c);
 					}

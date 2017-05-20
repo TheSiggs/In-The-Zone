@@ -174,10 +174,8 @@ public class BattleView
 	 * @param c If empty, then deselect all characters.
 	 * */
 	public void selectCharacter(Optional<Character> c) {
-		if (mode.isInteractive()) {
-			outOfTurnSelect(c);
-			setMode(new ModeSelect(this));
-		}
+		outOfTurnSelect(c);
+		if (mode.isInteractive()) setMode(new ModeSelect(this));
 	}
 
 	/**

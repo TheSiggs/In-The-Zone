@@ -76,6 +76,15 @@ public class Game extends Application {
 			primaryStage.setMinWidth(MIN_WIDTH);
 			primaryStage.setMinHeight(MIN_HEIGHT);
 			primaryStage.show();
+
+			/* This works around a race condition in javaFX that would otherwise lead
+			 * to incorrect mapping from local to screen coordinates for popup windows.
+			 * */
+			primaryStage.setX(primaryStage.getX() + 1);
+			primaryStage.setY(primaryStage.getY() + 1);
+			primaryStage.setX(primaryStage.getX() - 1);
+			primaryStage.setY(primaryStage.getY() - 1);
+
 		} catch (Exception e) {
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Error starting game client");

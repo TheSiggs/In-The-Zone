@@ -81,7 +81,7 @@ public class PathFinderNode extends Node<MapPoint> {
 	public static boolean canTraverseBoundary(
 		MapPoint from, MapPoint to, StageInfo terrain
 	) {
-		MapPoint dp = from.subtract(to).normalise();
+		MapPoint dp = to.subtract(from).normalise();
 		SlopeType slope;
 		if (dp.x == 1) slope = SlopeType.E;
 		else if (dp.x == -1) slope = SlopeType.W;

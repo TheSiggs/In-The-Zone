@@ -45,7 +45,7 @@ public class FearedStatusEffect extends StatusEffect {
 	public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		r.put("info", info.toString());
-		r.put("agent", agent.getPos().getJSON());
+		r.put("agent", agentPos.getJSON());
 		return r;
 	}
 

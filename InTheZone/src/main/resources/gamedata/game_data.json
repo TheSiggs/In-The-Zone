@@ -800,7 +800,7 @@
           "mp": 0,
           "chance": 0.75,
           "eff": 1,
-          "statusEffect": "feared",
+          "statusEffect": "feared 2",
           "range": {
             "los": true,
             "piercing": false,
@@ -8997,6 +8997,6 @@
       "sprites": []
     }
   ],
-  "version": "aeb02f91-3d56-4aaf-9cf9-1ccd2b6d9b3d",
-  "versionNumber": 190
+  "version": "f01e4f34-25a5-44c7-adad-73e1cbd56577",
+  "versionNumber": 191
 }

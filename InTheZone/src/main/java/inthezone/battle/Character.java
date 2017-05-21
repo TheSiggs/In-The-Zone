@@ -265,24 +265,36 @@ public class Character extends Targetable {
 		debuffedAP = false;
 		debuffedMP = false;
 
-		// handle status effects
+		// handle status effects (but not feared or panicked)
 		hasCover = false;
-		statusBuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
-		statusDebuff.ifPresent(s -> r.addAll(s.doBeforeTurn(battle, this)));
-
 		statusBuff.ifPresent(s -> {
+			r.addAll(s.doBeforeTurn(battle, this));
 			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
 		});
-		statusDebuff.ifPresent(s -> {
-			lastDebuff = s;
-			if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
-		});
+
+		if (statusDebuff.map(x -> !x.info.type.causesMovement()).orElse(false)) {
+			statusDebuff.ifPresent(s -> {
+				r.addAll(s.doBeforeTurn(battle, this));
+				lastDebuff = s;
+				if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
+			});
+		}
+
 
 		clampPoints();
 
 		// trigger the current zone (if there is one)
 		currentZone = Optional.empty();
 		r.addAll(triggerZone(battle.battleState));
+
+		// handle feared and panicked
+		if (statusDebuff.map(x -> x.info.type.causesMovement()).orElse(false)) {
+			statusDebuff.ifPresent(s -> {
+				r.addAll(s.doBeforeTurn(battle, this));
+				lastDebuff = s;
+				if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
+			});
+		}
 
 		return r;
 	}

@@ -110,14 +110,14 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void turn() {
-		List<Zone> zones = battle.doTurnStart(thisPlayer);
+		final List<Zone> zones = battle.doTurnStart(thisPlayer);
 
 		try {
 			commandQueue.addAll(battle.getTurnStart(thisPlayer));
 
 			final boolean commandsComming = !commandQueue.isEmpty();
 			Platform.runLater(() -> {
-				List<Targetable> affected = new ArrayList<>();
+				final List<Targetable> affected = new ArrayList<>();
 				affected.addAll(battle.battleState.cloneCharacters());
 				affected.addAll(zones);
 				try {

@@ -60,6 +60,10 @@ public enum StatusEffectType {
 		}
 	}
 
+	public boolean causesMovement() {
+		return this == PANICKED || this == FEARED;
+	}
+
 	public static StatusEffectType parse(String s)
 		throws CorruptDataException
 	{

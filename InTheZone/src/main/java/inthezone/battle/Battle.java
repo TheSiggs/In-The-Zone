@@ -58,10 +58,9 @@ public class Battle {
 	 * @param player The player who's turn is starting
 	 * */
 	public List<Command> getTurnStart(Player player) {
-		final List<Command> r = battleState.characters.stream()
-			.flatMap(c -> c.turnReset(this, player).stream())
-			.collect(Collectors.toList());
+		final List<Command> r = new ArrayList<>();
 
+		// apply fatigue damage first
 		if (round > 7) {
 			r.add(new FatigueCommand(
 				battleState.characters.stream()
@@ -73,6 +72,11 @@ public class Battle {
 						Optional.empty(), false, false))
 					.collect(Collectors.toList())));
 		}
+
+		// do all the other effects
+		r.addAll(battleState.characters.stream()
+			.flatMap(c -> c.turnReset(this, player).stream())
+			.collect(Collectors.toList()));
 
 		return r;
 	}

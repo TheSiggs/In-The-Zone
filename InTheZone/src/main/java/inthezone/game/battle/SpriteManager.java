@@ -141,16 +141,17 @@ public class SpriteManager {
 						final CharacterInfoBox box = view.hud.characters.get(c.id);
 						if (box != null) box.updateCharacter(c);
 						decals.updateCharacter(c);
+
+						final Sprite characterSprite = view.getStage().allSprites.stream()
+							.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
+
+						if (c.isDead()) {
+							characterSprite.setAnimation("dead");
+						} else if (!c.isDead() && old.isDead()) {
+							characterSprite.setAnimation("idle");
+						}
 					}
 
-					final Sprite characterSprite = view.getStage().getSpritesByTile(old.getPos()).stream()
-						.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
-
-					if (c.isDead()) {
-						characterSprite.setAnimation("dead");
-					} else if (!c.isDead() && old.isDead()) {
-						characterSprite.setAnimation("idle");
-					}
 
 					this.characters.put(c.id, c);
 				}

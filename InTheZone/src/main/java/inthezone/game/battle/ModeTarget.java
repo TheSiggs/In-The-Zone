@@ -33,9 +33,17 @@ public class ModeTarget extends Mode {
 	private int remainingTargets;
 	private boolean canCancel = true;
 
+	@Override public String toString() {
+		return "==ModeTarget== canCancel: " + canCancel +
+			", agent: " + selectedCharacter.getPos().toString() +
+			", castFrom: " + castFrom.toString();
+	}
+
 	@Override public boolean canCancel() {return canCancel;}
 
 	// used for recursion to track which characters we've already rebounded off.
+	// An ability cannot rebound off the same character twice, except for the
+	// agent of the ability (necessary for hit and run).
 	private Set<MapPoint> retargetedFrom = new HashSet<>();
 
 	private final Collection<Casting> allCastings = new ArrayList<>();
@@ -106,9 +114,21 @@ public class ModeTarget extends Mode {
 		view.numTargets.setValue(remainingTargets);
 		view.multiTargeting.setValue(targetingAbility.info.range.nTargets > 1);
 
+		final boolean onlyAffectsSelf = targetingAbility.info.range.targetMode.self &&
+			!targetingAbility.info.range.targetMode.enemies &&
+			!targetingAbility.info.range.targetMode.allies;
+
+		final boolean noAOE = targetingAbility.info.range.radius == 0;
+		final int range = targetingAbility.info.range.range;
+
 		if (targetingAbility.info.range.range == 0) {
 			// range 0 abilities get applied immediately
 			allCastings.add(new Casting(castFrom, castFrom));
+			return applyAbility();
+
+		} else if (onlyAffectsSelf && noAOE && castFrom.distance(selectedCharacter.getPos()) <= range) {
+			// this ability can only affect the agent, so apply it immediately
+			allCastings.add(new Casting(castFrom, selectedCharacter.getPos()));
 			return applyAbility();
 
 		} else {
@@ -120,7 +140,7 @@ public class ModeTarget extends Mode {
 			}
 			Stage stage = view.getStage();
 			getFutureWithRetry(view.battle.requestInfo(new InfoTargeting(
-				selectedCharacter, castFrom, targetingAbility))).ifPresent(tr -> {
+				selectedCharacter, castFrom, retargetedFrom, targetingAbility))).ifPresent(tr -> {
 					tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 					view.setSelectable(tr);
 				});
@@ -195,6 +215,9 @@ public class ModeTarget extends Mode {
 
 		canCancel = false;
 		view.multiTargeting.setValue(false);
+
+		// the agent of the ability can always be retargeted
+		retargetedFrom.remove(selectedCharacter.getPos());
 		view.battle.requestCommand(new UseAbilityCommandRequest(
 			selectedCharacter.getPos(), AbilityAgentType.CHARACTER,
 			targetingAbility,
@@ -244,7 +267,7 @@ public class ModeTarget extends Mode {
 	@Override public void handleSelection(MapPoint p) {
 		if (view.isSelectable(p)) {
 			view.setMode(addTarget(p));
-		} else {
+		} else if (canCancel) {
 			view.selectCharacter(Optional.empty());
 		}
 	}

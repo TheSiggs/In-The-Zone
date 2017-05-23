@@ -57,7 +57,12 @@ public class RoadBlock extends Targetable {
 	@Override public void dealDamage(int damage) {
 		hits -= 1;
 		if (hits < 0) hits = 0;
-		if (isDead()) boundZone.ifPresent(z -> z.purge());
+		if (isDead()) {
+			boundZone.ifPresent(z -> {
+				System.err.println("Purging zone " + z.toString());
+				z.purge();
+			});
+		}
 	}
 	public boolean hasBeenHit() {return hits < HITS_TO_DESTROY;}
 	@Override public void defuse() {return;}

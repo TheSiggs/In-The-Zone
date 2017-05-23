@@ -155,13 +155,12 @@ public class PullPush extends InstantEffect {
 		final List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
 		final List<MapPoint> path = new ArrayList<>();
 
+		// make sure there is a character to pull and a path to pull along
 		if (los == null || los.isEmpty()) return path;
+		final Player player = battle.getCharacterAt(from).map(c -> c.player).orElse(null);
+		if (player == null) return path;
 
 		// Stop the path short at the first impassable object.
-		final Player player = battle.getCharacterAt(from).map(c -> c.player).orElse(null);
-		if (player == null)
-			throw new RuntimeException("Cannot find character to push/pull at " + from + " with target " + to);
-
 		MapPoint last = los.remove(0);
 		path.add(last);
 		while (

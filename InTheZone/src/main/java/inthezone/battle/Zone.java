@@ -26,6 +26,10 @@ public class Zone extends Targetable implements HasParentAgent {
 	private boolean purged = false;
 	private Optional<Integer> turnsRemaining;
 
+	@Override public String toString() {
+		return "ZONE on " + centre + " " + range.toString();
+	}
+
 	@Override public Character getParent() {return parent;}
 
 	public Zone(

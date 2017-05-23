@@ -170,7 +170,9 @@ public class BattleView
 	 * Select a particular character.
 	 * */
 	public void selectCharacterById(int id) {
-		selectCharacter(Optional.ofNullable(sprites.getCharacterById(id)));
+		if (mode.canCancel()) {
+			selectCharacter(Optional.ofNullable(sprites.getCharacterById(id)));
+		}
 	}
 
 	/**
@@ -178,8 +180,10 @@ public class BattleView
 	 * @param c If empty, then deselect all characters.
 	 * */
 	public void selectCharacter(Optional<Character> c) {
-		outOfTurnSelect(c);
-		if (mode.isInteractive()) setMode(new ModeSelect(this));
+		if (mode.canCancel()) {
+			outOfTurnSelect(c);
+			if (mode.isInteractive()) setMode(new ModeSelect(this));
+		}
 	}
 
 	/**

@@ -11,9 +11,11 @@ import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -176,7 +178,7 @@ public class SpriteManager {
 						if (s != null) stage.removeSprite(s);
 					}
 
-				} else {
+				} else if (!zones.containsKey(z.centre)) {
 					for (MapPoint p : z.range) {
 						final Sprite s = new Sprite(z.getSprite());
 						s.pos = p;
@@ -203,6 +205,5 @@ public class SpriteManager {
 			}
 		}
 	}
-
 }
 

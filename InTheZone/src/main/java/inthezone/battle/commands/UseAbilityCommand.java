@@ -177,9 +177,6 @@ public class UseAbilityCommand extends Command {
 				agentType == AbilityAgentType.CHARACTER &&
 				abilityData.info.zone == AbilityZoneType.BOUND_ZONE
 			) {
-				System.err.println("Make bound zone with " + constructed.toString());
-				System.err.println("Agent is " + battle.battleState.getCharacterAt(agent).toString()); 
-
 				Optional<RoadBlock> o = constructed.stream()
 					.flatMap(p -> battle.battleState.getTargetableAt(p).stream())
 					.filter(t -> t instanceof RoadBlock).findFirst().map(t -> (RoadBlock) t);

@@ -191,7 +191,7 @@ public class PullPush extends InstantEffect {
 
 	@Override public List<Targetable> apply(Battle battle) {
 		return paths.stream()
-			.flatMap(path -> battle.doPushPull(path).stream())
+			.flatMap(path -> battle.doPushPull(path, isFear).stream())
 			.collect(Collectors.toList());
 	}
 

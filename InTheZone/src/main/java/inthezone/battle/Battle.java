@@ -209,13 +209,17 @@ public class Battle {
 	/**
 	 * Handle the push and pull effects.
 	 * */
-	public List<Targetable> doPushPull(List<MapPoint> path) {
+	public List<Targetable> doPushPull(List<MapPoint> path, boolean isFear) {
 		final List<Targetable> r = new ArrayList<>();
 		if (path.size() < 2) return r;
 
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
 			MapPoint t = path.get(path.size() - 1);
-			c.teleport(t, battleState.hasMana(t));
+			if (isFear) {
+				c.moveTo(t, battleState.pathCost(path), battleState.hasMana(t));
+			} else {
+				c.teleport(t, battleState.hasMana(t));
+			}
 			r.add(c);
 		});
 

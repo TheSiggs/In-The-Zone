@@ -169,6 +169,8 @@ public class Character extends Targetable {
 	 * Buff or debuff this character's points.
 	 * */
 	public void pointsBuff(int ap, int mp, int hp) {
+		if (isDead()) return;
+
 		if (buffedAP && ap > 0) ap = 0;
 		if (buffedMP && mp > 0) mp = 0;
 		if (debuffedAP && ap < 0) ap = 0;
@@ -186,6 +188,8 @@ public class Character extends Targetable {
 		if (this.ap < 0) this.ap = 0;
 		if (this.mp < 0) this.mp = 0;
 		if (this.hp < 0) this.hp = 0;
+
+		if (this.hp == 0) kill();
 	}
 
 	private void clampPoints() {
@@ -196,6 +200,8 @@ public class Character extends Targetable {
 		if (this.ap > stats.ap) this.ap = stats.ap;
 		if (this.mp > stats.mp) this.mp = stats.mp;
 		if (this.hp > stats.hp) this.hp = stats.hp;
+
+		if (this.hp == 0) kill();
 	}
 
 	/**
@@ -232,6 +238,10 @@ public class Character extends Targetable {
 
 	public void kill() {
 		hp = 0;
+		ap = 0;
+		mp = 0;
+		statusBuff = Optional.empty();
+		statusDebuff = Optional.empty();
 	}
 
 	@Override public boolean isDead() {
@@ -256,8 +266,8 @@ public class Character extends Targetable {
 		if (this.player != player) return r;
 
 		final Stats stats = getStats();
-		ap = stats.ap;
-		mp = stats.mp;
+		ap = isDead()? 0 : stats.ap;
+		mp = isDead()? 0 : stats.mp;
 
 		// reset the point buff/debuff checks
 		buffedAP = false;
@@ -279,7 +289,6 @@ public class Character extends Targetable {
 				if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
 			});
 		}
-
 
 		clampPoints();
 
@@ -319,9 +328,6 @@ public class Character extends Targetable {
 		return r;
 	}
 
-	/**
-	 * Remove all status effects
-	 * */
 	@Override public Stats getStats() {
 		final Stats b = statusBuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
 		final Stats d = statusDebuff.map(s -> s.getBaseStatsBuff()).orElse(new Stats());
@@ -347,8 +353,9 @@ public class Character extends Targetable {
 	}
 
 	@Override public void dealDamage(int damage) {
-		if (hasCover) return;
+		if (hasCover || isDead()) return;
 		hp = Math.min(getStats().hp, Math.max(0, hp - damage));
+		if (hp == 0) kill();
 		System.err.println("HP: " + hp + " after damage " + damage);
 	}
 
@@ -361,9 +368,15 @@ public class Character extends Targetable {
 		clampPoints();
 	}
 
+	@Override public void revive() {
+		hp = Math.max(1, hp);
+	}
+
 	@Override public void purge() { return; }
 
 	@Override public void applyStatus(Battle battle, StatusEffect status) {
+		if (isDead()) return;
+
 		final StatusEffectInfo info = status.getInfo();
 
 		if (info.type == StatusEffectType.COVER) {
@@ -400,7 +413,7 @@ public class Character extends Targetable {
 	@Override public boolean blocksSpace() { return true; }
 
 	@Override public boolean blocksPath(Player player) {
-		return !(hp == 0 || this.player == player);
+		return !(isDead() || this.player == player);
 	}
 }
 

@@ -164,8 +164,9 @@ public class CommandProcessor {
 			}
 
 			for (int i = 0; i < pullpush.paths.size(); i++) {
-				view.sprites.scheduleMovement("idle", pushSpeed,
-					pullpush.paths.get(i), (Character) affectedCharacters.get(i));
+				final Character c = (Character) affectedCharacters.get(i);
+				view.sprites.scheduleMovement(c.isDead()? "dead" : "idle",
+					pushSpeed, pullpush.paths.get(i), c);
 			}
 
 			return !pullpush.paths.isEmpty();

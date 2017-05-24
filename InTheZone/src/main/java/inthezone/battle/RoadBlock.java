@@ -55,6 +55,8 @@ public class RoadBlock extends Targetable {
 	@Override public double getAttackBuff() {return 0;}
 	@Override public double getDefenceBuff() {return 0;}
 	@Override public void dealDamage(int damage) {
+		if (damage <= 0) return;
+
 		hits -= 1;
 		if (hits < 0) hits = 0;
 		if (isDead()) {
@@ -68,6 +70,7 @@ public class RoadBlock extends Targetable {
 	@Override public void defuse() {return;}
 	@Override public void cleanse() {return;}
 	@Override public void purge() {return;}
+	@Override public void revive() {return;}
 	@Override public void applyStatus(Battle battle, StatusEffect status) {return;}
 	@Override public boolean isPushable() {return false;}
 	@Override public boolean isEnemyOf(Character character) {return true;}

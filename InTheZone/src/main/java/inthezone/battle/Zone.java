@@ -102,6 +102,7 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public void defuse() {return;}
 	@Override public void cleanse() {return;}
 	@Override public void purge() {purged = true;}
+	@Override public void revive() {return;}
 	@Override public void applyStatus(Battle battle, StatusEffect status) {return;}
 	@Override public boolean isPushable() {return false;}
 	@Override public boolean isEnemyOf(Character character) {return true;}

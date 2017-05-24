@@ -23,6 +23,7 @@ public abstract class Targetable implements Obstacle {
 	public abstract void defuse();
 	public abstract void cleanse();
 	public abstract void purge();
+	public abstract void revive();
 	public abstract void applyStatus(Battle battle, StatusEffect status);
 	public abstract boolean isPushable();
 	public abstract boolean isEnemyOf(Character character);

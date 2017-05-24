@@ -292,7 +292,7 @@ public class Battle {
 		for (MapPoint t : targets) {
 			battleState.getCharacterAt(t).ifPresent(c -> {
 				if (c.isDead()) {
-					c.dealDamage(-1);
+					c.revive();
 					r.add(c);
 				}
 			});

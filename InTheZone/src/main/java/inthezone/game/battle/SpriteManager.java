@@ -53,7 +53,8 @@ public class SpriteManager {
 			final AnimationChain chain = new AnimationChain(s);
 			stage.registerAnimationChain(chain);
 			chain.doOnFinished(() -> {
-				s.setAnimation("idle");
+				final Character c = characters.get((Integer) s.userData);
+				s.setAnimation(c.isDead()? "dead" : "idle");
 
 				spritesInMotion -= 1;
 				if (spritesInMotion < 0) {

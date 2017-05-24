@@ -86,7 +86,7 @@ public class SpriteManager {
 		final Stage stage = view.getStage();
 
 		final int id = a.id;
-		final Sprite s = stage.getSpritesByTile(a.getPos()).stream()
+		final Sprite s = stage.allSprites.stream()
 			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
 
 		stage.queueTeleportSprite(s, t);
@@ -104,7 +104,7 @@ public class SpriteManager {
 		MapPoint end = path.get(1);
 
 		final int id = affected.id;
-		final Sprite s = stage.getSpritesByTile(start).stream()
+		final Sprite s = stage.allSprites.stream()
 			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
 
 		for (MapPoint p : path.subList(2, path.size())) {

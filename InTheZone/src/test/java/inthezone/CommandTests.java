@@ -119,6 +119,57 @@ public class CommandTests {
 	}
 
 	@Test
+	public void defusingZone() throws Exception {
+		// set up a battle
+		final Battle b = bt.simpleBattle();
+
+		// create a trap
+		final Ability trap1 = getAbility(b, bt.danPos, "Trap1");
+		assertNotNull(trap1);
+
+		final MapPoint trapPos = new MapPoint(2, 4);
+
+		final CommandRequest requestTrap = new UseAbilityCommandRequest(
+			bt.danPos, AbilityAgentType.CHARACTER, trap1, single(new Casting(bt.danPos, trapPos)));
+
+		List<ExecutedCommand> trapRS = doCommand(requestTrap, b);
+		assertFalse(trapRS.isEmpty());
+
+		// confirm that the trap is there
+		Trap trap = b.battleState.getTrapAt(trapPos).get();
+		assertNotNull(trap);
+		assertEquals(trapPos, trap.getPos());
+
+		// create a safe passage zone (which defuses all traps)
+		final Ability zone1 = getAbility(b, bt.danPos, "Safepassage");
+		assertNotNull(zone1);
+
+		final MapPoint zonePos = new MapPoint(2, 4);
+
+		final CommandRequest requestZone = new UseAbilityCommandRequest(
+			bt.danPos, AbilityAgentType.CHARACTER, zone1, single(new Casting(bt.danPos, zonePos)));
+
+		final List<ExecutedCommand> zoneRS = doCommand(requestZone, b);
+		assertFalse(zoneRS.isEmpty());
+
+		// confirm that the trap is defused
+		trap = b.battleState.getTrapAt(trapPos).orElse(null);
+		assertNull(trap);
+
+		// attempt to create another trap
+		final CommandRequest requestTrap2 = new UseAbilityCommandRequest(
+			bt.danPos, AbilityAgentType.CHARACTER, trap1, single(new Casting(bt.danPos, trapPos)));
+
+		trapRS = doCommand(requestTrap2, b);
+		assertFalse(trapRS.isEmpty());
+
+		// confirm that it is defused
+		// TODO: confirm what the appropriate behaviour is.
+		// trap = b.battleState.getTrapAt(trapPos).orElse(null);
+		// assertNull(trap);
+	}
+
+	@Test
 	public void pullOverDeadCharacter() throws Exception {
 		final Battle b = bt.simpleBattle();
 

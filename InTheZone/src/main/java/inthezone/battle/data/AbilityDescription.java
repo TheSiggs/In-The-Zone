@@ -51,8 +51,8 @@ public class AbilityDescription {
 	) {
 		if (a.trap) {
 			generateTrap(s, a);
-		} else if (a.zone == AbilityZoneType.BOUND_ZONE) {
-			generateBoundZone(s, a);
+		} else if (a.zone != AbilityZoneType.NONE) {
+			generateZone(s, a);
 		} else {
 			generateAbility(s, maxDistanceFromSelf, a);
 		}
@@ -80,26 +80,36 @@ public class AbilityDescription {
 		}
 	}
 
-	private static void generateBoundZone(StringBuilder s, AbilityInfo a) {
+	private static void generateZone(StringBuilder s, AbilityInfo a) {
+		final boolean isBound = a.zone == AbilityZoneType.BOUND_ZONE;
 		final InstantEffectInfo obstacles;
+
 		try {
 			obstacles = new InstantEffectInfo("obstacles");
 		} catch (Exception e) {
 			throw new RuntimeException("obstacles type is invalid.  This cannot happen");
 		}
 
-		if (!a.instantBefore.equals(Optional.of(obstacles))) {
+		if (isBound && !a.instantBefore.equals(Optional.of(obstacles))) {
 			s.append("ERROR: This ability attempts to make a bound zone, but it doesn't have obstacles as it's pre-effect");
 		} else {
 			s.append("create");
 			if (a.range.nTargets == 1) {
-				s.append(" a bound zone");
+				s.append(" a");
+				if (isBound) s.append(" bound");
+				s.append(" zone");
 			} else {
-				s.append(a.range.nTargets).append(" bound zones");
+				s.append(" ").append(a.range.nTargets);
+				if (isBound) s.append(" bound");
+				s.append(" zones");
 			}
 			s.append(" with radius ").append(a.range.radius);
 			if (a.range.piercing) s.append(" including the attack path");
-			s.append(". The zone will ");
+			if (a.range.nTargets > 1) {
+				s.append(". The zones will ");
+			} else {
+				s.append(". The zone will ");
+			}
 			generateAbility(s, 0, a);
 		}
 	}
@@ -227,10 +237,6 @@ public class AbilityDescription {
 			s.append(" Does not require line of sight to the target(s).");
 		}
 
-		if (a.zone == AbilityZoneType.ZONE) {
-			s.append(" The targeted area becomes a zone lasting 4 turns.");
-		}
-
 		if (a.recursion == 1) {
 			s.append(" Rebounds once.");
 		} else if (a.recursion == 2) {
@@ -356,10 +362,11 @@ public class AbilityDescription {
 			return;
 		}
 
-		boolean trapZone = a.trap || a.zone == AbilityZoneType.BOUND_ZONE;
+		boolean trapZone = a.trap ||
+			a.zone == AbilityZoneType.BOUND_ZONE || a.zone == AbilityZoneType.ZONE;
 
 		if (a.range.range == 0 || trapZone) {
-			if (a.range.radius > 0 && a.zone != AbilityZoneType.BOUND_ZONE) {
+			if (a.range.radius > 0 && a.zone == AbilityZoneType.NONE) {
 				if (a.trap) s.append(" the target and");
 				
 				if (!(a.range.targetMode.equals(selfOnly))) {
@@ -405,10 +412,10 @@ public class AbilityDescription {
 				if (noTargetCharacters) s.append(" your square"); else s.append(" yourself");
 
 			} else {
-				if (noTargetCharacters) {
-					s.append(" your square");
-				} else if (a.zone == AbilityZoneType.BOUND_ZONE) {
-					if (a.range.targetMode.enemies && a.range.targetMode.allies) {
+				if (a.zone != AbilityZoneType.NONE) {
+					if (noTargetCharacters) {
+						s.append(" every square in the zone");
+					} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {
 						s.append(" any character");
 						if (!a.range.targetMode.self) s.append(" (but not you)");
 					} else if (a.range.targetMode.enemies) {
@@ -422,6 +429,8 @@ public class AbilityDescription {
 					}
 				} else if (a.trap || a.isSubsequent) {
 					s.append(" the target");
+				} else if (noTargetCharacters) {
+					s.append(" your square");
 				} else {
 					s.append(a.range.targetMode.toString())
 						.append(" (but this is range 0 so enemies and allies cannot be affected)");

@@ -51,8 +51,9 @@ public class ClientConfig implements HasJSONRepresentation {
 		} catch (Exception e) {
 			System.err.println("Error reading config file: " + e.getMessage());
 
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-			a.setHeaderText("Error reading config file \"" + configFile.toString() + "\"");
+			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+			a.setHeaderText("Error reading config file \"" + configFile.toString() +
+				"\"\nA new config file has been generated.  Click OK to continue. ");
 			a.setContentText(e.getMessage());
 			a.showAndWait();
 

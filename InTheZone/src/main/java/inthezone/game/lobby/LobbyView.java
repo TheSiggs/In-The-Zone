@@ -78,7 +78,12 @@ public class LobbyView extends VBox {
 			}
 
 			ServerPlayer s = playerList.getSelectionModel().getSelectedItem();
-			if (s != null) {
+			if (s != null && s.isInGame()) {
+				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
+				a.setHeaderText(s.name + " is in a game");
+				a.showAndWait();
+				
+			} else if (s != null) {
 				try {
 					parent.showScreen(
 						new ChallengePane(gameData, config,
@@ -190,9 +195,9 @@ class ServerPlayer {
 		this.inGame = inGame;
 	}
 
-	public void setInGame() {
-		inGame = true;
-	}
+	public void setInGame() { inGame = true; }
+
+	public boolean isInGame() { return inGame; }
 
 	public void reset() {
 		inGame = false;

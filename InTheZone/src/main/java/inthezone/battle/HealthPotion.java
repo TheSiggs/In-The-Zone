@@ -10,6 +10,7 @@ public class HealthPotion implements Item {
 
 	public void doEffect(Targetable t) {
 		t.dealDamage(-((int) Math.ceil(((double) t.getStats().hp) * HEAL)));
+		t.cleanse();
 	}
 
 	public boolean canAffect(BattleState battle, MapPoint p) {

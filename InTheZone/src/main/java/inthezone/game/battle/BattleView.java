@@ -56,8 +56,8 @@ public class BattleView
 	public final BooleanProperty isCharacterSelected = new SimpleBooleanProperty(false);
 	public final BooleanProperty multiTargeting = new SimpleBooleanProperty(false);
 	public final IntegerProperty numTargets = new SimpleIntegerProperty(0);
-	public final BooleanProperty areAllItemsUsed = new SimpleBooleanProperty(false);
 	public final BooleanProperty cannotCancel = new SimpleBooleanProperty(false);
+	public final IntegerProperty remainingPotions = new SimpleIntegerProperty(1);
 
 	// Are we expecting an animation completion event from the game engine.
 	private boolean inAnimation = false;

@@ -16,6 +16,7 @@ import javafx.beans.property.StringProperty;
 public class AbilityInfoModel {
 	private final BooleanProperty banned;
 	private final StringProperty name;
+	private final StringProperty icon;
 	private final StringProperty type;
 	private final BooleanProperty trap;
 	private final StringProperty zone;
@@ -45,6 +46,7 @@ public class AbilityInfoModel {
 	public AbilityInfoModel(boolean isMana, boolean isSubsequent) {
 		this.banned = new SimpleBooleanProperty(false);
 		this.name = new SimpleStringProperty("New ability");
+		this.icon = new SimpleStringProperty("");
 		this.type = new SimpleStringProperty("skill");
 		this.trap = new SimpleBooleanProperty(false);
 		this.zone = new SimpleStringProperty("None");
@@ -72,6 +74,7 @@ public class AbilityInfoModel {
 	public void init(AbilityInfo i) {
 		this.banned.setValue(i.banned);
 		this.name.setValue(i.name);
+		this.icon.setValue(i.iconFile);
 		this.type.setValue(i.type.toString().toLowerCase());
 		this.trap.setValue(i.trap);
 		this.zone.setValue(i.zone.toString().toLowerCase());
@@ -117,6 +120,7 @@ public class AbilityInfoModel {
 		AbilityInfoModel r = new AbilityInfoModel(isMana, isSubsequent);
 		r.banned.setValue(banned.getValue());
 		r.name.setValue(name.getValue());
+		r.icon.setValue(icon.getValue());
 		r.type.setValue(type.getValue());
 		r.trap.setValue(trap.getValue());
 		r.zone.setValue(zone.getValue());
@@ -144,6 +148,9 @@ public class AbilityInfoModel {
 
 	public StringProperty nameProperty() { return name; }
 	public String getName() { return name.getValue(); }
+
+	public StringProperty iconProperty() { return icon; }
+	public String getIcon() { return icon.getValue(); }
 
 	public StringProperty typeProperty() { return type; }
 	public String getType() { return type.getValue(); }

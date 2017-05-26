@@ -118,12 +118,12 @@ public class CharacterInfo implements HasJSONRepresentation {
 			try {
 				portrait = new Image(loc.gfx(portraitFile));
 			} catch (IOException e) {
-				throw new CorruptDataException("Cannot find character portrait");
+				throw new CorruptDataException("Cannot find character portrait for " + name);
 			}
 
 			final Collection<AbilityInfo> allAbilities = new LinkedList<>();
 			for (Object a : abilities) {
-				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a, lib));
+				allAbilities.add(AbilityInfo.fromJSON((JSONObject) a, loc, lib));
 			}
 
 			final List<Integer> hpCurve = decodeCurve(rhpCurve);

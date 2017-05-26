@@ -512,6 +512,7 @@ public class AbilitiesPane extends VBox {
 		return new AbilityInfo(
 			a.getBanned(),
 			a.getName(),
+			null, a.getIcon(),
 			AbilityType.parse(a.getType()),
 			a.getTrap(),
 			AbilityZoneType.fromString(a.getZone()),

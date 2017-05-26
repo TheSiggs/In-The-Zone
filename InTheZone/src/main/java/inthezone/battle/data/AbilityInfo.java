@@ -4,13 +4,20 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
 import isogame.engine.SpriteInfo;
+import isogame.resource.ResourceLocator;
+import javafx.scene.image.Image;
+import java.io.IOException;
 import java.util.Optional;
-import org.json.JSONObject;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class AbilityInfo implements HasJSONRepresentation {
+	public final static String DEFAULT_ICON = "abilities/default.png";
+
 	public final boolean banned;
 	public final String name;
+	public final Image icon;
+	public final String iconFile;
 	public final AbilityType type;
 	public final boolean trap;
 	public final AbilityZoneType zone;
@@ -40,6 +47,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public AbilityInfo(
 		boolean banned,
 		String name,
+		Image icon, String iconFile,
 		AbilityType type,
 		boolean trap,
 		AbilityZoneType zone,
@@ -61,6 +69,8 @@ public class AbilityInfo implements HasJSONRepresentation {
 	) {
 		this.banned = banned;
 		this.name = name;
+		this.icon = icon;
+		this.iconFile = iconFile;
 		this.type = type;
 		this.trap = trap;
 		this.zoneTrapSprite = zoneTrapSprite;
@@ -87,6 +97,7 @@ public class AbilityInfo implements HasJSONRepresentation {
 		final JSONObject r = new JSONObject();
 		r.put("banned", banned);
 		r.put("name", name);
+		if (!iconFile.equals("")) r.put("icon", iconFile);
 		r.put("type", type.toString());
 		r.put("trap", trap);
 		r.put("zone", zone.toString());
@@ -107,18 +118,20 @@ public class AbilityInfo implements HasJSONRepresentation {
 		return r;
 	}
 
-	public static AbilityInfo fromJSON(JSONObject json, Library lib)
-		throws CorruptDataException
-	{
-		return fromJSON(json, lib, false, false);
+	public static AbilityInfo fromJSON(
+		JSONObject json, ResourceLocator loc, Library lib
+	) throws CorruptDataException {
+		return fromJSON(json, loc, lib, false, false);
 	}
 
 	public static AbilityInfo fromJSON(
-		JSONObject json, Library lib, boolean isMana, boolean isSubsequent
+		JSONObject json, ResourceLocator loc, Library lib,
+		boolean isMana, boolean isSubsequent
 	) throws CorruptDataException {
 		try {
 			final boolean banned = json.optBoolean("banned", false);
 			final String name = json.getString("name");
+			final String iconFile = json.optString("icon", DEFAULT_ICON);
 			final AbilityType type = AbilityType.parse(json.getString("type"));
 			final boolean trap = json.optBoolean("trap", false);
 			final String rzoneTrapSprite = json.optString("zoneTrapSprite", null);
@@ -145,10 +158,11 @@ public class AbilityInfo implements HasJSONRepresentation {
 			final Optional<StatusEffectInfo> statusEffect;
 
 			if (rmana == null) mana = Optional.empty(); else {
-				mana = Optional.of(AbilityInfo.fromJSON(rmana, lib, true, false));
+				mana = Optional.of(AbilityInfo.fromJSON(rmana, loc, lib, true, false));
 			}
 			if (rsubsequent == null) subsequent = Optional.empty(); else {
-				subsequent = Optional.of(AbilityInfo.fromJSON(rsubsequent, lib, isMana, true));
+				subsequent = Optional.of(AbilityInfo.fromJSON(
+					rsubsequent, loc, lib, isMana, true));
 			}
 			if (rinstantBefore == null) instantBefore = Optional.empty(); else {
 				instantBefore = Optional.of(new InstantEffectInfo(rinstantBefore));
@@ -167,8 +181,16 @@ public class AbilityInfo implements HasJSONRepresentation {
 				zoneTrapSprite = Optional.of(lib.getSprite((String) rzoneTrapSprite));
 			}
 
+			final Image icon;
+			try {
+				System.err.println("File: " + iconFile);
+				icon = new Image(loc.gfx(iconFile));
+			} catch (IOException e) {
+				throw new CorruptDataException("Cannot find ability icon for " + name);
+			}
+
 			return new AbilityInfo(
-				banned, name, type, trap, zone, zoneTrapSprite,
+				banned, name, icon, iconFile, type, trap, zone, zoneTrapSprite,
 				ap, mp, pp, eff, chance, heal, range, mana,
 				subsequent, recursion,
 				instantBefore, instantAfter, statusEffect,

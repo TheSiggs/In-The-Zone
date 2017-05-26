@@ -182,7 +182,12 @@ public class BattleView
 	public void selectCharacter(Optional<Character> c) {
 		if (mode.canCancel()) {
 			outOfTurnSelect(c);
-			if (mode.isInteractive()) setMode(new ModeSelect(this));
+			if (mode.isInteractive()) {
+				if (!(mode instanceof ModeSelect || mode instanceof ModeMove)) {
+					hud.writeMessage("Cancelled");
+				}
+				setMode(new ModeSelect(this));
+			}
 		}
 	}
 

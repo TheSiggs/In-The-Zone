@@ -69,7 +69,7 @@ public class Game extends Application {
 			this.networkThread = contentPane.networkThread;
 
 			Scene scene = new Scene(contentPane, 960, 540);
-			scene.getStylesheets().add("HUD.css");
+			scene.getStylesheets().add("GUI.css");
 
 			primaryStage.setTitle("In the Zone!");
 			primaryStage.setScene(scene);

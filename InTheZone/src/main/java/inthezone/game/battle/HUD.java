@@ -46,6 +46,7 @@ public class HUD extends AnchorPane {
 	public HUD(BattleView view, StandardSprites sprites) {
 		super();
 		this.setMinSize(0, 0);
+		this.getStylesheets().add("HUD.css");
 
 		this.sprites = sprites;
 
@@ -63,8 +64,8 @@ public class HUD extends AnchorPane {
 		endTurnButton.setOnAction(event -> {view.sendEndTurn();});
 		resignButton.setOnAction(event -> view.sendResign());
 
-		endTurnButton.getStyleClass().add("gui_button");
-		resignButton.getStyleClass().add("gui_button");
+		endTurnButton.getStyleClass().add("gui-button");
+		resignButton.getStyleClass().add("gui-button");
 
 		endTurnButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.cannotCancel).or(disableUI));

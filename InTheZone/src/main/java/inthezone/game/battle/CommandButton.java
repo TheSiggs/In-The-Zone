@@ -20,6 +20,9 @@ public class CommandButton extends Button {
 	public CommandButton(Image icon, String description) {
 		super(null, new ImageView(icon));
 
+		descriptionWindow.getScene().getStylesheets().add("HUD.css");
+		this.description.getStylesheets().add("HUD.css");
+
 		this.description.setWrapText(true);
 		this.description.setPrefWidth(300);
 		this.description.setText(description);

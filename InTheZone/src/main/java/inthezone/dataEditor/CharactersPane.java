@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -75,14 +76,18 @@ public class CharactersPane extends VBox {
 			Stats s = new Stats(3, 3, 1, 1, 1, 1);
 
 			Image portrait;
+			try {
+				portrait = new Image(new FileInputStream(
+					new File(dataDir, "gfx/portrait/blank.png")));
+			} catch (IOException e) {
+				portrait = null;
+			}
+
 			Image bigPortrait;
 			try {
-				portrait = new Image((new File(dataDir,
-					"gfx/portrait/blank.png")).toString());
-				bigPortrait = new Image((new File(dataDir,
-					"gfx/portrait/generic.png")).toString());
-			} catch (IllegalArgumentException e) {
-				portrait = null;
+				bigPortrait = new Image(new FileInputStream(
+					new File(dataDir, "gfx/portrait/generic.png")));
+			} catch (IOException e) {
 				bigPortrait = null;
 			}
 
@@ -102,10 +107,11 @@ public class CharactersPane extends VBox {
 		remove.setOnAction(event -> {
 			CharacterPane r = (CharacterPane) characters.getExpandedPane();
 			if (r != null) {
-				Alert m = new Alert(Alert.AlertType.CONFIRMATION);
+				Alert m = new Alert(Alert.AlertType.CONFIRMATION, null,
+					ButtonType.NO, ButtonType.YES);
 				m.setHeaderText("Really delete " + r.getName() + "?");
 				m.showAndWait()
-					.filter(response -> response == ButtonType.OK)
+					.filter(response -> response == ButtonType.YES)
 					.ifPresent(response -> {
 						abilities.clearAbilities();
 						characters.getPanes().remove(r);

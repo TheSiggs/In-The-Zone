@@ -27,7 +27,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.control.cell.ChoiceBoxTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
@@ -216,13 +218,20 @@ public class AbilitiesPane extends VBox {
 		});
 
 		remove.setOnAction(event -> {
-			selected.stream()
-				.sorted((a, b) -> {if (b < a) return -1; else if (b > a) return 1; else return 0;})
-				.forEach(i -> {
-					TreeItem<AbilityInfoModel> item = table.getTreeItem(i);
-					if (item != null) item.getParent().getChildren().remove(item);
+			Alert m = new Alert(Alert.AlertType.CONFIRMATION, null,
+				ButtonType.NO, ButtonType.YES);
+			m.setHeaderText("Really remove ability?");
+			m.showAndWait()
+				.filter(response -> response == ButtonType.YES)
+				.ifPresent(response -> {
+					selected.stream()
+						.sorted((a, b) -> {if (b < a) return -1; else if (b > a) return 1; else return 0;})
+						.forEach(i -> {
+							TreeItem<AbilityInfoModel> item = table.getTreeItem(i);
+							if (item != null) item.getParent().getChildren().remove(item);
+						});
+						changed.setValue(true);
 				});
-				changed.setValue(true);
 		});
 
 		addMana.setOnAction(event -> {

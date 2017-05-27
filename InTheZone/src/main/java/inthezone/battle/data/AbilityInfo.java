@@ -183,7 +183,6 @@ public class AbilityInfo implements HasJSONRepresentation {
 
 			final Image icon;
 			try {
-				System.err.println("File: " + iconFile);
 				icon = new Image(loc.gfx(iconFile));
 			} catch (IOException e) {
 				throw new CorruptDataException("Cannot find ability icon for " + name);

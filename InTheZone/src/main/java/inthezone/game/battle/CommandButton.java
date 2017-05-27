@@ -7,6 +7,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Popup;
 
 public class CommandButton extends Button {
@@ -15,8 +17,9 @@ public class CommandButton extends Button {
 
 	public final BooleanProperty cannotUseThis = new SimpleBooleanProperty(false);
 
-	public CommandButton(String label, String description) {
-		super(label);
+	public CommandButton(Image icon, String description) {
+		super(null, new ImageView(icon));
+
 		this.description.setWrapText(true);
 		this.description.setPrefWidth(300);
 		this.description.setText(description);

@@ -32,10 +32,8 @@ public class HUD extends AnchorPane {
 	private final FlowPane actionButtons = new FlowPane();
 
 	private final FlowPane abilitiesMenu = new FlowPane();
-	private final CommandButton pushItem =
-		new CommandButton("Push", "Push a character (1 AP)");
-	private final CommandButton potionItem =
-		new CommandButton("Use potion", "Use a healing potion (1 AP)");
+	private final CommandButton pushItem;
+	private final CommandButton potionItem;
 
 	private final BooleanProperty disableUI = new SimpleBooleanProperty(false);
 
@@ -57,7 +55,9 @@ public class HUD extends AnchorPane {
 		endTurnButton.setTooltip(new Tooltip("End your turn"));
 		resignButton.setTooltip(new Tooltip("Resign from the game"));
 
+		pushItem = new CommandButton(sprites.pushIcon, "Push a character (1 AP)");
 		pushItem.setButtonAction(event -> view.usePush());
+		potionItem = new CommandButton(sprites.potionIcon, "Use a healing potion (1 AP)");
 		potionItem.setButtonAction(event -> view.useItem());
 
 		endTurnButton.setOnAction(event -> {view.sendEndTurn();});
@@ -152,7 +152,7 @@ public class HUD extends AnchorPane {
 	public void updateAbilities(Character c, boolean mana) {
 		final Ability basicAbility = mana ? c.basicAbility.getMana() : c.basicAbility;
 
-		final CommandButton attackItem = new CommandButton("Attack",
+		final CommandButton attackItem = new CommandButton(sprites.attackIcon,
 			(new AbilityDescription(basicAbility.info)).toString());
 		attackItem.setButtonAction(event -> view.useAbility(basicAbility));
 
@@ -169,7 +169,7 @@ public class HUD extends AnchorPane {
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
-			final CommandButton i = new CommandButton(ability.info.name,
+			final CommandButton i = new CommandButton(ability.info.icon,
 				(new AbilityDescription(ability.info)).toString());
 			i.cannotUseThis.set(notMyTurn ||
 				ability.info.ap > c.getAP() ||

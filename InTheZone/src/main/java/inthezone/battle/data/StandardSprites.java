@@ -18,6 +18,9 @@ public class StandardSprites {
 	public final SpriteInfo trap;
 	public final SpriteInfo zone;
 	public final Map<StatusEffectType, Image> statusEffects = new HashMap<>();
+	public final Image attackIcon;
+	public final Image pushIcon;
+	public final Image potionIcon;
 
 	public StandardSprites(Library l, ResourceLocator loc) throws CorruptDataException {
 		System.err.println("Make standard sprites");
@@ -38,6 +41,14 @@ public class StandardSprites {
 		// Detect errors in the status effects map
 		if (statusEffects.size() != StatusEffectType.class.getEnumConstants().length) {
 			throw new CorruptDataException("Missing status effect icons");
+		}
+
+		try {
+			this.attackIcon = new Image(loc.gfx("abilities/attack.png"));
+			this.potionIcon = new Image(loc.gfx("abilities/potion.png"));
+			this.pushIcon = new Image(loc.gfx("abilities/push.png"));
+		} catch (IOException e) {
+			throw new CorruptDataException("Missing command icon", e);
 		}
 	}
 }

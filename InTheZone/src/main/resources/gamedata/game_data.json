@@ -357,6 +357,7 @@
         260
       ],
       "portrait": "portrait/bridget.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -745,6 +746,7 @@
         145
       ],
       "portrait": "portrait/eve.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -1063,6 +1065,7 @@
         165
       ],
       "portrait": "portrait/sar.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -1495,6 +1498,7 @@
         170
       ],
       "portrait": "portrait/zan.png",
+      "bigPortrait": "portrait/zan_big.png",
       "attackCurve": [
         17,
         17,
@@ -1784,6 +1788,7 @@
         210
       ],
       "portrait": "portrait/kieran.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -2079,6 +2084,7 @@
         165
       ],
       "portrait": "portrait/dan.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -2123,6 +2129,7 @@
       "sprite": "robot",
       "hpCurve": [],
       "portrait": "portrait/robot.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [],
       "playable": false
     },
@@ -2480,6 +2487,7 @@
         180
       ],
       "portrait": "portrait/galen.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -2868,6 +2876,7 @@
         165
       ],
       "portrait": "portrait/nettis.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         17,
         17,
@@ -9107,6 +9116,6 @@
       "sprites": []
     }
   ],
-  "version": "29d74b90-4f19-40f3-8d55-b2821c167242",
-  "versionNumber": 193
+  "version": "dbbff700-4c40-40b4-af50-f3ceccdf8133",
+  "versionNumber": 194
 }

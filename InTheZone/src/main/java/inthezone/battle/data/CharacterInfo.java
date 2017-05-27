@@ -21,6 +21,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public final String name;
 	public final String portraitFile;
 	public final Image portrait;
+	public final String bigPortraitFile;
+	public final Image bigPortrait;
 	public final SpriteInfo sprite;
 	public final Stats stats;
 	public final Collection<AbilityInfo> abilities;
@@ -41,6 +43,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 		SpriteInfo sprite,
 		Image portrait,
 		String portraitFile,
+		Image bigPortrait,
+		String bigPortraitFile,
 		Stats stats,
 		Collection<AbilityInfo> abilities,
 		boolean playable,
@@ -53,6 +57,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 		this.sprite = sprite;
 		this.portrait = portrait;
 		this.portraitFile = portraitFile;
+		this.bigPortrait = bigPortrait;
+		this.bigPortraitFile = bigPortraitFile;
 		this.abilities = abilities;
 		this.playable = playable;
 
@@ -76,6 +82,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 		r.put("name", name);
 		r.put("sprite", sprite.id);
 		r.put("portrait", portraitFile);
+		r.put("bigPortrait", bigPortraitFile);
 		r.put("playable", playable);
 		r.put("stats", stats.getJSON());
 		final JSONArray as = new JSONArray();
@@ -108,6 +115,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 			final Stats stats = Stats.fromJSON(json.getJSONObject("stats"));
 			final SpriteInfo sprite = lib.getSprite(json.getString("sprite"));
 			final String portraitFile = json.getString("portrait");
+			final String bigPortraitFile = json.optString("bigPortrait", "portrait/generic.png");
 			final boolean playable = json.getBoolean("playable");
 			final JSONArray abilities = json.getJSONArray("abilities");
 			final JSONArray rhpCurve = json.getJSONArray("hpCurve");
@@ -115,10 +123,13 @@ public class CharacterInfo implements HasJSONRepresentation {
 			final JSONArray rdefenceCurve = json.getJSONArray("defenceCurve");
 
 			Image portrait;
+			Image bigPortrait;
 			try {
 				portrait = new Image(loc.gfx(portraitFile));
+				bigPortrait = new Image(loc.gfx(bigPortraitFile));
 			} catch (IOException e) {
-				throw new CorruptDataException("Cannot find character portrait for " + name);
+				throw new CorruptDataException(
+					"Cannot find character portrait for " + name, e);
 			}
 
 			final Collection<AbilityInfo> allAbilities = new LinkedList<>();
@@ -131,8 +142,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 			final List<Integer> defenceCurve = decodeCurve(rdefenceCurve);
 
 			return new CharacterInfo(
-				name, sprite, portrait, portraitFile, stats, allAbilities, playable,
-				hpCurve, attackCurve, defenceCurve);
+				name, sprite, portrait, portraitFile, bigPortrait, bigPortraitFile,
+				stats, allAbilities, playable, hpCurve, attackCurve, defenceCurve);
 
 		} catch(ClassCastException e) {
 			throw new CorruptDataException("Type error in character", e);

@@ -22,6 +22,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import java.io.File;
@@ -38,6 +39,7 @@ public class CharacterPane extends TitledPane {
 
 	private final GridPane grid = new GridPane();
 	private final Button portrait;
+	private final Button bigPortrait;
 	private final TextField name;
 	private final CheckBox playable;
 	private final ComboBox<SpriteInfo> sprite;
@@ -53,6 +55,8 @@ public class CharacterPane extends TitledPane {
 
 	private String portraitFilename;
 	private Image portraitImage;
+	private String bigPortraitFilename;
+	private Image bigPortraitImage;
 
 	public String getName() {
 		return name.getText() == null? "" : name.getText();
@@ -74,6 +78,8 @@ public class CharacterPane extends TitledPane {
 			sprite.getValue(),
 			portraitImage,
 			portraitFilename,
+			bigPortraitImage,
+			bigPortraitFilename,
 			new Stats(
 				ap.getValue(), mp.getValue(),
 				power.getValue(), baseHP,
@@ -147,7 +153,10 @@ public class CharacterPane extends TitledPane {
 
 		portraitFilename = character.portraitFile;
 		portraitImage = character.portrait;
+		bigPortraitFilename = character.bigPortraitFile;
+		bigPortraitImage = character.bigPortrait;
 		portrait = new Button(null, makePortraitImage(portraitImage));
+		bigPortrait = new Button(null, makePortraitImage(bigPortraitImage));
 
 		name = new TextField(character.name);
 		playable = new CheckBox("Playable");
@@ -166,30 +175,14 @@ public class CharacterPane extends TitledPane {
 
 		portrait.setOnAction(x -> {
 			changed.setValue(true);
-
-			FileChooser fc = new FileChooser();
-			fc.setTitle("Choose portrait file");
-			fc.setInitialDirectory(gfxRoot);
-			fc.getExtensionFilters().addAll(new ExtensionFilter("Graphics files",
-				"*.png", "*.PNG", "*.jpg", "*.JPG",
-				"*.jpeg", "*.JPEG", "*.bmp", "*.BMP"));
-			File r = fc.showOpenDialog(this.getScene().getWindow());
-			if (r != null) {
-				try {
-					String path = gfxRoot.toPath().relativize(r.toPath()).toString();
-					portraitImage = new Image(new FileInputStream(r));
-					portraitFilename = path;
-					portrait.setGraphic(makePortraitImage(portraitImage));
-				} catch (IOException e) {
-					Alert error = new Alert(Alert.AlertType.ERROR);
-					error.setTitle("Cannot load image from file " + r.toString());
-					error.setHeaderText(e.toString());
-					error.showAndWait();
-				}
-			}
+			updatePortrait(false);
+		});
+		bigPortrait.setOnAction(x -> {
+			changed.setValue(true);
+			updatePortrait(true);
 		});
 
-		grid.add(portrait, 1, 0);
+		grid.add(new HBox(portrait, bigPortrait), 1, 0);
 		grid.addRow(1, new Label("Name"), name);
 		grid.add(playable, 1, 2);
 		grid.addRow(3, new Label("Sprite"), sprite);
@@ -224,6 +217,35 @@ public class CharacterPane extends TitledPane {
 				abilities.setAbilities(name.textProperty(), abilitiesRoot);
 			}
 		});
+	}
+
+	private void updatePortrait(boolean big) {
+		FileChooser fc = new FileChooser();
+		fc.setTitle("Choose portrait file");
+		fc.setInitialDirectory(gfxRoot);
+		fc.getExtensionFilters().addAll(new ExtensionFilter("Graphics files",
+			"*.png", "*.PNG", "*.jpg", "*.JPG",
+			"*.jpeg", "*.JPEG", "*.bmp", "*.BMP"));
+		File r = fc.showOpenDialog(this.getScene().getWindow());
+		if (r != null) {
+			try {
+				String path = gfxRoot.toPath().relativize(r.toPath()).toString();
+				if (big) {
+					bigPortraitImage = new Image(new FileInputStream(r));
+					bigPortraitFilename = path;
+					bigPortrait.setGraphic(makePortraitImage(bigPortraitImage));
+				} else {
+					portraitImage = new Image(new FileInputStream(r));
+					portraitFilename = path;
+					portrait.setGraphic(makePortraitImage(portraitImage));
+				}
+			} catch (IOException e) {
+				Alert error = new Alert(Alert.AlertType.ERROR);
+				error.setTitle("Cannot load image from file " + r.toString());
+				error.setHeaderText(e.toString());
+				error.showAndWait();
+			}
+		}
 	}
 }
 

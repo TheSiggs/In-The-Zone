@@ -75,16 +75,21 @@ public class CharactersPane extends VBox {
 			Stats s = new Stats(3, 3, 1, 1, 1, 1);
 
 			Image portrait;
+			Image bigPortrait;
 			try {
 				portrait = new Image((new File(dataDir,
 					"gfx/portrait/blank.png")).toString());
+				bigPortrait = new Image((new File(dataDir,
+					"gfx/portrait/generic.png")).toString());
 			} catch (IllegalArgumentException e) {
 				portrait = null;
+				bigPortrait = null;
 			}
 
 			CharacterInfo c = new CharacterInfo(
 				"New character", null,
 				portrait, "portrait/blank.png",
+				bigPortrait, "portrait/generic.png",
 				s, new LinkedList<>(), true,
 				new LinkedList<>(), new LinkedList<>(), new LinkedList<>());
 			CharacterPane pane =

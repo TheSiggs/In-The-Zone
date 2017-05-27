@@ -31,7 +31,7 @@ import org.json.JSONObject;
 public class GameDataFactory implements HasJSONRepresentation {
 	private final Library globalLibrary;
 	private final StandardSprites standardSprites;
-	private final ResourceLocator loc;
+	public final ResourceLocator loc;
 	public static final String globalLibraryName = "global_library.json";
 	public static final String gameDataName = "game_data.json";
 	public static final File gameDataCacheDir =

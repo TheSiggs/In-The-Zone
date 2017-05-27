@@ -39,7 +39,8 @@ public class DataEditor extends Application {
 			// used to detect changes in the data so we know if it is necessary to save
 			final SimpleBooleanProperty changed = new SimpleBooleanProperty(false);
 
-			AbilitiesPane abilitiesPane = new AbilitiesPane(changed, factory);
+			AbilitiesPane abilitiesPane =
+				new AbilitiesPane(changed, factory, dataDir.get());
 			CharactersPane charactersPane = new CharactersPane(
 				factory, dataDir.get(), changed, abilitiesPane);
 

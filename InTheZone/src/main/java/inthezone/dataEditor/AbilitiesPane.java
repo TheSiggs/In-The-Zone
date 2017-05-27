@@ -41,6 +41,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -140,7 +141,9 @@ public class AbilitiesPane extends VBox {
 		table.setPlaceholder(noCharacterSelectedMessage);
 	}
 
-	public AbilitiesPane(WritableValue<Boolean> changed, GameDataFactory gameData) {
+	public AbilitiesPane(
+		WritableValue<Boolean> changed, GameDataFactory gameData, File dataRoot
+	) {
 		super();
 
 		description.setEditable(false);
@@ -308,7 +311,7 @@ public class AbilitiesPane extends VBox {
 				final TreeItem<AbilityInfoModel> item = table.getTreeItem(selected.get(0));
 				final AbilityInfoModel v = item.getValue();
 
-				final AbilityGraphicsDialog d = new AbilityGraphicsDialog(gameData, v);
+				final AbilityGraphicsDialog d = new AbilityGraphicsDialog(gameData, dataRoot, v);
 				d.showAndWait();
 				if (d.getResult()) changed.setValue(true);
 			}

@@ -58,7 +58,7 @@ public class LoadoutView extends DialogScreen<Void> {
 			onDone.accept(null);
 		});
 
-		rightPane.setMaxWidth(344);
+		rightPane.setMaxWidth(280);
 		this.getChildren().add(rightPane);
 
 		setLoadoutModel(model);

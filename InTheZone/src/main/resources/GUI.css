@@ -15,12 +15,31 @@
 	-fx-font-weight:bold;
 }
 
+.gui-img-button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:2px;
+}
+
 .panel {
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
 	-fx-border-style:solid;
+}
+
+.clear-panel {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-padding:4px 10px 4px 10px;
+}
+
+.clear-panel .viewport {
+	/*-fx-background-color: transparent;*/
 }
 
 .character-indicator-panel-title {

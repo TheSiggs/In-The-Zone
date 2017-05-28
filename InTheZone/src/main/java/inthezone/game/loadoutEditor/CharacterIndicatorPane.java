@@ -4,9 +4,13 @@ import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Stats;
+import inthezone.game.RollerScrollPane;
 import javafx.beans.binding.StringExpression;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -32,10 +36,14 @@ public class CharacterIndicatorPane extends AnchorPane {
 	private final ImageView portrait = new ImageView();
 
 	private final Map<String, ImageView> abilities = new HashMap<>();
+	private final RollerScrollPane abilitiesListContainer;
 	private final HBox abilitiesList = new HBox(2);
 
 	public CharacterIndicatorPane(Optional<CharacterProfileModel> profile) {
 		super();
+
+		abilitiesList.setAlignment(Pos.CENTER_LEFT);
+		abilitiesListContainer = new RollerScrollPane(abilitiesList, true);
 
 		if (profile.isPresent()) {
 			setupCharacterProfile(profile.get());
@@ -55,6 +63,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 
 		this.getStyleClass().add("panel");
 		name.getStyleClass().add("character-indicator-panel-title");
+		abilitiesListContainer.getStyleClass().add("clear-panel");
 
 		name.setText(profile.rootCharacter.name);
 
@@ -78,11 +87,11 @@ public class CharacterIndicatorPane extends AnchorPane {
 		AnchorPane.setTopAnchor(portrait, 10d);
 		AnchorPane.setRightAnchor(portrait, 0d);
 
-		AnchorPane.setBottomAnchor(abilitiesList, 4d);
-		AnchorPane.setLeftAnchor(abilitiesList, 10d);
-		AnchorPane.setRightAnchor(abilitiesList, 10d);
+		AnchorPane.setBottomAnchor(abilitiesListContainer, 0d);
+		AnchorPane.setLeftAnchor(abilitiesListContainer, 0d);
+		AnchorPane.setRightAnchor(abilitiesListContainer, 0d);
 
-		this.getChildren().addAll(portrait, info, abilitiesList);
+		this.getChildren().addAll(portrait, info, abilitiesListContainer);
 
 		profile.profileProperty().addListener((x, p0, p1) -> updateProfile(p1));
 		pp.textProperty().bind(StringExpression.stringExpression(profile.costProperty()));

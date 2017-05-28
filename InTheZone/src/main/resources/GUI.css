@@ -1,10 +1,11 @@
 .gui-pane {
-	-fx-background-image:url(/gui_assets/general_background.png)
+	-fx-background-image:url(/gui_assets/general_background.png);
+	-fx-background-size:100% 100%;
 }
 
 .gui-button {
 	-fx-background-image:url(/gui_assets/button_tex.png);
-	-fx-background-repeat:no-repeat;
+	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
 	-fx-border-style:solid;
@@ -12,5 +13,32 @@
 	-fx-font-family:'Impact';
 	-fx-font-size:20px;
 	-fx-font-weight:bold;
+}
+
+.panel {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+}
+
+.character-indicator-panel-title {
+	-fx-font-size:16px;
+}
+
+.panel Label {
+	-fx-text-fill:white;
+}
+
+.gui-textfield {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-text-fill:white;
+	-fx-font-size:16px;
+	-fx-padding:10px;
 }
 

@@ -1,5 +1,7 @@
 package inthezone.game;
 
+import javafx.animation.Interpolator;
+import javafx.animation.Transition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -10,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.Node;
+import javafx.util.Duration;
 
 public class RollerScrollPane extends AnchorPane {
 	private final ScrollPane pane = new ScrollPane();
@@ -84,21 +87,12 @@ public class RollerScrollPane extends AnchorPane {
 		content.boundsInLocalProperty().addListener(o -> showHideButtons());
 		pane.viewportBoundsProperty().addListener(o -> showHideButtons());
 
-		back.setOnAction(event -> {
-			if (horizontal) {
-				pane.setHvalue(Math.max(pane.getHmin(), pane.getHvalue() - 0.04));
-			} else {
-				pane.setVvalue(Math.max(pane.getVmin(), pane.getVvalue() - 0.04));
-			}
-		});
-
-		forward.setOnAction(event -> {
-			if (horizontal) {
-				pane.setHvalue(Math.min(pane.getHmax(), pane.getHvalue() + 0.04));
-			} else {
-				pane.setVvalue(Math.min(pane.getVmax(), pane.getVvalue() + 0.04));
-			}
-		});
+		back.setOnMousePressed(event -> mouseDown(true));
+		back.setOnMouseReleased(event -> mouseUp());
+		back.setOnMouseExited(event -> mouseUp());
+		forward.setOnMousePressed(event -> mouseDown(false));
+		forward.setOnMouseReleased(event -> mouseUp());
+		forward.setOnMouseExited(event -> mouseUp());
 
 		this.getChildren().addAll(pane, back, forward);
 	}
@@ -133,5 +127,55 @@ public class RollerScrollPane extends AnchorPane {
 		content.boundsInLocalProperty().addListener(o -> showHideButtons());
 		showHideButtons();
 	}
+
+	private ScrollAnimation animation = null;
+
+	private void mouseDown(boolean back) {
+		if (animation == null) {
+			// this is a hack that forces the ScrollPane to correctly compute the
+			// scroll bounds.
+			pane.requestFocus();
+
+			// start the scrolling animation
+			animation = new ScrollAnimation(back);
+			animation.play();
+		}
+	}
+
+	private void mouseUp() {
+		if (animation != null) {
+			animation.pause();
+			animation = null;
+		}
+	}
+
+	private class ScrollAnimation extends Transition {
+		private final static double SCROLL_SPEED = 4;
+
+		final double max;
+		final double start;
+		final boolean back;
+
+		public ScrollAnimation(boolean back) {
+			this.back = back;
+			this.setInterpolator(Interpolator.LINEAR);
+			if (back) {
+				max = horizontal? pane.getHmin() : pane.getVmin();
+			} else {
+				max = horizontal? pane.getHmax() : pane.getVmax();
+			}
+			start = horizontal? pane.getHvalue() : pane.getVvalue();
+			setCycleDuration(new Duration((Math.abs(max - start) / SCROLL_SPEED) * 1000));
+		}
+
+		public void interpolate(double frac) {
+			final double pos;
+			if (back) pos = ((start - max) * (1 - frac)) + max;
+			else pos = ((max - start) * frac) + start;
+
+			if (horizontal) pane.setHvalue(pos); else pane.setVvalue(pos);
+		}
+	}
+
 }
 

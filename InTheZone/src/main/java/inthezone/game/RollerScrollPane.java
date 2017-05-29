@@ -1,33 +1,35 @@
 package inthezone.game;
 
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.Node;
 
-public class RollerScrollPane extends StackPane {
+public class RollerScrollPane extends AnchorPane {
 	private final ScrollPane pane = new ScrollPane();
 	private final boolean horizontal;
 	private final Button back;
 	private final Button forward;
-	private final Pane inner;
 
 	private final static double SCROLL_BUTTON_SIZE = 10;
 
-	public RollerScrollPane(Node content, boolean horizontal) {
+	private Region content;
+
+	public RollerScrollPane(Region content, boolean horizontal) {
 		super();
 		this.horizontal = horizontal;
+		this.content = content;
 
 		pane.setContent(content);
+		pane.setPannable(true);
 		pane.setFitToHeight(true);
+		pane.setFitToWidth(true);
 		pane.setVbarPolicy(ScrollBarPolicy.NEVER);
 		pane.setHbarPolicy(ScrollBarPolicy.NEVER);
 
@@ -45,29 +47,39 @@ public class RollerScrollPane extends StackPane {
 				new Image("/gui_assets/arrow_up.png")));
 			forward = new Button(null, new ImageView(
 				new Image("/gui_assets/arrow_down.png")));
+			back.setMaxWidth(Double.MAX_VALUE);
 			back.setMaxHeight(SCROLL_BUTTON_SIZE);
 			forward.setMaxHeight(SCROLL_BUTTON_SIZE);
+			forward.setMaxWidth(Double.MAX_VALUE);
 		}
 
-		//pane.getStyleClass().add("clear-panel");
-		//pane.setStyle("-fx-padding:0px;");
-		pane.setStyle("-fx-background-color:red;");
+		pane.getStyleClass().add("clear-panel");
+		pane.setStyle("-fx-padding:0px;");
 		back.getStyleClass().add("gui-img-button");
 		forward.getStyleClass().add("gui-img-button");
 
 		if (horizontal) {
-			inner = new HBox();
-			HBox.setHgrow(pane, Priority.ALWAYS);
+			AnchorPane.setTopAnchor(back, 0d);
+			AnchorPane.setBottomAnchor(back, 0d);
+			AnchorPane.setLeftAnchor(back, 0d);
+
+			AnchorPane.setTopAnchor(forward, 0d);
+			AnchorPane.setBottomAnchor(forward, 0d);
+			AnchorPane.setRightAnchor(forward, 0d);
 		} else {
-			inner = new VBox();
-			VBox.setVgrow(pane, Priority.ALWAYS);
+			AnchorPane.setTopAnchor(back, 0d);
+			AnchorPane.setLeftAnchor(back, 0d);
+			AnchorPane.setRightAnchor(back, 0d);
+
+			AnchorPane.setBottomAnchor(forward, 0d);
+			AnchorPane.setLeftAnchor(forward, 0d);
+			AnchorPane.setRightAnchor(forward, 0d);
 		}
 
-		back.setVisible(false);
-		forward.setVisible(false);
-		back.setManaged(false);
-		forward.setManaged(false);
-		inner.getChildren().addAll(back, pane, forward);
+		AnchorPane.setTopAnchor(pane, 0d);
+		AnchorPane.setBottomAnchor(pane, 0d);
+		AnchorPane.setLeftAnchor(pane, 0d);
+		AnchorPane.setRightAnchor(pane, 0d);
 
 		content.boundsInLocalProperty().addListener(o -> showHideButtons());
 		pane.viewportBoundsProperty().addListener(o -> showHideButtons());
@@ -88,8 +100,10 @@ public class RollerScrollPane extends StackPane {
 			}
 		});
 
-		this.getChildren().add(inner);
+		this.getChildren().addAll(pane, back, forward);
 	}
+
+	private boolean isVisible = false;
 
 	public void showHideButtons() {
 		final Bounds vp = pane.getViewportBounds();
@@ -99,15 +113,22 @@ public class RollerScrollPane extends StackPane {
 		if (horizontal) v = vp.getWidth() < cn.getWidth();
 		else v = vp.getHeight() < cn.getHeight();
 
+		if (v == isVisible) return;
+		isVisible = v;
+
 		back.setVisible(v);
-		back.setManaged(v);
 		forward.setVisible(v);
-		forward.setManaged(v);
- 
-		if (!v) pane.requestFocus();
+
+		if (v) {
+			if (horizontal) content.setPadding(new Insets(0, 18, 0, 18));
+			else content.setPadding(new Insets(18, 0, 18, 0));
+		} else {
+			content.setPadding(new Insets(0));
+		}
 	}
 
-	public void setContent(Node content) {
+	public void setContent(Region content) {
+		this.content = content;
 		pane.setContent(content);
 		content.boundsInLocalProperty().addListener(o -> showHideButtons());
 		showHideButtons();

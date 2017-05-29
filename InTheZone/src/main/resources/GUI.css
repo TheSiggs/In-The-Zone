@@ -13,6 +13,8 @@
 	-fx-font-family:'Impact';
 	-fx-font-size:20px;
 	-fx-font-weight:bold;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
 }
 
 .gui-img-button {
@@ -22,6 +24,8 @@
 	-fx-border-width:2px;
 	-fx-border-style:solid;
 	-fx-padding:2px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
 }
 
 .panel {
@@ -36,10 +40,12 @@
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-padding:4px 10px 4px 10px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
 }
 
 .clear-panel .viewport {
-	/*-fx-background-color: transparent;*/
+	-fx-background-color: transparent;
 }
 
 .character-indicator-panel-title {
@@ -59,5 +65,7 @@
 	-fx-text-fill:white;
 	-fx-font-size:16px;
 	-fx-padding:10px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
 }
 

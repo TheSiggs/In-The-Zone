@@ -343,6 +343,7 @@ public class BattleView
 		System.err.println(ec.cmd.getJSON());
 		commands.queueCommand(ec);
 		if (!inAnimation) inAnimation = commands.doNextCommand();
+		if (!(mode instanceof ModeAnimating)) setMode(new ModeAnimating(this, mode));
 		if (!inAnimation && commands.isComplete()) setMode(mode.animationDone());
 	}
 

@@ -80,7 +80,7 @@ public class Trigger {
 	 * @param p The location of the trap or zone tor trigger
 	 * */
 	public List<Command> getAllTriggers(MapPoint p) {
-		List<Command> r = new ArrayList<>();
+		final List<Command> r = new ArrayList<>();
 
 		battle.getZoneAt(p).ifPresent(zone -> {
 			battle.getTargetableAt(p).stream()
@@ -90,7 +90,7 @@ public class Trigger {
 
 		battle.getTrapAt(p).ifPresent(trap -> {
 			try {
-				List<Casting> targets = new ArrayList<>(); targets.add(new Casting(p, p));
+				final List<Casting> targets = new ArrayList<>(); targets.add(new Casting(p, p));
 
 				if (battle.getTargetableAt(p).stream()
 					.anyMatch(t -> trap.ability.canTarget(trap.parent, t)))

@@ -125,13 +125,8 @@ public class CommandProcessor {
 
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(true);
-				if (cmd.commandsComming) {
-					view.setMode(new ModeAnimating(view));
-					registeredAnimations = false;
-				} else {
-					view.setMode(new ModeSelect(view));
-					registeredAnimations = false;
-				}
+				view.setMode(new ModeAnimating(view));
+				registeredAnimations = false;
 			} else {
 				view.isMyTurn.setValue(false);
 				registeredAnimations = false;

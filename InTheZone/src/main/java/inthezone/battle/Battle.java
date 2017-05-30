@@ -73,9 +73,29 @@ public class Battle {
 					.collect(Collectors.toList())));
 		}
 
-		// do all the other effects
 		r.addAll(battleState.characters.stream()
 			.flatMap(c -> c.turnReset(this, player).stream())
+			.collect(Collectors.toList()));
+
+		return r;
+	}
+
+	/**
+	 * Turn start has a second phase now in which zones, traps, and obstacles
+	 * interact.
+	 * */
+	public List<Command> getTurnStartPhase2() {
+		final List<Command> r = new ArrayList<>();
+
+		// triggers for non-character targetables.
+		final Set<MapPoint> misc = battleState.targetable.stream()
+			.filter(t -> !(t instanceof Character))
+			.map(t -> t.getPos())
+			.collect(Collectors.toSet());
+
+		final Trigger trigger = new Trigger(battleState);
+		r.addAll(misc.stream()
+			.flatMap(p -> trigger.getAllTriggers(p).stream())
 			.collect(Collectors.toList()));
 
 		return r;

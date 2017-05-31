@@ -5,11 +5,14 @@ import inthezone.battle.BattleState;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.InstantEffectFactory;
 import inthezone.battle.Targetable;
+import inthezone.battle.Trigger;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -118,6 +121,12 @@ public class InstantEffectCommand extends Command {
 			postEffect.ifPresent(a -> a.retarget(turn.battleState, retarget));
 		}
 
+		final Trigger trigger = new Trigger(turn.battleState);
+		final List<Command> triggers = new ArrayList<>(effect.getConstructed().stream()
+			.flatMap(p -> trigger.getAllTriggers(p).stream())
+			.collect(Collectors.toList()));
+
+		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
 		return r;
 	}
 }

@@ -3,6 +3,7 @@ package inthezone.game.battle;
 import inthezone.battle.Character;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
+import inthezone.battle.Trap;
 import inthezone.battle.Zone;
 import isogame.engine.AnimationChain;
 import isogame.engine.MapPoint;
@@ -26,8 +27,9 @@ public class SpriteManager {
 
 	private final Map<Integer, Character> characters = new HashMap<>();
 
-	// includes roadblocks and traps, but no zones
-	private final Map<MapPoint, Sprite> temporaryImmobileObjects = new HashMap<>();
+	private final Map<MapPoint, Sprite> traps = new HashMap<>();
+
+	private final Map<MapPoint, Sprite> roadblocks = new HashMap<>();
 
 	public final Map<MapPoint, Sprite> zones = new HashMap<>();
 
@@ -188,21 +190,36 @@ public class SpriteManager {
 					}
 				}
 
-			} else if (t.reap()) {
-				final Sprite s = temporaryImmobileObjects.remove(t.getPos());
-				if (s != null) view.getStage().removeSprite(s);
-
-			} else if (!temporaryImmobileObjects.containsKey(t.getPos())) {
-				final Sprite s = new Sprite(t.getSprite());
-				s.pos = t.getPos();
-				view.getStage().addSprite(s);
-				temporaryImmobileObjects.put(t.getPos(), s);
-
 			} else if (t instanceof RoadBlock) {
-				final Sprite s = temporaryImmobileObjects.get(t.getPos());
-				if (s != null && ((RoadBlock) t).hasBeenHit()) {
-					s.setAnimation("hit");
+				if (!roadblocks.containsKey(t.getPos())) {
+					final Sprite s = new Sprite(t.getSprite());
+					s.pos = t.getPos();
+					view.getStage().addSprite(s);
+					roadblocks.put(t.getPos(), s);
+
+				} else if (t.reap()) {
+					final Sprite s = roadblocks.remove(t.getPos());
+					if (s != null) view.getStage().removeSprite(s);
+
+				} else {
+					final Sprite s = roadblocks.get(t.getPos());
+					if (s != null && ((RoadBlock) t).hasBeenHit()) {
+						s.setAnimation("hit");
+					}
 				}
+
+			} else if (t instanceof Trap) {
+				if (t.reap()) {
+					final Sprite s = traps.remove(t.getPos());
+					if (s != null) view.getStage().removeSprite(s);
+
+				} else if (!traps.containsKey(t.getPos())) {
+					final Sprite s = new Sprite(t.getSprite());
+					s.pos = t.getPos();
+					view.getStage().addSprite(s);
+					traps.put(t.getPos(), s);
+				}
+
 			}
 		}
 	}

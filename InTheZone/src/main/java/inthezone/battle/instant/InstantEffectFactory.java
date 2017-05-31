@@ -7,6 +7,7 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +30,7 @@ public class InstantEffectFactory {
 			case PUSH: /* fallthrough */
 			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets, false);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets, castFrom);
-			case OBSTACLES: return Obstacles.getEffect(castFrom, battleState, info, targets);
+			case OBSTACLES: return Obstacles.getEffect(castFrom, battleState, info, new HashSet<>(targets));
 			case MOVE: return Move.getEffect(battleState, info, targets, castFrom);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}

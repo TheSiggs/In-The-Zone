@@ -93,7 +93,8 @@ public class Trigger {
 				final List<Casting> targets = new ArrayList<>(); targets.add(new Casting(p, p));
 
 				if (battle.getTargetableAt(p).stream()
-					.anyMatch(t -> trap.ability.canTarget(trap.parent, t)))
+					.anyMatch(t -> !(t instanceof Trap) &&
+						trap.ability.canTarget(trap.parent, t)))
 				{
 					r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP,
 						trap.ability, targets)).makeCommand(battle));

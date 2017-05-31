@@ -41,12 +41,6 @@ public class RoadBlock extends Targetable {
 		this.boundZone = Optional.of(zone);
 	}
 
-	@Override public List<Command> triggerZone(BattleState battle) {
-		if (!battle.getZoneAt(pos).equals(boundZone))
-			return super.triggerZone(battle);
-		else return new ArrayList<>();
-	}
-
 	@Override public boolean blocksSpace() {return true;}
 	@Override public boolean blocksPath(Player player) {return true;}
 

@@ -90,7 +90,10 @@ public class Battle {
 		// triggers for non-character targetables.
 		final Set<MapPoint> misc = battleState.targetable.stream()
 			.filter(t -> !(t instanceof Character))
-			.map(t -> t.getPos())
+			.map(t -> {
+				t.currentZone = Optional.empty();
+				return t.getPos();
+			})
 			.collect(Collectors.toSet());
 
 		final Trigger trigger = new Trigger(battleState);

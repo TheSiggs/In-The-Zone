@@ -47,14 +47,14 @@ public abstract class Targetable implements Obstacle {
 	 * */
 	public List<Command> triggerZone(BattleState battle) {
 		final MapPoint pos = getPos();
-		List<Command> r = new ArrayList<>();
+		final List<Command> r = new ArrayList<>();
 
-		Optional<Zone> newZone = battle.getZoneAt(pos);
+		final Optional<Zone> newZone = battle.getZoneAt(pos);
 		if (!newZone.equals(currentZone)) {
 			currentZone = newZone;
 			newZone.ifPresent(zone -> {
 				try {
-					List<Casting> castings = new ArrayList<>(); castings.add(new Casting(pos, pos));
+					final List<Casting> castings = new ArrayList<>(); castings.add(new Casting(pos, pos));
 
 					r.addAll((new UseAbilityCommandRequest(pos, AbilityAgentType.ZONE,
 						zone.ability, castings)).makeCommand(battle));

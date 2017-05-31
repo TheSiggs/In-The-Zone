@@ -22,11 +22,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Obstacles extends InstantEffect {
-	private final Collection<MapPoint> placements;
+	private final Collection<MapPoint> placements = new ArrayList<>();
 
 	private Obstacles(Collection<MapPoint> placements, MapPoint agent) {
 		super(agent);
-		this.placements = placements;
+		this.placements.addAll(placements);
 	}
 
 	@Override public JSONObject getJSON() {

@@ -19,6 +19,7 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
+import inthezone.game.InTheZoneKeyBinding;
 import isogame.engine.CorruptDataException;
 import isogame.engine.KeyBinding;
 import isogame.engine.MapPoint;
@@ -106,14 +107,13 @@ public class BattleView
 		canvas.doOnMouseOver(p -> mode.handleMouseOver(p));
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
 
-		canvas.setOnKeyTyped(event -> {
-			if (event.getCode().equals(KeyCode.ESCAPE)) cancelAbility();
-		});
-
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
+
+		canvas.doOnKeyReleased(action -> {if (action == InTheZoneKeyBinding.cancel) cancelAbility();});
 
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
 		this.sprites = new SpriteManager(this, allSprites, decals, () -> {

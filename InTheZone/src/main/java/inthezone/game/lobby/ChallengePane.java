@@ -159,7 +159,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			}
 		});
 
-		startPosChooser.doOnSelection(p -> {
+		startPosChooser.doOnSelection((p, button) -> {
 			Optional<CharacterProfile> o = characterSelector.getSelectedCharacter();
 			o.ifPresent(c -> {
 				if (currentStage != null) {

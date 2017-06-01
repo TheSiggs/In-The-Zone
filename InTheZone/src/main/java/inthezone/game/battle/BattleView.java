@@ -33,6 +33,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.MouseButton;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -91,10 +92,12 @@ public class BattleView
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(
-			p -> {
+			(p, button) -> {
 				if (p == null && mode.canCancel()) {
 					selectCharacter(Optional.empty());
-				} else  {
+				} else if (mode.canCancel() && button == MouseButton.SECONDARY) {
+					cancelAbility();
+				} else {
 					mode.handleSelection(p);
 				}
 			});
@@ -102,6 +105,10 @@ public class BattleView
 		canvas.doOnMouseOutSprite(decals::handleMouseOut);
 		canvas.doOnMouseOver(p -> mode.handleMouseOver(p));
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
+
+		canvas.setOnKeyTyped(event -> {
+			if (event.getCode().equals(KeyCode.ESCAPE)) cancelAbility();
+		});
 
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
@@ -208,6 +215,10 @@ public class BattleView
 		selectedCharacter = c;
 		isCharacterSelected.setValue(c.isPresent());
 		hud.selectCharacter(c);
+	}
+
+	public void cancelAbility() {
+		selectCharacter(selectedCharacter);
 	}
 
 	/**

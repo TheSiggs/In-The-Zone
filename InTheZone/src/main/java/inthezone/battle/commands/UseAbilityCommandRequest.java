@@ -101,15 +101,21 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 			// Only do instant effects when the agent is a character.
 			if (agentType == AbilityAgentType.CHARACTER) {
-				for (DamageToTarget t : allTargets) {
-					if (t.pre) preTargets.add(t.target);
-					if (t.post) postTargets.add(t.target);
-				}
-
 				ability.info.instantBefore.ifPresent(i -> {
-					if (i.isField()) preTargets.addAll(castings);});
+					if (i.isField()) {
+						preTargets.addAll(castings);
+					} else {
+						for (DamageToTarget t : allTargets) if (t.pre) preTargets.add(t.target);
+					}
+				});
+
 				ability.info.instantAfter.ifPresent(i -> {
-					if (i.isField()) postTargets.addAll(castings);});
+					if (i.isField()) {
+						postTargets.addAll(castings);
+					} else {
+						for (DamageToTarget t : allTargets) if (t.post) postTargets.add(t.target);
+					}
+				});
 			}
 
 			InstantEffectCommand preEffect = null;

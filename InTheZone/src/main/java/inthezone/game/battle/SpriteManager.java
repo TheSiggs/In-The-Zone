@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
+import inthezone.battle.data.StandardSprites;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.battle.Trap;
@@ -39,12 +40,16 @@ public class SpriteManager {
 
 	private final DecalRenderer decals;
 
+	private final StandardSprites standardSprites;
+
 	public SpriteManager(
 		BattleView view, Collection<Sprite> sprites,
+		StandardSprites standardSprites,
 		DecalRenderer decals, Runnable onAnimationsFinished
 	) {
 		this.view = view;
 		this.sprites.addAll(sprites);
+		this.standardSprites = standardSprites;
 		this.decals = decals;
 
 		for (Sprite s : this.sprites) {
@@ -214,7 +219,13 @@ public class SpriteManager {
 					if (s != null) view.getStage().removeSprite(s);
 
 				} else if (!traps.containsKey(t.getPos())) {
-					final Sprite s = new Sprite(t.getSprite());
+					final Sprite s;
+					if (((Trap) t).parent.player.equals(view.player)) {
+						s = new Sprite(t.getSprite());
+					} else {
+						s = new Sprite(standardSprites.trap);
+					}
+
 					s.pos = t.getPos();
 					view.getStage().addSprite(s);
 					traps.put(t.getPos(), s);

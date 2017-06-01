@@ -116,21 +116,23 @@ public class BattleView
 		canvas.doOnKeyReleased(action -> {if (action == InTheZoneKeyBinding.cancel) cancelAbility();});
 
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
-		this.sprites = new SpriteManager(this, allSprites, decals, () -> {
-			inAnimation = false;
+		this.sprites = new SpriteManager(
+			this, allSprites, gameData.getStandardSprites(), decals,
+			() -> {
+				inAnimation = false;
 
-			while (!inAnimation && !commands.isEmpty()) {
-				inAnimation = commands.doNextCommand();
-			}
-
-			if (!inAnimation) {
-				if (commands.isEmpty() && instantEffectCompletion.isPresent()) {
-					instantEffectCompletion.get().run();
-					instantEffectCompletion = Optional.empty();
-				} else if (commands.isComplete()) {
-					setMode(mode.animationDone());
+				while (!inAnimation && !commands.isEmpty()) {
+					inAnimation = commands.doNextCommand();
 				}
-			}
+
+				if (!inAnimation) {
+					if (commands.isEmpty() && instantEffectCompletion.isPresent()) {
+						instantEffectCompletion.get().run();
+						instantEffectCompletion = Optional.empty();
+					} else if (commands.isComplete()) {
+						setMode(mode.animationDone());
+					}
+				}
 		});
 
 		battle = new BattleInProgress(

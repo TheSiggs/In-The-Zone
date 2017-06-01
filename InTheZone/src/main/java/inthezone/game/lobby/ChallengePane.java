@@ -10,6 +10,7 @@ import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
 import isogame.engine.FacingDirection;
 import isogame.engine.Highlighter;
+import isogame.engine.KeyBinding;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -23,6 +24,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -110,6 +113,11 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		startPosChooser.widthProperty().bind(this.widthProperty());
 		startPosChooser.heightProperty().bind(this.heightProperty());
 		startPosChooser.startAnimating();
+
+		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
+		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
+		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
+		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
 
 		startPosChooser.setFocusTraversable(true);
 		// make sure other controls can't take focus

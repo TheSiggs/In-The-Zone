@@ -1,6 +1,8 @@
 package inthezone.battle;
 
 import inthezone.battle.commands.AbilityAgentType;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
@@ -206,6 +208,18 @@ public class BattleState {
 		return Optional.ofNullable(zoneMap.get(x));
 	}
 
+	private static final Optional<InstantEffectInfo> defuseEffect = Optional.of(
+		new InstantEffectInfo(InstantEffectType.DEFUSE, 0));
+
+	/**
+	 * Determine if there is a defusing zone at a particular point.
+	 * */
+	public boolean hasDefusingZone(MapPoint x) {
+		return getZoneAt(x).map(z ->
+			z.ability.info.instantBefore.equals(defuseEffect) ||
+			z.ability.info.instantAfter.equals(defuseEffect)).orElse(false);
+	}
+
 	/**
 	 * Get the agent of an ability
 	 * */
@@ -408,13 +422,13 @@ public class BattleState {
 	public Collection<MapPoint> getTargetableArea(
 		MapPoint agent, MapPoint castFrom, Ability ability
 	) {
-		Collection<MapPoint> diamond =
+		final Collection<MapPoint> diamond =
 			LineOfSight.getDiamond(castFrom, ability.info.range.range);
 
 		if (!ability.info.range.los) {
 			return diamond;
 		} else {
-			Set<MapPoint> obstacles = getCharacterAt(castFrom)
+			final Set<MapPoint> obstacles = getCharacterAt(castFrom)
 				.map(c -> movementObstacles(c.player))
 				.orElse(allObstacles());
 			

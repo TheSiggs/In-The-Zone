@@ -8,7 +8,6 @@ import inthezone.battle.Casting;
 import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.AbilityZoneType;
-import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
@@ -157,18 +156,9 @@ public class UseAbilityCommand extends Command {
 		if (agentType == AbilityAgentType.CHARACTER && abilityData.info.trap) {
 			placedTraps = true;
 
-			final Optional<InstantEffectInfo> defuseEffect;
-			try {
-				defuseEffect = Optional.of(new InstantEffectInfo("defuse"));
-			} catch (CorruptDataException e) {
-				throw new RuntimeException("This cannot happen", e);
-			}
-
 			// don't place traps on defusing zones
-			final Collection<MapPoint> realTargets = targetSquares.stream().filter(p ->
-				battle.battleState.getZoneAt(p).map(z ->
-					!z.ability.info.instantBefore.equals(defuseEffect) &&
-					!z.ability.info.instantAfter.equals(defuseEffect)).orElse(true))
+			final Collection<MapPoint> realTargets = targetSquares.stream()
+				.filter(p -> !battle.battleState.hasDefusingZone(p))
 				.collect(Collectors.toList());
 
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));

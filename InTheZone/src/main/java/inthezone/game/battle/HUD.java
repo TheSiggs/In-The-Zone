@@ -161,17 +161,17 @@ public class HUD extends AnchorPane {
 
 		final boolean notMyTurn = !view.isMyTurn.get();
 
-		attackItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
-		potionItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn ||
+		attackItem.cannotUseThis.set(c.isDead() || c.isStunned() || c.getAP() < 1 || notMyTurn);
+		potionItem.cannotUseThis.set(c.isDead() || c.isStunned() || c.getAP() < 1 || notMyTurn ||
 			view.remainingPotions.get() <= 0);
-		pushItem.cannotUseThis.set(c.isStunned() || c.getAP() < 1 || notMyTurn);
+		pushItem.cannotUseThis.set(c.isDead() || c.isStunned() || c.getAP() < 1 || notMyTurn);
 
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
 			final CommandButton i = new CommandButton(ability.info.icon,
 				(new AbilityDescription(ability.info)).toString());
-			i.cannotUseThis.set(notMyTurn ||
+			i.cannotUseThis.set(c.isDead() || notMyTurn ||
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));

@@ -169,8 +169,6 @@ public class Character extends Targetable {
 	 * Buff or debuff this character's points.
 	 * */
 	public void pointsBuff(int ap, int mp, int hp) {
-		if (isDead()) return;
-
 		if (buffedAP && ap > 0) ap = 0;
 		if (buffedMP && mp > 0) mp = 0;
 		if (debuffedAP && ap < 0) ap = 0;
@@ -208,7 +206,7 @@ public class Character extends Targetable {
 	 * Move the character spending movement points
 	 * */
 	public void moveTo(MapPoint p, int mp, boolean hasMana) {
-		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+		if (isDead() || statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
 			return;
 		}
 
@@ -238,8 +236,6 @@ public class Character extends Targetable {
 
 	public void kill() {
 		hp = 0;
-		ap = 0;
-		mp = 0;
 		statusBuff = Optional.empty();
 		statusDebuff = Optional.empty();
 	}
@@ -249,7 +245,7 @@ public class Character extends Targetable {
 	}
 
 	public void teleport(MapPoint p, boolean hasMana) {
-		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+		if (isDead() || statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
 			return;
 		}
 
@@ -266,8 +262,8 @@ public class Character extends Targetable {
 		if (this.player != player) return r;
 
 		final Stats stats = getStats();
-		ap = isDead()? 0 : stats.ap;
-		mp = isDead()? 0 : stats.mp;
+		ap = stats.ap;
+		mp = stats.mp;
 
 		// reset the point buff/debuff checks
 		buffedAP = false;

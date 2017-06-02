@@ -423,7 +423,9 @@ public class BattleState {
 		MapPoint agent, MapPoint castFrom, Ability ability
 	) {
 		final Collection<MapPoint> diamond =
-			LineOfSight.getDiamond(castFrom, ability.info.range.range);
+			LineOfSight.getDiamond(castFrom, ability.info.range.range).stream()
+			.filter(p -> !terrainObstacles.contains(p))
+			.collect(Collectors.toList());
 
 		if (!ability.info.range.los) {
 			return diamond;

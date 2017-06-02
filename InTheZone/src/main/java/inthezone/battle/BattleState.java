@@ -50,14 +50,30 @@ public class BattleState {
 
 		terrainObstacles = new HashSet<>(terrain.allSprites.stream()
 			.map(s -> s.pos).collect(Collectors.toList()));
+
+		updateRevengeBonus();
 	}
 
 	/**
-	 * Get the revenge bonus for a player
+	 * Get the revenge bonus for a player.
 	 * */
 	public double getRevengeBonus(Player p) {
-		long cs = characters.stream().filter(c -> c.player == p).count();
+		final long cs = characters.stream().filter(c -> c.player == p).count();
 		if (cs == 0 || cs > 4) return 0; else return revengeBonus[(int) (4 - cs)];
+	}
+
+	/**
+	 * Update the revenge bonus parameter of each character.
+	 * */
+	public void updateRevengeBonus() {
+		final double playerARevenge = getRevengeBonus(Player.PLAYER_A);
+		final double playerBRevenge = getRevengeBonus(Player.PLAYER_B);
+		for (Character c : characters) {
+			switch (c.player) {
+				case PLAYER_A: c.revengeBonus = playerARevenge; break;
+				case PLAYER_B: c.revengeBonus = playerBRevenge; break;
+			}
+		}
 	}
 
 	/**

@@ -21,6 +21,7 @@ public class StandardSprites {
 	public final Image attackIcon;
 	public final Image pushIcon;
 	public final Image potionIcon;
+	public final Image revengeIcon;
 
 	public StandardSprites(Library l, ResourceLocator loc) throws CorruptDataException {
 		System.err.println("Make standard sprites");
@@ -47,6 +48,7 @@ public class StandardSprites {
 			this.attackIcon = new Image(loc.gfx("abilities/attack.png"));
 			this.potionIcon = new Image(loc.gfx("abilities/potion.png"));
 			this.pushIcon = new Image(loc.gfx("abilities/push.png"));
+			this.revengeIcon = new Image(loc.gfx("status/revenge.png"));
 		} catch (IOException e) {
 			throw new CorruptDataException("Missing command icon", e);
 		}

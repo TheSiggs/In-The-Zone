@@ -14,7 +14,7 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.1 r15371"
    sodipodi:docname="portraits_src.svg">
   <defs
      id="defs4" />
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="500.37355"
-     inkscape:cy="735.22188"
+     inkscape:cx="379.30212"
+     inkscape:cy="820.05483"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -95,18 +95,17 @@
        inkscape:export-filename="/home/callum/isogamedata/gfx/portrait/blank.png" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-86.313354"
        y="241.32219"
        id="text4148"
-       sodipodi:linespacing="125%"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan4150"
          x="-86.313354"
          y="241.32219"
-         style="font-size:70px">R</tspan></text>
+         style="font-size:70px;line-height:1.25">R</tspan></text>
     <g
        id="g4254"
        inkscape:export-xdpi="17.870188"
@@ -156,15 +155,14 @@
          style="fill:none;fill-rule:evenodd;stroke:#005000;stroke-width:5.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <text
-       sodipodi:linespacing="125%"
        id="text4243"
        y="222.79108"
        x="620.28601"
-       style="font-style:normal;font-weight:normal;font-size:53.49126816px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffd5d5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffd5d5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"
        inkscape:export-xdpi="17.870188"
        inkscape:export-ydpi="17.870188"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-family:Impact;-inkscape-font-specification:'Impact Condensed';fill:#ffd5d5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:53.49126816px;line-height:1.25;font-family:Impact;-inkscape-font-specification:'Impact Condensed';fill:#ffd5d5"
          y="222.79108"
          x="620.28601"
          id="tspan4245"
@@ -173,15 +171,54 @@
        inkscape:export-ydpi="17.870188"
        inkscape:export-xdpi="17.870188"
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:53.49126816px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffd5d5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffd5d5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="466.07407"
        y="219.93393"
-       id="text4267"
-       sodipodi:linespacing="125%"><tspan
+       id="text4267"><tspan
          sodipodi:role="line"
          id="tspan4269"
          x="466.07407"
          y="219.93393"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-family:Impact;-inkscape-font-specification:'Impact Condensed';fill:#ffd5d5">W</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:53.49126816px;line-height:1.25;font-family:Impact;-inkscape-font-specification:'Impact Condensed';fill:#ffd5d5">W</tspan></text>
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.88582683;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4501"
+       width="119.99999"
+       height="119.99999"
+       x="446.65173"
+       y="265.39792"
+       inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gamedata/gfx/status/revenge.png"
+       inkscape:export-xdpi="17.870188"
+       inkscape:export-ydpi="17.870188" />
+    <text
+       id="text4505"
+       y="348.63928"
+       x="464.60083"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffd5d5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"
+       inkscape:export-xdpi="17.870188"
+       inkscape:export-ydpi="17.870188"
+       inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gamedata/gfx/status/revenge.png"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:53.49126816px;line-height:1.25;font-family:Impact;-inkscape-font-specification:'Impact Condensed';fill:#ffd5d5"
+         y="348.63928"
+         x="464.60083"
+         id="tspan4503"
+         sodipodi:role="line">RVN</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ff2913;stroke-width:5.625;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 453.61607,372.94256 2.00893,-99.10714 98.4375,-2.00893"
+       id="path4507"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gamedata/gfx/status/revenge.png"
+       inkscape:export-xdpi="17.870188"
+       inkscape:export-ydpi="17.870188" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4512"
+       d="m 561.60146,279.36545 -2.00893,99.10714 -98.4375,2.00893"
+       style="fill:none;fill-rule:evenodd;stroke:#b50000;stroke-width:5.625;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gamedata/gfx/status/revenge.png"
+       inkscape:export-xdpi="17.870188"
+       inkscape:export-ydpi="17.870188" />
   </g>
 </svg>

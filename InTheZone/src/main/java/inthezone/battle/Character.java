@@ -46,6 +46,9 @@ public class Character extends Targetable {
 	private int mp = 0;
 	private int hp = 0;
 
+	double revengeBonus = 0;
+	public double getRevengeBonus() { return revengeBonus; }
+
 	private Character(
 		int id,
 		String name,
@@ -62,7 +65,8 @@ public class Character extends Targetable {
 		MapPoint pos,
 		int ap,
 		int mp,
-		int hp
+		int hp,
+		double revengeBonus
 	) {
 		this.id = id;
 		this.name = name;
@@ -80,6 +84,7 @@ public class Character extends Targetable {
 		this.ap = ap;
 		this.mp = mp;
 		this.hp = hp;
+		this.revengeBonus = revengeBonus;
 	}
 
 	/**
@@ -102,7 +107,8 @@ public class Character extends Targetable {
 			pos,
 			ap,
 			mp,
-			hp
+			hp,
+			revengeBonus
 		);
 	}
 

@@ -12,11 +12,15 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +30,14 @@ public class LoadoutView extends DialogScreen<Void> {
 
 	private final AnchorPane root = new AnchorPane();
 	private final Label characterName = new Label("");
+	private final PPIndicator pp;
+
 	private final TextField loadoutName =
 		new TextField("<Loadout name (click to edit)>");
 	private final Button done = new Button("Done");
-	private final Label costLabel = new Label("Cost: ");
 	private final VBox rightPane = new VBox(4);
-	private final PPIndicator pp;
+	private final CharacterProfilePane profilePane = new CharacterProfilePane();
+	private final HBox mainPane = new HBox(10);
 
 	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
 	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
@@ -66,15 +72,21 @@ public class LoadoutView extends DialogScreen<Void> {
 		loadoutName.getStyleClass().add("gui-textfield");
 		done.getStyleClass().add("gui-button");
 
+		done.setMaxWidth(Double.MAX_VALUE);
+
 		// The done button
 		done.setOnAction(event -> {
 			onDone.accept(null);
 		});
 
 		rightPane.setMaxWidth(280);
-		AnchorPane.setRightAnchor(rightPane, 10d);
-		AnchorPane.setTopAnchor(rightPane, 10d);
-		AnchorPane.setBottomAnchor(rightPane, 10d);
+		rightPane.setMinWidth(280);
+		rightPane.setFillWidth(true);
+
+		AnchorPane.setLeftAnchor(mainPane, 10d);
+		AnchorPane.setRightAnchor(mainPane, 10d);
+		AnchorPane.setTopAnchor(mainPane, 10d);
+		AnchorPane.setBottomAnchor(mainPane, 10d);
 
 		pp = new PPIndicator(totalCost);
 		AnchorPane.setTopAnchor(pp, 10d);
@@ -86,7 +98,11 @@ public class LoadoutView extends DialogScreen<Void> {
 		AnchorPane.setLeftAnchor(characterName, 10d);
 		AnchorPane.setRightAnchor(characterName, 100d);
 
-		root.getChildren().addAll(rightPane, pp, characterName);
+		mainPane.setAlignment(Pos.CENTER_LEFT);
+		HBox.setHgrow(profilePane, Priority.ALWAYS);
+		mainPane.getChildren().addAll(profilePane, rightPane);
+
+		root.getChildren().addAll(mainPane, pp, characterName);
 
 		this.getChildren().add(root);
 
@@ -95,6 +111,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		selectedCharacter.addListener((v, o, n) -> {
 			characterName.setText(n.profileProperty()
 				.get().rootCharacter.name);
+			profilePane.setProfile(n);
 		});
 	}
 
@@ -106,7 +123,11 @@ public class LoadoutView extends DialogScreen<Void> {
 		rebindTotalCost(model);
 
 		rightPane.getChildren().clear();
-		rightPane.getChildren().add(loadoutName);
+		final Separator spacer1 = new Separator(Orientation.VERTICAL);
+		final Separator spacer2 = new Separator(Orientation.VERTICAL);
+		VBox.setVgrow(spacer1, Priority.ALWAYS);
+		VBox.setVgrow(spacer2, Priority.ALWAYS);
+		rightPane.getChildren().addAll(spacer1, loadoutName);
 		for (int i = 0; i < 4; i++) {
 			rightPane.getChildren().add(
 				new CharacterIndicatorPane(
@@ -115,7 +136,7 @@ public class LoadoutView extends DialogScreen<Void> {
 				if (selectedCharacter.get() == null) selectedCharacter.set(p);
 			});
 		}
-		rightPane.getChildren().add(done);
+		rightPane.getChildren().addAll(done, spacer2);
 	}
 
 	private static LoadoutModel emptyLoadout(

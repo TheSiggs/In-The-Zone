@@ -75,4 +75,7 @@
 	-fx-font-family:serif;
 }
 
+.separator {
+	visibility:hidden;
+}
 

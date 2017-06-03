@@ -14,17 +14,23 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.AnchorPane;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LoadoutView extends DialogScreen<Void> {
 	private LoadoutModel model;
-	private final TextField loadoutName = new TextField("<Loadout name (click to edit)>");
+
+	private final AnchorPane root = new AnchorPane();
+	private final TextField loadoutName =
+		new TextField("<Loadout name (click to edit)>");
 	private final Button done = new Button("Done");
 	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
 	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
 	private final Label costLabel = new Label("Cost: ");
 	private final VBox rightPane = new VBox(4);
+	private final PPIndicator pp;
+
 	private final ClientConfig config;
 
 	private void rebindTotalCost(LoadoutModel l) {
@@ -59,7 +65,15 @@ public class LoadoutView extends DialogScreen<Void> {
 		});
 
 		rightPane.setMaxWidth(280);
-		this.getChildren().add(rightPane);
+		AnchorPane.setRightAnchor(rightPane, 10d);
+
+		pp = new PPIndicator(totalCost);
+		AnchorPane.setTopAnchor(pp, 10d);
+		AnchorPane.setLeftAnchor(pp, 10d);
+
+		root.getChildren().addAll(rightPane, pp);
+
+		this.getChildren().add(root);
 
 		setLoadoutModel(model);
 	}
@@ -69,6 +83,7 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		loadoutName.setText(model.name.get());
 		model.name.bind(loadoutName.textProperty());
+		rebindTotalCost(model);
 
 		rightPane.getChildren().clear();
 		rightPane.getChildren().add(loadoutName);

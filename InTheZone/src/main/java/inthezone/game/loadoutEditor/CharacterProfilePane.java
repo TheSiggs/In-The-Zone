@@ -1,5 +1,6 @@
 package inthezone.game.loadoutEditor;
 
+import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterInfo;
@@ -29,9 +30,15 @@ public class CharacterProfilePane extends HBox {
 	private final HBox topSection = new HBox(4);
 	private final RollerScrollPane scrollAbilities;
 	private final ListView<AbilityInfo> abilities = new ListView<>();
+
 	private final VBox descriptionPanel = new VBox(10);
+	private final Label abilityName = new Label("");
 	private final Label description = new Label("");
+	private final Label manaUpgrade = new Label("↓ Mana upgrade ↓");
+	private final Label manaAbilityName = new Label("");
+	private final Label manaDescription = new Label("");
 	private final Button addAbility = new Button("Add ability");
+
 	private final VBox stats = new VBox(4);
 	private final Spinner<Integer> hp = new Spinner<>();
 	private final Spinner<Integer> attack = new Spinner<>();
@@ -52,8 +59,40 @@ public class CharacterProfilePane extends HBox {
 		scrollBasics = new RollerScrollPane(basics, false);
 		bottomScroll = new RollerScrollPane(bottomSection, true);
 
-		descriptionPanel.getChildren().addAll(description, addAbility);
-		VBox.setVgrow(description, Priority.ALWAYS);
+		descriptionPanel.getStyleClass().add("panel");
+		descriptionPanel.setId("description-panel");
+		addAbility.getStyleClass().add("gui-button");
+		addAbility.setId("add-ability-button");
+
+		abilityName.getStyleClass().add("ability-name");
+		manaAbilityName.getStyleClass().add("ability-name");
+		manaUpgrade.setId("mana-upgrade");
+
+		abilityName.setMaxWidth(Double.MAX_VALUE);
+		manaAbilityName.setMaxWidth(Double.MAX_VALUE);
+		manaUpgrade.setMaxWidth(Double.MAX_VALUE);
+		description.setAlignment(Pos.CENTER_LEFT);
+		manaDescription.setAlignment(Pos.CENTER_LEFT);
+		manaUpgrade.setAlignment(Pos.CENTER_LEFT);
+
+		descriptionPanel.setAlignment(Pos.BOTTOM_CENTER);
+		descriptionPanel.setFillWidth(true);
+		descriptionPanel.setMinWidth(320);
+		descriptionPanel.setMaxWidth(320);
+		descriptionPanel.getChildren().addAll(
+			abilityName, description, manaUpgrade,
+			manaAbilityName, manaDescription, addAbility);
+
+		description.setAlignment(Pos.TOP_LEFT);
+		description.setWrapText(true);
+		description.setMaxWidth(Double.MAX_VALUE);
+
+		manaDescription.setAlignment(Pos.TOP_LEFT);
+		manaDescription.setWrapText(true);
+		manaDescription.setMaxWidth(Double.MAX_VALUE);
+
+		manaDescription.setMaxHeight(Double.MAX_VALUE);
+		VBox.setVgrow(manaDescription, Priority.ALWAYS);
 
 		stats.getChildren().addAll(hp, attack, defence, basicAbility, scrollBasics);
 		VBox.setVgrow(scrollBasics, Priority.ALWAYS);
@@ -82,6 +121,37 @@ public class CharacterProfilePane extends HBox {
 		HBox.setHgrow(portraitWrapper, Priority.ALWAYS);
 		this.setAlignment(Pos.CENTER_LEFT);
 		this.getChildren().addAll(leftSection, portraitWrapper);
+
+		abilities.getSelectionModel().selectedItemProperty()
+			.addListener((v, o, n) -> {
+				if (n == null) {
+					abilityName.setText("No ability selected");
+					abilityName.setGraphic(null);
+					description.setText("No ability selected");
+					manaUpgrade.setVisible(false);
+					manaAbilityName.setText("");
+					manaAbilityName.setGraphic(null);
+					manaDescription.setText("");
+				} else {
+					final AbilityDescription d = new AbilityDescription(n);
+					abilityName.setText(d.getTitle() + "\n" + d.getInfoLine());
+					abilityName.setGraphic(new ImageView(n.icon));
+					description.setText(d.getDescription());
+
+					if (n.mana.isPresent()) {
+						final AbilityDescription md = new AbilityDescription(n.mana.get());
+						manaUpgrade.setVisible(true);
+						manaAbilityName.setText(md.getTitle() + "\n" + md.getInfoLine());
+						manaAbilityName.setGraphic(new ImageView(n.mana.get().icon));
+						manaDescription.setText(md.getDescription());
+					} else {
+						manaUpgrade.setVisible(false);
+						manaAbilityName.setText("");
+						manaAbilityName.setGraphic(null);
+						manaDescription.setText("");
+					}
+				}
+			});
 	}
 
 	public void setProfile(CharacterProfileModel model) {

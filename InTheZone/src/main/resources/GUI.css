@@ -119,5 +119,27 @@
 	-fx-border:none;
 }
 
+#description-panel {
+	-fx-padding:10px;
+}
+
+#add-ability-button {
+	-fx-background-image:url(/gui_assets/big_mixed_texture.png);
+}
+
+.ability-name {
+	-fx-padding:0px 0px 10px 0px;
+	-fx-text-fill:white;
+	-fx-font-size:16px;
+	-fx-font-weight:bold;
+	-fx-graphic-text-gap:10px;
+}
+
+#mana-upgrade {
+	-fx-text-fill:yellow;
+	-fx-padding:40px 0px 40px 0px;
+	-fx-font-size:16px;
+	-fx-font-weight:bold;
+}
 
 

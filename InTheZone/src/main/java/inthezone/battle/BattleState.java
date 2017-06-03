@@ -1,6 +1,8 @@
 package inthezone.battle;
 
 import inthezone.battle.commands.AbilityAgentType;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
@@ -48,14 +50,30 @@ public class BattleState {
 
 		terrainObstacles = new HashSet<>(terrain.allSprites.stream()
 			.map(s -> s.pos).collect(Collectors.toList()));
+
+		updateRevengeBonus();
 	}
 
 	/**
-	 * Get the revenge bonus for a player
+	 * Get the revenge bonus for a player.
 	 * */
 	public double getRevengeBonus(Player p) {
-		long cs = characters.stream().filter(c -> c.player == p).count();
+		final long cs = characters.stream().filter(c -> c.player == p).count();
 		if (cs == 0 || cs > 4) return 0; else return revengeBonus[(int) (4 - cs)];
+	}
+
+	/**
+	 * Update the revenge bonus parameter of each character.
+	 * */
+	public void updateRevengeBonus() {
+		final double playerARevenge = getRevengeBonus(Player.PLAYER_A);
+		final double playerBRevenge = getRevengeBonus(Player.PLAYER_B);
+		for (Character c : characters) {
+			switch (c.player) {
+				case PLAYER_A: c.revengeBonus = playerARevenge; break;
+				case PLAYER_B: c.revengeBonus = playerBRevenge; break;
+			}
+		}
 	}
 
 	/**
@@ -204,6 +222,18 @@ public class BattleState {
 	 * */
 	public Optional<Zone> getZoneAt(MapPoint x) {
 		return Optional.ofNullable(zoneMap.get(x));
+	}
+
+	private static final Optional<InstantEffectInfo> defuseEffect = Optional.of(
+		new InstantEffectInfo(InstantEffectType.DEFUSE, 0));
+
+	/**
+	 * Determine if there is a defusing zone at a particular point.
+	 * */
+	public boolean hasDefusingZone(MapPoint x) {
+		return getZoneAt(x).map(z ->
+			z.ability.info.instantBefore.equals(defuseEffect) ||
+			z.ability.info.instantAfter.equals(defuseEffect)).orElse(false);
 	}
 
 	/**
@@ -408,13 +438,15 @@ public class BattleState {
 	public Collection<MapPoint> getTargetableArea(
 		MapPoint agent, MapPoint castFrom, Ability ability
 	) {
-		Collection<MapPoint> diamond =
-			LineOfSight.getDiamond(castFrom, ability.info.range.range);
+		final Collection<MapPoint> diamond =
+			LineOfSight.getDiamond(castFrom, ability.info.range.range).stream()
+			.filter(p -> !terrainObstacles.contains(p))
+			.collect(Collectors.toList());
 
 		if (!ability.info.range.los) {
 			return diamond;
 		} else {
-			Set<MapPoint> obstacles = getCharacterAt(castFrom)
+			final Set<MapPoint> obstacles = getCharacterAt(castFrom)
 				.map(c -> movementObstacles(c.player))
 				.orElse(allObstacles());
 			

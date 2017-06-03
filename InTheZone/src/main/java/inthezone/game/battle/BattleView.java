@@ -19,7 +19,9 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
+import inthezone.game.InTheZoneKeyBinding;
 import isogame.engine.CorruptDataException;
+import isogame.engine.KeyBinding;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -30,6 +32,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.MouseButton;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,10 +93,12 @@ public class BattleView
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(
-			p -> {
+			(p, button) -> {
 				if (p == null && mode.canCancel()) {
 					selectCharacter(Optional.empty());
-				} else  {
+				} else if (mode.canCancel() && button == MouseButton.SECONDARY) {
+					cancelAbility();
+				} else {
 					mode.handleSelection(p);
 				}
 			});
@@ -100,22 +107,32 @@ public class BattleView
 		canvas.doOnMouseOver(p -> mode.handleMouseOver(p));
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
 
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
+
+		canvas.doOnKeyReleased(action -> {if (action == InTheZoneKeyBinding.cancel) cancelAbility();});
+
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
-		this.sprites = new SpriteManager(this, allSprites, decals, () -> {
-			inAnimation = false;
+		this.sprites = new SpriteManager(
+			this, allSprites, gameData.getStandardSprites(), decals,
+			() -> {
+				inAnimation = false;
 
-			while (!inAnimation && !commands.isEmpty()) {
-				inAnimation = commands.doNextCommand();
-			}
-
-			if (!inAnimation) {
-				if (commands.isEmpty() && instantEffectCompletion.isPresent()) {
-					instantEffectCompletion.get().run();
-					instantEffectCompletion = Optional.empty();
-				} else if (commands.isComplete()) {
-					setMode(mode.animationDone());
+				while (!inAnimation && !commands.isEmpty()) {
+					inAnimation = commands.doNextCommand();
 				}
-			}
+
+				if (!inAnimation) {
+					if (commands.isEmpty() && instantEffectCompletion.isPresent()) {
+						instantEffectCompletion.get().run();
+						instantEffectCompletion = Optional.empty();
+					} else if (commands.isComplete()) {
+						setMode(mode.animationDone());
+					}
+				}
 		});
 
 		battle = new BattleInProgress(
@@ -200,6 +217,10 @@ public class BattleView
 		selectedCharacter = c;
 		isCharacterSelected.setValue(c.isPresent());
 		hud.selectCharacter(c);
+	}
+
+	public void cancelAbility() {
+		selectCharacter(selectedCharacter);
 	}
 
 	/**
@@ -343,6 +364,8 @@ public class BattleView
 		System.err.println(ec.cmd.getJSON());
 		commands.queueCommand(ec);
 		if (!inAnimation) inAnimation = commands.doNextCommand();
+		if (!(mode instanceof ModeAnimating) && !(mode instanceof ModeOtherTurn))
+			setMode(new ModeAnimating(this, mode));
 		if (!inAnimation && commands.isComplete()) setMode(mode.animationDone());
 	}
 

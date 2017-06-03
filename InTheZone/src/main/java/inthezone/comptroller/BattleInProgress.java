@@ -121,15 +121,20 @@ public class BattleInProgress implements Runnable {
 				affected.addAll(battle.battleState.cloneCharacters());
 				affected.addAll(zones);
 				try {
-					listener.command(
-						(new StartTurnCommand(thisPlayer, affected, commandsComming))
-						.doCmdComputingTriggers(battle).get(0));
+					final ExecutedCommand st =
+						new StartTurnCommand(thisPlayer, affected)
+							.doCmdComputingTriggers(battle).get(0);
+					listener.command(commandsComming? st : st.markLastInSequence());
 				} catch (CommandException e) {
 					listener.badCommand(e);
 				}
 			});
 
 			if (doCommands()) return;
+
+			commandQueue.addAll(battle.getTurnStartPhase2());
+			if (doCommands()) return;
+
 		} catch (CommandException e) {
 			Platform.runLater(() -> listener.badCommand(e));
 		}
@@ -236,14 +241,14 @@ public class BattleInProgress implements Runnable {
 	}
 
 	private void otherTurn() {
-		List<Zone> zones = battle.doTurnStart(thisPlayer.otherPlayer());
+		final List<Zone> zones = battle.doTurnStart(thisPlayer.otherPlayer());
 		battle.getTurnStart(thisPlayer.otherPlayer()); // Do this for the side-effects only
 		Platform.runLater(() -> {
-			List<Targetable> affected = new ArrayList<>();
+			final List<Targetable> affected = new ArrayList<>();
 			affected.addAll(battle.battleState.cloneCharacters());
 			affected.addAll(zones);
 			try {
-				listener.command((new StartTurnCommand(thisPlayer.otherPlayer(), affected, false))
+				listener.command((new StartTurnCommand(thisPlayer.otherPlayer(), affected))
 					.doCmdComputingTriggers(battle).get(0));
 			} catch (CommandException e) {
 				listener.badCommand(e);

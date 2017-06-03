@@ -80,17 +80,18 @@ public class CharacterInfoBox extends AnchorPane {
 		grid.setAlignment(Pos.CENTER);
 		grid.getChildren().addAll(hp, ap, mp, statusLine);
 
-		ap.update(character.hasMana()? "ap_mana" : "ap", character.getAP(), character.getStats().ap, false);
-		mp.update("mp", character.getMP(), character.getStats().mp, false);
-		hp.update(character.hasCover()? "hp_cover" : "hp", character.getHP(), character.getMaxHP(), character.hasCover());
+		updateCharacter(character);
 	}
 
 	private void updateStatus(
-		Optional<StatusEffect> buff, Optional<StatusEffect> debuff
+		Character c, Optional<StatusEffect> buff, Optional<StatusEffect> debuff
 	) {
 		statusLine.getChildren().clear();
 		buff.ifPresent(s -> statusLine.getChildren().add(statusEffectImage(s)));
 		debuff.ifPresent(s -> statusLine.getChildren().add(statusEffectImage(s)));
+		if (c.getRevengeBonus() != 0) {
+			statusLine.getChildren().add(revengeImage(c));
+		}
 	}
 
 	private ImageView statusEffectImage(StatusEffect s) {
@@ -102,11 +103,21 @@ public class CharacterInfoBox extends AnchorPane {
 		return r;
 	}
 
+	private ImageView revengeImage(Character c) {
+		final ImageView r = new ImageView(sprites.revengeIcon);
+		final Tooltip t = new Tooltip(c.name + " is angry!\n" +
+			c.name + " gets a revenge bonus of " + c.getRevengeBonus());
+		t.setWrapText(true);
+		t.setPrefWidth(300);
+		Tooltip.install(r, t);
+		return r;
+	}
+
 	public void updateCharacter(Character c) {
 		ap.update(c.hasMana()? "ap_mana" : "ap", c.getAP(), c.getStats().ap, false);
 		mp.update("mp", c.getMP(), c.getStats().mp, false);
 		hp.update(c.hasCover()? "hp_cover" : "hp", c.getHP(), c.getMaxHP(), c.hasCover());
-		updateStatus(c.getStatusBuff(), c.getStatusDebuff());
+		updateStatus(c, c.getStatusBuff(), c.getStatusDebuff());
 	}
 
 	public void setSelected(boolean isSelected) {

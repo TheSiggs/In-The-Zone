@@ -90,7 +90,7 @@ public class Trap extends Targetable implements HasParentAgent {
 
 	@Override public Trap clone() {
 		return new Trap(
-			pos, ability, parent, hasMana,
+			pos, ability, parent.clone(), hasMana,
 			chanceBuff, attackBuff, defenceBuff,
 			stats, sprite, defused);
 	}

@@ -46,6 +46,9 @@ public class Character extends Targetable {
 	private int mp = 0;
 	private int hp = 0;
 
+	double revengeBonus = 0;
+	public double getRevengeBonus() { return revengeBonus; }
+
 	private Character(
 		int id,
 		String name,
@@ -62,7 +65,8 @@ public class Character extends Targetable {
 		MapPoint pos,
 		int ap,
 		int mp,
-		int hp
+		int hp,
+		double revengeBonus
 	) {
 		this.id = id;
 		this.name = name;
@@ -80,6 +84,7 @@ public class Character extends Targetable {
 		this.ap = ap;
 		this.mp = mp;
 		this.hp = hp;
+		this.revengeBonus = revengeBonus;
 	}
 
 	/**
@@ -102,7 +107,8 @@ public class Character extends Targetable {
 			pos,
 			ap,
 			mp,
-			hp
+			hp,
+			revengeBonus
 		);
 	}
 
@@ -169,8 +175,6 @@ public class Character extends Targetable {
 	 * Buff or debuff this character's points.
 	 * */
 	public void pointsBuff(int ap, int mp, int hp) {
-		if (isDead()) return;
-
 		if (buffedAP && ap > 0) ap = 0;
 		if (buffedMP && mp > 0) mp = 0;
 		if (debuffedAP && ap < 0) ap = 0;
@@ -208,7 +212,7 @@ public class Character extends Targetable {
 	 * Move the character spending movement points
 	 * */
 	public void moveTo(MapPoint p, int mp, boolean hasMana) {
-		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+		if (isDead() || statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
 			return;
 		}
 
@@ -238,8 +242,6 @@ public class Character extends Targetable {
 
 	public void kill() {
 		hp = 0;
-		ap = 0;
-		mp = 0;
 		statusBuff = Optional.empty();
 		statusDebuff = Optional.empty();
 	}
@@ -249,7 +251,7 @@ public class Character extends Targetable {
 	}
 
 	public void teleport(MapPoint p, boolean hasMana) {
-		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+		if (isDead() || statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
 			return;
 		}
 
@@ -266,8 +268,8 @@ public class Character extends Targetable {
 		if (this.player != player) return r;
 
 		final Stats stats = getStats();
-		ap = isDead()? 0 : stats.ap;
-		mp = isDead()? 0 : stats.mp;
+		ap = stats.ap;
+		mp = stats.mp;
 
 		// reset the point buff/debuff checks
 		buffedAP = false;

@@ -164,9 +164,8 @@ public class CommandTests {
 		assertFalse(trapRS.isEmpty());
 
 		// confirm that it is defused
-		// TODO: confirm what the appropriate behaviour is.
-		// trap = b.battleState.getTrapAt(trapPos).orElse(null);
-		// assertNull(trap);
+		 trap = b.battleState.getTrapAt(trapPos).orElse(null);
+		 assertNull(trap);
 	}
 
 	@Test

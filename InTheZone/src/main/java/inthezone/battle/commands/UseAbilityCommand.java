@@ -155,9 +155,15 @@ public class UseAbilityCommand extends Command {
 
 		if (agentType == AbilityAgentType.CHARACTER && abilityData.info.trap) {
 			placedTraps = true;
+
+			// don't place traps on defusing zones
+			final Collection<MapPoint> realTargets = targetSquares.stream()
+				.filter(p -> !battle.battleState.hasDefusingZone(p))
+				.collect(Collectors.toList());
+
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			r.addAll(battle.battleState.getCharacterAt(agent)
-				.map(c -> battle.createTrap(abilityData, c, targetSquares))
+				.map(c -> battle.createTrap(abilityData, c, realTargets))
 				.orElseThrow(() -> new CommandException("53: Missing ability agent")));
 
 		} else {

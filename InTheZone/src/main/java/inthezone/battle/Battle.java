@@ -73,9 +73,32 @@ public class Battle {
 					.collect(Collectors.toList())));
 		}
 
-		// do all the other effects
 		r.addAll(battleState.characters.stream()
 			.flatMap(c -> c.turnReset(this, player).stream())
+			.collect(Collectors.toList()));
+
+		return r;
+	}
+
+	/**
+	 * Turn start has a second phase now in which zones, traps, and obstacles
+	 * interact.
+	 * */
+	public List<Command> getTurnStartPhase2() {
+		final List<Command> r = new ArrayList<>();
+
+		// triggers for non-character targetables.
+		final Set<MapPoint> misc = battleState.targetable.stream()
+			.filter(t -> !(t instanceof Character))
+			.map(t -> {
+				t.currentZone = Optional.empty();
+				return t.getPos();
+			})
+			.collect(Collectors.toSet());
+
+		final Trigger trigger = new Trigger(battleState);
+		r.addAll(misc.stream()
+			.flatMap(p -> trigger.getAllTriggers(p).stream())
 			.collect(Collectors.toList()));
 
 		return r;
@@ -92,6 +115,7 @@ public class Battle {
 				battleState.pathCost(path), battleState.hasMana(target));
 			else c.teleport(target, battleState.hasMana(target));
 		});
+		battleState.updateRevengeBonus();
 	}
 
 	/**
@@ -145,6 +169,8 @@ public class Battle {
 
 			if (t.reap()) battleState.removeObstacle(t);
 		}
+
+		battleState.updateRevengeBonus();
 	}
 
 	/**
@@ -159,6 +185,7 @@ public class Battle {
 			if (battleState.isSpaceFree(p) && !battleState.getTrapAt(p).isPresent())
 				r.add(battleState.placeTrap(p, ability, agent, sprites));
 		}
+		battleState.updateRevengeBonus();
 		return r;
 	}
 
@@ -177,6 +204,7 @@ public class Battle {
 		final Optional<Integer> turns = ability.info.zone == AbilityZoneType.BOUND_ZONE?
 			Optional.empty() : Optional.of(zoneTurns);
 
+		battleState.updateRevengeBonus();
 		return battleState.placeZone(
 				ps.iterator().next(), range, ability, turns, bind, agent)
 			.map(x -> Stream.of(x))
@@ -193,6 +221,7 @@ public class Battle {
 					"Attempted to attack non-target, command verification code failed"));
 			t.dealDamage(d.damage);
 		}
+		battleState.updateRevengeBonus();
 	}
 
 	/**
@@ -204,6 +233,7 @@ public class Battle {
 				item.doEffect(t);
 				a.useItem(item);
 			}));
+		battleState.updateRevengeBonus();
 	}
 
 	/**
@@ -223,6 +253,7 @@ public class Battle {
 			r.add(c);
 		});
 
+		battleState.updateRevengeBonus();
 		return r;
 	}
 
@@ -230,6 +261,7 @@ public class Battle {
 	 * Handle the teleport effect.
 	 * */
 	public List<Targetable> doTeleport(MapPoint source, MapPoint destination) {
+		battleState.updateRevengeBonus();
 		return battleState.getCharacterAt(source).map(c -> {
 			c.teleport(destination, battleState.hasMana(destination));
 			return Stream.of(c);
@@ -240,6 +272,7 @@ public class Battle {
 	 * Handle the cleanse effect.
 	 * */
 	public List<Targetable> doCleanse(Collection<MapPoint> targets) {
+		battleState.updateRevengeBonus();
 		return targets.stream().flatMap(ot ->
 				battleState.getTargetableAt(ot).stream()
 					.map(t -> {t.cleanse(); return t;})
@@ -256,6 +289,7 @@ public class Battle {
 			).collect(Collectors.toList());
 
 		r.stream().forEach(t -> {if (t.reap()) battleState.removeObstacle(t);});
+		battleState.updateRevengeBonus();
 		return r;
 	}
 
@@ -269,6 +303,7 @@ public class Battle {
 			).collect(Collectors.toList());
 
 		r.stream().forEach(t -> {if (t.reap()) battleState.removeObstacle(t);});
+		battleState.updateRevengeBonus();
 		return r;
 	}
 
@@ -280,6 +315,7 @@ public class Battle {
 		for (MapPoint p : obstacles) {
 			r.add(battleState.placeObstacle(p, sprites));
 		}
+		battleState.updateRevengeBonus();
 		return r;
 	}
 
@@ -298,6 +334,7 @@ public class Battle {
 			});
 		}
 
+		battleState.updateRevengeBonus();
 		return r;
 	}
 

@@ -30,10 +30,22 @@ public class InfoTargeting extends InfoRequest<Collection<MapPoint>> {
 	}
 
 	@Override public void completeAction(Battle battle) {
-		complete.complete(battle.battleState.getTargetableArea(
-			subject.getPos(), castFrom, ability).stream()
-				.filter(x -> !retargetedFrom.contains(x))
+		final Collection<MapPoint> area =
+			battle.battleState.getTargetableArea(
+				subject.getPos(), castFrom, ability).stream()
+					.filter(x -> !retargetedFrom.contains(x))
+					.collect(Collectors.toList());
+
+		if (ability.info.trap) {
+			complete.complete(area.stream()
+				.filter(p ->
+					battle.battleState.isSpaceFree(p) &&
+					!battle.battleState.getTrapAt(p).isPresent() &&
+					!battle.battleState.hasDefusingZone(p))
 				.collect(Collectors.toList()));
+		}
+
+		complete.complete(area);
 	}
 }
 

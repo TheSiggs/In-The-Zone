@@ -11,14 +11,10 @@ import org.json.JSONObject;
  * */
 public class StartTurnCommand extends Command {
 	public final Player player;
-	public final boolean commandsComming;
 
 	private final List<Targetable> affected;
 
-	public StartTurnCommand(
-		Player player, List<Targetable> affected, boolean commandsComming
-	) {
-		this.commandsComming = commandsComming;
+	public StartTurnCommand( Player player, List<Targetable> affected) {
 		this.affected = affected;
 		this.player = player;
 	}

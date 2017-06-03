@@ -26,11 +26,11 @@ public class NetworkCommandGenerator implements CommandGenerator {
 	) {
 		while (true) {
 			try {
-				Command cmd = commandQueue.take();
+				final Command cmd = commandQueue.take();
 
 				try {
-					ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
-					Platform.runLater(() -> listener.command(ec)); 
+					final ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+					Platform.runLater(() -> listener.command(ec.markLastInSequence())); 
 					if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
 						return;
 					}

@@ -28,7 +28,7 @@ import java.util.List;
 public class CharacterProfilePane extends HBox {
 	private final VBox leftSection = new VBox(4);
 	private final HBox topSection = new HBox(4);
-	private final RollerScrollPane scrollAbilities;
+	private final VBox scrollAbilities;
 	private final ListView<AbilityInfo> abilities = new ListView<>();
 
 	private final VBox descriptionPanel = new VBox(10);
@@ -44,7 +44,7 @@ public class CharacterProfilePane extends HBox {
 	private final Spinner<Integer> attack = new Spinner<>();
 	private final Spinner<Integer> defence = new Spinner<>();
 	private final Label basicAbility = new Label("Basic ability");
-	private final RollerScrollPane scrollBasics;
+	private final VBox scrollBasics;
 	private final ListView<AbilityInfo> basics = new ListView<>();
 	private final StackPane portraitWrapper = new StackPane();
 	private final ImageView portrait = new ImageView();
@@ -54,10 +54,26 @@ public class CharacterProfilePane extends HBox {
 
 	private CharacterProfileModel model = null;
 
+	private final static double descriptionWidth = 320;
+	private final static double abilitiesListWidth = 200;
+	private final static double abilitiesListHeight = 520;
+	private final static double basicsWidth = 200;
+
 	public CharacterProfilePane() {
-		scrollAbilities = new RollerScrollPane(abilities, false);
-		scrollBasics = new RollerScrollPane(basics, false);
+		scrollAbilities = new VBox(abilities);
+		scrollBasics = new VBox(basics);
 		bottomScroll = new RollerScrollPane(bottomSection, true);
+
+		scrollAbilities.getStyleClass().add("panel");
+		scrollBasics.getStyleClass().add("panel");
+
+		scrollAbilities.setPrefWidth(abilitiesListWidth);
+		scrollAbilities.setPrefHeight(abilitiesListHeight);
+		scrollAbilities.setMinWidth(abilitiesListWidth);
+		scrollBasics.setPrefWidth(basicsWidth);
+		scrollBasics.setMinWidth(basicsWidth);
+
+		abilities.getStyleClass().add("gui-list");
 
 		descriptionPanel.getStyleClass().add("panel");
 		descriptionPanel.setId("description-panel");
@@ -77,8 +93,8 @@ public class CharacterProfilePane extends HBox {
 
 		descriptionPanel.setAlignment(Pos.BOTTOM_CENTER);
 		descriptionPanel.setFillWidth(true);
-		descriptionPanel.setMinWidth(320);
-		descriptionPanel.setMaxWidth(320);
+		descriptionPanel.setMinWidth(descriptionWidth);
+		descriptionPanel.setMaxWidth(descriptionWidth);
 		descriptionPanel.getChildren().addAll(
 			abilityName, description, manaUpgrade,
 			manaAbilityName, manaDescription, addAbility);
@@ -180,6 +196,12 @@ public class CharacterProfilePane extends HBox {
 		abilities.getSelectionModel().select(0);
 		basics.setItems(basicsList);
 		basics.getSelectionModel().select(profile.basicAbility);
+
+		abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
+		scrollAbilities.layout();
+
+		basics.setPrefHeight(basicsList.size() * 30 + 6);
+		scrollBasics.layout();
 
 		hp.setValueFactory(new PPSpinnerFactory("Health: ",
 			profile.hpPP, info.hpCurve.get(0), info.hpCurve));

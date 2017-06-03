@@ -142,4 +142,24 @@
 	-fx-font-weight:bold;
 }
 
+.gui-list {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-padding:0px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-list .list-cell {
+	-fx-background-color:transparent;
+	-fx-text-fill:white;
+	-fx-padding:6px 10px 6px 10px;
+	-fx-border:solid;
+	-fx-border-color:black;
+	-fx-border-width:0px 0px 2px 0px;
+}
+
+.gui-list .list-cell:selected {
+	-fx-font-weight:bold;
+}
 

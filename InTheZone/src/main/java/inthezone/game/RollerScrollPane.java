@@ -116,8 +116,10 @@ public class RollerScrollPane extends AnchorPane {
 		if (v) {
 			if (horizontal) content.setPadding(new Insets(0, 18, 0, 18));
 			else content.setPadding(new Insets(18, 0, 18, 0));
+			content.layout();
 		} else {
 			content.setPadding(new Insets(0));
+			content.layout();
 		}
 	}
 

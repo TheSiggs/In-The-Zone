@@ -6,6 +6,7 @@ import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Stats;
 import inthezone.game.RollerScrollPane;
 import javafx.beans.binding.StringExpression;
+import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
@@ -13,6 +14,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -35,12 +37,23 @@ public class CharacterIndicatorPane extends AnchorPane {
 	private final GridPane info = new GridPane();
 	private final ImageView portrait = new ImageView();
 
+	private final ObjectProperty<CharacterProfileModel> selectedCharacter;
+
 	private final Map<String, ImageView> abilities = new HashMap<>();
 	private final RollerScrollPane abilitiesListContainer;
 	private final HBox abilitiesList = new HBox(2);
 
-	public CharacterIndicatorPane(Optional<CharacterProfileModel> profile) {
+	public CharacterIndicatorPane(
+		Optional<CharacterProfileModel> profile,
+		ObjectProperty<CharacterProfileModel> selectedCharacter
+	) {
 		super();
+
+		this.selectedCharacter = selectedCharacter;
+		this.setOnMouseClicked(event -> {
+			if (event.getButton().equals(MouseButton.PRIMARY))
+				profile.ifPresent(m -> selectedCharacter.set(m));
+		});
 
 		abilitiesList.setAlignment(Pos.CENTER_LEFT);
 		abilitiesListContainer = new RollerScrollPane(abilitiesList, true);

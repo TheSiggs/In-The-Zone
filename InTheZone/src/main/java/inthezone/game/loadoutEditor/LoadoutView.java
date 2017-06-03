@@ -8,13 +8,16 @@ import inthezone.game.DialogScreen;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +25,18 @@ public class LoadoutView extends DialogScreen<Void> {
 	private LoadoutModel model;
 
 	private final AnchorPane root = new AnchorPane();
+	private final Label characterName = new Label("");
 	private final TextField loadoutName =
 		new TextField("<Loadout name (click to edit)>");
 	private final Button done = new Button("Done");
-	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
-	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
 	private final Label costLabel = new Label("Cost: ");
 	private final VBox rightPane = new VBox(4);
 	private final PPIndicator pp;
+
+	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
+	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
+	private final ObjectProperty<CharacterProfileModel> selectedCharacter =
+		new SimpleObjectProperty<>(null);
 
 	private final ClientConfig config;
 
@@ -66,16 +73,29 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		rightPane.setMaxWidth(280);
 		AnchorPane.setRightAnchor(rightPane, 10d);
+		AnchorPane.setTopAnchor(rightPane, 10d);
+		AnchorPane.setBottomAnchor(rightPane, 10d);
 
 		pp = new PPIndicator(totalCost);
 		AnchorPane.setTopAnchor(pp, 10d);
 		AnchorPane.setLeftAnchor(pp, 10d);
 
-		root.getChildren().addAll(rightPane, pp);
+		characterName.setId("loadout-character-name");
+		characterName.setAlignment(Pos.BASELINE_CENTER);
+		AnchorPane.setTopAnchor(characterName, 20d);
+		AnchorPane.setLeftAnchor(characterName, 10d);
+		AnchorPane.setRightAnchor(characterName, 100d);
+
+		root.getChildren().addAll(rightPane, pp, characterName);
 
 		this.getChildren().add(root);
 
 		setLoadoutModel(model);
+
+		selectedCharacter.addListener((v, o, n) -> {
+			characterName.setText(n.profileProperty()
+				.get().rootCharacter.name);
+		});
 	}
 
 	public void setLoadoutModel(LoadoutModel model) {
@@ -89,7 +109,11 @@ public class LoadoutView extends DialogScreen<Void> {
 		rightPane.getChildren().add(loadoutName);
 		for (int i = 0; i < 4; i++) {
 			rightPane.getChildren().add(
-				new CharacterIndicatorPane(model.usedProfiles.get(i)));
+				new CharacterIndicatorPane(
+					model.usedProfiles.get(i), selectedCharacter));
+			model.usedProfiles.get(i).ifPresent(p -> {
+				if (selectedCharacter.get() == null) selectedCharacter.set(p);
+			});
 		}
 		rightPane.getChildren().add(done);
 	}

@@ -69,3 +69,10 @@
 	-fx-faint-focus-color: transparent;
 }
 
+#loadout-character-name {
+	-fx-text-fill:white;
+	-fx-font-size:72px;
+	-fx-font-family:serif;
+}
+
+

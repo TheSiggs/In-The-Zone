@@ -79,3 +79,45 @@
 	visibility:hidden;
 }
 
+.gui-spinner {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-padding:4px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-spinner .increment-arrow-button,
+.gui-spinner .decrement-arrow-button
+{
+	-fx-border:none;
+	-fx-background-color:transparent;
+}
+
+.gui-spinner .increment-arrow-button {
+	-fx-background-image:url(/gui_assets/plus.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-position:center;
+	-fx-background-size:contain;
+}
+
+.gui-spinner .decrement-arrow-button {
+	-fx-background-image:url(/gui_assets/minus.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-position:center center;
+	-fx-background-size:contain;
+}
+
+.gui-spinner .increment-arrow,
+.gui-spinner .decrement-arrow {
+	-fx-background-color:transparent;
+}
+
+.gui-spinner .text-field {
+	-fx-padding:6px;
+	-fx-text-fill:white;
+	-fx-background-color:transparent;
+	-fx-border:none;
+}
+
+
+

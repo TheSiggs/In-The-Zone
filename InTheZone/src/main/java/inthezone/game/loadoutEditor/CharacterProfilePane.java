@@ -25,14 +25,14 @@ import javafx.util.StringConverter;
 import java.util.List;
 
 public class CharacterProfilePane extends HBox {
-	private final VBox leftSection = new VBox(10);
-	private final HBox topSection = new HBox(10);
+	private final VBox leftSection = new VBox(4);
+	private final HBox topSection = new HBox(4);
 	private final RollerScrollPane scrollAbilities;
 	private final ListView<AbilityInfo> abilities = new ListView<>();
 	private final VBox descriptionPanel = new VBox(10);
 	private final Label description = new Label("");
 	private final Button addAbility = new Button("Add ability");
-	private final VBox stats = new VBox(10);
+	private final VBox stats = new VBox(4);
 	private final Spinner<Integer> hp = new Spinner<>();
 	private final Spinner<Integer> attack = new Spinner<>();
 	private final Spinner<Integer> defence = new Spinner<>();
@@ -61,6 +61,15 @@ public class CharacterProfilePane extends HBox {
 		topSection.getChildren().addAll(scrollAbilities, descriptionPanel, stats);
 
 		HBox.setHgrow(bottomScroll, Priority.ALWAYS);
+
+		hp.getStyleClass().addAll("panel", "gui-spinner");
+		attack.getStyleClass().addAll("panel", "gui-spinner");
+		defence.getStyleClass().addAll("panel", "gui-spinner");
+
+		hp.setMaxWidth(Double.MAX_VALUE);
+		attack.setMaxWidth(Double.MAX_VALUE);
+		defence.setMaxWidth(Double.MAX_VALUE);
+		stats.setFillWidth(true);
 
 		final Separator spacer1 = new Separator(Orientation.VERTICAL);
 		final Separator spacer2 = new Separator(Orientation.VERTICAL);
@@ -102,11 +111,11 @@ public class CharacterProfilePane extends HBox {
 		basics.setItems(basicsList);
 		basics.getSelectionModel().select(profile.basicAbility);
 
-		hp.setValueFactory(new PPSpinnerFactory(
+		hp.setValueFactory(new PPSpinnerFactory("Health: ",
 			profile.hpPP, info.hpCurve.get(0), info.hpCurve));
-		attack.setValueFactory(new PPSpinnerFactory(
+		attack.setValueFactory(new PPSpinnerFactory("Attack: ",
 			profile.attackPP, info.attackCurve.get(0), info.attackCurve));
-		defence.setValueFactory(new PPSpinnerFactory(
+		defence.setValueFactory(new PPSpinnerFactory("Defence: ",
 			profile.defencePP, info.defenceCurve.get(0), info.defenceCurve));
 
 		bottomSection.getChildren().clear();
@@ -120,7 +129,9 @@ public class CharacterProfilePane extends HBox {
 class PPSpinnerFactory extends SpinnerValueFactory<Integer> { 
 	private final int[] values;
 
-	public PPSpinnerFactory(int init, int base, List<Integer> curve) {
+	public PPSpinnerFactory(
+		String prefix, int init, int base, List<Integer> curve
+	) {
 
 		values = new int[1 + curve.size()];
 		values[0] = base;
@@ -128,7 +139,7 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 
 		setConverter(new StringConverter<Integer>() {
 			@Override public Integer fromString(String s) {
-				final int raw = Integer.parseInt(s);
+				final int raw = Integer.parseInt(s.substring(prefix.length()));
 				for (int i = 0; i < values.length; i++) {
 					if (values[i] == raw) return i;
 				}
@@ -136,11 +147,7 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 			}
 
 			@Override public String toString(Integer i) {
-				if (i < 0 || i >= values.length) {
-					return "";
-				} else {
-					return "" + values[i];
-				}
+				return prefix + ((i < 0 || i >= values.length)? "" : values[i]);
 			}
 		});
 

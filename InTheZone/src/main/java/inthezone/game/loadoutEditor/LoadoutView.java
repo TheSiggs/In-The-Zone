@@ -5,6 +5,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
+import inthezone.game.RollerScrollPane;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -103,7 +104,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		HBox.setHgrow(profilePane, Priority.ALWAYS);
 		mainPane.getChildren().addAll(profilePane, rightPane);
 
-		root.getChildren().addAll(mainPane, pp, characterName);
+		root.getChildren().addAll(characterName, mainPane, pp);
 
 		this.getChildren().add(root);
 
@@ -130,18 +131,33 @@ public class LoadoutView extends DialogScreen<Void> {
 		rightPane.getChildren().clear();
 		final Separator spacer1 = new Separator(Orientation.VERTICAL);
 		final Separator spacer2 = new Separator(Orientation.VERTICAL);
+		spacer1.setMinHeight(0);
+		spacer2.setMinHeight(0);
 		VBox.setVgrow(spacer1, Priority.ALWAYS);
 		VBox.setVgrow(spacer2, Priority.ALWAYS);
 		rightPane.getChildren().addAll(spacer1, loadoutName);
+
+		final VBox indicatorsPane = new VBox(4);
+		indicatorsPane.setMaxWidth(Double.MAX_VALUE);
+		indicatorsPane.setFillWidth(true);
 		for (int i = 0; i < 4; i++) {
-			rightPane.getChildren().add(
+			indicatorsPane.getChildren().add(
 				new CharacterIndicatorPane(
 					model.usedProfiles.get(i), selectedCharacter));
 			model.usedProfiles.get(i).ifPresent(p -> {
 				if (selectedCharacter.get() == null) selectedCharacter.set(p);
 			});
 		}
-		rightPane.getChildren().addAll(done, spacer2);
+		final RollerScrollPane scrollPane =
+			new RollerScrollPane(indicatorsPane, false);
+		scrollPane.setId("character-indicators");
+		scrollPane.setMaxHeight(178 * 4 + 48);
+		scrollPane.setMaxWidth(Double.MAX_VALUE);
+		scrollPane.setMinHeight(100);
+		scrollPane.layout();
+		scrollPane.setScrollPos(scrollPane.getScrollMin());
+
+		rightPane.getChildren().addAll(scrollPane, done, spacer2);
 	}
 
 	private static LoadoutModel emptyLoadout(

@@ -4,18 +4,21 @@ import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.Node;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class RollerScrollPane extends AnchorPane {
-	private final ScrollPane pane = new ScrollPane();
+	private final StackPane innerPane = new StackPane();
+	private final StackPane viewPane = new StackPane();
+	private final Rectangle clipRect = new Rectangle();
 	private final boolean horizontal;
 	private final Button back;
 	private final Button forward;
@@ -24,17 +27,37 @@ public class RollerScrollPane extends AnchorPane {
 
 	private Region content;
 
+	private double scrollMin = 0;
+	private double scrollMax = 0;
+	private double scroll = 0;
+
 	public RollerScrollPane(Region content, boolean horizontal) {
 		super();
 		this.horizontal = horizontal;
 		this.content = content;
 
-		pane.setContent(content);
-		pane.setPannable(true);
-		pane.setFitToHeight(true);
-		pane.setFitToWidth(true);
-		pane.setVbarPolicy(ScrollBarPolicy.NEVER);
-		pane.setHbarPolicy(ScrollBarPolicy.NEVER);
+		if (horizontal) this.setMinWidth(64);
+		else this.setMinHeight(64);
+
+		if (horizontal) innerPane.maxWidthProperty().bind(this.widthProperty());
+		else innerPane.maxHeightProperty().bind(this.heightProperty());
+
+		innerPane.getChildren().add(content);
+		viewPane.setAlignment(Pos.TOP_LEFT);
+		viewPane.getChildren().add(innerPane);
+		viewPane.maxWidthProperty().bind(this.widthProperty());
+		viewPane.maxHeightProperty().bind(this.heightProperty());
+		viewPane.setClip(clipRect);
+
+		this.widthProperty().addListener((v, o, n) -> {
+			final Insets i = this.getInsets();
+			clipRect.setWidth(this.getWidth() - i.getLeft() - i.getRight());
+		});
+
+		this.heightProperty().addListener((v, o, n) -> {
+			final Insets i = this.getInsets();
+			clipRect.setHeight(this.getHeight() - i.getTop() - i.getBottom());
+		});
 
 		if (horizontal) {
 			back = new Button(null, new ImageView(
@@ -52,13 +75,11 @@ public class RollerScrollPane extends AnchorPane {
 				new Image("/gui_assets/arrow_down.png")));
 			back.setMaxWidth(Double.MAX_VALUE);
 			back.setMaxHeight(SCROLL_BUTTON_SIZE);
-			forward.setMaxHeight(SCROLL_BUTTON_SIZE);
 			forward.setMaxWidth(Double.MAX_VALUE);
+			forward.setMaxHeight(SCROLL_BUTTON_SIZE);
 		}
 
 		this.getStyleClass().add("roller-scroller");
-		pane.getStyleClass().add("roller-scroller");
-		pane.setStyle("-fx-padding:0px;");
 		back.getStyleClass().add("gui-img-button");
 		forward.getStyleClass().add("gui-img-button");
 
@@ -80,13 +101,10 @@ public class RollerScrollPane extends AnchorPane {
 			AnchorPane.setRightAnchor(forward, 0d);
 		}
 
-		AnchorPane.setTopAnchor(pane, 0d);
-		AnchorPane.setBottomAnchor(pane, 0d);
-		AnchorPane.setLeftAnchor(pane, 0d);
-		AnchorPane.setRightAnchor(pane, 0d);
-
-		content.boundsInLocalProperty().addListener(o -> showHideButtons());
-		pane.viewportBoundsProperty().addListener(o -> showHideButtons());
+		AnchorPane.setTopAnchor(viewPane, 0d);
+		AnchorPane.setBottomAnchor(viewPane, 0d);
+		AnchorPane.setLeftAnchor(viewPane, 0d);
+		AnchorPane.setRightAnchor(viewPane, 0d);
 
 		back.setOnMousePressed(event -> mouseDown(true));
 		back.setOnMouseReleased(event -> mouseUp());
@@ -95,50 +113,58 @@ public class RollerScrollPane extends AnchorPane {
 		forward.setOnMouseReleased(event -> mouseUp());
 		forward.setOnMouseExited(event -> mouseUp());
 
-		this.getChildren().addAll(pane, back, forward);
+		this.getChildren().addAll(viewPane, back, forward);
+
+		content.boundsInLocalProperty().addListener(o -> showHideButtons());
+		viewPane.boundsInParentProperty().addListener(o -> showHideButtons());
+
+		showHideButtons();
+	}
+
+	public double getScrollMin() { return scrollMin; }
+
+	public double getScrollMax() { return scrollMax; }
+
+	public void setScrollPos(double pos) {
+		scroll = Math.min(scrollMax, Math.max(pos, scrollMin));
+		if (horizontal) innerPane.setTranslateX(-scroll);
+			else innerPane.setTranslateY(-scroll);
 	}
 
 	private boolean isVisible = false;
 
-	public void showHideButtons() {
-		final Bounds vp = pane.getViewportBounds();
-		final Bounds cn = pane.getContent().getBoundsInLocal();
+	private void showHideButtons() {
+		final Bounds vp = viewPane.getBoundsInParent();
+		final Bounds cn = innerPane.getBoundsInLocal();
 
 		final boolean v;
-		if (horizontal) v = vp.getWidth() < cn.getWidth();
-		else v = vp.getHeight() < cn.getHeight();
-
-		if (v == isVisible) return;
-		isVisible = v;
+		if (horizontal) v = cn.getWidth() > vp.getWidth();
+		else v = cn.getHeight() > vp.getHeight();
 
 		back.setVisible(v);
 		forward.setVisible(v);
 
 		if (v) {
-			if (horizontal) content.setPadding(new Insets(0, 18, 0, 18));
-			else content.setPadding(new Insets(18, 0, 18, 0));
-			content.layout();
-		} else {
-			content.setPadding(new Insets(0));
-			content.layout();
-		}
-	}
+			scrollMin = -20;
+			if (horizontal) {
+				scrollMax = cn.getWidth() - vp.getWidth() + 20;
+			} else {
+				scrollMax = cn.getHeight() - vp.getHeight() + 20;
+			}
 
-	public void setContent(Region content) {
-		this.content = content;
-		pane.setContent(content);
-		content.boundsInLocalProperty().addListener(o -> showHideButtons());
-		showHideButtons();
+		} else if (isVisible) {
+			scrollMin = 0;
+			scrollMax = 0;
+			setScrollPos(0);
+		}
+
+		isVisible = v;
 	}
 
 	private ScrollAnimation animation = null;
 
 	private void mouseDown(boolean back) {
 		if (animation == null) {
-			// this is a hack that forces the ScrollPane to correctly compute the
-			// scroll bounds.
-			pane.requestFocus();
-
 			// start the scrolling animation
 			animation = new ScrollAnimation(back);
 			animation.play();
@@ -153,7 +179,7 @@ public class RollerScrollPane extends AnchorPane {
 	}
 
 	private class ScrollAnimation extends Transition {
-		private final static double SCROLL_SPEED = 4;
+		private final static double SCROLL_SPEED = 180;
 
 		final double max;
 		final double start;
@@ -163,11 +189,11 @@ public class RollerScrollPane extends AnchorPane {
 			this.back = back;
 			this.setInterpolator(Interpolator.LINEAR);
 			if (back) {
-				max = horizontal? pane.getHmin() : pane.getVmin();
+				max = scrollMin;
 			} else {
-				max = horizontal? pane.getHmax() : pane.getVmax();
+				max = scrollMax;
 			}
-			start = horizontal? pane.getHvalue() : pane.getVvalue();
+			start = scroll;
 			setCycleDuration(new Duration((Math.abs(max - start) / SCROLL_SPEED) * 1000));
 		}
 
@@ -176,7 +202,7 @@ public class RollerScrollPane extends AnchorPane {
 			if (back) pos = ((start - max) * (1 - frac)) + max;
 			else pos = ((max - start) * frac) + start;
 
-			if (horizontal) pane.setHvalue(pos); else pane.setVvalue(pos);
+			setScrollPos(pos);
 		}
 	}
 

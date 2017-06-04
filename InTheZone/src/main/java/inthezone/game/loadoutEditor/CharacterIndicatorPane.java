@@ -133,6 +133,8 @@ public class CharacterIndicatorPane extends AnchorPane {
 			abilities.put(a.name, i);
 			abilitiesList.getChildren().add(i);
 		}
+		abilitiesListContainer.layout();
+		abilitiesListContainer.setScrollPos(abilitiesListContainer.getScrollMin());
 
 		abilitiesList.getChildren().removeAll(abilitiesList.getChildren().stream()
 			.filter(x -> !abilities.containsValue(x))

@@ -60,6 +60,9 @@ public class CharacterProfilePane extends HBox {
 	private final static double abilitiesListHeight = 520;
 	private final static double basicsWidth = 280;
 
+	private final Separator leftSpacer1 = new Separator(Orientation.VERTICAL);
+	private final Separator leftSpacer2 = new Separator(Orientation.VERTICAL);
+
 	public CharacterProfilePane() {
 		scrollAbilities = new VBox(abilities);
 
@@ -113,16 +116,18 @@ public class CharacterProfilePane extends HBox {
 		defence.setMaxWidth(Double.MAX_VALUE);
 		stats.setFillWidth(true);
 
-		final Separator spacer1 = new Separator(Orientation.VERTICAL);
-		final Separator spacer2 = new Separator(Orientation.VERTICAL);
-		VBox.setVgrow(spacer1, Priority.ALWAYS);
-		VBox.setVgrow(spacer2, Priority.ALWAYS);
-		leftSection.getChildren().addAll(spacer1, topSection, bottomScroll, spacer2);
+		VBox.setVgrow(leftSpacer1, Priority.ALWAYS);
+		leftSpacer1.setMinHeight(94);
+		VBox.setVgrow(leftSpacer2, Priority.ALWAYS);
+		leftSection.getChildren().addAll(
+			leftSpacer1, topSection, bottomScroll, leftSpacer2);
 
+		portraitWrapper.setMinWidth(100);
 		portraitWrapper.getChildren().add(portrait);
+		portraitWrapper.setMouseTransparent(true);
 
 		HBox.setHgrow(portraitWrapper, Priority.ALWAYS);
-		this.setAlignment(Pos.CENTER_LEFT);
+		this.setAlignment(Pos.TOP_LEFT);
 		this.getChildren().addAll(leftSection, portraitWrapper);
 
 		abilities.getSelectionModel().selectedItemProperty()
@@ -135,8 +140,8 @@ public class CharacterProfilePane extends HBox {
 			final AbilityInfo a = abilities.getSelectionModel().getSelectedItem();
 			if (a != null && !model.abilities.contains(a)) {
 				model.abilities.add(a);
-				bottomSection.getChildren().add(new AbilityButton(
-					a, true, bottomSection.getChildren(), model.abilities));
+				bottomSection.getChildren().add(
+					new AbilityButton(a, true));
 			}
 		});
 
@@ -149,6 +154,14 @@ public class CharacterProfilePane extends HBox {
 			"Increase or decrease defence stat (costs PP)"));
 		basicAbility.setTooltip(new Tooltip(
 			"Choose a basic ability for this character"));
+
+		// Resize the character portrait image to fit the window
+		this.sceneProperty().addListener((v, o, n) -> {
+			if (n != null) {
+				portrait.fitHeightProperty().bind(n.heightProperty().multiply(0.95));
+			}
+		});
+
 	}
 
 	public void setProfile(CharacterProfileModel model) {
@@ -160,7 +173,6 @@ public class CharacterProfilePane extends HBox {
 
 		portrait.setImage(profile.rootCharacter.bigPortrait);
 		portrait.setPreserveRatio(true);
-		portrait.setFitHeight(720);
 
 		final ObservableList<AbilityInfo> abilitiesList =
 			FXCollections.<AbilityInfo>observableArrayList();
@@ -202,50 +214,51 @@ public class CharacterProfilePane extends HBox {
 			final boolean removable =
 				a.type != AbilityType.BASIC &&
 				a.type != AbilityType.SPECIAL;
-			bottomSection.getChildren().add(new AbilityButton(
-				a, removable, bottomSection.getChildren(), model.abilities));
+			bottomSection.getChildren().add(
+				new AbilityButton(a, removable));
 		}
 	}
-}
 
-class AbilityButton extends AnchorPane {
-	private final StackPane imageWrapper = new StackPane();
-	private final ImageView image = new ImageView();
-	private final Button remove = new Button();
+	class AbilityButton extends AnchorPane {
+		private final StackPane imageWrapper = new StackPane();
+		private final ImageView image = new ImageView();
+		private final Button remove = new Button();
 
-	public AbilityButton(
-		AbilityInfo a, boolean removable,
-		ObservableList<Node> abilityButtons,
-		ObservableList<AbilityInfo> abilities
-	) {
-		this.getStyleClass().add("ability-button");
-		this.setMinWidth(60);
-		this.setMinHeight(60);
-		image.setImage(a.icon);
-		imageWrapper.getChildren().add(image);
-		AnchorPane.setTopAnchor(imageWrapper, 0d);
-		AnchorPane.setBottomAnchor(imageWrapper, 0d);
-		AnchorPane.setLeftAnchor(imageWrapper, 0d);
-		AnchorPane.setRightAnchor(imageWrapper, 0d);
+		public AbilityButton(
+			AbilityInfo a, boolean removable
+		) {
+			this.getStyleClass().add("ability-button");
+			this.setMinWidth(60);
+			this.setMinHeight(60);
+			image.setImage(a.icon);
+			imageWrapper.getChildren().add(image);
+			AnchorPane.setTopAnchor(imageWrapper, 0d);
+			AnchorPane.setBottomAnchor(imageWrapper, 0d);
+			AnchorPane.setLeftAnchor(imageWrapper, 0d);
+			AnchorPane.setRightAnchor(imageWrapper, 0d);
 
-		AnchorPane.setTopAnchor(remove, 0d);
-		AnchorPane.setRightAnchor(remove, 0d);
+			AnchorPane.setTopAnchor(remove, 0d);
+			AnchorPane.setRightAnchor(remove, 0d);
 
-		this.getChildren().add(imageWrapper);
+			this.getChildren().add(imageWrapper);
 
-		if (removable) {
-			this.getChildren().add(remove);
-			remove.setOnAction(event -> {
-				abilityButtons.remove(this);
-				abilities.remove(a);
-			});
+			if (removable) {
+				this.getChildren().add(remove);
+				remove.setOnAction(event -> {
+					bottomSection.getChildren().remove(this);
+					model.abilities.remove(a);
+				});
+			}
+
+			image.setOnMouseClicked(event ->
+				abilities.getSelectionModel().select(a));
+
+			remove.setTooltip(new Tooltip("Remove this ability"));
+			final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
+			t.setWrapText(true);
+			t.setMaxWidth(300);
+			Tooltip.install(image, t);
 		}
-
-		remove.setTooltip(new Tooltip("Remove this ability"));
-		final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
-		t.setWrapText(true);
-		t.setMaxWidth(300);
-		Tooltip.install(image, t);
 	}
 }
 

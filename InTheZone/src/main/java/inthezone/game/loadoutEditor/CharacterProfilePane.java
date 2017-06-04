@@ -17,6 +17,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -138,6 +139,16 @@ public class CharacterProfilePane extends HBox {
 					a, true, bottomSection.getChildren(), model.abilities));
 			}
 		});
+
+		addAbility.setTooltip(new Tooltip("Add this ability to your loadout"));
+		hp.setTooltip(new Tooltip(
+			"Increase or decrease health points (costs PP)"));
+		attack.setTooltip(new Tooltip(
+			"Increase or decrease attack stat (costs PP)"));
+		defence.setTooltip(new Tooltip(
+			"Increase or decrease defence stat (costs PP)"));
+		basicAbility.setTooltip(new Tooltip(
+			"Choose a basic ability for this character"));
 	}
 
 	public void setProfile(CharacterProfileModel model) {
@@ -229,6 +240,12 @@ class AbilityButton extends AnchorPane {
 				abilities.remove(a);
 			});
 		}
+
+		remove.setTooltip(new Tooltip("Remove this ability"));
+		final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
+		t.setWrapText(true);
+		t.setMaxWidth(300);
+		Tooltip.install(image, t);
 	}
 }
 

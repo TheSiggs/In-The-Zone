@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -113,6 +114,10 @@ public class LoadoutView extends DialogScreen<Void> {
 				.get().rootCharacter.name);
 			profilePane.setProfile(n);
 		});
+
+		loadoutName.setTooltip(new Tooltip("Enter a name for this loadout"));
+		done.setTooltip(new Tooltip(
+			"Save this loadout and return to the loadouts menu"));
 	}
 
 	public void setLoadoutModel(LoadoutModel model) {

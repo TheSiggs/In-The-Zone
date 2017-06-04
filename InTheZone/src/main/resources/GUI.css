@@ -246,3 +246,18 @@
 	-fx-padding:0px;
 }
 
+.switch-buttons .button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:2px;
+	-fx-content-display:graphic-only;
+	-fx-label-padding:0;
+	-fx-font-size:2px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+

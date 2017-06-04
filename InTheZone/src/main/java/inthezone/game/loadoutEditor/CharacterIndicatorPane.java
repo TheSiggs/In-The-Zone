@@ -9,10 +9,12 @@ import javafx.beans.binding.StringExpression;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
@@ -23,9 +25,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CharacterIndicatorPane extends AnchorPane {
-	private CharacterProfileModel profile = null;
+	private final LoadoutModel loadouts;
 
-	private final Label placeholder = new Label("Click to add a character");
+	private CharacterProfileModel profile = null;
 
 	private final Label name = new Label("");
 	private final Label hp = new Label("0");
@@ -42,16 +44,22 @@ public class CharacterIndicatorPane extends AnchorPane {
 	private final RollerScrollPane abilitiesListContainer;
 	private final HBox abilitiesList = new HBox(2);
 
+	private final HBox switchButtons = new HBox();
+	private final Button switchLeft = new Button(null,
+		new ImageView(new Image("/gui_assets/arrow_left.png")));
+	private final Button switchRight = new Button(null,
+		new ImageView(new Image("/gui_assets/arrow_right.png")));
+
 	public CharacterIndicatorPane(
-		CharacterProfileModel profile,
+		LoadoutModel loadouts, CharacterProfileModel profile,
 		ObjectProperty<CharacterProfileModel> selectedCharacter
 	) {
-		super();
+		this.loadouts = loadouts;
 
 		this.selectedCharacter = selectedCharacter;
 		this.setOnMouseClicked(event -> {
 			if (event.getButton().equals(MouseButton.PRIMARY))
-				selectedCharacter.set(profile);
+				selectedCharacter.set(this.profile);
 		});
 
 		abilitiesList.setAlignment(Pos.CENTER_LEFT);
@@ -85,6 +93,22 @@ public class CharacterIndicatorPane extends AnchorPane {
 		info.add(power,   1, 5);
 		info.add(pp,      1, 6);
 
+		switchButtons.getChildren().addAll(switchLeft, switchRight);
+		switchButtons.getStyleClass().add("switch-buttons");
+
+		switchLeft.setOnAction(event -> {
+			updateProfileModel(loadouts.substituteLeft(this.profile));
+			selectedCharacter.set(this.profile);
+		});
+
+		switchRight.setOnAction(event -> {
+			updateProfileModel(loadouts.substituteRight(this.profile));
+			selectedCharacter.set(this.profile);
+		});
+
+		AnchorPane.setTopAnchor(switchButtons, 10d);
+		AnchorPane.setRightAnchor(switchButtons, 10d);
+
 		AnchorPane.setTopAnchor(info, 10d);
 		AnchorPane.setLeftAnchor(info, 10d);
 
@@ -95,9 +119,15 @@ public class CharacterIndicatorPane extends AnchorPane {
 		AnchorPane.setLeftAnchor(abilitiesListContainer, 0d);
 		AnchorPane.setRightAnchor(abilitiesListContainer, 0d);
 
-		this.getChildren().addAll(portrait, info, abilitiesListContainer);
+		this.getChildren().addAll(portrait, info,
+			switchButtons, abilitiesListContainer);
 
-		profile.profileProperty().addListener((x, p0, p1) -> updateProfile(p1));
+		updateProfileModel(profile);
+	}
+
+	private void updateProfileModel(CharacterProfileModel profile) {
+		this.profile = profile;
+		profile.setProfileUpdateReceiver(this::updateProfile);
 		pp.textProperty().bind(StringExpression.stringExpression(profile.costProperty()));
 		updateProfile(profile.profileProperty().getValue());
 	}

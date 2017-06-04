@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class CharacterProfileModel {
 	public final ObservableList<AbilityInfo> abilities = FXCollections.observableArrayList();
@@ -46,6 +47,8 @@ public class CharacterProfileModel {
 			cost.setValue(newProfile.computeCost());
 		};
 
+		profileProperty().addListener((v, o, n) -> profileUpdate.accept(n));
+
 		basicAbility.addListener(update);
 		abilities.addListener(update);
 		hpPP.addListener(update);
@@ -73,6 +76,11 @@ public class CharacterProfileModel {
 
 	public ReadOnlyObjectProperty<CharacterProfile> profileProperty() {
 		return profile.getReadOnlyProperty();
+	}
+
+	Consumer<CharacterProfile> profileUpdate = x -> {};
+	public void setProfileUpdateReceiver(Consumer<CharacterProfile> profileUpdate) {
+		this.profileUpdate = profileUpdate;
 	}
 
 	private CharacterProfile encodeProfile() {

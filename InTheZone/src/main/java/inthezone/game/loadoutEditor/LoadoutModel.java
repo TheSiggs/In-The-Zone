@@ -5,13 +5,16 @@ import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import isogame.engine.CorruptDataException;
+import javafx.beans.binding.NumberExpression;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +22,7 @@ public class LoadoutModel {
 	public final StringProperty name = new SimpleStringProperty();
 
 	public final List<CharacterProfileModel> usedProfiles = new ArrayList<>();
-	public final Queue<CharacterProfileModel> otherProfiles = new LinkedList<>();
+	public final Deque<CharacterProfileModel> otherProfiles = new LinkedList<>();
 
 	public LoadoutModel(GameDataFactory gameData)
 		throws CorruptDataException
@@ -33,12 +36,37 @@ public class LoadoutModel {
 		while (usedProfiles.size() < 4) {
 			usedProfiles.add(otherProfiles.poll());
 		}
+
+		rebindTotalCost();
 	}
 
-	public CharacterProfileModel substituteCharacter(CharacterProfileModel old) {
+	public final IntegerProperty totalCost = new SimpleIntegerProperty(0);
+
+	public void rebindTotalCost() {
+		totalCost.bind(usedProfiles.stream()
+			.map(pr -> (NumberExpression) pr.costProperty())
+			.reduce(new SimpleIntegerProperty(0), (x, y) -> x.add(y)));
+	}
+
+	/**
+	 * Substitute with the previous character in the queue.
+	 * */
+	public CharacterProfileModel substituteLeft(CharacterProfileModel old) {
 		int i = usedProfiles.indexOf(old);
-		CharacterProfileModel r = otherProfiles.poll();
-		otherProfiles.offer(usedProfiles.set(i, r));
+		CharacterProfileModel r = otherProfiles.pollLast();
+		otherProfiles.offerFirst(usedProfiles.set(i, r));
+		rebindTotalCost();
+		return r;
+	}
+
+	/**
+	 * Substitute with the next character in the queue.
+	 * */
+	public CharacterProfileModel substituteRight(CharacterProfileModel old) {
+		int i = usedProfiles.indexOf(old);
+		CharacterProfileModel r = otherProfiles.pollFirst();
+		otherProfiles.offerLast(usedProfiles.set(i, r));
+		rebindTotalCost();
 		return r;
 	}
 	
@@ -63,6 +91,8 @@ public class LoadoutModel {
 			})
 			.collect(Collectors.toList()));
 
+		System.err.println("read others: " + otherProfiles);
+
 		for (CharacterInfo c : gameData.getCharacters()) {
 			if (c.playable && !seenCharacters.contains(c.name)) {
 				otherProfiles.add(new CharacterProfileModel(new CharacterProfile(c)));
@@ -72,6 +102,8 @@ public class LoadoutModel {
 		while (usedProfiles.size() < 4) {
 			usedProfiles.add(otherProfiles.poll());
 		}
+
+		rebindTotalCost();
 	}
 
 	public Loadout encodeLoadout() {
@@ -82,6 +114,8 @@ public class LoadoutModel {
 		final List<CharacterProfile> others = otherProfiles.stream()
 			.map(p -> p.profileProperty().get())
 			.collect(Collectors.toList());
+
+		System.err.println("including others: " + others);
 
 		return new Loadout(name.getValue(), characters, others);
 	}

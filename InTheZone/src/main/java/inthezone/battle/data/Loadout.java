@@ -26,6 +26,7 @@ public class Loadout implements HasJSONRepresentation {
 	) {
 		this.name = name;
 		this.characters.addAll(characters);
+		this.otherCharacters.addAll(otherCharacters);
 	}
 
 	/**

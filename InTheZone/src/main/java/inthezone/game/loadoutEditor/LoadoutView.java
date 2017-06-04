@@ -7,12 +7,9 @@ import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import inthezone.game.RollerScrollPane;
 import isogame.engine.CorruptDataException;
-import javafx.beans.binding.NumberExpression;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -42,18 +39,11 @@ public class LoadoutView extends DialogScreen<Void> {
 	private final CharacterProfilePane profilePane = new CharacterProfilePane();
 	private final HBox mainPane = new HBox(10);
 
-	private final IntegerProperty totalCost = new SimpleIntegerProperty(0);
 	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
 	private final ObjectProperty<CharacterProfileModel> selectedCharacter =
 		new SimpleObjectProperty<>(null);
 
 	private final ClientConfig config;
-
-	private void rebindTotalCost(LoadoutModel l) {
-		if (l != null) totalCost.bind(l.usedProfiles.stream()
-			.map(pr -> (NumberExpression) pr.costProperty())
-			.reduce(new SimpleIntegerProperty(0), (x, y) -> x.add(y)));
-	}
 
 	public LoadoutView(ClientConfig config, GameDataFactory gameData)
 		throws CorruptDataException
@@ -94,7 +84,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		AnchorPane.setTopAnchor(mainPane, 10d);
 		AnchorPane.setBottomAnchor(mainPane, 10d);
 
-		pp = new PPIndicator(totalCost);
+		pp = new PPIndicator(this.model.totalCost);
 		AnchorPane.setTopAnchor(pp, 10d);
 		AnchorPane.setLeftAnchor(pp, 10d);
 
@@ -132,7 +122,6 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		loadoutName.setText(model.name.get());
 		model.name.bind(loadoutName.textProperty());
-		rebindTotalCost(model);
 
 		rightPane.getChildren().clear();
 		final Separator spacer1 = new Separator(Orientation.VERTICAL);
@@ -149,7 +138,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		indicatorsPane.setFillWidth(true);
 		for (int i = 0; i < 4; i++) {
 			indicatorsPane.getChildren().add(
-				new CharacterIndicatorPane(
+				new CharacterIndicatorPane(model,
 					model.usedProfiles.get(i), selectedCharacter));
 			if (selectedCharacter.get() == null) {
 				selectedCharacter.set(model.usedProfiles.get(i));
@@ -164,6 +153,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		scrollPane.layout();
 		scrollPane.setScrollPos(scrollPane.getScrollMin());
 
+		pp.setCostProperty(model.totalCost);
 		rightPane.getChildren().addAll(scrollPane, done, spacer2);
 	}
 

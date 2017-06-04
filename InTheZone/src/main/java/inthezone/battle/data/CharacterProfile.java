@@ -34,6 +34,9 @@ public class CharacterProfile implements HasJSONRepresentation {
 	{
 		this.rootCharacter = rootCharacter;
 		this.abilities = new ArrayList<>();
+		abilities.addAll(rootCharacter.abilities.stream()
+			.filter(a -> a.type == AbilityType.SPECIAL)
+			.collect(Collectors.toList()));
 		basicAbility = rootCharacter.abilities.stream()
 			.filter(a -> a.type == AbilityType.BASIC)
 			.findFirst().orElseThrow(() ->

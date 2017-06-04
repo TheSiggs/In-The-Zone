@@ -6,6 +6,7 @@ import inthezone.battle.data.Loadout;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import inthezone.game.RollerScrollPane;
+import isogame.engine.CorruptDataException;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -50,15 +51,16 @@ public class LoadoutView extends DialogScreen<Void> {
 
 	private void rebindTotalCost(LoadoutModel l) {
 		if (l != null) totalCost.bind(l.usedProfiles.stream()
-			.map(opr -> (NumberExpression) opr.map(pr ->
-				pr.costProperty()).orElse(new SimpleIntegerProperty(0)))
+			.map(pr -> (NumberExpression) pr.costProperty())
 			.reduce(new SimpleIntegerProperty(0), (x, y) -> x.add(y)));
 	}
 
-	public LoadoutView(ClientConfig config, GameDataFactory gameData) {
+	public LoadoutView(ClientConfig config, GameDataFactory gameData)
+		throws CorruptDataException
+	{
 		this(config, gameData, emptyLoadout(config, gameData));
 		if (config.loadouts.size() > 0) {
-			setLoadoutModel(new LoadoutModel(config.loadouts.iterator().next()));
+			setLoadoutModel(new LoadoutModel(gameData, config.loadouts.remove(0)));
 		}
 	}
 
@@ -78,6 +80,8 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		// The done button
 		done.setOnAction(event -> {
+			config.loadouts.add(this.model.encodeLoadout());
+			config.writeConfig();
 			onDone.accept(null);
 		});
 
@@ -108,13 +112,15 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		this.getChildren().add(root);
 
-		setLoadoutModel(model);
-
 		selectedCharacter.addListener((v, o, n) -> {
-			characterName.setText(n.profileProperty()
-				.get().rootCharacter.name);
-			profilePane.setProfile(n);
+			if (n != null) {
+				characterName.setText(n.profileProperty()
+					.get().rootCharacter.name);
+				profilePane.setProfile(n);
+			}
 		});
+
+		setLoadoutModel(model);
 
 		loadoutName.setTooltip(new Tooltip("Enter a name for this loadout"));
 		done.setTooltip(new Tooltip(
@@ -137,6 +143,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		VBox.setVgrow(spacer2, Priority.ALWAYS);
 		rightPane.getChildren().addAll(spacer1, loadoutName);
 
+		selectedCharacter.set(null);
 		final VBox indicatorsPane = new VBox(4);
 		indicatorsPane.setMaxWidth(Double.MAX_VALUE);
 		indicatorsPane.setFillWidth(true);
@@ -144,9 +151,9 @@ public class LoadoutView extends DialogScreen<Void> {
 			indicatorsPane.getChildren().add(
 				new CharacterIndicatorPane(
 					model.usedProfiles.get(i), selectedCharacter));
-			model.usedProfiles.get(i).ifPresent(p -> {
-				if (selectedCharacter.get() == null) selectedCharacter.set(p);
-			});
+			if (selectedCharacter.get() == null) {
+				selectedCharacter.set(model.usedProfiles.get(i));
+			}
 		}
 		final RollerScrollPane scrollPane =
 			new RollerScrollPane(indicatorsPane, false);
@@ -162,9 +169,8 @@ public class LoadoutView extends DialogScreen<Void> {
 
 	private static LoadoutModel emptyLoadout(
 		ClientConfig config, GameDataFactory gameData
-	) {
-		final List<CharacterProfile> profiles = new ArrayList<>();
-		return new LoadoutModel(new Loadout("<new loadout>", profiles));
+	) throws CorruptDataException {
+		return new LoadoutModel(gameData);
 	}
 }
 

@@ -66,7 +66,14 @@ public class LobbyView extends VBox {
 		});
 
 		loadouts.setOnAction(event -> {
-			parent.showScreen(new LoadoutView(config, gameData), v -> {});
+			try {
+				parent.showScreen(new LoadoutView(config, gameData), v -> {});
+			} catch (CorruptDataException e) {
+				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				a.setHeaderText("Game data corrupt");
+				a.showAndWait();
+				System.exit(1);
+			}
 		});
 
 		challenge.setOnAction(event -> {

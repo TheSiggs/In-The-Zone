@@ -105,9 +105,16 @@ public class DisconnectedView extends FlowPane {
 		});
 
 		loadout.setOnAction(event -> {
-			parent.showScreen(
-				new LoadoutView(parent.config, parent.gameData),
-				v -> {});
+			try {
+				parent.showScreen(
+					new LoadoutView(parent.config, parent.gameData),
+					v -> {});
+			} catch (CorruptDataException e) {
+				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				a.setHeaderText("Game data corrupt");
+				a.showAndWait();
+				System.exit(1);
+			}
 		});
 
 		sandpit.setOnAction(event -> {
@@ -123,9 +130,10 @@ public class DisconnectedView extends FlowPane {
 					new ChallengePane(gameData, config, Optional.empty(),
 						Player.PLAYER_A), getStartSandpitCont());
 			} catch (CorruptDataException e) {
-				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
-				a.setHeaderText("Error initialising challenge panel");
+				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				a.setHeaderText("Game data corrupt");
 				a.showAndWait();
+				System.exit(1);
 			}
 		});
 
@@ -172,7 +180,7 @@ public class DisconnectedView extends FlowPane {
 		for (int i = 0; i < startTiles.size(); i++)
 			characters.add(new CharacterProfile(gameData.getCharacter("Robot")));
 
-		return new Loadout("Sandpit", characters);
+		return new Loadout("Sandpit", characters, new ArrayList<>());
 	}
 
 	public void startConnecting() {

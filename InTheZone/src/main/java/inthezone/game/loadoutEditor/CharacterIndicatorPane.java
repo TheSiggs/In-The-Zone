@@ -20,7 +20,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CharacterIndicatorPane extends AnchorPane {
@@ -44,7 +43,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 	private final HBox abilitiesList = new HBox(2);
 
 	public CharacterIndicatorPane(
-		Optional<CharacterProfileModel> profile,
+		CharacterProfileModel profile,
 		ObjectProperty<CharacterProfileModel> selectedCharacter
 	) {
 		super();
@@ -52,21 +51,13 @@ public class CharacterIndicatorPane extends AnchorPane {
 		this.selectedCharacter = selectedCharacter;
 		this.setOnMouseClicked(event -> {
 			if (event.getButton().equals(MouseButton.PRIMARY))
-				profile.ifPresent(m -> selectedCharacter.set(m));
+				selectedCharacter.set(profile);
 		});
 
 		abilitiesList.setAlignment(Pos.CENTER_LEFT);
 		abilitiesListContainer = new RollerScrollPane(abilitiesList, true);
 
-		if (profile.isPresent()) {
-			setupCharacterProfile(profile.get());
-		} else {
-			AnchorPane.setTopAnchor(placeholder, 0d);
-			AnchorPane.setBottomAnchor(placeholder, 0d);
-			AnchorPane.setLeftAnchor(placeholder, 0d);
-			AnchorPane.setRightAnchor(placeholder, 0d);
-			this.getChildren().add(placeholder);
-		}
+		setupCharacterProfile(profile);
 	}
 
 	private void setupCharacterProfile(CharacterProfileModel profile) {

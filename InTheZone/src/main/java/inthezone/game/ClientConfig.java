@@ -62,7 +62,7 @@ public class ClientConfig implements HasJSONRepresentation {
 	}
 
 	public Optional<String> defaultPlayerName = Optional.empty();
-	public final Collection<Loadout> loadouts = new ArrayList<>();
+	public final List<Loadout> loadouts = new ArrayList<>();
 
 	public String server = DEFAULT_SERVER;
 	public int port = DEFAULT_PORT;

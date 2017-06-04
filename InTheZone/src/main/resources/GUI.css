@@ -119,7 +119,7 @@
 	-fx-border:none;
 }
 
-#description-panel {
+.description-panel {
 	-fx-padding:10px;
 }
 
@@ -130,17 +130,22 @@
 .ability-name {
 	-fx-padding:0px 0px 10px 0px;
 	-fx-text-fill:white;
-	-fx-font-size:16px;
+	-fx-font-size:14px;
 	-fx-font-weight:bold;
 	-fx-graphic-text-gap:10px;
 }
 
-#mana-upgrade {
+.mana-upgrade {
 	-fx-text-fill:yellow;
 	-fx-padding:40px 0px 40px 0px;
 	-fx-font-size:16px;
 	-fx-font-weight:bold;
 }
+
+#basic-description .ability-name {
+	-fx-content-display:text-only;
+}
+
 
 .gui-list {
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
@@ -160,6 +165,58 @@
 }
 
 .gui-list .list-cell:selected {
+	-fx-font-weight:bold;
+}
+
+.gui-combo {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:0px 2px 0px 0px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-combo .list-cell {
+	-fx-background-color:transparent;
+	-fx-padding:10px;
+	-fx-text-fill:white;
+}
+
+#basic-ability .arrow {
+	visibility:hidden;
+}
+
+#basic-ability .arrow-button {
+	-fx-background-image:url(/gui_assets/plus.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-size:auto auto;
+	-fx-background-position:center center;
+}
+
+.gui-combo .list-view {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-padding:0px;
+	-fx-border-color:black;
+	-fx-border-width:0px 2px 0px 2px;
+	-fx-border-style:solid;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-combo .list-view .list-cell {
+	-fx-background-color:transparent;
+	-fx-text-fill:white;
+	-fx-padding:6px 10px 6px 10px;
+	-fx-border:solid;
+	-fx-border-color:black;
+	-fx-border-width:0px 0px 2px 0px;
+}
+
+.gui-combo .list-view .list-cell:hover {
 	-fx-font-weight:bold;
 }
 

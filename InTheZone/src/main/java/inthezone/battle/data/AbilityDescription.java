@@ -26,17 +26,31 @@ public class AbilityDescription {
 		return s.toString();
 	}
 
-	public String getDescription() {
+	public String getLoadoutInfoLine() {
 		final StringBuilder s = new StringBuilder();
+		s.append(ability.ap).append(" AP");
+		if (ability.mp > 0) s.append(", ").append(ability.mp).append(" MP");
+		if (ability.range.range > 1) s.append(", Range ").append(ability.range.range);
+		return s.toString();
+	}
+
+	public String getDescription() {
+		StringBuilder s = new StringBuilder();
+		generateBannedNotice(s, ability);
+		final String p1 = s.toString();
+
+		s = new StringBuilder();
 		generateAbilityDescription(s, ability);
-		final String p = s.toString();
-		return p.substring(0, 1).toUpperCase() + p.substring(1);
+		final String p2 = s.toString();
+
+		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
 	}
 
 	private static String generateDescription(AbilityInfo a) {
 		StringBuilder s = new StringBuilder();
 		s.append(a.name).append(" ");
 		generateInfoLine(s, a);
+		generateBannedNotice(s, a);
 		s.append("\n");
 		final String p1 = s.toString();
 		s = new StringBuilder();
@@ -57,7 +71,9 @@ public class AbilityDescription {
 		if (a.range.range > 1) {
 			s.append(", Range ").append(a.range.range);
 		}
+	}
 
+	private static void generateBannedNotice(StringBuilder s, AbilityInfo a) {
 		if (a.banned) {
 			s.append("\n");
 			s.append("=== NOTICE ===");

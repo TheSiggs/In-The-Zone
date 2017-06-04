@@ -11,8 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
@@ -31,21 +31,19 @@ public class CharacterProfilePane extends HBox {
 	private final VBox scrollAbilities;
 	private final ListView<AbilityInfo> abilities = new ListView<>();
 
-	private final VBox descriptionPanel = new VBox(10);
-	private final Label abilityName = new Label("");
-	private final Label description = new Label("");
-	private final Label manaUpgrade = new Label("↓ Mana upgrade ↓");
-	private final Label manaAbilityName = new Label("");
-	private final Label manaDescription = new Label("");
+	private final AbilityDescriptionPanel descriptionPanel =
+		new AbilityDescriptionPanel();
 	private final Button addAbility = new Button("Add ability");
 
 	private final VBox stats = new VBox(4);
 	private final Spinner<Integer> hp = new Spinner<>();
 	private final Spinner<Integer> attack = new Spinner<>();
 	private final Spinner<Integer> defence = new Spinner<>();
-	private final Label basicAbility = new Label("Basic ability");
-	private final VBox scrollBasics;
-	private final ListView<AbilityInfo> basics = new ListView<>();
+
+	private final ComboBox<AbilityInfo> basicAbility = new ComboBox<>();
+	private final AbilityDescriptionPanel basicDescriptionPanel =
+		new AbilityDescriptionPanel();
+
 	private final StackPane portraitWrapper = new StackPane();
 	private final ImageView portrait = new ImageView();
 
@@ -57,61 +55,46 @@ public class CharacterProfilePane extends HBox {
 	private final static double descriptionWidth = 320;
 	private final static double abilitiesListWidth = 200;
 	private final static double abilitiesListHeight = 520;
-	private final static double basicsWidth = 200;
+	private final static double basicsWidth = 280;
 
 	public CharacterProfilePane() {
 		scrollAbilities = new VBox(abilities);
-		scrollBasics = new VBox(basics);
-		bottomScroll = new RollerScrollPane(bottomSection, true);
 
 		scrollAbilities.getStyleClass().add("panel");
-		scrollBasics.getStyleClass().add("panel");
-
 		scrollAbilities.setPrefWidth(abilitiesListWidth);
 		scrollAbilities.setPrefHeight(abilitiesListHeight);
 		scrollAbilities.setMinWidth(abilitiesListWidth);
-		scrollBasics.setPrefWidth(basicsWidth);
-		scrollBasics.setMinWidth(basicsWidth);
-
 		abilities.getStyleClass().add("gui-list");
 
-		descriptionPanel.getStyleClass().add("panel");
-		descriptionPanel.setId("description-panel");
-		addAbility.getStyleClass().add("gui-button");
-		addAbility.setId("add-ability-button");
+		bottomScroll = new RollerScrollPane(bottomSection, true);
 
-		abilityName.getStyleClass().add("ability-name");
-		manaAbilityName.getStyleClass().add("ability-name");
-		manaUpgrade.setId("mana-upgrade");
-
-		abilityName.setMaxWidth(Double.MAX_VALUE);
-		manaAbilityName.setMaxWidth(Double.MAX_VALUE);
-		manaUpgrade.setMaxWidth(Double.MAX_VALUE);
-		description.setAlignment(Pos.CENTER_LEFT);
-		manaDescription.setAlignment(Pos.CENTER_LEFT);
-		manaUpgrade.setAlignment(Pos.CENTER_LEFT);
-
-		descriptionPanel.setAlignment(Pos.BOTTOM_CENTER);
-		descriptionPanel.setFillWidth(true);
 		descriptionPanel.setMinWidth(descriptionWidth);
 		descriptionPanel.setMaxWidth(descriptionWidth);
-		descriptionPanel.getChildren().addAll(
-			abilityName, description, manaUpgrade,
-			manaAbilityName, manaDescription, addAbility);
 
-		description.setAlignment(Pos.TOP_LEFT);
-		description.setWrapText(true);
-		description.setMaxWidth(Double.MAX_VALUE);
+		addAbility.getStyleClass().add("gui-button");
+		addAbility.setId("add-ability-button");
+		descriptionPanel.getChildren().add(addAbility);
 
-		manaDescription.setAlignment(Pos.TOP_LEFT);
-		manaDescription.setWrapText(true);
-		manaDescription.setMaxWidth(Double.MAX_VALUE);
+		basicAbility.getStyleClass().add("gui-combo");
+		basicAbility.setId("basic-ability");
+		basicAbility.setMaxWidth(Double.MAX_VALUE);
+		basicAbility.setConverter(new StringConverter<AbilityInfo>() {
+			@Override public AbilityInfo fromString(String string) {
+				return null;
+			}
 
-		manaDescription.setMaxHeight(Double.MAX_VALUE);
-		VBox.setVgrow(manaDescription, Priority.ALWAYS);
+			@Override public String toString(AbilityInfo info) {
+				return "Basic ability:\n" + info.toString();
+			}
+		});
 
-		stats.getChildren().addAll(hp, attack, defence, basicAbility, scrollBasics);
-		VBox.setVgrow(scrollBasics, Priority.ALWAYS);
+		basicDescriptionPanel.setId("basic-description");
+		basicDescriptionPanel.setMinWidth(basicsWidth);
+		basicDescriptionPanel.setMaxWidth(basicsWidth);
+
+		stats.getChildren().addAll(hp, attack, defence,
+			basicAbility, basicDescriptionPanel);
+		VBox.setVgrow(basicDescriptionPanel, Priority.ALWAYS);
 
 		topSection.getChildren().addAll(scrollAbilities, descriptionPanel, stats);
 
@@ -139,35 +122,10 @@ public class CharacterProfilePane extends HBox {
 		this.getChildren().addAll(leftSection, portraitWrapper);
 
 		abilities.getSelectionModel().selectedItemProperty()
-			.addListener((v, o, n) -> {
-				if (n == null) {
-					abilityName.setText("No ability selected");
-					abilityName.setGraphic(null);
-					description.setText("No ability selected");
-					manaUpgrade.setVisible(false);
-					manaAbilityName.setText("");
-					manaAbilityName.setGraphic(null);
-					manaDescription.setText("");
-				} else {
-					final AbilityDescription d = new AbilityDescription(n);
-					abilityName.setText(d.getTitle() + "\n" + d.getInfoLine());
-					abilityName.setGraphic(new ImageView(n.icon));
-					description.setText(d.getDescription());
+			.addListener((v, o, n) -> descriptionPanel.setAbility(n));
 
-					if (n.mana.isPresent()) {
-						final AbilityDescription md = new AbilityDescription(n.mana.get());
-						manaUpgrade.setVisible(true);
-						manaAbilityName.setText(md.getTitle() + "\n" + md.getInfoLine());
-						manaAbilityName.setGraphic(new ImageView(n.mana.get().icon));
-						manaDescription.setText(md.getDescription());
-					} else {
-						manaUpgrade.setVisible(false);
-						manaAbilityName.setText("");
-						manaAbilityName.setGraphic(null);
-						manaDescription.setText("");
-					}
-				}
-			});
+		basicAbility.getSelectionModel().selectedItemProperty()
+			.addListener((v, o, n) -> basicDescriptionPanel.setAbility(n));
 	}
 
 	public void setProfile(CharacterProfileModel model) {
@@ -194,14 +152,12 @@ public class CharacterProfilePane extends HBox {
 
 		abilities.setItems(abilitiesList);
 		abilities.getSelectionModel().select(0);
-		basics.setItems(basicsList);
-		basics.getSelectionModel().select(profile.basicAbility);
+
+		basicAbility.setItems(basicsList);
+		basicAbility.getSelectionModel().select(profile.basicAbility);
 
 		abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
 		scrollAbilities.layout();
-
-		basics.setPrefHeight(basicsList.size() * 30 + 6);
-		scrollBasics.layout();
 
 		hp.setValueFactory(new PPSpinnerFactory("Health: ",
 			profile.hpPP, info.hpCurve.get(0), info.hpCurve));

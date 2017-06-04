@@ -27,13 +27,13 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
      inkscape:cx="379.30212"
-     inkscape:cy="820.05483"
+     inkscape:cy="591.4834"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="false"
-     inkscape:window-width="1301"
-     inkscape:window-height="744"
+     inkscape:window-width="1855"
+     inkscape:window-height="1176"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1">
@@ -220,5 +220,21 @@
        inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gamedata/gfx/status/revenge.png"
        inkscape:export-xdpi="17.870188"
        inkscape:export-ydpi="17.870188" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:21.25984257;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 191.51785,455.04078 50.89287,50.89285"
+       id="path4623"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gui_assets/x.png"
+       inkscape:export-xdpi="14.923846"
+       inkscape:export-ydpi="14.923846" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4625"
+       d="m 191.51785,505.93363 50.89287,-50.89285"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:21.25984257;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/home/callum/source_working/in-the-zone/InTheZone/src/main/resources/gui_assets/x.png"
+       inkscape:export-xdpi="14.923846"
+       inkscape:export-ydpi="14.923846" />
   </g>
 </svg>

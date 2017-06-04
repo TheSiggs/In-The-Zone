@@ -18,10 +18,12 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.Node;
 import javafx.util.StringConverter;
 import java.util.List;
 
@@ -73,6 +75,7 @@ public class CharacterProfilePane extends HBox {
 
 		addAbility.getStyleClass().add("gui-button");
 		addAbility.setId("add-ability-button");
+		addAbility.setFocusTraversable(false);
 		descriptionPanel.getChildren().add(addAbility);
 
 		basicAbility.getStyleClass().add("gui-combo");
@@ -126,9 +129,20 @@ public class CharacterProfilePane extends HBox {
 
 		basicAbility.getSelectionModel().selectedItemProperty()
 			.addListener((v, o, n) -> basicDescriptionPanel.setAbility(n));
+
+		addAbility.setOnAction(event -> {
+			final AbilityInfo a = abilities.getSelectionModel().getSelectedItem();
+			if (a != null && !model.abilities.contains(a)) {
+				model.abilities.add(a);
+				bottomSection.getChildren().add(new AbilityButton(
+					a, true, bottomSection.getChildren(), model.abilities));
+			}
+		});
 	}
 
 	public void setProfile(CharacterProfileModel model) {
+		if (this.model != null) this.model.unbindAll();
+
 		this.model = model;
 		final CharacterProfile profile = model.profileProperty().get();
 		final CharacterInfo info = profile.rootCharacter;
@@ -154,24 +168,68 @@ public class CharacterProfilePane extends HBox {
 		abilities.getSelectionModel().select(0);
 
 		basicAbility.setItems(basicsList);
-		basicAbility.getSelectionModel().select(profile.basicAbility);
+		basicAbility.getSelectionModel().select(model.basicAbility.get());
+		model.basicAbility.bind(
+			basicAbility.getSelectionModel().selectedItemProperty());
 
 		abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
 		scrollAbilities.layout();
 
 		hp.setValueFactory(new PPSpinnerFactory("Health: ",
-			profile.hpPP, info.hpCurve.get(0), info.hpCurve));
+			profile.hpPP, info.stats.hp, info.hpCurve));
 		attack.setValueFactory(new PPSpinnerFactory("Attack: ",
-			profile.attackPP, info.attackCurve.get(0), info.attackCurve));
+			profile.attackPP, info.stats.attack, info.attackCurve));
 		defence.setValueFactory(new PPSpinnerFactory("Defence: ",
-			profile.defencePP, info.defenceCurve.get(0), info.defenceCurve));
+			profile.defencePP, info.stats.defence, info.defenceCurve));
+
+		model.hpPP.bind(hp.valueProperty());
+		model.attackPP.bind(attack.valueProperty());
+		model.defencePP.bind(defence.valueProperty());
 
 		bottomSection.getChildren().clear();
 		for (AbilityInfo a : profile.abilities) {
-			bottomSection.getChildren().add(new ImageView(a.icon));
+			final boolean removable =
+				a.type != AbilityType.BASIC &&
+				a.type != AbilityType.SPECIAL;
+			bottomSection.getChildren().add(new AbilityButton(
+				a, removable, bottomSection.getChildren(), model.abilities));
 		}
 	}
+}
 
+class AbilityButton extends AnchorPane {
+	private final StackPane imageWrapper = new StackPane();
+	private final ImageView image = new ImageView();
+	private final Button remove = new Button();
+
+	public AbilityButton(
+		AbilityInfo a, boolean removable,
+		ObservableList<Node> abilityButtons,
+		ObservableList<AbilityInfo> abilities
+	) {
+		this.getStyleClass().add("ability-button");
+		this.setMinWidth(60);
+		this.setMinHeight(60);
+		image.setImage(a.icon);
+		imageWrapper.getChildren().add(image);
+		AnchorPane.setTopAnchor(imageWrapper, 0d);
+		AnchorPane.setBottomAnchor(imageWrapper, 0d);
+		AnchorPane.setLeftAnchor(imageWrapper, 0d);
+		AnchorPane.setRightAnchor(imageWrapper, 0d);
+
+		AnchorPane.setTopAnchor(remove, 0d);
+		AnchorPane.setRightAnchor(remove, 0d);
+
+		this.getChildren().add(imageWrapper);
+
+		if (removable) {
+			this.getChildren().add(remove);
+			remove.setOnAction(event -> {
+				abilityButtons.remove(this);
+				abilities.remove(a);
+			});
+		}
+	}
 }
 
 class PPSpinnerFactory extends SpinnerValueFactory<Integer> { 

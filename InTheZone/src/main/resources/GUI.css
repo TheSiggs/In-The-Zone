@@ -15,6 +15,7 @@
 	-fx-font-weight:bold;
 	-fx-focus-color: transparent;
 	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
 }
 
 .gui-img-button {
@@ -26,6 +27,7 @@
 	-fx-padding:2px;
 	-fx-focus-color: transparent;
 	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
 }
 
 .panel {
@@ -36,16 +38,20 @@
 	-fx-border-style:solid;
 }
 
-.clear-panel {
+.opaque-roller-scroller {
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
 	-fx-background-repeat:repeat;
+}
+
+.roller-scroller {
+	-fx-background-color:transparent;
 	-fx-padding:4px 10px 4px 10px;
 	-fx-focus-color: transparent;
 	-fx-faint-focus-color: transparent;
 }
 
-.clear-panel .viewport {
-	-fx-background-color: transparent;
+.roller-scroller .viewport {
+	-fx-background-color:transparent;
 }
 
 .character-indicator-panel-title {
@@ -218,5 +224,22 @@
 
 .gui-combo .list-view .list-cell:hover {
 	-fx-font-weight:bold;
+}
+
+.ability-button , .ability-button .image-view {
+	-fx-alignment:center;
+}
+
+.ability-button .button {
+	-fx-graphic:url(/gui_assets/x.png);
+	-fx-content-display:graphic-only;
+	-fx-alignment:center;
+	-fx-background-image:url(/gui_assets/big_gold_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-border:solid;
+	-fx-border-width:2px;
+	-fx-border-color:black;
+	-fx-padding:2px;
+	-fx-shadow-highlight-color:transparent;
 }
 

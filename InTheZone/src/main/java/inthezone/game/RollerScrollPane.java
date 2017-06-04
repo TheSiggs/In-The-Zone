@@ -56,7 +56,8 @@ public class RollerScrollPane extends AnchorPane {
 			forward.setMaxWidth(Double.MAX_VALUE);
 		}
 
-		pane.getStyleClass().add("clear-panel");
+		this.getStyleClass().add("roller-scroller");
+		pane.getStyleClass().add("roller-scroller");
 		pane.setStyle("-fx-padding:0px;");
 		back.getStyleClass().add("gui-img-button");
 		forward.getStyleClass().add("gui-img-button");

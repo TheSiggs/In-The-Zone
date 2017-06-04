@@ -76,7 +76,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 
 		this.getStyleClass().add("panel");
 		name.getStyleClass().add("character-indicator-panel-title");
-		abilitiesListContainer.getStyleClass().add("clear-panel");
+		abilitiesListContainer.getStyleClass().add("opaque-roller-scroller");
 
 		name.setText(profile.rootCharacter.name);
 
@@ -121,17 +121,17 @@ public class CharacterIndicatorPane extends AnchorPane {
 		this.attack.setText("" + baseStats.attack);
 		this.defence.setText("" + baseStats.defence);
 
+		abilities.clear();
+		abilitiesList.getChildren().clear();
 		for (AbilityInfo a : profile.allAbilities()) {
-			if (!abilities.containsKey(a.name)) {
-				final ImageView i = new ImageView(a.icon);
-				final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
-				t.setWrapText(true);
-				t.setMaxWidth(300);
-				Tooltip.install(i, t);
+			final ImageView i = new ImageView(a.icon);
+			final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
+			t.setWrapText(true);
+			t.setMaxWidth(300);
+			Tooltip.install(i, t);
 
-				abilities.put(a.name, i);
-				abilitiesList.getChildren().add(i);
-			}
+			abilities.put(a.name, i);
+			abilitiesList.getChildren().add(i);
 		}
 
 		abilitiesList.getChildren().removeAll(abilitiesList.getChildren().stream()

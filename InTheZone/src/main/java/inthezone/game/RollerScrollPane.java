@@ -119,6 +119,8 @@ public class RollerScrollPane extends AnchorPane {
 		viewPane.boundsInParentProperty().addListener(o -> showHideButtons());
 
 		showHideButtons();
+
+		this.setOnScroll(event -> setScrollPos(scroll - event.getDeltaY()));
 	}
 
 	public double getScrollMin() { return scrollMin; }

@@ -78,6 +78,11 @@ public class LoadoutOverview extends DialogScreen<Void> {
 		scrollLoadouts.minProperty().bind(loadoutsWrapper.hminProperty());
 		loadoutsWrapper.hvalueProperty().bindBidirectional(scrollLoadouts.valueProperty());
 
+		loadoutsWrapper.setOnScroll(event -> {
+			loadoutsWrapper.setHvalue(loadoutsWrapper.getHvalue() -
+				(6 * event.getDeltaY() / loadouts.getWidth()));
+		});
+
 		final Separator spacer1 = new Separator(Orientation.VERTICAL);
 		final Separator spacer2 = new Separator(Orientation.VERTICAL);
 		spacer1.setMinHeight(88);

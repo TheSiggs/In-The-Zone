@@ -14,16 +14,19 @@ import org.json.JSONObject;
 public class Loadout implements HasJSONRepresentation {
 	public final String name;
 	public final List<CharacterProfile> characters = new ArrayList<>();
+	public final List<CharacterProfile> otherCharacters = new ArrayList<>();
 
 	public final static int maxPP = 30;
 	public final static int maxCharacters = 4;
 
 	public Loadout(
 		String name,
-		List<CharacterProfile> characters
+		List<CharacterProfile> characters,
+		List<CharacterProfile> otherCharacters
 	) {
 		this.name = name;
 		this.characters.addAll(characters);
+		this.otherCharacters.addAll(otherCharacters);
 	}
 
 	/**
@@ -43,9 +46,12 @@ public class Loadout implements HasJSONRepresentation {
 	public JSONObject getJSON() {
 		final JSONObject o = new JSONObject();
 		final JSONArray cs = new JSONArray();
+		final JSONArray ocs = new JSONArray();
 		for (CharacterProfile p : characters) cs.put(p.getJSON());
+		for (CharacterProfile p : otherCharacters) ocs.put(p.getJSON());
 		o.put("name", name);
 		o.put("characters", cs);
+		o.put("otherCharacters", ocs);
 		return o;
 	}
 
@@ -56,11 +62,18 @@ public class Loadout implements HasJSONRepresentation {
 			final String name = json.getString("name");
 			final List<JSONObject> cs =
 				jsonArrayToList(json.getJSONArray("characters"), JSONObject.class);
+			final JSONArray ocs = json.optJSONArray("otherCharacters");
 
 			final List<CharacterProfile> r = new ArrayList<>();
 			for (JSONObject c : cs) r.add(CharacterProfile.fromJSON(c, gameData));
 
-			return new Loadout(name, r);
+			final List<CharacterProfile> others = new ArrayList<>();
+			if (ocs != null) {
+				for (Object c : ocs)
+					others.add(CharacterProfile.fromJSON((JSONObject) c, gameData));
+			}
+
+			return new Loadout(name, r, others);
 
 		} catch (ClassCastException e) {
 			throw new CorruptDataException("Type error in loadout", e);

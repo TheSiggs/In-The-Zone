@@ -38,18 +38,6 @@
 	-fx-opacity:0.0;
 }
 
-.gui_button {
-	-fx-background-image:url(/gui_assets/button_tex.png);
-	-fx-background-repeat:no-repeat;
-	-fx-border-color:black;
-	-fx-border-width:2px;
-	-fx-border-style:solid;
-	-fx-text-fill:white;
-	-fx-font-family:'Impact';
-	-fx-font-size:20px;
-	-fx-font-weight:bold;
-}
-
 #rounds {
 	-fx-background-image:url(/gui_assets/rounds.png);
 }

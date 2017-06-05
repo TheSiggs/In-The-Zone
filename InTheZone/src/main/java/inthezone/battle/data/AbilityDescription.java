@@ -16,9 +16,54 @@ public class AbilityDescription {
 
 	@Override public String toString() { return description; }
 
+	public String getTitle() {
+		return ability.name;
+	}
+
+	public String getInfoLine() {
+		final StringBuilder s = new StringBuilder();
+		generateInfoLine(s, ability);
+		return s.toString();
+	}
+
+	public String getLoadoutInfoLine() {
+		final StringBuilder s = new StringBuilder();
+		s.append(ability.ap).append(" AP");
+		if (ability.mp > 0) s.append(", ").append(ability.mp).append(" MP");
+		if (ability.range.range > 1) s.append(", Range ").append(ability.range.range);
+		return s.toString();
+	}
+
+	public String getDescription() {
+		StringBuilder s = new StringBuilder();
+		generateBannedNotice(s, ability);
+		final String p1 = s.toString();
+
+		s = new StringBuilder();
+		generateAbilityDescription(s, ability);
+		final String p2 = s.toString();
+
+		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
+	}
+
 	private static String generateDescription(AbilityInfo a) {
 		StringBuilder s = new StringBuilder();
-		s.append(a.name).append(" (").append(a.type.toString()).append(")");
+		s.append(a.name).append(" ");
+		generateInfoLine(s, a);
+		generateBannedNotice(s, a);
+		s.append("\n");
+		final String p1 = s.toString();
+		s = new StringBuilder();
+		generateAbilityDescription(s, a);
+		final String p2 = s.toString();
+		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
+	}
+
+	private static void generateInfoLine(StringBuilder s, AbilityInfo a) {
+		s.append("(").append(a.type.toString());
+		if (a.isMana) s.append(" / mana");
+		s.append(")");
+
 		s.append(" -- ").append(a.ap).append(" AP");
 		if (a.mp > 0) {
 			s.append(", ").append(a.mp).append(" MP");
@@ -26,23 +71,21 @@ public class AbilityDescription {
 		if (a.range.range > 1) {
 			s.append(", Range ").append(a.range.range);
 		}
-		s.append("\n");
+	}
 
+	private static void generateBannedNotice(StringBuilder s, AbilityInfo a) {
 		if (a.banned) {
 			s.append("\n");
 			s.append("=== NOTICE ===");
 			s.append("\"").append(a.name).append("\" is no longer permitted for tournament play.");
 			s.append("Please remove \"").append(a.name).append("\" from all your characters.");
 			s.append("\n");
-			s.append("\n");
 		}
+	}
 
-		final String p1 = s.toString();
-		s = new StringBuilder();
+	private static void generateAbilityDescription(StringBuilder s, AbilityInfo a) {
+		if (a.isMana) s.append("when standing on a mana zone, ");
 		generateTopLevelAbility(s, true, 0, a);
-		final String p2 = s.toString();
-
-		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
 	}
 
 	private static void generateTopLevelAbility(

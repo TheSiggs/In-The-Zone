@@ -3,189 +3,261 @@ package inthezone.game.loadoutEditor;
 import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
+import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import inthezone.game.RollerScrollPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
+import javafx.scene.Node;
 import javafx.util.StringConverter;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class CharacterProfilePane extends VBox {
-	private CharacterProfileModel profile = null;
+public class CharacterProfilePane extends HBox {
+	private final VBox leftSection = new VBox(4);
+	private final HBox topSection = new HBox(4);
+	private final VBox scrollAbilities;
+	private final ListView<AbilityInfo> abilities = new ListView<>();
 
-	private final ObservableList<AbilityInfo> basicAbilitiesModel = FXCollections.observableArrayList();
+	private final AbilityDescriptionPanel descriptionPanel =
+		new AbilityDescriptionPanel();
+	private final Button addAbility = new Button("Add ability");
 
-	private final HBox abilitiesArea = new HBox();
-	private final FlowPane toolbar = new FlowPane();
+	private final VBox stats = new VBox(4);
+	private final Spinner<Integer> hp = new Spinner<>();
+	private final Spinner<Integer> attack = new Spinner<>();
+	private final Spinner<Integer> defence = new Spinner<>();
 
-	private final Spinner<Integer> hp = new Spinner<>(0, 0, 0);
-	private final Spinner<Integer> attack = new Spinner<>(0, 0, 0);
-	private final Spinner<Integer> defence = new Spinner<>(0, 0, 0);
+	private final ComboBox<AbilityInfo> basicAbility = new ComboBox<>();
+	private final AbilityDescriptionPanel basicDescriptionPanel =
+		new AbilityDescriptionPanel();
 
-	private final Button addAbility = new Button("Use ability");
-	private final VBox allAbilitiesPane = new VBox();
-	private final VBox selectedPane = new VBox();
-	private final ListView<AbilityInfo> allAbilities = new ListView<>();
-	private final TextArea description = new TextArea("<no ability selected>");
-	private final ListView<AbilityInfo> selectedAbilities = new ListView<>();
-	private final ComboBox<AbilityInfo> basicAbilities = new ComboBox<>(basicAbilitiesModel);
+	private final StackPane portraitWrapper = new StackPane();
+	private final ImageView portrait = new ImageView();
 
-	public ReadOnlyObjectProperty<CharacterProfile> profileProperty() {
-		return profile == null ? null : profile.profileProperty();
-	}
+	private final RollerScrollPane bottomScroll;
+	private final HBox bottomSection = new HBox(10);
+
+	private CharacterProfileModel model = null;
+
+	private final static double descriptionWidth = 320;
+	private final static double abilitiesListWidth = 200;
+	private final static double abilitiesListHeight = 520;
+	private final static double basicsWidth = 280;
+
+	private final Separator leftSpacer1 = new Separator(Orientation.VERTICAL);
+	private final Separator leftSpacer2 = new Separator(Orientation.VERTICAL);
 
 	public CharacterProfilePane() {
-		super();
+		scrollAbilities = new VBox(abilities);
 
-		toolbar.getChildren().addAll(
-			new Label("HP"), hp,
-			new Label("Attack"), attack,
-			new Label("Defence"), defence);
+		scrollAbilities.getStyleClass().add("panel");
+		scrollAbilities.setPrefWidth(abilitiesListWidth);
+		scrollAbilities.setPrefHeight(abilitiesListHeight);
+		scrollAbilities.setMinWidth(abilitiesListWidth);
+		abilities.getStyleClass().add("gui-list");
 
-		allAbilities.setEditable(false);
-		allAbilitiesPane.getChildren().addAll(addAbility, allAbilities, description);
+		bottomScroll = new RollerScrollPane(bottomSection, true);
 
-		description.setEditable(false);
-		description.setWrapText(true);
-		description.setPrefRowCount(3);
-		description.setPrefWidth(280);
+		descriptionPanel.setMinWidth(descriptionWidth);
+		descriptionPanel.setMaxWidth(descriptionWidth);
 
-		allAbilities.setPlaceholder(new Label("No character selected"));
-		selectedAbilities.setPlaceholder(new Label("No abilities chosen"));
+		addAbility.getStyleClass().add("gui-button");
+		addAbility.setId("add-ability-button");
+		addAbility.setFocusTraversable(false);
+		descriptionPanel.getChildren().add(addAbility);
 
-		allAbilities.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
-			if (n == null) {
-				description.setText("<no ability selected>");
-			} else {
-				description.setText(new AbilityDescription(n).toString());
+		basicAbility.getStyleClass().add("gui-combo");
+		basicAbility.setId("basic-ability");
+		basicAbility.setMaxWidth(Double.MAX_VALUE);
+		basicAbility.setConverter(new StringConverter<AbilityInfo>() {
+			@Override public AbilityInfo fromString(String string) {
+				return null;
+			}
+
+			@Override public String toString(AbilityInfo info) {
+				return "Basic ability:\n" + info.toString();
 			}
 		});
 
-		addAbility.setOnAction(event -> addAbility());
+		basicDescriptionPanel.setId("basic-description");
+		basicDescriptionPanel.setMinWidth(basicsWidth);
+		basicDescriptionPanel.setMaxWidth(basicsWidth);
 
-		addAbility.disableProperty().bind(allAbilities.getSelectionModel()
-			.selectedItemProperty().isNull());
+		stats.getChildren().addAll(hp, attack, defence,
+			basicAbility, basicDescriptionPanel);
+		VBox.setVgrow(basicDescriptionPanel, Priority.ALWAYS);
 
-		allAbilities.setOnMouseClicked(event -> {
-			if (event.getClickCount() > 1) addAbility();
+		topSection.getChildren().addAll(scrollAbilities, descriptionPanel, stats);
+
+		HBox.setHgrow(bottomScroll, Priority.ALWAYS);
+
+		hp.getStyleClass().addAll("panel", "gui-spinner");
+		attack.getStyleClass().addAll("panel", "gui-spinner");
+		defence.getStyleClass().addAll("panel", "gui-spinner");
+
+		hp.setMaxWidth(Double.MAX_VALUE);
+		attack.setMaxWidth(Double.MAX_VALUE);
+		defence.setMaxWidth(Double.MAX_VALUE);
+		stats.setFillWidth(true);
+
+		VBox.setVgrow(leftSpacer1, Priority.ALWAYS);
+		leftSpacer1.setMinHeight(94);
+		VBox.setVgrow(leftSpacer2, Priority.ALWAYS);
+		leftSection.getChildren().addAll(
+			leftSpacer1, topSection, bottomScroll, leftSpacer2);
+
+		portraitWrapper.setMinWidth(100);
+		portraitWrapper.getChildren().add(portrait);
+		portraitWrapper.setMouseTransparent(true);
+
+		HBox.setHgrow(portraitWrapper, Priority.ALWAYS);
+		this.setAlignment(Pos.TOP_LEFT);
+		this.getChildren().addAll(leftSection, portraitWrapper);
+
+		abilities.getSelectionModel().selectedItemProperty()
+			.addListener((v, o, n) -> descriptionPanel.setAbility(n));
+
+		basicAbility.getSelectionModel().selectedItemProperty()
+			.addListener((v, o, n) -> basicDescriptionPanel.setAbility(n));
+
+		addAbility.setOnAction(event -> {
+			final AbilityInfo a = abilities.getSelectionModel().getSelectedItem();
+			if (a != null && !model.abilities.contains(a)) {
+				model.abilities.add(a);
+				bottomSection.getChildren().add(
+					new AbilityButton(a, true));
+			}
 		});
 
-		hp.setPrefWidth(100);
-		attack.setPrefWidth(100);
-		defence.setPrefWidth(100);
+		addAbility.setTooltip(new Tooltip("Add this ability to your loadout"));
+		hp.setTooltip(new Tooltip(
+			"Increase or decrease health points (costs PP)"));
+		attack.setTooltip(new Tooltip(
+			"Increase or decrease attack stat (costs PP)"));
+		defence.setTooltip(new Tooltip(
+			"Increase or decrease defence stat (costs PP)"));
+		basicAbility.setTooltip(new Tooltip(
+			"Choose a basic ability for this character"));
 
-		selectedPane.getChildren().add(new HBox(new Label("Basic ability"), basicAbilities));
-		selectedPane.getChildren().add(selectedAbilities);
+		// Resize the character portrait image to fit the window
+		this.sceneProperty().addListener((v, o, n) -> {
+			if (n != null) {
+				portrait.fitHeightProperty().bind(n.heightProperty().multiply(0.95));
+			}
+		});
 
-		abilitiesArea.getChildren().addAll(selectedPane, allAbilitiesPane);
-		this.getChildren().addAll(toolbar, abilitiesArea);
 	}
 
-	private void addAbility() {
-		AbilityInfo i = allAbilities.getSelectionModel().getSelectedItem();
-		if (i != null && !profile.abilities.contains(i)) {
-			profile.abilities.add(i);
+	public void setProfile(CharacterProfileModel model) {
+		if (this.model != null) this.model.unbindAll();
+
+		this.model = model;
+		final CharacterProfile profile = model.profileProperty().get();
+		final CharacterInfo info = profile.rootCharacter;
+
+		portrait.setImage(profile.rootCharacter.bigPortrait);
+		portrait.setPreserveRatio(true);
+
+		final ObservableList<AbilityInfo> abilitiesList =
+			FXCollections.<AbilityInfo>observableArrayList();
+		final ObservableList<AbilityInfo> basicsList =
+			FXCollections.<AbilityInfo>observableArrayList();
+
+		for (AbilityInfo a : info.abilities) {
+			if (a.type == AbilityType.BASIC) {
+				basicsList.add(a);
+			} else if (a.type != AbilityType.SPECIAL) {
+				abilitiesList.add(a);
+			}
+		}
+
+		abilities.setItems(abilitiesList);
+		abilities.getSelectionModel().select(0);
+
+		basicAbility.setItems(basicsList);
+		basicAbility.getSelectionModel().select(model.basicAbility.get());
+		model.basicAbility.bind(
+			basicAbility.getSelectionModel().selectedItemProperty());
+
+		abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
+		scrollAbilities.layout();
+
+		hp.setValueFactory(new PPSpinnerFactory("Health: ",
+			profile.hpPP, info.stats.hp, info.hpCurve));
+		attack.setValueFactory(new PPSpinnerFactory("Attack: ",
+			profile.attackPP, info.stats.attack, info.attackCurve));
+		defence.setValueFactory(new PPSpinnerFactory("Defence: ",
+			profile.defencePP, info.stats.defence, info.defenceCurve));
+
+		model.hpPP.bind(hp.valueProperty());
+		model.attackPP.bind(attack.valueProperty());
+		model.defencePP.bind(defence.valueProperty());
+
+		bottomSection.getChildren().clear();
+		for (AbilityInfo a : profile.abilities) {
+			final boolean removable =
+				a.type != AbilityType.BASIC &&
+				a.type != AbilityType.SPECIAL;
+			bottomSection.getChildren().add(
+				new AbilityButton(a, removable));
 		}
 	}
 
-	public void setCharacterProfile(CharacterProfileModel profile) {
-		if (this.profile != null) this.profile.unbindAll();
+	class AbilityButton extends AnchorPane {
+		private final StackPane imageWrapper = new StackPane();
+		private final ImageView image = new ImageView();
+		private final Button remove = new Button();
 
-		this.profile = profile;
+		public AbilityButton(
+			AbilityInfo a, boolean removable
+		) {
+			this.getStyleClass().add("ability-button");
+			this.setMinWidth(60);
+			this.setMinHeight(60);
+			image.setImage(a.icon);
+			imageWrapper.getChildren().add(image);
+			AnchorPane.setTopAnchor(imageWrapper, 0d);
+			AnchorPane.setBottomAnchor(imageWrapper, 0d);
+			AnchorPane.setLeftAnchor(imageWrapper, 0d);
+			AnchorPane.setRightAnchor(imageWrapper, 0d);
 
-		if (profile == null) {
-			allAbilities.setItems(null);
-		} else {
-			allAbilities.setItems(FXCollections.observableArrayList(
-				profile.rootCharacter.abilities.stream()
-					.filter(a -> !a.banned && a.type != AbilityType.BASIC)
-					.collect(Collectors.toList())));
-		}
+			AnchorPane.setTopAnchor(remove, 0d);
+			AnchorPane.setRightAnchor(remove, 0d);
 
-		basicAbilitiesModel.clear();
-		selectedAbilities.setItems(null);
+			this.getChildren().add(imageWrapper);
 
-		if (profile != null) {
-			for (AbilityInfo a : profile.rootCharacter.abilities)
-				if (a.type == AbilityType.BASIC) basicAbilitiesModel.add(a);
-			basicAbilities.getSelectionModel().select(profile.basicAbility.getValue());
-			profile.basicAbility.bind(
-				basicAbilities.getSelectionModel().selectedItemProperty());
+			if (removable) {
+				this.getChildren().add(remove);
+				remove.setOnAction(event -> {
+					bottomSection.getChildren().remove(this);
+					model.abilities.remove(a);
+				});
+			}
 
-			selectedAbilities.setItems(profile.abilities);
-			selectedAbilities.setCellFactory(
-				RemovableAbilityCell.forListView(profile.abilities));
+			image.setOnMouseClicked(event ->
+				abilities.getSelectionModel().select(a));
 
-			hp.setValueFactory(new PPSpinnerFactory(profile.hpPP.getValue(),
-				profile.rootCharacter.stats.hp, profile.rootCharacter.hpCurve));
-			attack.setValueFactory(new PPSpinnerFactory(profile.attackPP.getValue(),
-				profile.rootCharacter.stats.attack, profile.rootCharacter.attackCurve));
-			defence.setValueFactory(new PPSpinnerFactory(profile.defencePP.getValue(),
-				profile.rootCharacter.stats.defence, profile.rootCharacter.defenceCurve));
-
-			// Force the spinners to update the display area
-			hp.getEditor().setText(
-				hp.getValueFactory().getConverter().toString(profile.hpPP.getValue()));
-			attack.getEditor().setText(
-				attack.getValueFactory().getConverter().toString(profile.attackPP.getValue()));
-			defence.getEditor().setText(
-				defence.getValueFactory().getConverter().toString(profile.defencePP.getValue()));
-
-			profile.hpPP.bind(hp.valueProperty());
-			profile.attackPP.bind(attack.valueProperty());
-			profile.defencePP.bind(defence.valueProperty());
-		}
-	}
-}
-
-class RemovableAbilityCell extends ListCell<AbilityInfo> {
-	private final ObservableList<AbilityInfo> items;
-
-	private HBox cell = null;
-	private final Label name = new Label();
-	private final Button remove = new Button("✕");
-
-	private void makeCell() {
-		cell = new HBox();
-		cell.getChildren().addAll(name, remove);
-	}
-
-	public static Callback<ListView<AbilityInfo>, ListCell<AbilityInfo>>
-		forListView(ObservableList<AbilityInfo> items)
-	{
-		return (listView -> new RemovableAbilityCell(items));
-	}
-
-	public RemovableAbilityCell(ObservableList<AbilityInfo> items) {
-		this.setText(null);
-		this.items = items;
-	}
-
-	@Override
-	protected void updateItem(AbilityInfo item, boolean empty) {
-		super.updateItem(item, empty);
-
-		if (empty) {
-			this.setGraphic(null);
-		} else {
-			if (cell == null) makeCell();
-			this.setGraphic(cell);
-			name.setText(item.name + (item.banned? "(BANNED)" : ""));
-			remove.setOnAction(event -> items.remove(item));
+			remove.setTooltip(new Tooltip("Remove this ability"));
+			final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
+			t.setWrapText(true);
+			t.setMaxWidth(300);
+			Tooltip.install(image, t);
 		}
 	}
 }
@@ -193,7 +265,9 @@ class RemovableAbilityCell extends ListCell<AbilityInfo> {
 class PPSpinnerFactory extends SpinnerValueFactory<Integer> { 
 	private final int[] values;
 
-	public PPSpinnerFactory(int init, int base, List<Integer> curve) {
+	public PPSpinnerFactory(
+		String prefix, int init, int base, List<Integer> curve
+	) {
 
 		values = new int[1 + curve.size()];
 		values[0] = base;
@@ -201,7 +275,7 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 
 		setConverter(new StringConverter<Integer>() {
 			@Override public Integer fromString(String s) {
-				final int raw = Integer.parseInt(s);
+				final int raw = Integer.parseInt(s.substring(prefix.length()));
 				for (int i = 0; i < values.length; i++) {
 					if (values[i] == raw) return i;
 				}
@@ -209,11 +283,7 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 			}
 
 			@Override public String toString(Integer i) {
-				if (i < 0 || i >= values.length) {
-					return "";
-				} else {
-					return "" + values[i];
-				}
+				return prefix + ((i < 0 || i >= values.length)? "" : values[i]);
 			}
 		});
 

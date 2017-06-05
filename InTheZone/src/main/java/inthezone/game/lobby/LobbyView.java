@@ -7,7 +7,7 @@ import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
-import inthezone.game.loadoutEditor.LoadoutView;
+import inthezone.game.loadoutEditor.LoadoutOverview;
 import isogame.engine.CorruptDataException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -66,7 +66,7 @@ public class LobbyView extends VBox {
 		});
 
 		loadouts.setOnAction(event -> {
-			parent.showScreen(new LoadoutView(config, gameData), v -> {});
+			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
 
 		challenge.setOnAction(event -> {

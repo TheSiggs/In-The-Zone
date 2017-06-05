@@ -24,8 +24,8 @@ public class Game extends Application {
 
 	private Network network = null;
 	private Thread networkThread = null;
-	private static final double MIN_WIDTH = 300.0;
-	private static final double MIN_HEIGHT = 200.0;
+	private static final double MIN_WIDTH = 1280.0;
+	private static final double MIN_HEIGHT = 720.0;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -68,8 +68,8 @@ public class Game extends Application {
 			this.network = contentPane.network;
 			this.networkThread = contentPane.networkThread;
 
-			Scene scene = new Scene(contentPane, 960, 540);
-			scene.getStylesheets().add("HUD.css");
+			Scene scene = new Scene(contentPane, MIN_WIDTH, MIN_HEIGHT);
+			scene.getStylesheets().add("GUI.css");
 
 			primaryStage.setTitle("In the Zone!");
 			primaryStage.setScene(scene);

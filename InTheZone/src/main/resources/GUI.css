@@ -1,0 +1,326 @@
+.gui-pane {
+	-fx-background-image:url(/gui_assets/general_background.png);
+	-fx-background-size:100% 100%;
+}
+
+.gui-button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:20px;
+	-fx-font-weight:bold;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.gui-img-button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:2px;
+	-fx-content-display:graphic-only;
+	-fx-label-padding:0;
+	-fx-font-size:2px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.tooltip {
+	-fx-font-size:12px;
+	-fx-text-fill:white;
+	-fx-font-family:sans;
+	-fx-font-weight:normal;
+}
+
+.panel {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+}
+
+.opaque-roller-scroller {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+}
+
+.roller-scroller {
+	-fx-background-color:transparent;
+	-fx-padding:4px 10px 4px 10px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.character-indicator-panel-title {
+	-fx-font-size:16px;
+}
+
+.panel Label {
+	-fx-text-fill:white;
+}
+
+.gui-textfield {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-text-fill:white;
+	-fx-font-size:16px;
+	-fx-padding:10px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.panel-title {
+	-fx-text-fill:white;
+	-fx-font-size:72px;
+	-fx-font-family:serif;
+}
+
+.pp-too-much {
+	-fx-background-image:url(/gui_assets/rounds_fatigue.png);
+}
+
+.separator {
+	visibility:hidden;
+}
+
+.gui-spinner {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-padding:4px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-spinner .increment-arrow-button,
+.gui-spinner .decrement-arrow-button
+{
+	-fx-border:none;
+	-fx-background-color:transparent;
+}
+
+.gui-spinner .increment-arrow-button {
+	-fx-background-image:url(/gui_assets/plus.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-position:center;
+	-fx-background-size:contain;
+}
+
+.gui-spinner .decrement-arrow-button {
+	-fx-background-image:url(/gui_assets/minus.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-position:center center;
+	-fx-background-size:contain;
+}
+
+.gui-spinner .increment-arrow,
+.gui-spinner .decrement-arrow {
+	-fx-background-color:transparent;
+}
+
+.gui-spinner .text-field {
+	-fx-padding:6px;
+	-fx-text-fill:white;
+	-fx-background-color:transparent;
+	-fx-border:none;
+}
+
+.description-panel {
+	-fx-padding:10px;
+}
+
+#add-ability-button {
+	-fx-background-image:url(/gui_assets/big_mixed_texture.png);
+}
+
+.ability-name {
+	-fx-padding:0px 0px 10px 0px;
+	-fx-text-fill:white;
+	-fx-font-size:14px;
+	-fx-font-weight:bold;
+	-fx-graphic-text-gap:10px;
+}
+
+.mana-upgrade {
+	-fx-text-fill:yellow;
+	-fx-padding:40px 0px 40px 0px;
+	-fx-font-size:16px;
+	-fx-font-weight:bold;
+}
+
+#basic-description .ability-name {
+	-fx-content-display:text-only;
+}
+
+#basic-description .mana-upgrade {
+	-fx-padding:0px;
+}
+
+.gui-list {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-padding:0px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-list .list-cell {
+	-fx-background-color:transparent;
+	-fx-text-fill:white;
+	-fx-padding:6px 10px 6px 10px;
+	-fx-border:solid;
+	-fx-border-color:black;
+	-fx-border-width:0px 0px 2px 0px;
+}
+
+.gui-list .list-cell:selected {
+	-fx-font-weight:bold;
+}
+
+.gui-combo {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:0px 2px 0px 0px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-combo .list-cell {
+	-fx-background-color:transparent;
+	-fx-padding:10px;
+	-fx-text-fill:white;
+}
+
+#basic-ability .arrow {
+	visibility:hidden;
+}
+
+#basic-ability .arrow-button {
+	-fx-background-image:url(/gui_assets/plus.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-size:auto auto;
+	-fx-background-position:center center;
+}
+
+.gui-combo .list-view {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-padding:0px;
+	-fx-border-color:black;
+	-fx-border-width:0px 2px 0px 2px;
+	-fx-border-style:solid;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.gui-combo .list-view .list-cell {
+	-fx-background-color:transparent;
+	-fx-text-fill:white;
+	-fx-padding:6px 10px 6px 10px;
+	-fx-border:solid;
+	-fx-border-color:black;
+	-fx-border-width:0px 0px 2px 0px;
+}
+
+.gui-combo .list-view .list-cell:hover {
+	-fx-font-weight:bold;
+}
+
+.ability-button , .ability-button .image-view {
+	-fx-alignment:center;
+}
+
+.ability-button .button {
+	-fx-graphic:url(/gui_assets/x.png);
+	-fx-content-display:graphic-only;
+	-fx-alignment:center;
+	-fx-background-image:url(/gui_assets/big_gold_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-border:solid;
+	-fx-border-width:2px;
+	-fx-border-color:black;
+	-fx-padding:2px;
+	-fx-shadow-highlight-color:transparent;
+}
+
+#character-indicators {
+	-fx-padding:0px;
+}
+
+.switch-buttons .button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:2px;
+	-fx-content-display:graphic-only;
+	-fx-label-padding:0;
+	-fx-font-size:2px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.loadout-cell .label {
+	-fx-font-size:36px;
+	-fx-font-weight:bold;
+}
+
+.loadout-cell-frame {
+	-fx-background-image:url(/gui_assets/filmframe.png);
+	-fx-padding:36px 60px 36px 60px;
+}
+
+.scroll-loadouts {
+	-fx-background-color:transparent;
+}
+
+.scroll-loadouts .viewport {
+	-fx-background-color:transparent;
+}
+
+.loadouts-scrollbar {
+	-fx-background-color:transparent;
+}
+
+.loadouts-scrollbar .track-background {
+	-fx-background-color:transparent;
+}
+
+.loadouts-scrollbar .track {
+	-fx-background-color:#3d241f;
+	-fx-background-insets:6px 2px 6px 2px;
+}
+
+.loadouts-scrollbar .increment-button ,
+.loadouts-scrollbar .decrement-button {
+	-fx-background-color:transparent;
+	-fx-background-radius: 0px;
+	-fx-padding:0px 0px 16px 0px;
+}
+
+.loadouts-scrollbar .increment-arrow,
+.loadouts-scrollbar .decrement-arrow {
+	-fx-shape: " ";	
+	-fx-padding:0px;
+}
+
+.loadouts-scrollbar .thumb {
+	-fx-background-color:#3d241f;
+	-fx-background-radius:4px;
+}
+

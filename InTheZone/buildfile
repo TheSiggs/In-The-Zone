@@ -1,7 +1,7 @@
 repositories.remote << 'http://repo1.maven.org/maven2'
 
 allJars = [
-	'lib/json-simple-1.1.1.jar',
+	'lib/json-20160810.jar',
 	'lib/engine.jar',
 	'lib/dcoder-ai.jar',
 	'lib/vecmath.jar',

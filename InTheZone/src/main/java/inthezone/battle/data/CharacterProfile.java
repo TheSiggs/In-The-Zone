@@ -4,6 +4,7 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.json.JSONArray;
@@ -22,11 +23,20 @@ public class CharacterProfile implements HasJSONRepresentation {
 	private final int extraDefence;
 	private final int extraHP;
 
+	public Collection<AbilityInfo> allAbilities() {
+		final List<AbilityInfo> r = new LinkedList<>(abilities);
+		r.add(0, basicAbility);
+		return r;
+	}
+
 	public CharacterProfile(CharacterInfo rootCharacter)
 		throws CorruptDataException
 	{
 		this.rootCharacter = rootCharacter;
 		this.abilities = new ArrayList<>();
+		abilities.addAll(rootCharacter.abilities.stream()
+			.filter(a -> a.type == AbilityType.SPECIAL)
+			.collect(Collectors.toList()));
 		basicAbility = rootCharacter.abilities.stream()
 			.filter(a -> a.type == AbilityType.BASIC)
 			.findFirst().orElseThrow(() ->

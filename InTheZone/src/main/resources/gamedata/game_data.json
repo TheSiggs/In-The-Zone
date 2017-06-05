@@ -357,7 +357,7 @@
         260
       ],
       "portrait": "portrait/bridget.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/bridget_big.png",
       "attackCurve": [
         17,
         17,
@@ -746,7 +746,7 @@
         145
       ],
       "portrait": "portrait/eve.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/eve_big.png",
       "attackCurve": [
         17,
         17,
@@ -1065,7 +1065,7 @@
         165
       ],
       "portrait": "portrait/sar.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/sar_big.png",
       "attackCurve": [
         17,
         17,
@@ -1788,7 +1788,7 @@
         210
       ],
       "portrait": "portrait/kieran.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/kieran_big.png",
       "attackCurve": [
         17,
         17,
@@ -2084,7 +2084,7 @@
         165
       ],
       "portrait": "portrait/dan.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/dan_big.png",
       "attackCurve": [
         17,
         17,
@@ -2487,7 +2487,7 @@
         180
       ],
       "portrait": "portrait/galen.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/galen_big.png",
       "attackCurve": [
         17,
         17,
@@ -2876,7 +2876,7 @@
         165
       ],
       "portrait": "portrait/nettis.png",
-      "bigPortrait": "portrait/generic.png",
+      "bigPortrait": "portrait/nettis_big.png",
       "attackCurve": [
         17,
         17,
@@ -9116,6 +9116,6 @@
       "sprites": []
     }
   ],
-  "version": "dbbff700-4c40-40b4-af50-f3ceccdf8133",
-  "versionNumber": 194
+  "version": "5cc53595-6040-47f4-a853-323ec904e7ed",
+  "versionNumber": 195
 }

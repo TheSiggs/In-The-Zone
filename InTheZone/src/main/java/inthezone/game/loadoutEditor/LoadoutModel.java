@@ -27,6 +27,8 @@ public class LoadoutModel {
 	public LoadoutModel(GameDataFactory gameData)
 		throws CorruptDataException
 	{
+		name.set("New loadout");
+
 		for (CharacterInfo c : gameData.getCharacters()) {
 			if (c.playable) {
 				otherProfiles.add(new CharacterProfileModel(new CharacterProfile(c)));
@@ -73,7 +75,7 @@ public class LoadoutModel {
 	public LoadoutModel(GameDataFactory gameData, Loadout loadout)
 		throws CorruptDataException
 	{
-		name.setValue(loadout.name);
+		name.set(loadout.name);
 
 		final Set<String> seenCharacters = new HashSet<>();
 
@@ -91,8 +93,6 @@ public class LoadoutModel {
 			})
 			.collect(Collectors.toList()));
 
-		System.err.println("read others: " + otherProfiles);
-
 		for (CharacterInfo c : gameData.getCharacters()) {
 			if (c.playable && !seenCharacters.contains(c.name)) {
 				otherProfiles.add(new CharacterProfileModel(new CharacterProfile(c)));
@@ -107,6 +107,8 @@ public class LoadoutModel {
 	}
 
 	public Loadout encodeLoadout() {
+		if (name.get().equals("")) name.set("<no name>");
+
 		final List<CharacterProfile> characters = usedProfiles.stream()
 			.map(p -> p.profileProperty().get())
 			.collect(Collectors.toList());
@@ -114,8 +116,6 @@ public class LoadoutModel {
 		final List<CharacterProfile> others = otherProfiles.stream()
 			.map(p -> p.profileProperty().get())
 			.collect(Collectors.toList());
-
-		System.err.println("including others: " + others);
 
 		return new Loadout(name.getValue(), characters, others);
 	}

@@ -34,7 +34,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 	private final ScrollBar scrollLoadouts = new ScrollBar();
 	private final ScrollPane loadoutsWrapper = new ScrollPane();
 	private final HBox loadouts = new HBox(-16);
-	private final VBox centerWrapper = new VBox(32);
+	private final VBox centerWrapper = new VBox();
 
 	private final ContentPane parent;
 	
@@ -124,7 +124,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 			loadouts.getChildren().add(0, cell);
 			parent.showScreen(
 				new LoadoutView(parent.config, parent.gameData, m),
-				v -> cell.updateView());
+				v -> cell.updateView(v));
 
 		} catch (CorruptDataException e) {
 			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
@@ -142,6 +142,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 
 class LoadoutFrame extends VBox {
 	private Optional<Loadout> mloadout;
+	private final StackPane topSpacer = new StackPane();
 	private final StackPane frame = new StackPane();
 	private final HBox infoLine = new HBox(10);
 	private final Label title = new Label(" ");
@@ -165,16 +166,14 @@ class LoadoutFrame extends VBox {
 		delete.getStyleClass().add("gui-img-button");
 
 		frame.setOnMouseClicked(event -> {
+			if (!event.isStillSincePress()) return;
 			try {
-				if (mloadout.isPresent()) {
-					parent.config.loadouts.remove(mloadout.get());
+				if (this.mloadout.isPresent()) {
+					parent.config.loadouts.remove(this.mloadout.get());
 					parent.showScreen(
 						new LoadoutView(parent.config, parent.gameData,
-							new LoadoutModel(parent.gameData, mloadout.get())),
-						v -> {
-							this.mloadout = v;
-							updateView();
-						});
+							new LoadoutModel(parent.gameData, this.mloadout.get())),
+						v -> updateView(v));
 				} else {
 					overview.newLoadout();
 				}
@@ -189,12 +188,12 @@ class LoadoutFrame extends VBox {
 
 		delete.setOnMouseClicked(event -> {
 			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-				"Really remove loadout " + mloadout.get().name,
+				"Really remove loadout " + this.mloadout.get().name,
 				ButtonType.NO, ButtonType.YES);
 			a.setHeaderText(null);
 			a.showAndWait().ifPresent(bt -> {
 				if (bt == ButtonType.YES) {
-					parent.config.loadouts.remove(mloadout.get());
+					parent.config.loadouts.remove(this.mloadout.get());
 					parent.config.writeConfig();
 					overview.removeLoadoutFrame(this);
 				}
@@ -214,22 +213,26 @@ class LoadoutFrame extends VBox {
 		HBox.setHgrow(spacer2, Priority.ALWAYS);
 		infoLine.setAlignment(Pos.CENTER_LEFT);
 		infoLine.getChildren().addAll(spacer1, title);
-		if (mloadout.isPresent()) infoLine.getChildren().add(delete);
+		if (this.mloadout.isPresent()) infoLine.getChildren().add(delete);
 		infoLine.getChildren().add(spacer2);
 
-		this.getChildren().addAll(frame, infoLine);
+		topSpacer.setMinHeight(32);
+		topSpacer.setMaxHeight(32);
+		this.getChildren().addAll(topSpacer, frame, infoLine);
 
 		Tooltip.install(frame, new Tooltip("Click here to edit this loadout"));
 		delete.setTooltip(new Tooltip("Delete this loadout"));
 
-		updateView();
+		updateView(this.mloadout);
 	}
 
-	public void updateView() {
-		if (mloadout.isPresent()) {
+	public void updateView(Optional<Loadout> mloadout) {
+		this.mloadout = mloadout;
+
+		if (this.mloadout.isPresent()) {
 			final HBox characters = new HBox();
 			characters.setMaxWidth(frameW);
-			for (CharacterProfile c : mloadout.get().characters) {
+			for (CharacterProfile c : this.mloadout.get().characters) {
 				final StackPane wrapper = new StackPane();
 				wrapper.setMinWidth(100);
 				final ImageView img =
@@ -242,7 +245,7 @@ class LoadoutFrame extends VBox {
 			frame.getChildren().clear();
 			frame.getChildren().add(characters);
 
-			title.setText(mloadout.get().name);
+			title.setText(this.mloadout.get().name);
 
 		} else {
 			frame.getChildren().clear();

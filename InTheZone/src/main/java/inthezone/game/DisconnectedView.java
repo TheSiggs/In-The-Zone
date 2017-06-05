@@ -9,7 +9,7 @@ import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.battle.BattleView;
-import inthezone.game.loadoutEditor.LoadoutView;
+import inthezone.game.loadoutEditor.LoadoutOverview;
 import inthezone.game.lobby.ChallengePane;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -105,16 +105,7 @@ public class DisconnectedView extends FlowPane {
 		});
 
 		loadout.setOnAction(event -> {
-			try {
-				parent.showScreen(
-					new LoadoutView(parent.config, parent.gameData),
-					v -> {});
-			} catch (CorruptDataException e) {
-				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-				a.setHeaderText("Game data corrupt");
-				a.showAndWait();
-				System.exit(1);
-			}
+			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
 
 		sandpit.setOnAction(event -> {

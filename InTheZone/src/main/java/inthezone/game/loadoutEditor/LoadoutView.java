@@ -45,15 +45,6 @@ public class LoadoutView extends DialogScreen<Void> {
 
 	private final ClientConfig config;
 
-	public LoadoutView(ClientConfig config, GameDataFactory gameData)
-		throws CorruptDataException
-	{
-		this(config, gameData, emptyLoadout(config, gameData));
-		if (config.loadouts.size() > 0) {
-			setLoadoutModel(new LoadoutModel(gameData, config.loadouts.remove(0)));
-		}
-	}
-
 	public LoadoutView(
 		ClientConfig config, GameDataFactory gameData, LoadoutModel model
 	) {
@@ -88,7 +79,7 @@ public class LoadoutView extends DialogScreen<Void> {
 		AnchorPane.setTopAnchor(pp, 10d);
 		AnchorPane.setLeftAnchor(pp, 10d);
 
-		characterName.setId("loadout-character-name");
+		characterName.getStyleClass().add("panel-title");
 		characterName.setAlignment(Pos.BASELINE_CENTER);
 		AnchorPane.setTopAnchor(characterName, 20d);
 		AnchorPane.setLeftAnchor(characterName, 10d);
@@ -155,12 +146,6 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		pp.setCostProperty(model.totalCost);
 		rightPane.getChildren().addAll(scrollPane, done, spacer2);
-	}
-
-	private static LoadoutModel emptyLoadout(
-		ClientConfig config, GameDataFactory gameData
-	) throws CorruptDataException {
-		return new LoadoutModel(gameData);
 	}
 }
 

@@ -74,7 +74,7 @@
 	-fx-faint-focus-color: transparent;
 }
 
-#loadout-character-name {
+.panel-title {
 	-fx-text-fill:white;
 	-fx-font-size:72px;
 	-fx-font-family:serif;
@@ -259,5 +259,54 @@
 	-fx-focus-color: transparent;
 	-fx-faint-focus-color: transparent;
 	-fx-shadow-highlight-color:transparent;
+}
+
+.loadout-cell .label {
+	-fx-font-size:36px;
+	-fx-font-weight:bold;
+}
+
+.loadout-cell-frame {
+	-fx-background-image:url(/gui_assets/filmframe.png);
+	-fx-padding:36px 60px 36px 60px;
+}
+
+.scroll-loadouts {
+	-fx-background-color:transparent;
+}
+
+.scroll-loadouts .viewport {
+	-fx-background-color:transparent;
+}
+
+.loadouts-scrollbar {
+	-fx-background-color:transparent;
+}
+
+.loadouts-scrollbar .track-background {
+	-fx-background-color:transparent;
+}
+
+.loadouts-scrollbar .track {
+	-fx-background-color:#3d241f;
+	-fx-background-insets:6px 2px 6px 2px;
+}
+
+.loadouts-scrollbar .increment-button ,
+.loadouts-scrollbar .decrement-button {
+	-fx-background-color:transparent;
+	-fx-background-radius: 0px;
+	-fx-padding:0px 0px 16px 0px;
+}
+
+.loadouts-scrollbar .increment-arrow,
+.loadouts-scrollbar .decrement-arrow {
+	-fx-shape: " ";	
+	-fx-padding:0px;
+}
+
+.loadouts-scrollbar .thumb {
+	-fx-background-color:#3d241f;
+	-fx-background-radius:4px;
 }
 

@@ -1,5 +1,6 @@
 package inthezone.game.loadoutEditor;
 
+import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Loadout;
 import inthezone.game.ContentPane;
 import inthezone.game.DialogScreen;
@@ -15,6 +16,8 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -73,11 +76,11 @@ public class LoadoutOverview extends DialogScreen<Void> {
 
 		scrollLoadouts.maxProperty().bind(loadoutsWrapper.hmaxProperty());
 		scrollLoadouts.minProperty().bind(loadoutsWrapper.hminProperty());
-		loadoutsWrapper.hvalueProperty().bind(scrollLoadouts.valueProperty());
+		loadoutsWrapper.hvalueProperty().bindBidirectional(scrollLoadouts.valueProperty());
 
 		final Separator spacer1 = new Separator(Orientation.VERTICAL);
 		final Separator spacer2 = new Separator(Orientation.VERTICAL);
-		spacer1.setMinHeight(94);
+		spacer1.setMinHeight(88);
 		VBox.setVgrow(spacer1, Priority.ALWAYS);
 		VBox.setVgrow(spacer2, Priority.ALWAYS);
 		centerWrapper.getChildren().addAll(
@@ -87,21 +90,17 @@ public class LoadoutOverview extends DialogScreen<Void> {
 		loadoutsWrapper.viewportBoundsProperty().addListener(v -> adjustScrollbar());
 		loadouts.boundsInLocalProperty().addListener(v -> adjustScrollbar());
 
-		try {
-			for (Loadout l : parent.config.loadouts) {
-				final LoadoutModel m = new LoadoutModel(parent.gameData, l);
-				loadouts.getChildren().add(new LoadoutFrame(parent, this, Optional.of(m)));
-			}
-			loadouts.getChildren().add(new LoadoutFrame(parent, this, Optional.empty()));
-		} catch (CorruptDataException e) {
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-			a.setHeaderText("Game data corrupt");
-			a.showAndWait();
-			System.exit(1);
+		for (Loadout l : parent.config.loadouts) {
+			loadouts.getChildren().add(new LoadoutFrame(parent, this, Optional.of(l)));
 		}
+		loadouts.getChildren().add(new LoadoutFrame(parent, this, Optional.empty()));
 
 		root.getChildren().addAll(centerWrapper, title, newLoadout, back);
 		this.getChildren().add(root);
+
+		newLoadout.setTooltip(new Tooltip("Create a new loadout"));
+		back.setTooltip(new Tooltip(
+			"Back to the previous screen (your loadouts will be saved)"));
 	}
 
 	private void adjustScrollbar() {
@@ -120,7 +119,8 @@ public class LoadoutOverview extends DialogScreen<Void> {
 	public void newLoadout() {
 		try {
 			final LoadoutModel m = new LoadoutModel(parent.gameData);
-			final LoadoutFrame cell = new LoadoutFrame(parent, this, Optional.of(m));
+			final LoadoutFrame cell =
+				new LoadoutFrame(parent, this, Optional.of(m.encodeLoadout()));
 			loadouts.getChildren().add(0, cell);
 			parent.showScreen(
 				new LoadoutView(parent.config, parent.gameData, m),
@@ -133,12 +133,21 @@ public class LoadoutOverview extends DialogScreen<Void> {
 			System.exit(1);
 		}
 	}
+
+	public void removeLoadoutFrame(LoadoutFrame frame) {
+		loadouts.getChildren().remove(frame);
+		loadoutsWrapper.layout();
+	}
 }
 
 class LoadoutFrame extends VBox {
-	private final Optional<LoadoutModel> model;
+	private Optional<Loadout> mloadout;
 	private final StackPane frame = new StackPane();
+	private final HBox infoLine = new HBox(10);
 	private final Label title = new Label(" ");
+
+	private final Button delete = new Button(null,
+		new ImageView(new Image("/gui_assets/x.png")));
 
 	private static final double frameW = 651;
 	private static final double frameH = 435;
@@ -147,21 +156,49 @@ class LoadoutFrame extends VBox {
 	private static final double portraitH = 380;
 
 	public LoadoutFrame(
-		ContentPane parent, LoadoutOverview overview, Optional<LoadoutModel> model
+		ContentPane parent, LoadoutOverview overview, Optional<Loadout> mloadout
 	) {
-		this.model = model;
+		this.mloadout = mloadout;
 
 		this.getStyleClass().add("loadout-cell");
 		frame.getStyleClass().add("loadout-cell-frame");
+		delete.getStyleClass().add("gui-img-button");
 
-		this.setOnMouseClicked(event -> {
-			if (model.isPresent()) {
-				parent.showScreen(
-					new LoadoutView(parent.config, parent.gameData, model.get()),
-					v -> updateView());
-			} else {
-				overview.newLoadout();
+		frame.setOnMouseClicked(event -> {
+			try {
+				if (mloadout.isPresent()) {
+					parent.config.loadouts.remove(mloadout.get());
+					parent.showScreen(
+						new LoadoutView(parent.config, parent.gameData,
+							new LoadoutModel(parent.gameData, mloadout.get())),
+						v -> {
+							this.mloadout = v;
+							updateView();
+						});
+				} else {
+					overview.newLoadout();
+				}
+			} catch (CorruptDataException e) {
+				final Alert a = new Alert(Alert.AlertType.ERROR,
+					e.getMessage(), ButtonType.CLOSE);
+				a.setHeaderText("Game data corrupt");
+				a.showAndWait();
+				System.exit(1);
 			}
+		});
+
+		delete.setOnMouseClicked(event -> {
+			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
+				"Really remove loadout " + mloadout.get().name,
+				ButtonType.NO, ButtonType.YES);
+			a.setHeaderText(null);
+			a.showAndWait().ifPresent(bt -> {
+				if (bt == ButtonType.YES) {
+					parent.config.loadouts.remove(mloadout.get());
+					parent.config.writeConfig();
+					overview.removeLoadoutFrame(this);
+				}
+			});
 		});
 
 		frame.setMinWidth(frameW);
@@ -170,20 +207,33 @@ class LoadoutFrame extends VBox {
 		frame.setMaxHeight(frameH);
 
 		this.setAlignment(Pos.TOP_CENTER);
-		this.getChildren().addAll(frame, title);
+
+		final Separator spacer1 = new Separator(Orientation.HORIZONTAL);
+		final Separator spacer2 = new Separator(Orientation.HORIZONTAL);
+		HBox.setHgrow(spacer1, Priority.ALWAYS);
+		HBox.setHgrow(spacer2, Priority.ALWAYS);
+		infoLine.setAlignment(Pos.CENTER_LEFT);
+		infoLine.getChildren().addAll(spacer1, title);
+		if (mloadout.isPresent()) infoLine.getChildren().add(delete);
+		infoLine.getChildren().add(spacer2);
+
+		this.getChildren().addAll(frame, infoLine);
+
+		Tooltip.install(frame, new Tooltip("Click here to edit this loadout"));
+		delete.setTooltip(new Tooltip("Delete this loadout"));
 
 		updateView();
 	}
 
 	public void updateView() {
-		if (model.isPresent()) {
+		if (mloadout.isPresent()) {
 			final HBox characters = new HBox();
 			characters.setMaxWidth(frameW);
-			for (CharacterProfileModel c : model.get().usedProfiles) {
+			for (CharacterProfile c : mloadout.get().characters) {
 				final StackPane wrapper = new StackPane();
 				wrapper.setMinWidth(100);
 				final ImageView img =
-					new ImageView(c.profileProperty().get().rootCharacter.bigPortrait);
+					new ImageView(c.rootCharacter.bigPortrait);
 				img.setPreserveRatio(true);
 				img.setFitHeight(portraitH);
 				wrapper.getChildren().add(img);
@@ -192,7 +242,7 @@ class LoadoutFrame extends VBox {
 			frame.getChildren().clear();
 			frame.getChildren().add(characters);
 
-			title.setText(model.get().name.get());
+			title.setText(mloadout.get().name);
 
 		} else {
 			frame.getChildren().clear();

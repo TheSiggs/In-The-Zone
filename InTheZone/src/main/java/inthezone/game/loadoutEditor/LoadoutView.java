@@ -24,8 +24,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class LoadoutView extends DialogScreen<Void> {
+public class LoadoutView extends DialogScreen<Loadout> {
 	private LoadoutModel model;
 
 	private final AnchorPane root = new AnchorPane();
@@ -61,9 +62,10 @@ public class LoadoutView extends DialogScreen<Void> {
 
 		// The done button
 		done.setOnAction(event -> {
-			config.loadouts.add(this.model.encodeLoadout());
+			final Loadout out = this.model.encodeLoadout();
+			config.loadouts.add(out);
 			config.writeConfig();
-			onDone.accept(null);
+			onDone.accept(Optional.of(out));
 		});
 
 		rightPane.setMaxWidth(280);

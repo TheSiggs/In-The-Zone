@@ -33,6 +33,13 @@
 	-fx-shadow-highlight-color:transparent;
 }
 
+.tooltip {
+	-fx-font-size:12px;
+	-fx-text-fill:white;
+	-fx-font-family:sans;
+	-fx-font-weight:normal;
+}
+
 .panel {
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
 	-fx-background-repeat:repeat;

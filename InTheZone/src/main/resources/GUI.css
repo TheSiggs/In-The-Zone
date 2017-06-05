@@ -158,6 +158,9 @@
 	-fx-content-display:text-only;
 }
 
+#basic-description .mana-upgrade {
+	-fx-padding:0px;
+}
 
 .gui-list {
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);

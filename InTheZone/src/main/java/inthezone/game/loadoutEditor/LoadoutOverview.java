@@ -216,6 +216,7 @@ class LoadoutFrame extends VBox {
 		final Separator spacer2 = new Separator(Orientation.HORIZONTAL);
 		HBox.setHgrow(spacer1, Priority.ALWAYS);
 		HBox.setHgrow(spacer2, Priority.ALWAYS);
+		infoLine.setMaxWidth(frameW);
 		infoLine.setAlignment(Pos.CENTER_LEFT);
 		infoLine.getChildren().addAll(spacer1, title);
 		if (this.mloadout.isPresent()) infoLine.getChildren().add(delete);
@@ -251,6 +252,7 @@ class LoadoutFrame extends VBox {
 			frame.getChildren().add(characters);
 
 			title.setText(this.mloadout.get().name);
+			title.setTooltip(new Tooltip(title.getText()));
 
 		} else {
 			frame.getChildren().clear();

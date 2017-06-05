@@ -87,6 +87,10 @@
 	-fx-font-family:serif;
 }
 
+.pp-too-much {
+	-fx-background-image:url(/gui_assets/rounds_fatigue.png);
+}
+
 .separator {
 	visibility:hidden;
 }

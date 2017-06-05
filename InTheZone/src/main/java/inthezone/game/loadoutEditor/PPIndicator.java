@@ -16,7 +16,7 @@ public class PPIndicator extends StackPane {
 		"or when you add extra health, attack, or defence points";
 
 	public PPIndicator(IntegerProperty cost) {
-		label.setText("Power points: 0 / " + Loadout.maxPP);
+		updatePP(cost.get());
 		label.getStyleClass().add("gui-textfield");
 
 		Tooltip.install(this, new Tooltip(tooltipMessage));
@@ -39,6 +39,11 @@ public class PPIndicator extends StackPane {
 			Tooltip.install(this, new Tooltip(tooltipMessage + "\n\n" +
 				"You have spent too many power points.  You must\n" +
 				"remove some abilities or reduce your stats."));
+			label.getStyleClass().remove("pp-too-much");
+			label.getStyleClass().add("pp-too-much");
+		} else {
+			Tooltip.install(this, new Tooltip(tooltipMessage));
+			label.getStyleClass().remove("pp-too-much");
 		}
 	}
 

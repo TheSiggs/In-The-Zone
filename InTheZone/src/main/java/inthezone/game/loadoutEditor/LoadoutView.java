@@ -13,7 +13,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
@@ -40,7 +42,6 @@ public class LoadoutView extends DialogScreen<Loadout> {
 	private final CharacterProfilePane profilePane = new CharacterProfilePane();
 	private final HBox mainPane = new HBox(10);
 
-	private final BooleanProperty isLegitimate = new SimpleBooleanProperty(true);
 	private final ObjectProperty<CharacterProfileModel> selectedCharacter =
 		new SimpleObjectProperty<>(null);
 
@@ -62,6 +63,17 @@ public class LoadoutView extends DialogScreen<Loadout> {
 
 		// The done button
 		done.setOnAction(event -> {
+			if (this.model.totalCost.get() > Loadout.maxPP) {
+				final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
+					"This loadout uses too many power points.\n" +
+					"You cannot use this loadout for network games.\n" +
+					"Continue anyway?",
+					ButtonType.YES, ButtonType.CANCEL);
+				a.setHeaderText(null);
+				final Optional<ButtonType> r = a.showAndWait();
+				if (!r.isPresent() || r.get() == ButtonType.CANCEL) return;
+			}
+
 			final Loadout out = this.model.encodeLoadout();
 			config.loadouts.add(out);
 			config.writeConfig();

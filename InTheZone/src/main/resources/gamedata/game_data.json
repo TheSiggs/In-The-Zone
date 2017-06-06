@@ -781,6 +781,7 @@
             "nTargets": 1
           },
           "media": {
+            "obstacleSprite": "spire",
             "icon": "abilities/ghostly_spire.png",
             "zoneTrapSprite": "gs"
           },
@@ -2021,6 +2022,7 @@
             "nTargets": 1
           },
           "media": {
+            "obstacleSprite": "spire",
             "icon": "abilities/guardian_spire.png",
             "zoneTrapSprite": "gs"
           },
@@ -9145,6 +9147,6 @@
       "sprites": []
     }
   ],
-  "version": "69084a7a-a180-4456-951e-e6605bf3bf41",
-  "versionNumber": 197
+  "version": "5c37891d-abb0-4365-9d11-974f80b05463",
+  "versionNumber": 198
 }

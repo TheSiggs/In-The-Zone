@@ -222,7 +222,7 @@ public class CommandTests {
 		zan2.dealDamage(1000);
 
 		final RoadBlock obstacle = b.battleState.placeObstacle(
-			obstaclePos, bt.testData.getStandardSprites());
+			obstaclePos, Optional.empty(), bt.testData.getStandardSprites());
 
 		assertNotNull(obstacle);
 		assertEquals(obstaclePos, obstacle.getPos());

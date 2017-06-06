@@ -4,6 +4,7 @@ import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.FatigueCommand;
+import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
@@ -310,10 +311,12 @@ public class Battle {
 	/**
 	 * Handle the obstacles effect
 	 * */
-	public List<Targetable> doObstacles(Collection<MapPoint> obstacles) {
+	public List<Targetable> doObstacles(
+		Optional<AbilityInfo> a, Collection<MapPoint> obstacles
+	) {
 		final List<Targetable> r = new ArrayList<>();
 		for (MapPoint p : obstacles) {
-			r.add(battleState.placeObstacle(p, sprites));
+			r.add(battleState.placeObstacle(p, a, sprites));
 		}
 		battleState.updateRevengeBonus();
 		return r;

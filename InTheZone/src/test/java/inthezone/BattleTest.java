@@ -114,7 +114,7 @@ public class BattleTest {
 		assertTrue(r3.isEmpty());
 
 		final RoadBlock obstacle = b.battleState.placeObstacle(
-			new MapPoint(3, 4), testData.getStandardSprites());
+			new MapPoint(3, 4), Optional.empty(), testData.getStandardSprites());
 		final List<Trap> r4 = b.createTrap(trap1, dan, single(new MapPoint(3, 4)));
 		assertTrue(r4.isEmpty());
 

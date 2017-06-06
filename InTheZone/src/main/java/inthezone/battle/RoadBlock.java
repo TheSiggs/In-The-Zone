@@ -1,6 +1,7 @@
 package inthezone.battle;
 
 import inthezone.battle.commands.Command;
+import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
@@ -20,12 +21,12 @@ public class RoadBlock extends Targetable {
 	private Optional<Zone> boundZone;
 
 	public RoadBlock(
-		MapPoint pos, StandardSprites sprites
+		MapPoint pos, Optional<AbilityInfo> a, StandardSprites sprites
 	) {
 		this.pos = pos;
 		this.boundZone = Optional.empty();
 		hits = HITS_TO_DESTROY;
-		this.sprite = sprites.roadBlock;
+		this.sprite = a.flatMap(aa -> aa.media.obstacleSprite).orElse(sprites.roadBlock);
 	}
 
 	private RoadBlock(

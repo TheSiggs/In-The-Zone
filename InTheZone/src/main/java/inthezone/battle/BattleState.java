@@ -1,6 +1,7 @@
 package inthezone.battle;
 
 import inthezone.battle.commands.AbilityAgentType;
+import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
@@ -87,8 +88,10 @@ public class BattleState {
 	/**
 	 * Place a new obstacle.
 	 * */
-	public RoadBlock placeObstacle(MapPoint p, StandardSprites sprites) {
-		RoadBlock r = new RoadBlock(p, sprites);
+	public RoadBlock placeObstacle(
+		MapPoint p, Optional<AbilityInfo> a, StandardSprites sprites
+	) {
+		RoadBlock r = new RoadBlock(p, a, sprites);
 		targetable.add(r);
 		return r;
 	}

@@ -17,6 +17,7 @@ import org.json.JSONObject;
  * */
 public class InstantEffectFactory {
 	public static InstantEffect getEffect(
+		String abilityName,
 		BattleState battleState,
 		InstantEffectInfo info,
 		MapPoint castFrom,
@@ -30,7 +31,7 @@ public class InstantEffectFactory {
 			case PUSH: /* fallthrough */
 			case PULL: return PullPush.getEffect(battleState, info, castFrom, targets, false);
 			case TELEPORT: return Teleport.getEffect(battleState, info, targets, castFrom);
-			case OBSTACLES: return Obstacles.getEffect(castFrom, battleState, info, new HashSet<>(targets));
+			case OBSTACLES: return Obstacles.getEffect(castFrom, abilityName, new HashSet<>(targets));
 			case MOVE: return Move.getEffect(battleState, info, targets, castFrom);
 			default: throw new RuntimeException("Unimplemented effect " + info.type);
 		}

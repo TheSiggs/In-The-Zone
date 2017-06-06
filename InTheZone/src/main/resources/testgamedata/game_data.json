@@ -7,6 +7,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": true,
@@ -15,6 +16,7 @@
             "radius": 0,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "basic",
           "ap": 2,
           "zone": "None",
@@ -29,6 +31,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -37,6 +40,7 @@
             "radius": 0,
             "nTargets": 2
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -51,6 +55,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -59,6 +64,7 @@
             "radius": 6,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "instantAfter": "TELEPORT 2",
           "ap": 2,
@@ -75,6 +81,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -83,6 +90,7 @@
             "radius": 0,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "ap": 2,
           "zone": "None",
@@ -98,6 +106,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -106,6 +115,7 @@
             "radius": 2,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -120,6 +130,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -128,6 +139,7 @@
             "radius": 1,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -138,6 +150,7 @@
             "mp": 0,
             "chance": 1,
             "eff": 1,
+            "icon": "abilities/default.png",
             "range": {
               "los": false,
               "piercing": false,
@@ -146,6 +159,7 @@
               "radius": 1,
               "nTargets": 1
             },
+            "media": {"icon": "abilities/default.png"},
             "type": "skill",
             "ap": 0,
             "zone": "None",
@@ -164,6 +178,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -172,6 +187,7 @@
             "radius": 2,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -199,6 +215,7 @@
       "sprite": "zan",
       "hpCurve": [],
       "portrait": "portrait/zan.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [
         3,
         4,
@@ -213,6 +230,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -221,6 +239,7 @@
             "radius": 1,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "basic",
           "ap": 2,
           "zone": "None",
@@ -236,6 +255,7 @@
           "chance": 1,
           "eff": 1,
           "statusEffect": "vulnerable",
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -244,6 +264,7 @@
             "radius": 3,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -258,6 +279,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 3,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -266,6 +288,7 @@
             "radius": 3,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "ap": 2,
           "zone": "Zone",
@@ -280,6 +303,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 3,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -288,6 +312,7 @@
             "radius": 3,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "ap": 2,
           "zone": "BoundZone",
@@ -303,6 +328,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -311,6 +337,7 @@
             "radius": 0,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -335,6 +362,7 @@
       "sprite": "kieren",
       "hpCurve": [],
       "portrait": "portrait/blank.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [],
       "playable": true
     },
@@ -345,6 +373,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -353,6 +382,7 @@
             "radius": 1,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "basic",
           "ap": 2,
           "zone": "None",
@@ -367,6 +397,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 10,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -375,6 +406,7 @@
             "radius": 3,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -389,6 +421,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -397,6 +430,7 @@
             "radius": 1,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "ap": 2,
           "zone": "None",
@@ -411,6 +445,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -419,6 +454,7 @@
             "radius": 2,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "ap": 2,
           "zone": "Zone",
@@ -433,6 +469,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -441,6 +478,7 @@
             "radius": 1,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -456,6 +494,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -464,6 +503,7 @@
             "radius": 1,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "Zone",
@@ -488,6 +528,7 @@
       "sprite": "daniel",
       "hpCurve": [],
       "portrait": "portrait/blank.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [],
       "playable": true
     },
@@ -497,6 +538,7 @@
         "mp": 0,
         "chance": 1,
         "eff": 1,
+        "icon": "abilities/default.png",
         "range": {
           "los": true,
           "piercing": false,
@@ -505,6 +547,7 @@
           "radius": 1,
           "nTargets": 1
         },
+        "media": {"icon": "abilities/default.png"},
         "type": "basic",
         "ap": 2,
         "zone": "None",
@@ -527,6 +570,7 @@
       "sprite": "robot",
       "hpCurve": [],
       "portrait": "portrait/robot.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [],
       "playable": false
     },
@@ -537,6 +581,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -545,6 +590,7 @@
             "radius": 0,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "basic",
           "ap": 2,
           "zone": "None",
@@ -559,6 +605,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -567,6 +614,7 @@
             "radius": 0,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -581,6 +629,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 2,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -589,6 +638,7 @@
             "radius": 2,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -603,6 +653,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": true,
@@ -611,6 +662,7 @@
             "radius": 2,
             "nTargets": 1
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "skill",
           "ap": 2,
           "zone": "None",
@@ -625,6 +677,7 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
+          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -633,6 +686,7 @@
             "radius": 0,
             "nTargets": 3
           },
+          "media": {"icon": "abilities/default.png"},
           "type": "spell",
           "ap": 2,
           "zone": "None",
@@ -657,6 +711,7 @@
       "sprite": "nettis",
       "hpCurve": [],
       "portrait": "portrait/nettis.png",
+      "bigPortrait": "portrait/generic.png",
       "attackCurve": [],
       "playable": true
     }
@@ -6892,6 +6947,6 @@
       "sprites": []
     }
   ],
-  "version": "20c14f6a-ec51-4a3d-9fed-8801f5404323",
-  "versionNumber": 73
+  "version": "84d2b146-bfd5-4dc6-b9ba-df974b0b71d4",
+  "versionNumber": 74
 }

@@ -12,16 +12,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AbilityInfo implements HasJSONRepresentation {
-	public final static String DEFAULT_ICON = "abilities/default.png";
-
 	public final boolean banned;
 	public final String name;
-	public final Image icon;
-	public final String iconFile;
+	public final AbilityMedia media;
 	public final AbilityType type;
 	public final boolean trap;
 	public final AbilityZoneType zone;
-	public final Optional<SpriteInfo> zoneTrapSprite;
 	public final int ap;
 	public final int mp;
 	public final int pp;
@@ -47,11 +43,10 @@ public class AbilityInfo implements HasJSONRepresentation {
 	public AbilityInfo(
 		boolean banned,
 		String name,
-		Image icon, String iconFile,
 		AbilityType type,
+		AbilityMedia media,
 		boolean trap,
 		AbilityZoneType zone,
-		Optional<SpriteInfo> zoneTrapSprite,
 		int ap,
 		int mp,
 		int pp,
@@ -69,11 +64,9 @@ public class AbilityInfo implements HasJSONRepresentation {
 	) {
 		this.banned = banned;
 		this.name = name;
-		this.icon = icon;
-		this.iconFile = iconFile;
+		this.media = media;
 		this.type = type;
 		this.trap = trap;
-		this.zoneTrapSprite = zoneTrapSprite;
 		this.zone = zone;
 		this.ap = ap;
 		this.mp = mp;
@@ -92,16 +85,14 @@ public class AbilityInfo implements HasJSONRepresentation {
 		this.isSubsequent = isSubsequent;
 	}
 
-	@Override
-	public JSONObject getJSON() {
+	@Override public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		r.put("banned", banned);
 		r.put("name", name);
-		if (!iconFile.equals("")) r.put("icon", iconFile);
+		r.put("media", media.getJSON());
 		r.put("type", type.toString());
 		r.put("trap", trap);
 		r.put("zone", zone.toString());
-		zoneTrapSprite.ifPresent(e -> r.put("zoneTrapSprite", e.id));
 		r.put("ap", ap);
 		r.put("mp", mp);
 		r.put("pp", pp);
@@ -131,10 +122,9 @@ public class AbilityInfo implements HasJSONRepresentation {
 		try {
 			final boolean banned = json.optBoolean("banned", false);
 			final String name = json.getString("name");
-			final String iconFile = json.optString("icon", DEFAULT_ICON);
 			final AbilityType type = AbilityType.parse(json.getString("type"));
+			final AbilityMedia media = AbilityMedia.fromJSON(json.getJSONObject("media"), loc, lib);
 			final boolean trap = json.optBoolean("trap", false);
-			final String rzoneTrapSprite = json.optString("zoneTrapSprite", null);
 			final AbilityZoneType zone = AbilityZoneType.fromString(json.getString("zone"));
 			final int ap = json.getInt("ap");
 			final int mp = json.getInt("mp");
@@ -174,22 +164,8 @@ public class AbilityInfo implements HasJSONRepresentation {
 				statusEffect = Optional.of(new StatusEffectInfo(rstatusEffect));
 			}
 
-			final Optional<SpriteInfo> zoneTrapSprite;
-			if (rzoneTrapSprite == null) {
-				zoneTrapSprite = Optional.empty();
-			} else {
-				zoneTrapSprite = Optional.of(lib.getSprite((String) rzoneTrapSprite));
-			}
-
-			final Image icon;
-			try {
-				icon = new Image(loc.gfx(iconFile));
-			} catch (IOException e) {
-				throw new CorruptDataException("Cannot find ability icon for " + name);
-			}
-
 			return new AbilityInfo(
-				banned, name, icon, iconFile, type, trap, zone, zoneTrapSprite,
+				banned, name, type, media, trap, zone,
 				ap, mp, pp, eff, chance, heal, range, mana,
 				subsequent, recursion,
 				instantBefore, instantAfter, statusEffect,

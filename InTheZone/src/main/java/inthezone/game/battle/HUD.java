@@ -170,7 +170,7 @@ public class HUD extends AnchorPane {
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
-			final CommandButton i = new CommandButton(ability.info.icon,
+			final CommandButton i = new CommandButton(ability.info.media.icon,
 				(new AbilityDescription(ability.info)).toString());
 			i.cannotUseThis.set(c.isDead() || notMyTurn ||
 				ability.info.ap > c.getAP() ||

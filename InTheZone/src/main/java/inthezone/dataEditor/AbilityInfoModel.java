@@ -16,11 +16,13 @@ import javafx.beans.property.StringProperty;
 public class AbilityInfoModel {
 	private final BooleanProperty banned;
 	private final StringProperty name;
-	private final StringProperty icon;
 	private final StringProperty type;
+
+	private final StringProperty icon;
+	private final ObjectProperty<SpriteInfo> zoneTrapSprite;
+
 	private final BooleanProperty trap;
 	private final StringProperty zone;
-	private final ObjectProperty<SpriteInfo> zoneTrapSprite;
 	private final IntegerProperty ap;
 	private final IntegerProperty mp;
 	private final IntegerProperty pp;
@@ -74,11 +76,11 @@ public class AbilityInfoModel {
 	public void init(AbilityInfo i) {
 		this.banned.setValue(i.banned);
 		this.name.setValue(i.name);
-		this.icon.setValue(i.iconFile);
 		this.type.setValue(i.type.toString().toLowerCase());
+		this.icon.setValue(i.media.iconFile);
+		this.zoneTrapSprite.setValue(i.media.zoneTrapSprite.orElse(null));
 		this.trap.setValue(i.trap);
 		this.zone.setValue(i.zone.toString().toLowerCase());
-		this.zoneTrapSprite.setValue(i.zoneTrapSprite.orElse(null));
 		this.ap.setValue(i.ap);
 		this.mp.setValue(i.mp);
 		this.pp.setValue(i.pp);

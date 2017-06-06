@@ -3,6 +3,7 @@ package inthezone.dataEditor;
 import com.diffplug.common.base.Errors;
 import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.AbilityMedia;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.data.GameDataFactory;
@@ -524,11 +525,13 @@ public class AbilitiesPane extends VBox {
 		return new AbilityInfo(
 			a.getBanned(),
 			a.getName(),
-			null, a.getIcon(),
 			AbilityType.parse(a.getType()),
+			new AbilityMedia(
+				null, a.getIcon(),
+				Optional.ofNullable(a.getZoneTrapSprite())
+			),
 			a.getTrap(),
 			AbilityZoneType.fromString(a.getZone()),
-			Optional.ofNullable(a.getZoneTrapSprite()),
 			a.getAP(),
 			a.getMP(),
 			a.getPP(),

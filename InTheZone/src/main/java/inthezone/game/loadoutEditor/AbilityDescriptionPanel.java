@@ -60,14 +60,14 @@ public class AbilityDescriptionPanel extends VBox {
 		} else {
 			final AbilityDescription d = new AbilityDescription(a);
 			abilityName.setText(d.getTitle() + " (" + a.pp + " PP)\n" + d.getLoadoutInfoLine());
-			abilityName.setGraphic(new ImageView(a.icon));
+			abilityName.setGraphic(new ImageView(a.media.icon));
 			description.setText(d.getDescription());
 
 			if (a.mana.isPresent()) {
 				final AbilityDescription md = new AbilityDescription(a.mana.get());
 				manaUpgrade.setVisible(true);
 				manaAbilityName.setText(md.getTitle() + "\n" + md.getLoadoutInfoLine());
-				manaAbilityName.setGraphic(new ImageView(a.mana.get().icon));
+				manaAbilityName.setGraphic(new ImageView(a.mana.get().media.icon));
 				manaDescription.setText(md.getDescription());
 			} else {
 				manaUpgrade.setVisible(false);

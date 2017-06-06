@@ -230,7 +230,7 @@ public class CharacterProfilePane extends HBox {
 			this.getStyleClass().add("ability-button");
 			this.setMinWidth(60);
 			this.setMinHeight(60);
-			image.setImage(a.icon);
+			image.setImage(a.media.icon);
 			imageWrapper.getChildren().add(image);
 			AnchorPane.setTopAnchor(imageWrapper, 0d);
 			AnchorPane.setBottomAnchor(imageWrapper, 0d);

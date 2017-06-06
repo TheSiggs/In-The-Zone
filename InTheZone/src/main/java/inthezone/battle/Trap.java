@@ -34,7 +34,7 @@ public class Trap extends Targetable implements HasParentAgent {
 		this.hasMana = hasMana;
 		this.ability = ability;
 		this.parent = agent;
-		this.sprite = ability.info.zoneTrapSprite.orElse(sprites.trap);
+		this.sprite = ability.info.media.zoneTrapSprite.orElse(sprites.trap);
 
 		this.chanceBuff = agent.getChanceBuff();
 		this.attackBuff = agent.getAttackBuff();

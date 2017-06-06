@@ -48,7 +48,7 @@ public class Zone extends Targetable implements HasParentAgent {
 
 		this.turnsRemaining = turns;
 
-		this.sprite = ability.info.zoneTrapSprite;
+		this.sprite = ability.info.media.zoneTrapSprite;
 
 		this.chanceBuff = agent.getChanceBuff();
 		this.attackBuff = agent.getAttackBuff();

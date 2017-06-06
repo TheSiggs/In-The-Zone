@@ -273,11 +273,16 @@ public class BattleView
 	 * Send the resign message
 	 * */
 	public void sendResign() {
-		selectedCharacter = Optional.empty();
-		isCharacterSelected.setValue(false);
-		hud.selectCharacter(Optional.empty());
-		battle.requestCommand(new ResignCommandRequest(player));
-		setMode(new ModeAnimating(this));
+		final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
+			"Really resign?", ButtonType.NO, ButtonType.YES);
+
+		if (a.showAndWait().map(r -> r == ButtonType.YES).orElse(false)) {
+			selectedCharacter = Optional.empty();
+			isCharacterSelected.setValue(false);
+			hud.selectCharacter(Optional.empty());
+			battle.requestCommand(new ResignCommandRequest(player));
+			setMode(new ModeAnimating(this));
+		}
 	}
 
 	/**

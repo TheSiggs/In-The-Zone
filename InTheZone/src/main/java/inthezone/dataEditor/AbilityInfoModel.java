@@ -20,6 +20,7 @@ public class AbilityInfoModel {
 
 	private final StringProperty icon;
 	private final ObjectProperty<SpriteInfo> zoneTrapSprite;
+	private final ObjectProperty<SpriteInfo> obstacleSprite;
 
 	private final BooleanProperty trap;
 	private final StringProperty zone;
@@ -53,6 +54,7 @@ public class AbilityInfoModel {
 		this.trap = new SimpleBooleanProperty(false);
 		this.zone = new SimpleStringProperty("None");
 		this.zoneTrapSprite = new SimpleObjectProperty<>(null);
+		this.obstacleSprite = new SimpleObjectProperty<>(null);
 		this.ap = new SimpleIntegerProperty(2);
 		this.mp = new SimpleIntegerProperty(0);
 		this.pp = new SimpleIntegerProperty(1);
@@ -79,6 +81,7 @@ public class AbilityInfoModel {
 		this.type.setValue(i.type.toString().toLowerCase());
 		this.icon.setValue(i.media.iconFile);
 		this.zoneTrapSprite.setValue(i.media.zoneTrapSprite.orElse(null));
+		this.obstacleSprite.setValue(i.media.obstacleSprite.orElse(null));
 		this.trap.setValue(i.trap);
 		this.zone.setValue(i.zone.toString().toLowerCase());
 		this.ap.setValue(i.ap);
@@ -165,6 +168,9 @@ public class AbilityInfoModel {
 
 	public ObjectProperty<SpriteInfo> zoneTrapSpriteProperty() { return zoneTrapSprite; }
 	public SpriteInfo getZoneTrapSprite() { return zoneTrapSprite.getValue(); }
+
+	public ObjectProperty<SpriteInfo> obstacleSpriteProperty() { return obstacleSprite; }
+	public SpriteInfo getObstacleSprite() { return obstacleSprite.getValue(); }
 
 	public IntegerProperty apProperty() { return ap; }
 	public int getAP() { return ap.getValue(); }

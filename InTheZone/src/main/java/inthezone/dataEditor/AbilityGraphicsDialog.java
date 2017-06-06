@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A dialog box to edit ability graphics and sounds
+ * A dialog box to edit ability graphics and sounds.
  * */
 public class AbilityGraphicsDialog extends Dialog<Boolean> {
 	private final File dataRoot;
@@ -34,6 +34,7 @@ public class AbilityGraphicsDialog extends Dialog<Boolean> {
 	private Button icon;
 	private final TextField name = new TextField();
 	private final ChoiceBox<SpriteInfo> zoneTrapSprite = new ChoiceBox<>();
+	private final ChoiceBox<SpriteInfo> obstacleSprite = new ChoiceBox<>();
 
 	private boolean changed = false;
 
@@ -46,6 +47,8 @@ public class AbilityGraphicsDialog extends Dialog<Boolean> {
 	) {
 		this.dataRoot = dataRoot;
 		this.gfxRoot = new File(dataRoot, "gfx");
+
+		this.setTitle("Choose graphics and sounds");
 
 		this.gameData = gameData;
 		this.model = model;
@@ -68,9 +71,15 @@ public class AbilityGraphicsDialog extends Dialog<Boolean> {
 		model.zoneTrapSpriteProperty().bind(zoneTrapSprite.getSelectionModel().selectedItemProperty());
 		zoneTrapSprite.getSelectionModel().selectedItemProperty().addListener(markChanged);
 
+		obstacleSprite.setItems(obstacleSprites());
+		obstacleSprite.getSelectionModel().select(model.getObstacleSprite());
+		model.obstacleSpriteProperty().bind(obstacleSprite.getSelectionModel().selectedItemProperty());
+		obstacleSprite.getSelectionModel().selectedItemProperty().addListener(markChanged);
+
 		content.addRow(0, new Label("Icon"), icon);
 		content.addRow(1, new Label("Name"), name);
-		content.addRow(2, new Label("Zone/trap sprite"), zoneTrapSprite);
+		content.addRow(2, new Label("Obstacle sprite"), obstacleSprite);
+		content.addRow(3, new Label("Zone/trap sprite"), zoneTrapSprite);
 
 		icon.setOnAction(event -> {
 			changed = true;
@@ -109,6 +118,16 @@ public class AbilityGraphicsDialog extends Dialog<Boolean> {
 		for (SpriteInfo i : gameData.getGlobalSprites()) {
 			if (i.priority == ZONE || i.priority == TRAP) spriteList.add(i);
 		}
+		return spriteList;
+	}
+
+	private ObservableList<SpriteInfo> obstacleSprites() {
+		final ObservableList<SpriteInfo> spriteList = FXCollections.observableArrayList();
+		final int OBSTACLE = gameData.getPriorityLevel("OBSTACLE");
+		for (SpriteInfo i : gameData.getGlobalSprites()) {
+			if (i.priority == OBSTACLE) spriteList.add(i);
+		}
+
 		return spriteList;
 	}
 

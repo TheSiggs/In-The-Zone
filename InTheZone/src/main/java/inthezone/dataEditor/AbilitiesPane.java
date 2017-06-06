@@ -528,7 +528,8 @@ public class AbilitiesPane extends VBox {
 			AbilityType.parse(a.getType()),
 			new AbilityMedia(
 				null, a.getIcon(),
-				Optional.ofNullable(a.getZoneTrapSprite())
+				Optional.ofNullable(a.getZoneTrapSprite()),
+				Optional.ofNullable(a.getObstacleSprite())
 			),
 			a.getTrap(),
 			AbilityZoneType.fromString(a.getZone()),

@@ -7,7 +7,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.5,
-          "icon": "abilities/ironwall.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -28,7 +27,6 @@
             "chance": 1,
             "eff": 0,
             "statusEffect": "resistant",
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -42,7 +40,6 @@
               "zoneTrapSprite": "zoneiw"
             },
             "type": "special",
-            "zoneTrapSprite": "zoneiw",
             "ap": 0,
             "zone": "BoundZone",
             "instantBefore": "OBSTACLES",
@@ -61,7 +58,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -85,7 +81,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/powerup_beatup.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -105,7 +100,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.5,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -134,7 +128,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "weakened",
-          "icon": "abilities/zone_weakness.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -148,7 +141,6 @@
             "zoneTrapSprite": "zonezw"
           },
           "type": "skill",
-          "zoneTrapSprite": "zonezw",
           "ap": 2,
           "zone": "Zone",
           "name": "Zone of weakness",
@@ -163,7 +155,6 @@
           "chance": 0.75,
           "eff": 0.8,
           "statusEffect": "stunned",
-          "icon": "abilities/divine_spark.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -188,7 +179,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "resistant",
-          "icon": "abilities/iron_cloth.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -202,7 +192,6 @@
             "zoneTrapSprite": "ic"
           },
           "type": "skill",
-          "zoneTrapSprite": "ic",
           "ap": 1,
           "zone": "Zone",
           "name": "Iron cloth",
@@ -216,7 +205,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.5,
-          "icon": "abilities/recharge.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -241,7 +229,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "dazed",
-          "icon": "abilities/livewire.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -266,7 +253,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "vampirism",
-          "icon": "abilities/massextraction.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -286,7 +272,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.4,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -315,7 +300,6 @@
           "chance": 0.5,
           "eff": 1,
           "statusEffect": "vulnerable",
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -339,7 +323,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": true,
@@ -396,7 +379,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "strengthened",
-          "icon": "abilities/beginassault.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -416,7 +398,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -444,7 +425,6 @@
           "mp": 0,
           "chance": 0,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -469,7 +449,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "accelerated",
-          "icon": "abilities/speedofwind.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -483,7 +462,6 @@
             "zoneTrapSprite": "sw"
           },
           "type": "spell",
-          "zoneTrapSprite": "sw",
           "ap": 2,
           "zone": "Zone",
           "name": "Speed of wind",
@@ -498,7 +476,6 @@
           "chance": 1,
           "eff": 2,
           "statusEffect": "energized",
-          "icon": "abilities/manaunleashed.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -523,7 +500,6 @@
           "chance": 0.75,
           "eff": 1.4,
           "statusEffect": "vulnerable",
-          "icon": "abilities/iron_cloth.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -548,7 +524,6 @@
           "chance": 1,
           "eff": 1.3,
           "statusEffect": "slowed",
-          "icon": "abilities/bouncing_bones.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -572,7 +547,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/safe_passage.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -586,7 +560,6 @@
             "zoneTrapSprite": "sp"
           },
           "type": "spell",
-          "zoneTrapSprite": "sp",
           "ap": 1,
           "zone": "Zone",
           "instantBefore": "DEFUSE",
@@ -601,7 +574,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 3,
-          "icon": "abilities/blood.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -621,7 +593,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 0.5,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -650,7 +621,6 @@
           "chance": 1,
           "eff": 1.1,
           "statusEffect": "ongoing",
-          "icon": "abilities/dance_cuts.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -675,7 +645,6 @@
           "chance": 0.5,
           "eff": 1,
           "statusEffect": "vulnerable",
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -700,7 +669,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "vampirism",
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -720,7 +688,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 0.8,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -741,7 +708,6 @@
               "chance": 1,
               "eff": 0,
               "statusEffect": "strengthened",
-              "icon": "abilities/default.png",
               "range": {
                 "los": true,
                 "piercing": false,
@@ -806,7 +772,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "vulnerable",
-          "icon": "abilities/ghostly_spire.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -820,7 +785,6 @@
             "zoneTrapSprite": "gs"
           },
           "type": "special",
-          "zoneTrapSprite": "gs",
           "ap": 2,
           "zone": "BoundZone",
           "instantBefore": "OBSTACLES",
@@ -835,7 +799,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -860,7 +823,6 @@
           "chance": 0.75,
           "eff": 1,
           "statusEffect": "panicked",
-          "icon": "abilities/panic_attack.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -885,7 +847,6 @@
           "chance": 0.75,
           "eff": 1,
           "statusEffect": "feared 2",
-          "icon": "abilities/spine_chiller.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -910,7 +871,6 @@
           "chance": 0.75,
           "eff": 1.5,
           "statusEffect": "silenced",
-          "icon": "abilities/shadows_silence.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -934,7 +894,6 @@
           "mp": 0,
           "chance": 0.75,
           "eff": 1.6,
-          "icon": "abilities/shadows_force.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -960,7 +919,6 @@
           "chance": 0.75,
           "eff": 1.5,
           "statusEffect": "debilitated",
-          "icon": "abilities/crippling_shadow.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -985,7 +943,6 @@
           "chance": 0.75,
           "eff": 1.2,
           "statusEffect": "ongoing",
-          "icon": "abilities/shadows_return.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -1009,7 +966,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/spreading_darkness.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -1034,7 +990,6 @@
           "chance": 1,
           "eff": 0.8,
           "statusEffect": "precise",
-          "icon": "abilities/focus_mist.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1048,7 +1003,6 @@
             "zoneTrapSprite": "fm"
           },
           "type": "spell",
-          "zoneTrapSprite": "fm",
           "ap": 1,
           "zone": "Zone",
           "name": "Focus mist",
@@ -1062,7 +1016,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": false,
@@ -1086,7 +1039,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1142,7 +1094,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/teleport.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1167,7 +1118,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1192,7 +1142,6 @@
           "chance": 0.75,
           "eff": 1.6,
           "statusEffect": "dazed",
-          "icon": "abilities/dance_cuts.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1217,7 +1166,6 @@
           "chance": 0.75,
           "eff": 1.7,
           "statusEffect": "ongoing",
-          "icon": "abilities/deep_cut.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1241,7 +1189,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/teleport_slash.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1262,7 +1209,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.6,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -1291,7 +1237,6 @@
           "chance": 0.5,
           "eff": 1,
           "statusEffect": "vulnerable",
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1315,7 +1260,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.4,
-          "icon": "abilities/ghost_blade.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1335,7 +1279,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.4,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -1363,7 +1306,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/reposition.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1388,7 +1330,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": false,
             "piercing": true,
@@ -1412,7 +1353,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/hitandrun.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1433,7 +1373,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 0.5,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -1453,7 +1392,6 @@
               "mp": 0,
               "chance": 1,
               "eff": 0,
-              "icon": "abilities/default.png",
               "range": {
                 "los": true,
                 "piercing": false,
@@ -1486,7 +1424,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/callofthewild.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1504,7 +1441,6 @@
             "chance": 1,
             "eff": 0,
             "statusEffect": "energized",
-            "icon": "abilities/natures_blessing.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -1535,7 +1471,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/deliver.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1592,7 +1527,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/warriors_challenge.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1617,7 +1551,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1642,7 +1575,6 @@
           "chance": 0.75,
           "eff": 1.8,
           "statusEffect": "vulnerable",
-          "icon": "abilities/warriors_bane.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1667,7 +1599,6 @@
           "chance": 0.75,
           "eff": 1.8,
           "statusEffect": "weakened",
-          "icon": "abilities/flamestrike.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1692,7 +1623,6 @@
           "chance": 0.75,
           "eff": 1.6,
           "statusEffect": "imprisoned",
-          "icon": "abilities/earths_grip.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1716,7 +1646,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1740,7 +1669,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1764,7 +1692,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 3.5,
-          "icon": "abilities/implode.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1784,7 +1711,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 2.5,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -1812,7 +1738,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 2.5,
-          "icon": "abilities/manaunleashed.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1833,7 +1758,6 @@
             "chance": 1,
             "eff": 0,
             "statusEffect": "stunned",
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -1893,7 +1817,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/bastion_of_will.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1902,7 +1825,10 @@
             "radius": 0,
             "nTargets": 1
           },
-          "media": {"icon": "abilities/bastion_of_will.png"},
+          "media": {
+            "obstacleSprite": "roadblock",
+            "icon": "abilities/bastion_of_will.png"
+          },
           "type": "special",
           "ap": 1,
           "zone": "None",
@@ -1918,7 +1844,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1943,7 +1868,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "energized",
-          "icon": "abilities/blessing_of_energy.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1967,7 +1891,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.7,
-          "icon": "abilities/whisper_goddess.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -1981,7 +1904,6 @@
             "zoneTrapSprite": "wg"
           },
           "type": "spell",
-          "zoneTrapSprite": "wg",
           "ap": 2,
           "zone": "Zone",
           "name": "Whisper of the Goddess",
@@ -1996,7 +1918,6 @@
           "chance": 0.75,
           "eff": 1.4,
           "statusEffect": "slowed",
-          "icon": "abilities/wrath_goddess.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2021,7 +1942,6 @@
           "chance": 0.5,
           "eff": 1,
           "statusEffect": "slowed",
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2045,7 +1965,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2069,7 +1988,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/lightning.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2094,7 +2012,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "weakened",
-          "icon": "abilities/guardian_spire.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2108,7 +2025,6 @@
             "zoneTrapSprite": "gs"
           },
           "type": "spell",
-          "zoneTrapSprite": "gs",
           "ap": 2,
           "zone": "BoundZone",
           "instantBefore": "OBSTACLES",
@@ -2123,7 +2039,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 2,
-          "icon": "abilities/spike_trap.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2137,7 +2052,6 @@
             "zoneTrapSprite": "spiketrap"
           },
           "type": "skill",
-          "zoneTrapSprite": "spiketrap",
           "ap": 2,
           "zone": "None",
           "name": "Spike trap",
@@ -2152,7 +2066,6 @@
           "chance": 1,
           "eff": 2,
           "statusEffect": "imprisoned",
-          "icon": "abilities/claw_trap.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2166,7 +2079,6 @@
             "zoneTrapSprite": "clawtrap"
           },
           "type": "skill",
-          "zoneTrapSprite": "clawtrap",
           "ap": 2,
           "zone": "None",
           "name": "Claw trap",
@@ -2211,7 +2123,6 @@
         "mp": 0,
         "chance": 1,
         "eff": 1,
-        "icon": "abilities/default.png",
         "range": {
           "los": true,
           "piercing": false,
@@ -2254,7 +2165,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.5,
-          "icon": "abilities/heal.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2271,7 +2181,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 0,
-            "icon": "abilities/revive.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -2292,7 +2201,6 @@
               "mp": 0,
               "chance": 1,
               "eff": 1.5,
-              "icon": "abilities/default.png",
               "range": {
                 "los": true,
                 "piercing": false,
@@ -2327,7 +2235,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2351,7 +2258,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/disinfect.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2377,7 +2283,6 @@
           "chance": 1,
           "eff": 1,
           "statusEffect": "resistant",
-          "icon": "abilities/revitaliser_bomb.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2401,7 +2306,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/toxic_needles.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2422,7 +2326,6 @@
             "chance": 1,
             "eff": 2,
             "statusEffect": "ongoing",
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -2451,7 +2354,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "strengthened",
-          "icon": "abilities/musclre_enhancers.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2475,7 +2377,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 2.5,
-          "icon": "abilities/bear_trap.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2489,7 +2390,6 @@
             "zoneTrapSprite": "beartrap"
           },
           "type": "skill",
-          "zoneTrapSprite": "beartrap",
           "ap": 2,
           "zone": "None",
           "name": "Bear trap",
@@ -2503,7 +2403,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.7,
-          "icon": "abilities/grenade.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2528,7 +2427,6 @@
           "chance": 0.75,
           "eff": 1,
           "statusEffect": "weakened",
-          "icon": "abilities/muscle_relaxers.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2552,7 +2450,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2576,7 +2473,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2634,7 +2530,6 @@
           "chance": 1,
           "eff": 0,
           "statusEffect": "cover",
-          "icon": "abilities/cover.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2658,7 +2553,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2683,7 +2577,6 @@
           "chance": 1,
           "eff": 0.7,
           "statusEffect": "regeneration",
-          "icon": "abilities/heamatite.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2708,7 +2601,6 @@
           "chance": 1,
           "eff": 0.8,
           "statusEffect": "slowed",
-          "icon": "abilities/chilled_round.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2722,7 +2614,6 @@
             "zoneTrapSprite": "cr"
           },
           "type": "skill",
-          "zoneTrapSprite": "cr",
           "ap": 2,
           "zone": "Zone",
           "name": "Chilled round",
@@ -2736,7 +2627,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0,
-          "icon": "abilities/silverdust.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2762,7 +2652,6 @@
           "chance": 0.5,
           "eff": 1,
           "statusEffect": "dazed",
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2786,7 +2675,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.4,
-          "icon": "abilities/jade_shot.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2806,7 +2694,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.6,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -2834,7 +2721,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.4,
-          "icon": "abilities/disinfect.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2852,7 +2738,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.7,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -2884,7 +2769,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.4,
-          "icon": "abilities/disrupter_shot.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2901,7 +2785,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 1.7,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -2934,7 +2817,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 0.8,
-          "icon": "abilities/default.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2958,7 +2840,6 @@
           "mp": 0,
           "chance": 1,
           "eff": 1.5,
-          "icon": "abilities/concussive.png",
           "range": {
             "los": true,
             "piercing": false,
@@ -2979,7 +2860,6 @@
             "mp": 0,
             "chance": 1,
             "eff": 0.5,
-            "icon": "abilities/default.png",
             "range": {
               "los": true,
               "piercing": false,
@@ -9265,6 +9145,6 @@
       "sprites": []
     }
   ],
-  "version": "653449dd-c823-4b6a-8716-cb09b48dfff0",
-  "versionNumber": 196
+  "version": "69084a7a-a180-4456-951e-e6605bf3bf41",
+  "versionNumber": 197
 }

@@ -207,6 +207,7 @@ public class UseAbilityCommand extends Command {
 			}
 		}
 
+		r.addAll(battle.battleState.characters);
 		return r;
 	}
 

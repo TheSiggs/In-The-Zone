@@ -39,8 +39,8 @@ public class UseItemCommand extends Command {
 			if (kind != CommandKind.ITEM)
 				throw new ProtocolException("Expected move command");
 
-			MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			MapPoint target = MapPoint.fromJSON(json.getJSONObject("target"));
+			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
+			final MapPoint target = MapPoint.fromJSON(json.getJSONObject("target"));
 
 			return new UseItemCommand(agent, target);
 		} catch (JSONException|CorruptDataException e) {
@@ -53,9 +53,10 @@ public class UseItemCommand extends Command {
 		// there is only one item for now, so just create a health potion
 		battle.doUseItem(agent, target, new HealthPotion());
 
-		List<Targetable> r = new ArrayList<>();
+		final List<Targetable> r = new ArrayList<>();
 		battle.battleState.getCharacterAt(agent).ifPresent(x -> r.add(x));
 		battle.battleState.getCharacterAt(target).ifPresent(x -> r.add(x));
+		r.addAll(battle.battleState.characters);
 		return r;
 	}
 }

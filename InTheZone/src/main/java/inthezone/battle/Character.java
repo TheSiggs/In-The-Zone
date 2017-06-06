@@ -47,7 +47,7 @@ public class Character extends Targetable {
 	private int hp = 0;
 
 	double revengeBonus = 0;
-	public double getRevengeBonus() { return revengeBonus; }
+	public double getRevengeBonus() { return isDead()? 0 : revengeBonus; }
 
 	private Character(
 		int id,

@@ -59,7 +59,8 @@ public class BattleState {
 	 * Get the revenge bonus for a player.
 	 * */
 	public double getRevengeBonus(Player p) {
-		final long cs = characters.stream().filter(c -> c.player == p).count();
+		final long cs = characters.stream()
+			.filter(c -> c.player == p && !c.isDead()).count();
 		if (cs == 0 || cs > 4) return 0; else return revengeBonus[(int) (4 - cs)];
 	}
 

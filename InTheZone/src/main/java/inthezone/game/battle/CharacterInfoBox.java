@@ -106,7 +106,7 @@ public class CharacterInfoBox extends AnchorPane {
 	private ImageView revengeImage(Character c) {
 		final ImageView r = new ImageView(sprites.revengeIcon);
 		final Tooltip t = new Tooltip(c.name + " is angry!\n" +
-			c.name + " gets a revenge bonus of " + c.getRevengeBonus());
+			c.name + " gets a revenge bonus of " + Math.round(c.getRevengeBonus() * 100) + "%");
 		t.setWrapText(true);
 		t.setPrefWidth(300);
 		Tooltip.install(r, t);

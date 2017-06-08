@@ -9,6 +9,7 @@ public class HealthPotion implements Item {
 	private static final double HEAL = 0.5;
 
 	public void doEffect(Targetable t) {
+		t.revive();
 		t.dealDamage(-((int) Math.ceil(((double) t.getStats().hp) * HEAL)));
 		t.cleanse();
 	}

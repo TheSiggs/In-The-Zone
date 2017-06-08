@@ -172,7 +172,8 @@ public class HUD extends AnchorPane {
 
 			final CommandButton i = new CommandButton(ability.info.media.icon,
 				(new AbilityDescription(ability.info)).toString());
-			i.cannotUseThis.set(c.isDead() || notMyTurn ||
+			i.cannotUseThis.set(notMyTurn ||
+				c.isAbilityBlocked(ability) ||
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));

@@ -4,6 +4,7 @@ import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.LineOfSight;
 import isogame.engine.MapPoint;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -25,10 +26,14 @@ public class InfoMoveRange extends InfoRequest<Collection<MapPoint>> {
 	}
 
 	@Override public void completeAction(Battle battle) {
-		complete.complete(LineOfSight.getDiamond(subject.getPos(), range).stream()
-			.filter(p -> battle.battleState.canMoveRange(range,
-				battle.battleState.findPath(subject.getPos(), p, subject.player)))
-			.collect(Collectors.toList()));
+		if (subject.isImprisoned()) {
+			complete.complete(new ArrayList<>());
+		} else {
+			complete.complete(LineOfSight.getDiamond(subject.getPos(), range).stream()
+				.filter(p -> battle.battleState.canMoveRange(range,
+					battle.battleState.findPath(subject.getPos(), p, subject.player)))
+				.collect(Collectors.toList()));
+		}
 	}
 }
 

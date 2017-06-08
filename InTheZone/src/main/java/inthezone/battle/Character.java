@@ -13,6 +13,7 @@ import inthezone.battle.data.StatusEffectKind;
 import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.Debilitated;
 import inthezone.battle.status.Imprisoned;
+import inthezone.battle.status.Imprisoned;
 import inthezone.battle.status.Silenced;
 import inthezone.battle.status.StatusEffect;
 import inthezone.battle.status.Stunned;
@@ -147,16 +148,22 @@ public class Character extends Targetable {
 	}
 
 	public boolean isStunned() {
-		return statusBuff.map(s -> s instanceof Stunned).orElse(false);
+		return statusDebuff.map(s -> s instanceof Stunned).orElse(false);
+	}
+
+	public boolean isImprisoned() {
+		return statusDebuff.map(s -> s instanceof Imprisoned).orElse(false);
 	}
 
 	public boolean isAbilityBlocked(Ability a) {
-		if (a.info.type == AbilityType.SKILL) {
+		if (isDead() || isStunned()) {
+			return true;
+		} else if (a.info.type == AbilityType.SKILL) {
 			return statusDebuff.map(s -> s instanceof Debilitated).orElse(false);
 		} else if (a.info.type == AbilityType.SPELL) {
 			return statusDebuff.map(s -> s instanceof Silenced).orElse(false);
 		} else {
-			return statusDebuff.map(s -> s instanceof Stunned).orElse(false);
+			return false;
 		}
 	}
 

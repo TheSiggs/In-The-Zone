@@ -105,7 +105,7 @@
 .gui-spinner .increment-arrow-button,
 .gui-spinner .decrement-arrow-button
 {
-	-fx-border:none;
+	-fx-border-style:none;
 	-fx-background-color:transparent;
 }
 
@@ -132,7 +132,7 @@
 	-fx-padding:6px;
 	-fx-text-fill:white;
 	-fx-background-color:transparent;
-	-fx-border:none;
+	-fx-border-style:none;
 }
 
 .description-panel {
@@ -178,13 +178,18 @@
 	-fx-background-color:transparent;
 	-fx-text-fill:white;
 	-fx-padding:6px 10px 6px 10px;
-	-fx-border:solid;
+	-fx-border-style:solid;
 	-fx-border-color:black;
 	-fx-border-width:0px 0px 2px 0px;
 }
 
 .gui-list .list-cell:selected {
 	-fx-font-weight:bold;
+}
+
+.gui-list .list-cell:empty {
+	-fx-border-style:none;
+	-fx-border-width:0px;
 }
 
 .gui-combo {
@@ -230,7 +235,7 @@
 	-fx-background-color:transparent;
 	-fx-text-fill:white;
 	-fx-padding:6px 10px 6px 10px;
-	-fx-border:solid;
+	-fx-border-style:solid;
 	-fx-border-color:black;
 	-fx-border-width:0px 0px 2px 0px;
 }
@@ -249,7 +254,7 @@
 	-fx-alignment:center;
 	-fx-background-image:url(/gui_assets/big_gold_texture.png);
 	-fx-background-repeat:repeat;
-	-fx-border:solid;
+	-fx-border-style:solid;
 	-fx-border-width:2px;
 	-fx-border-color:black;
 	-fx-padding:2px;

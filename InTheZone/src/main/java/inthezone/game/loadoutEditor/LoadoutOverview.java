@@ -19,6 +19,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -102,6 +103,10 @@ public class LoadoutOverview extends DialogScreen<Void> {
 
 		root.getChildren().addAll(centerWrapper, title, newLoadout, back);
 		this.getChildren().add(root);
+
+		this.setOnKeyReleased(event -> {
+			if (event.getCode() == KeyCode.ESCAPE) onDone.accept(null);
+		});
 
 		newLoadout.setTooltip(new Tooltip("Create a new loadout"));
 		back.setTooltip(new Tooltip(

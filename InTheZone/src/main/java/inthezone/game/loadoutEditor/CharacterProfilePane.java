@@ -195,8 +195,8 @@ public class CharacterProfilePane extends HBox {
 		model.basicAbility.bind(
 			basicAbility.getSelectionModel().selectedItemProperty());
 
-		abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
-		scrollAbilities.layout();
+		/*abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
+		scrollAbilities.layout();*/
 
 		hp.setValueFactory(new PPSpinnerFactory("Health: ",
 			profile.hpPP, info.stats.hp, info.hpCurve));

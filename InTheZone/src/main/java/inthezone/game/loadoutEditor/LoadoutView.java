@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -62,23 +63,7 @@ public class LoadoutView extends DialogScreen<Loadout> {
 		done.setMaxWidth(Double.MAX_VALUE);
 
 		// The done button
-		done.setOnAction(event -> {
-			if (this.model.totalCost.get() > Loadout.maxPP) {
-				final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-					"This loadout uses too many power points.\n" +
-					"You cannot use this loadout for network games.\n" +
-					"Continue anyway?",
-					ButtonType.YES, ButtonType.CANCEL);
-				a.setHeaderText(null);
-				final Optional<ButtonType> r = a.showAndWait();
-				if (!r.isPresent() || r.get() == ButtonType.CANCEL) return;
-			}
-
-			final Loadout out = this.model.encodeLoadout();
-			config.loadouts.add(out);
-			config.writeConfig();
-			onDone.accept(Optional.of(out));
-		});
+		done.setOnAction(event -> saveAndExit());
 
 		rightPane.setMaxWidth(280);
 		rightPane.setMinWidth(280);
@@ -115,11 +100,33 @@ public class LoadoutView extends DialogScreen<Loadout> {
 			}
 		});
 
+		this.setOnKeyReleased(event -> {
+			if (event.getCode() == KeyCode.ESCAPE) saveAndExit();
+		});
+
 		setLoadoutModel(model);
 
 		loadoutName.setTooltip(new Tooltip("Enter a name for this loadout"));
 		done.setTooltip(new Tooltip(
 			"Save this loadout and return to the loadouts menu"));
+	}
+
+	public void saveAndExit() {
+		if (this.model.totalCost.get() > Loadout.maxPP) {
+			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
+				"This loadout uses too many power points.\n" +
+				"You cannot use this loadout for network games.\n" +
+				"Continue anyway?",
+				ButtonType.YES, ButtonType.CANCEL);
+			a.setHeaderText(null);
+			final Optional<ButtonType> r = a.showAndWait();
+			if (!r.isPresent() || r.get() == ButtonType.CANCEL) return;
+		}
+
+		final Loadout out = this.model.encodeLoadout();
+		config.loadouts.add(out);
+		config.writeConfig();
+		onDone.accept(Optional.of(out));
 	}
 
 	public void setLoadoutModel(LoadoutModel model) {

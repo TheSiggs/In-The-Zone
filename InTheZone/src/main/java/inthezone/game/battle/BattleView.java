@@ -17,6 +17,7 @@ import inthezone.battle.instant.Teleport;
 import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
+import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
 import inthezone.game.InTheZoneKeyBinding;
@@ -164,6 +165,11 @@ public class BattleView
 		this.mode = mode.setupMode();
 		this.cannotCancel.setValue(!mode.canCancel());
 		System.err.println("Set mode " + mode + " transforming to " + this.mode);
+		if ((this.mode instanceof ModeSelect ||
+			this.mode instanceof ModeMove) && !anyValidMoves()
+		) {
+			sendEndTurn();
+		}
 	}
 
 	/**
@@ -334,6 +340,22 @@ public class BattleView
 			throw new RuntimeException(
 				"Attempted to push but no character was selected");
 		}
+	}
+
+	public boolean anyValidMoves() {
+		return sprites.characters.values().stream()
+			.filter(c -> c.player == player)
+			.anyMatch(c -> anyValidMovesFor(c));
+	}
+
+	public boolean anyValidMovesFor(Character c) {
+		final boolean canMove =
+			mode.getFutureWithRetry(battle.requestInfo(new InfoMoveRange(c)))
+				.map(r -> !r.isEmpty()).orElse(false);
+
+		final boolean canAttack = !c.isDead() && !c.isStunned() && c.getAP() >= 1;
+
+		return canMove || canAttack;
 	}
 
 	@Override

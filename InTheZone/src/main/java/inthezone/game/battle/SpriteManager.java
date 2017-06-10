@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class SpriteManager {
 	private final BattleView view;
 
-	private final Map<Integer, Character> characters = new HashMap<>();
+	public final Map<Integer, Character> characters = new HashMap<>();
 
 	private final Map<MapPoint, Sprite> traps = new HashMap<>();
 

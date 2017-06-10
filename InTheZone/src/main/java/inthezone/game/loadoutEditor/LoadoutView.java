@@ -48,11 +48,17 @@ public class LoadoutView extends DialogScreen<Loadout> {
 
 	private final ClientConfig config;
 
+	private final int loadoutID;
+
 	public LoadoutView(
-		ClientConfig config, GameDataFactory gameData, LoadoutModel model
+		ClientConfig config,
+		GameDataFactory gameData,
+		LoadoutModel model,
+		int loadoutID
 	) {
 		this.config = config;
 		this.model = model;
+		this.loadoutID = loadoutID;
 
 		this.getStylesheets().add("/GUI.css");
 		this.getStyleClass().add("gui-pane");
@@ -124,7 +130,7 @@ public class LoadoutView extends DialogScreen<Loadout> {
 		}
 
 		final Loadout out = this.model.encodeLoadout();
-		config.loadouts.add(out);
+		config.loadouts.set(loadoutID, out);
 		config.writeConfig();
 		onDone.accept(Optional.of(out));
 	}

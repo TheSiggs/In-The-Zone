@@ -132,8 +132,9 @@ public class LoadoutOverview extends DialogScreen<Void> {
 			final LoadoutFrame cell =
 				new LoadoutFrame(parent, this, Optional.of(m.encodeLoadout()));
 			loadouts.getChildren().add(0, cell);
+			parent.config.loadouts.add(0, m.encodeLoadout());
 			parent.showScreen(
-				new LoadoutView(parent.config, parent.gameData, m),
+				new LoadoutView(parent.config, parent.gameData, m, 0),
 				v -> cell.updateView(v));
 
 		} catch (CorruptDataException e) {
@@ -179,10 +180,10 @@ class LoadoutFrame extends VBox {
 			if (!event.isStillSincePress()) return;
 			try {
 				if (this.mloadout.isPresent()) {
-					parent.config.loadouts.remove(this.mloadout.get());
+					final int id = parent.config.loadouts.indexOf(this.mloadout.get());
 					parent.showScreen(
 						new LoadoutView(parent.config, parent.gameData,
-							new LoadoutModel(parent.gameData, this.mloadout.get())),
+							new LoadoutModel(parent.gameData, this.mloadout.get()), id),
 						v -> updateView(v));
 				} else {
 					overview.newLoadout();

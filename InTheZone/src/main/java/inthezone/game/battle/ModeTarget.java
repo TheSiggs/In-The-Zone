@@ -5,12 +5,17 @@ import inthezone.battle.Casting;
 import inthezone.battle.Character;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.Targetable;
 import inthezone.comptroller.InfoAffected;
 import inthezone.comptroller.InfoAttackArea;
 import inthezone.comptroller.InfoTargeting;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -124,12 +129,14 @@ public class ModeTarget extends Mode {
 		if (targetingAbility.info.range.range == 0) {
 			// range 0 abilities get applied immediately
 			allCastings.add(new Casting(castFrom, castFrom));
-			return applyAbility();
+			return applyInstantly();
 
-		} else if (onlyAffectsSelf && noAOE && castFrom.distance(selectedCharacter.getPos()) <= range) {
+		} else if (onlyAffectsSelf && noAOE &&
+			castFrom.distance(selectedCharacter.getPos()) <= range
+		) {
 			// this ability can only affect the agent, so apply it immediately
 			allCastings.add(new Casting(castFrom, selectedCharacter.getPos()));
-			return applyAbility();
+			return applyInstantly();
 
 		} else {
 			if (recursionLevel > 0) {
@@ -140,13 +147,41 @@ public class ModeTarget extends Mode {
 			}
 			Stage stage = view.getStage();
 			getFutureWithRetry(view.battle.requestInfo(new InfoTargeting(
-				selectedCharacter, castFrom, retargetedFrom, targetingAbility))).ifPresent(tr -> {
+				selectedCharacter, castFrom, retargetedFrom, targetingAbility)))
+				.ifPresent(tr -> {
 					tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 					view.setSelectable(tr);
 				});
 		}
 
 		return this;
+	}
+
+	/**
+	 * Apply the ability instantly, offering the user to cancel if possible.
+	 * */
+	private Mode applyInstantly() {
+		if (this.canCancel()) {
+			final Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+			a.setHeaderText(null);
+			final String description =
+				(new AbilityDescription(targetingAbility.info)).toString();
+
+			final Text text = new Text(description);
+			text.setWrappingWidth(400);
+			a.getDialogPane().setContent(text);
+			a.setGraphic(new ImageView(targetingAbility.info.media.icon));
+
+			a.getButtonTypes().clear();
+			a.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+			if (a.showAndWait().map(r -> r == ButtonType.APPLY).orElse(false)) {
+				return applyAbility();
+			} else {
+				return this;
+			}
+		} else {
+			return applyAbility();
+		}
 	}
 
 	/**

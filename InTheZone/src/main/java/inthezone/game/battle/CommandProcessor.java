@@ -126,9 +126,11 @@ public class CommandProcessor {
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(true);
 				view.setMode(new ModeAnimating(view));
+				view.hud.writeMessage("Your turn");
 				registeredAnimations = false;
 			} else {
 				view.isMyTurn.setValue(false);
+				view.hud.writeMessage(view.otherPlayerName + "'s turn");
 				registeredAnimations = false;
 			}
 

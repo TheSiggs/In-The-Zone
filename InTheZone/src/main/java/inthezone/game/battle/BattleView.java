@@ -48,6 +48,7 @@ public class BattleView
 	// battle state
 	public final BattleInProgress battle;
 	public final Player player;
+	public final String otherPlayerName;
 	public final CommandProcessor commands;
 	public final SpriteManager sprites;
 	private Optional<Character> selectedCharacter = Optional.empty();
@@ -72,6 +73,7 @@ public class BattleView
 
 	public BattleView(
 		StartBattleCommand startBattle, Player player,
+		String otherPlayerName,
 		CommandGenerator otherPlayer,
 		Network network, GameDataFactory gameData
 	) throws CorruptDataException {
@@ -79,6 +81,7 @@ public class BattleView
 		this.setMinSize(0, 0);
 
 		this.player = player;
+		this.otherPlayerName = otherPlayerName;
 		this.commands = new CommandProcessor(this);
 		this.hud = new HUD(this, gameData.getStandardSprites());
 

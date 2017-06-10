@@ -152,7 +152,8 @@ public class LobbyView extends VBox {
 			parent.network.refuseChallenge(player);
 		}
 
-		Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Accept this challenge?",
+		final Alert a = new Alert(
+			Alert.AlertType.CONFIRMATION, "Accept this challenge?",
 			ButtonType.YES, ButtonType.NO);
 		a.setHeaderText(player + " challenges you to battle!");
 		a.showAndWait().ifPresent(r -> {
@@ -160,18 +161,21 @@ public class LobbyView extends VBox {
 				try {
 					parent.showScreen(
 						new ChallengePane(gameData, config,
-							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer()), oCmdReq -> {
+							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer()),
+							oCmdReq -> {
 								if (!oCmdReq.isPresent()) {
 									parent.network.refuseChallenge(player);
 								} else {
 									try {
-										StartBattleCommandRequest cmdReq = oCmdReq.get();
-										StartBattleCommand ready = cmdReq.makeCommand(otherCmd, gameData);
+										final StartBattleCommandRequest cmdReq = oCmdReq.get();
+										final StartBattleCommand ready =
+											cmdReq.makeCommand(otherCmd, gameData);
 										parent.network.acceptChallenge(
 											ready, otherCmd.player.otherPlayer(), player);
 									} catch (CorruptDataException e) {
 										parent.network.refuseChallenge(player);
-										Alert ae = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+										final Alert ae = new Alert(
+											Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 										ae.setHeaderText("Error initialising battle");
 										ae.showAndWait();
 									}
@@ -179,7 +183,8 @@ public class LobbyView extends VBox {
 							});
 				} catch (CorruptDataException e) {
 					parent.network.refuseChallenge(player);
-					Alert ae = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+					final Alert ae = new Alert(
+						Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 					ae.setHeaderText("Error initialising challenge panel");
 					ae.showAndWait();
 				}

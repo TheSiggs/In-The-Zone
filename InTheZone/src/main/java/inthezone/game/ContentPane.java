@@ -253,7 +253,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 		Platform.runLater(() -> {
 			try {
 				final BattleView newBattle = new BattleView(
-					ready, player,
+					ready, player, playerName,
 					new NetworkCommandGenerator(network.readCommandQueue),
 					network, gameData);
 				currentBattle = Optional.of(newBattle);

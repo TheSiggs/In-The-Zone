@@ -90,10 +90,12 @@ public class Trigger {
 
 		battle.getTrapAt(p).ifPresent(trap -> {
 			try {
-				final List<Casting> targets = new ArrayList<>(); targets.add(new Casting(p, p));
+				final List<Casting> targets =
+					new ArrayList<>(); targets.add(new Casting(p, p));
 
 				if (battle.getTargetableAt(p).stream()
 					.anyMatch(t -> !(t instanceof Trap) &&
+						!(t instanceof Zone) &&
 						trap.ability.canTarget(trap.parent, t)))
 				{
 					r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP,

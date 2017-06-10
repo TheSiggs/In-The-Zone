@@ -409,7 +409,7 @@ public class Character extends Targetable {
 		}
 	}
 
-	@Override public boolean isPushable() { return true; }
+	@Override public boolean isPushable() { return !isImprisoned(); }
 
 	@Override public boolean isEnemyOf(Character c) {
 		return player != c.player;

@@ -25,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.StageStyle;
 import java.util.Optional;
 
 public class LoadoutOverview extends DialogScreen<Void> {
@@ -201,6 +202,9 @@ class LoadoutFrame extends VBox {
 			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
 				"Really remove loadout " + this.mloadout.get().name,
 				ButtonType.NO, ButtonType.YES);
+			a.setGraphic(null);
+			a.initStyle(StageStyle.UNDECORATED);
+			a.getDialogPane().getStylesheets().add("dialogs.css");
 			a.setHeaderText(null);
 			a.showAndWait().ifPresent(bt -> {
 				if (bt == ButtonType.YES) {

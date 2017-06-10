@@ -24,7 +24,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.StageStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -120,11 +123,22 @@ public class LoadoutView extends DialogScreen<Loadout> {
 	public void saveAndExit() {
 		if (this.model.totalCost.get() > Loadout.maxPP) {
 			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
+				null, ButtonType.YES, ButtonType.CANCEL);
+			a.setHeaderText(null);
+			a.setGraphic(null);
+			a.initStyle(StageStyle.UNDECORATED);
+			a.getDialogPane().getStylesheets().add("dialogs.css");
+
+			final Text text = new Text(
 				"This loadout uses too many power points.\n" +
 				"You cannot use this loadout for network games.\n" +
-				"Continue anyway?",
-				ButtonType.YES, ButtonType.CANCEL);
-			a.setHeaderText(null);
+				"Continue anyway?");
+			final StackPane textWrapper = new StackPane(text);
+			textWrapper.getStyleClass().add("text-container");
+			text.setWrappingWidth(400);
+			text.getStyleClass().add("text");
+			a.getDialogPane().setContent(textWrapper);
+
 			final Optional<ButtonType> r = a.showAndWait();
 			if (!r.isPresent() || r.get() == ButtonType.CANCEL) return;
 		}

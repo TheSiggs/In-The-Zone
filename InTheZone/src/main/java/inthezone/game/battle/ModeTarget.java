@@ -147,13 +147,21 @@ public class ModeTarget extends Mode {
 			if (!canCancel) {
 				view.hud.writeMessage("The attack rebounds!");
 			}
-			Stage stage = view.getStage();
-			getFutureWithRetry(view.battle.requestInfo(new InfoTargeting(
-				selectedCharacter, castFrom, retargetedFrom, targetingAbility)))
-				.ifPresent(tr -> {
+			final Stage stage = view.getStage();
+			final Optional<Collection<MapPoint>> targets =
+				getFutureWithRetry(view.battle.requestInfo(new InfoTargeting(
+					selectedCharacter, castFrom, retargetedFrom, targetingAbility)));
+
+			if (targets.isPresent()) {
+				final Collection<MapPoint> tr = targets.get();
+				if (tr.isEmpty()) {
+					view.hud.writeMessage("No targets for " + targetingAbility.info.name);
+					return (new ModeSelect(view)).setupMode();
+				} else {
 					tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 					view.setSelectable(tr);
-				});
+				}
+			}
 		}
 
 		return this;

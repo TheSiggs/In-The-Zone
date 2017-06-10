@@ -64,6 +64,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 
 		abilitiesList.setAlignment(Pos.CENTER_LEFT);
 		abilitiesListContainer = new RollerScrollPane(abilitiesList, true);
+		abilitiesListContainer.setScrollWheelEnable(false);
 
 		setupCharacterProfile(profile);
 	}

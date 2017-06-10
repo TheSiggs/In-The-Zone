@@ -31,6 +31,8 @@ public class RollerScrollPane extends AnchorPane {
 	private double scrollMax = 0;
 	private double scroll = 0;
 
+	private boolean enableScrollWheel = true;
+
 	public RollerScrollPane(Region content, boolean horizontal) {
 		super();
 		this.horizontal = horizontal;
@@ -120,7 +122,13 @@ public class RollerScrollPane extends AnchorPane {
 
 		showHideButtons();
 
-		this.setOnScroll(event -> setScrollPos(scroll - event.getDeltaY()));
+		this.setOnScroll(event -> {
+			if (enableScrollWheel) setScrollPos(scroll - event.getDeltaY());
+		});
+	}
+
+	public void setScrollWheelEnable(boolean enableScrollWheel) {
+		this.enableScrollWheel = enableScrollWheel;
 	}
 
 	public double getScrollMin() { return scrollMin; }

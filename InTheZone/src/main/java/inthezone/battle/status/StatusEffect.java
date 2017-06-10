@@ -18,6 +18,10 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	private int remainingTurns = TOTAL_ROUNDS;
 	public StatusEffectInfo info;
 
+	@Override public String toString() {
+		return info.toString();
+	}
+
 	public StatusEffect(StatusEffectInfo info) {
 		this.info = info;
 	}

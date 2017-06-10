@@ -26,7 +26,7 @@ public class AbilityMedia implements HasJSONRepresentation {
 		Optional<SpriteInfo> obstacleSprite
 	) {
 		this.icon = icon;
-		this.iconFile = iconFile;
+		this.iconFile = iconFile.equals("") ? DEFAULT_ICON : iconFile;
 		this.zoneTrapSprite = zoneTrapSprite;
 		this.obstacleSprite = obstacleSprite;
 	}
@@ -65,7 +65,8 @@ public class AbilityMedia implements HasJSONRepresentation {
 			try {
 				icon = new Image(loc.gfx(iconFile));
 			} catch (IOException e) {
-				throw new CorruptDataException("Cannot find ability icon " + iconFile);
+				throw new CorruptDataException("Cannot find ability icon \"" +
+					iconFile + "\"");
 			}
 
 			return new AbilityMedia(icon, iconFile, zoneTrapSprite, obstacleSprite);

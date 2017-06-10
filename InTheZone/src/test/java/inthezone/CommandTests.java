@@ -329,5 +329,124 @@ public class CommandTests {
 			assertEquals(0, dan.getMP());
 		}
 	}
+
+	@Test
+	public void panicSlowed() throws Exception {
+		StandardSprites stdSprites = bt.testData.getStandardSprites();
+		final Battle b = bt.simpleBattle();
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(dan);
+		assertNotNull(dan2);
+
+		final Ability trap1 = getAbility(b, bt.danPos, "slow_trap");
+		assertNotNull(trap1);
+
+		final MapPoint targetPos = new MapPoint(5, 5);
+		dan.teleport(targetPos, false);
+
+		b.battleState.placeTrap(new MapPoint(4, 5), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(5, 4), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(6, 5), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(5, 6), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(4, 4), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(4, 6), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(6, 4), trap1, dan2, stdSprites);
+		b.battleState.placeTrap(new MapPoint(6, 6), trap1, dan2, stdSprites);
+
+		final StatusEffect panicked = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("panicked"), 0, Optional.empty());
+		dan.applyStatus(b, panicked);
+
+		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+		final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
+		assertFalse(cmds.isEmpty());
+		List<ExecutedCommand> rs = doCommands(cmds, b);
+
+		assertEquals(4, dan.getMP());
+		assertEquals(5, dan.getStats().mp);
+	}
+
+	@Test
+	public void panicSlowedII() throws Exception {
+		StandardSprites stdSprites = bt.testData.getStandardSprites();
+		final Battle b = bt.simpleBattle();
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		assertNotNull(dan);
+
+		final Ability zone1 = getAbility(b, bt.danPos, "slow_zone");
+		assertNotNull(zone1);
+
+		final MapPoint targetPos = new MapPoint(5, 5);
+		dan.teleport(targetPos, false);
+
+		final List<MapPoint> zoneRange = new ArrayList<>();
+		zoneRange.add(new MapPoint(5, 5));
+		zoneRange.add(new MapPoint(5, 6));
+		zoneRange.add(new MapPoint (5, 4));
+		zoneRange.add(new MapPoint(4, 5));
+		zoneRange.add(new MapPoint (6, 5));
+
+		final Optional<Zone> z =
+			b.battleState.placeZone(new MapPoint(5, 5), zoneRange, zone1,
+				Optional.of(4), Optional.empty(), dan);
+
+		assertNotEquals(Optional.empty(), z);
+
+		final StatusEffect panicked = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("panicked"), 0, Optional.empty());
+		dan.applyStatus(b, panicked);
+
+		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+		final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
+		assertFalse(cmds.isEmpty());
+		List<ExecutedCommand> rs = doCommands(cmds, b);
+
+		assertEquals(5, dan.getMP());
+		assertEquals(5, dan.getStats().mp);
+	}
+
+	@Test
+	public void panicAccelerated() throws Exception {
+		StandardSprites stdSprites = bt.testData.getStandardSprites();
+		final Battle b = bt.simpleBattle();
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		assertNotNull(dan);
+
+		final Ability zone1 = getAbility(b, bt.danPos, "fast_zone");
+		assertNotNull(zone1);
+
+		final MapPoint targetPos = new MapPoint(5, 5);
+		dan.teleport(targetPos, false);
+
+		final List<MapPoint> zoneRange = new ArrayList<>();
+		zoneRange.add(new MapPoint(5, 5));
+		zoneRange.add(new MapPoint(5, 6));
+		zoneRange.add(new MapPoint (5, 4));
+		zoneRange.add(new MapPoint(4, 5));
+		zoneRange.add(new MapPoint (6, 5));
+
+		final Optional<Zone> z =
+			b.battleState.placeZone(new MapPoint(5, 5), zoneRange, zone1,
+				Optional.of(4), Optional.empty(), dan);
+
+		assertNotEquals(Optional.empty(), z);
+
+		final StatusEffect panicked = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("panicked"), 0, Optional.empty());
+		dan.applyStatus(b, panicked);
+
+		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+		final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
+		System.err.println("Start commands: " + cmds);
+		assertFalse(cmds.isEmpty());
+		List<ExecutedCommand> rs = doCommands(cmds, b);
+
+		assertEquals(0, dan.getMP());
+		assertEquals(7, dan.getStats().mp);
+	}
 }
 

@@ -66,8 +66,15 @@ public class MoveCommand extends Command {
 
 	@Override
 	public List<Targetable> doCmd(Battle battle) throws CommandException {
-		if (!battle.battleState.canMove(path)) throw new CommandException("21: Invalid move command");
 		final Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
+
+		if (isPanic && oc.map(c -> !c.isPanicked()).orElse(true)) {
+			// this is an obsolete panic command, remove it.
+			return new ArrayList<>();
+		}
+
+		if (!battle.battleState.canMove(path))
+			throw new CommandException("21: Invalid move command");
 
 		battle.doMove(path, true);
 
@@ -82,24 +89,32 @@ public class MoveCommand extends Command {
 	{
 		final List<ExecutedCommand> r = new ArrayList<>();
 
-		final Character agent = turn.battleState.getCharacterAt(path.get(0)).orElseThrow(() ->
-			new CommandException("MV1: No character at start of path"));
+		final Character agent = turn.battleState.getCharacterAt(path.get(0))
+			.orElseThrow(() ->
+				new CommandException("MV1: No character at start of path"));
+
+		if (isPanic && !agent.isPanicked()) {
+			// this is an obsolete panic command, remove it.
+			return new ArrayList<>();
+		}
 
 		final List<MapPoint> path1 =
-			turn.battleState.reduceToValidPath(turn.battleState.trigger.shrinkPath(agent, path));
+			turn.battleState.reduceToValidPath(
+				turn.battleState.trigger.shrinkPath(agent, path));
 		
 		if (path1.size() >= 2) {
 			final Command move1 = new MoveCommand(path1, false);
 			r.add(new ExecutedCommand(move1, move1.doCmd(turn)));
 		}
 
-		final MapPoint loc = path1.isEmpty()? path.get(0) : path1.get(path1.size() - 1);
+		final MapPoint loc = path1.isEmpty()?
+			path.get(0) : path1.get(path1.size() - 1);
 		final List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
 		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
 
 		agent.currentZone = turn.battleState.getZoneAt(loc);
 
-		if (isPanic && path.size() != path1.size()) {
+		if (isPanic && agent.getMP() > 0) {
 			final Optional<Character> oc = turn.battleState.getCharacterAt(loc);
 			if (oc.isPresent()) {
 				final List<Command> cont = oc.get().continueTurnReset(turn);

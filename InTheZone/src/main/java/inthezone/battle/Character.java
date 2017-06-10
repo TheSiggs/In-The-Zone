@@ -1,9 +1,6 @@
 package inthezone.battle;
 
-import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
@@ -13,7 +10,7 @@ import inthezone.battle.data.StatusEffectKind;
 import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.Debilitated;
 import inthezone.battle.status.Imprisoned;
-import inthezone.battle.status.Imprisoned;
+import inthezone.battle.status.PanickedStatusEffect;
 import inthezone.battle.status.Silenced;
 import inthezone.battle.status.StatusEffect;
 import inthezone.battle.status.Stunned;
@@ -153,6 +150,10 @@ public class Character extends Targetable {
 
 	public boolean isImprisoned() {
 		return statusDebuff.map(s -> s instanceof Imprisoned).orElse(false);
+	}
+
+	public boolean isPanicked() {
+		return statusDebuff.map(s -> s instanceof PanickedStatusEffect).orElse(false);
 	}
 
 	public boolean isAbilityBlocked(Ability a) {

@@ -81,8 +81,8 @@ public class PathFinderNode extends Node<MapPoint> {
 	public static boolean canTraverseBoundary(
 		MapPoint from, MapPoint to, StageInfo terrain
 	) {
-		MapPoint dp = to.subtract(from).normalise();
-		SlopeType slope;
+		final MapPoint dp = to.subtract(from).normalise();
+		final SlopeType slope;
 		if (dp.x == 1) slope = SlopeType.E;
 		else if (dp.x == -1) slope = SlopeType.W;
 		else if (dp.y == 1) slope = SlopeType.S;
@@ -97,18 +97,20 @@ public class PathFinderNode extends Node<MapPoint> {
 	private static boolean canTraverseBoundary(
 		MapPoint from, MapPoint to, SlopeType slope, StageInfo terrain
 	) {
-		Tile tfrom = terrain.getTile(from);
-		Tile tto = terrain.getTile(to);
+		final Tile tfrom = terrain.getTile(from);
+		final Tile tto = terrain.getTile(to);
 
 		if (tfrom.slope == tto.slope && tfrom.elevation == tto.elevation) {
 			return true;
 		} else if (tfrom.slope != SlopeType.NONE) {
 			return
 				(slope == tfrom.slope && tto.elevation - tfrom.elevation == 1) ||
-				(slope == tfrom.slope.opposite() && tto.elevation == tfrom.elevation);
+				(slope == tfrom.slope.opposite() && tto.elevation == tfrom.elevation) ||
+				(slope == tfrom.slope &&
+					tto.slope == SlopeType.NONE && tto.elevation <= tfrom.elevation);
 		} else if (tfrom.elevation == tto.elevation) {
 			return tto.slope == SlopeType.NONE || tto.slope == slope;
-		} else if (tfrom.elevation - tto.elevation == 1) {
+		} else if (tfrom.elevation - tto.elevation >= 1) {
 			return tto.slope == slope.opposite() || tto.slope == SlopeType.NONE;
 		} else if (tfrom.elevation - tto.elevation == -1) {
 			return tto.slope == slope;

@@ -6,6 +6,8 @@ import inthezone.battle.Character;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.AbilityDescription;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.Targetable;
 import inthezone.comptroller.InfoAffected;
 import inthezone.comptroller.InfoAttackArea;
@@ -157,11 +159,20 @@ public class ModeTarget extends Mode {
 		return this;
 	}
 
+	private static boolean isCancellableEffect(Optional<InstantEffectInfo> e) {
+		return e.map(eff ->
+			eff.type == InstantEffectType.TELEPORT ||
+			eff.type == InstantEffectType.MOVE).orElse(false);
+	}
+
 	/**
 	 * Apply the ability instantly, offering the user to cancel if possible.
 	 * */
 	private Mode applyInstantly() {
-		if (this.canCancel()) {
+
+		if (this.canCancel() &&
+			!isCancellableEffect(targetingAbility.info.instantBefore)
+		) {
 			final Alert a = new Alert(Alert.AlertType.CONFIRMATION);
 			a.setHeaderText(null);
 			final String description =

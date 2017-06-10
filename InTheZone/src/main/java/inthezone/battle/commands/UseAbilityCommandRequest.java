@@ -177,7 +177,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		final List<MapPoint> targets =
 			effectTargets.stream().map(c -> c.target).collect(Collectors.toList());
 		return new InstantEffectCommand(InstantEffectFactory.getEffect(
-			ability.info.name, battleState, effect, agent,
+			ability.rootName, battleState, effect, agent,
 			targetArea, targets), postCommand, postEffect);
 	}
 }

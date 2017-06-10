@@ -155,8 +155,12 @@ public class ModeTarget extends Mode {
 			if (targets.isPresent()) {
 				final Collection<MapPoint> tr = targets.get();
 				if (tr.isEmpty()) {
-					view.hud.writeMessage("No targets for " + targetingAbility.info.name);
-					return (new ModeSelect(view)).setupMode();
+					if (canCancel() && recursionLevel == 0) {
+						view.hud.writeMessage("No targets for " + targetingAbility.info.name);
+						return (new ModeSelect(view)).setupMode();
+					} else {
+						return addTarget(castFrom).setupMode();
+					}
 				} else {
 					tr.stream().forEach(p -> stage.setHighlight(p, HIGHLIGHT_TARGET));
 					view.setSelectable(tr);

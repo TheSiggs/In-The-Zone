@@ -36,6 +36,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
+import javafx.stage.StageStyle;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -98,10 +99,10 @@ public class BattleView
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(
 			(p, button) -> {
-				if (p == null && mode.canCancel()) {
+				if (button == MouseButton.SECONDARY) {
+					if (mode.canCancel()) cancelAbility();
+				} else if (p == null && mode.canCancel()) {
 					selectCharacter(Optional.empty());
-				} else if (mode.canCancel() && button == MouseButton.SECONDARY) {
-					cancelAbility();
 				} else {
 					mode.handleSelection(p);
 				}
@@ -283,7 +284,12 @@ public class BattleView
 	 * */
 	public void sendResign() {
 		final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-			"Really resign?", ButtonType.NO, ButtonType.YES);
+			null, ButtonType.NO, ButtonType.YES);
+		a.initStyle(StageStyle.UNDECORATED);
+		a.getDialogPane().getStylesheets().add("dialogs.css");
+		a.setHeaderText(null);
+		a.setGraphic(null);
+		a.setContentText("Really resign?");
 
 		if (a.showAndWait().map(r -> r == ButtonType.YES).orElse(false)) {
 			selectedCharacter = Optional.empty();
@@ -383,7 +389,8 @@ public class BattleView
 
 	@Override
 	public void badCommand(CommandException e) {
-		Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+		final Alert a = new Alert(Alert.AlertType.ERROR,
+			e.getMessage(), ButtonType.CLOSE);
 		a.setHeaderText("Game error!");
 		a.showAndWait();
 		battle.requestCommand(new ResignCommandRequest(player));

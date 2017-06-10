@@ -15,9 +15,12 @@ import inthezone.comptroller.InfoTargeting;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
+import javafx.stage.StageStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -186,18 +189,26 @@ public class ModeTarget extends Mode {
 			!isCancellableEffect(targetingAbility.info.instantBefore)
 		) {
 			final Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+			a.initStyle(StageStyle.UNDECORATED);
+			a.getDialogPane().getStylesheets().add("dialogs.css");
 			a.setHeaderText(null);
 			final String description =
 				(new AbilityDescription(targetingAbility.info)).toString();
 
 			final Text text = new Text(description);
+			final StackPane textWrapper = new StackPane(text);
+			textWrapper.getStyleClass().add("text-container");
 			text.setWrappingWidth(400);
-			a.getDialogPane().setContent(text);
+			text.getStyleClass().add("text");
+			a.getDialogPane().setContent(textWrapper);
 			a.setGraphic(new ImageView(targetingAbility.info.media.icon));
 
+			final ButtonType confirmButton =
+				new ButtonType("Confirm", ButtonData.OK_DONE);
+
 			a.getButtonTypes().clear();
-			a.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
-			if (a.showAndWait().map(r -> r == ButtonType.APPLY).orElse(false)) {
+			a.getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
+			if (a.showAndWait().map(r -> r == confirmButton).orElse(false)) {
 				return applyAbility();
 			} else {
 				return this;

@@ -1,0 +1,40 @@
+.dialog-pane {
+	-fx-background-image:url(/gui_assets/big_mixed_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+}
+
+.dialog-pane .label {
+	-fx-text-fill:white;
+	-fx-font-size:20px;
+}
+
+.dialog-pane .text {
+	-fx-fill:white;
+}
+
+.button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:20px;
+	-fx-font-weight:bold;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.button:default {
+	-fx-background-image:url(/gui_assets/mp.png);
+}
+
+.text-container {
+	-fx-padding:10px;
+}
+

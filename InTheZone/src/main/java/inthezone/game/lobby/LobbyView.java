@@ -71,15 +71,20 @@ public class LobbyView extends VBox {
 
 		challenge.setOnAction(event -> {
 			if (config.loadouts.isEmpty()) {
-				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
-				a.setHeaderText("You must create at least one loadout before issuing a challenge");
+				final Alert a = new Alert(
+					Alert.AlertType.INFORMATION, null, ButtonType.OK);
+				a.setHeaderText(
+					"You must create at least one loadout before issuing a challenge");
 				a.showAndWait();
 				return;
 			}
 
-			ServerPlayer s = playerList.getSelectionModel().getSelectedItem();
+			final ServerPlayer s =
+				playerList.getSelectionModel().getSelectedItem();
+
 			if (s != null && s.isInGame()) {
-				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
+				final Alert a = new Alert(
+					Alert.AlertType.INFORMATION, null, ButtonType.OK);
 				a.setHeaderText(s.name + " is in a game");
 				a.showAndWait();
 				

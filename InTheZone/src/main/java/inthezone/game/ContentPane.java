@@ -41,6 +41,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	private Optional<BattleView> currentBattle = Optional.empty();
 
+	// remember the last challenge until such a time as we can present it to the
+	// player.
+	private Optional<String> challengePlayer = Optional.empty();
+	private Optional<StartBattleCommandRequest> challenge = Optional.empty();
+
 	public ContentPane(
 		ClientConfig config,
 		GameDataFactory gameData,
@@ -87,6 +92,15 @@ public class ContentPane extends StackPane implements LobbyListener {
 			else switchPane(disconnected);
 		} else {
 			switchPane(screens.peek());
+		}
+
+		if (screens.isEmpty()) {
+			challengePlayer.ifPresent(player ->
+				challenge.ifPresent(cmd -> {
+					challengePlayer = Optional.empty();
+					challenge = Optional.empty();
+					lobbyView.challengeFrom(player, cmd);
+				}));
 		}
 	}
 
@@ -201,7 +215,12 @@ public class ContentPane extends StackPane implements LobbyListener {
 	@Override
 	public void challengeFrom(String player, StartBattleCommandRequest cmd) {
 		Platform.runLater(() -> {
-			lobbyView.challengeFrom(player, cmd);
+			if (screens.isEmpty()) {
+				lobbyView.challengeFrom(player, cmd);
+			} else {
+				challengePlayer = Optional.of(player);
+				challenge = Optional.of(cmd);
+			}
 		});
 	}
 

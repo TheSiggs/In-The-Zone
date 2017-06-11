@@ -23,14 +23,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +47,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	private final ObservableList<Loadout> loadouts =
 		FXCollections.observableArrayList();
 	
-	private final BorderPane guiRoot = new BorderPane();
+	private final AnchorPane guiRoot = new AnchorPane();
 	private final FlowPane toolbar = new FlowPane();
 	private final ComboBox<String> stage = new ComboBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
@@ -56,13 +56,19 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 	private final CharacterSelector characterSelector = new CharacterSelector();
 
+	private final VBox characterInfoLeft = new VBox(10);
+	private final VBox characterInfoRight = new VBox(10);
+
 	private final Player player;
 	private Stage currentStage = null;
 
 	private final MapView startPosChooser;
 
 	private final Map<String, MapPoint> characterPositions = new HashMap<>();
-	private final Map<MapPoint, CharacterProfile> characterByPosition = new HashMap<>();
+	private final Map<MapPoint, CharacterProfile> characterByPosition =
+		new HashMap<>();
+	
+	private final GameDataFactory gameData;
 
 	/**
 	 * @param gameData The game data
@@ -77,9 +83,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	)
 		throws CorruptDataException
 	{
-		super();
 		this.player = player;
+		this.gameData = gameData;
 		this.setMinSize(0, 0);
+		this.getStylesheets().add("/GUI.css");
 
 		toolbar.setFocusTraversable(false);
 		stage.setFocusTraversable(false);
@@ -94,12 +101,25 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			new Label("Loadout"), loadout,
 			cancelButton, doneButton);
 		toolbar.setStyle("-fx-background-color:#FFFFFF");
-		guiRoot.setTop(toolbar);
 
-		final HBox ccentre = new HBox();
-		ccentre.setAlignment(Pos.CENTER);
-		ccentre.getChildren().addAll(characterSelector);
-		guiRoot.setBottom(ccentre);
+		AnchorPane.setTopAnchor(toolbar, 0d);
+		AnchorPane.setLeftAnchor(toolbar, 0d);
+		AnchorPane.setRightAnchor(toolbar, 0d);
+
+		AnchorPane.setBottomAnchor(characterInfoLeft, 10d);
+		AnchorPane.setLeftAnchor(characterInfoLeft, 10d);
+
+		AnchorPane.setBottomAnchor(characterInfoRight, 10d);
+		AnchorPane.setRightAnchor(characterInfoRight, 10d);
+
+		final StackPane characterSelectorWrapper =
+			new StackPane(characterSelector);
+		AnchorPane.setBottomAnchor(characterSelectorWrapper, 10d);
+		AnchorPane.setLeftAnchor(characterSelectorWrapper, 0d);
+		AnchorPane.setRightAnchor(characterSelectorWrapper, 0d);
+
+		guiRoot.getChildren().addAll(
+			characterInfoLeft, characterInfoRight, toolbar, characterSelectorWrapper);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
@@ -114,10 +134,14 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		startPosChooser.heightProperty().bind(this.heightProperty());
 		startPosChooser.startAnimating();
 
-		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
-		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
-		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
-		startPosChooser.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
+		startPosChooser.keyBindings.keys.put(
+			new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
+		startPosChooser.keyBindings.keys.put(
+			new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
+		startPosChooser.keyBindings.keys.put(
+			new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
+		startPosChooser.keyBindings.keys.put(
+			new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
 
 		startPosChooser.setFocusTraversable(true);
 		// make sure other controls can't take focus
@@ -130,67 +154,22 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		this.getChildren().addAll(startPosChooser, guiRoot);
 
-		stage.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
-			if (s != null) {
-				currentStage = gameData.getStage(s);
-				startPosChooser.setStage(currentStage);
-				Collection<MapPoint> tiles = player == Player.PLAYER_A?
-					currentStage.terrain.getPlayerStartTiles() :
-					currentStage.terrain.getAIStartTiles();
-				if (tiles.size() > 0) {
-					startPosChooser.centreOnTile(tiles.iterator().next());
-				}
-				startPosChooser.setSelectable(tiles);
-				startPosChooser.setHighlight(tiles, 0);
-			}
-		});
-
+		stage.getSelectionModel().selectedItemProperty()
+			.addListener((o, s0, s) -> setStage(s));
+	
 		if (useStage.isPresent()) {
-			String s = useStage.get();
+			final String s = useStage.get();
 			if (!stages.contains(s))
 				throw new CorruptDataException("Unknown stage " + s);
 			stage.getSelectionModel().select(s);
 			stage.setDisable(true);
 		}
 
-		loadout.getSelectionModel().selectedItemProperty().addListener((o, s0, s) -> {
-			if (s != null && s.isLegitimate()) {
-				characterSelector.setCharacters(s.characters);
-			}
-		});
+		loadout.getSelectionModel().selectedItemProperty()
+			.addListener((o, s0, s) -> setLoadout(s));
 
 		startPosChooser.doOnSelection((p, button) -> {
-			Optional<CharacterProfile> o = characterSelector.getSelectedCharacter();
-			o.ifPresent(c -> {
-				if (currentStage != null) {
-					Sprite s = new Sprite(c.rootCharacter.sprite);
-					s.setAnimation("walk");
-					s.pos = p;
-					s.direction = FacingDirection.UP;
-
-					characterSelector.setSelectedCharacter(Optional.empty());
-
-					if (characterByPosition.containsKey(p)) {
-						currentStage.clearTileOfSprites(p);
-						characterSelector.setSelectedCharacter(
-							Optional.ofNullable(characterByPosition.get(p)));
-						characterPositions.remove(characterByPosition.get(p).rootCharacter.name);
-					}
-
-					if (characterPositions.containsKey(c.rootCharacter.name)) {
-						MapPoint oldP = characterPositions.get(c.rootCharacter.name);
-						currentStage.clearTileOfSprites(oldP);
-						characterByPosition.remove(oldP);
-					}
-					currentStage.addSprite(s);
-					characterPositions.put(c.rootCharacter.name, p);
-					characterByPosition.put(p, c);
-
-					Loadout l = loadout.getSelectionModel().getSelectedItem();
-					doneButton.setDisable(
-						l == null || characterPositions.size() != l.characters.size());
-				}
-			});
+			if (button != MouseButton.SECONDARY) placeCharacter(p);
 		});
 
 		cancelButton.setOnAction(event -> {
@@ -198,8 +177,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		});
 
 		doneButton.setOnAction(event -> {
-			String s = stage.getSelectionModel().getSelectedItem();
-			Loadout l = loadout.getSelectionModel().getSelectedItem();
+			final String s = stage.getSelectionModel().getSelectedItem();
+			final Loadout l = loadout.getSelectionModel().getSelectedItem();
 			if (s == null || l == null ||
 				characterPositions.size() != l.characters.size())
 			{
@@ -207,11 +186,78 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 					"Stage, loadout, or placement not complete", ButtonType.OK);
 				a.showAndWait();
 			} else {
-				List<MapPoint> startTiles = l.characters.stream()
+				final List<MapPoint> startTiles = l.characters.stream()
 					.map(c -> characterPositions.get(c.rootCharacter.name))
 					.collect(Collectors.toList());
 				onDone.accept(Optional.of(new StartBattleCommandRequest(
 					s, player, l, startTiles)));
+			}
+		});
+	}
+
+	private void setLoadout(Loadout l) {
+		if (l != null && l.isLegitimate()) {
+			characterSelector.setCharacters(l.characters);
+			characterInfoLeft.getChildren().clear();
+			characterInfoRight.getChildren().clear();
+
+			for (int i = 0; i < l.characters.size(); i++) {
+				final SmallCharacterInfoPanel panel =
+					new SmallCharacterInfoPanel(l.characters.get(i));
+				if (i < 2) characterInfoLeft.getChildren().add(panel);
+				else characterInfoRight.getChildren().add(panel);
+			}
+		}
+	}
+
+	private void setStage(String s) {
+		if (s != null) {
+			this.currentStage = gameData.getStage(s);
+			startPosChooser.setStage(currentStage);
+			final Collection<MapPoint> tiles = player == Player.PLAYER_A?
+				currentStage.terrain.getPlayerStartTiles() :
+				currentStage.terrain.getAIStartTiles();
+			if (tiles.size() > 0) {
+				startPosChooser.centreOnTile(tiles.iterator().next());
+			}
+			startPosChooser.setSelectable(tiles);
+			startPosChooser.setHighlight(tiles, 0);
+		}
+	}
+
+	private void placeCharacter(MapPoint p) {
+		final Optional<CharacterProfile> o =
+			characterSelector.getSelectedCharacter();
+
+		o.ifPresent(c -> {
+			if (currentStage != null) {
+				final Sprite s = new Sprite(c.rootCharacter.sprite);
+				s.setAnimation("walk");
+				s.pos = p;
+				s.direction = FacingDirection.UP;
+
+				characterSelector.setSelectedCharacter(Optional.empty());
+
+				if (characterByPosition.containsKey(p)) {
+					currentStage.clearTileOfSprites(p);
+					characterSelector.setSelectedCharacter(
+						Optional.ofNullable(characterByPosition.get(p)));
+					characterPositions.remove(characterByPosition.get(p)
+						.rootCharacter.name);
+				}
+
+				if (characterPositions.containsKey(c.rootCharacter.name)) {
+					MapPoint oldP = characterPositions.get(c.rootCharacter.name);
+					currentStage.clearTileOfSprites(oldP);
+					characterByPosition.remove(oldP);
+				}
+				currentStage.addSprite(s);
+				characterPositions.put(c.rootCharacter.name, p);
+				characterByPosition.put(p, c);
+
+				final Loadout l = loadout.getSelectionModel().getSelectedItem();
+				doneButton.setDisable(
+					l == null || characterPositions.size() != l.characters.size());
 			}
 		});
 	}

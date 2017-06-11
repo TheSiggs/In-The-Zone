@@ -68,6 +68,10 @@
 	-fx-text-fill:white;
 }
 
+.small-character-info-panel Label {
+	-fx-padding:4px 10px 0px 10px;
+}
+
 .gui-textfield {
 	-fx-background-image:url(/gui_assets/button_tex.png);
 	-fx-background-repeat:repeat;

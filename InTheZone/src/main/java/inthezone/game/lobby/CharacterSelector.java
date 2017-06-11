@@ -43,7 +43,7 @@ public class CharacterSelector extends Canvas {
 		for (CharacterProfile p : characters) this.enabled.add(true);
 
 		if (characters.size() > 0) {
-			SpriteAnimation a =
+			final SpriteAnimation a =
 				this.characters.get(0).rootCharacter.sprite.defaultAnimation;
 			this.cw = a.w;
 			this.w = cw * characters.size();
@@ -57,7 +57,7 @@ public class CharacterSelector extends Canvas {
 					(double) h + GlobalConstants.TILEH);
 				int i = (int) Math.floor((double) x / GlobalConstants.TILEW);
 				x = (int) ((double) x - ((double) i * GlobalConstants.TILEW));
-				SpriteAnimation anim =
+				final SpriteAnimation anim =
 					this.characters.get(i).rootCharacter.sprite.animations.get("idle");
 				if (anim.hitTest(x, y, 0, CameraAngle.UL, FacingDirection.DOWN)) {
 					selected = Optional.of(this.characters.get(i));
@@ -74,7 +74,7 @@ public class CharacterSelector extends Canvas {
 	}
 
 	private void render() {
-		GraphicsContext gx = this.getGraphicsContext2D();
+		final GraphicsContext gx = this.getGraphicsContext2D();
 		gx.clearRect(0, 0, w, h);
 		for (int i = 0; i < characters.size(); i++) {
 			renderCharacter(gx, characters.get(i), i);
@@ -106,12 +106,18 @@ public class CharacterSelector extends Canvas {
 	}
 
 	public void setCharacterEnabled(CharacterProfile character, boolean enabled) {
-		int i = characters.indexOf(character);
+		final int i = characters.indexOf(character);
+
 		if (i >= 0 && i < this.enabled.size()) this.enabled.set(i, enabled);
-		if (selected.map(c -> c.rootCharacter.name.equals(character.rootCharacter.name))
-			.orElse(false)) selected = Optional.empty();
+
+		if (
+			selected.map(c ->
+				c.rootCharacter.name.equals(character.rootCharacter.name))
+			.orElse(false)
+		) {
+			selected = Optional.empty();
+		}
 		render();
 	}
-
 }
 

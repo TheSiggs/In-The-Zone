@@ -4,7 +4,7 @@ import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Stats;
-import inthezone.game.RollerScrollPane;
+import inthezone.game.guiComponents.RollerScrollPane;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;

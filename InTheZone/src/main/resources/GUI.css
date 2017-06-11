@@ -217,6 +217,7 @@
 	-fx-padding:0px 2px 0px 0px;
 	-fx-focus-color: transparent;
 	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
 }
 
 .gui-combo .list-cell {
@@ -356,5 +357,20 @@
 .loadouts-scrollbar .thumb {
 	-fx-background-color:#3d241f;
 	-fx-background-radius:4px;
+}
+
+.rolling-choice-box .combo-box .arrow-button {
+	-fx-background-color:transparent;
+	-fx-background-insets:0;
+	-fx-background-radius:0;
+	-fx-padding:0px;
+}
+
+.rolling-choice-box .combo-box .arrow-button .arrow {
+	-fx-background-color:transparent;
+	-fx-background-insets:0;
+	-fx-background-radius:0;
+	-fx-padding:0px;
+	-fx-shape: null;
 }
 

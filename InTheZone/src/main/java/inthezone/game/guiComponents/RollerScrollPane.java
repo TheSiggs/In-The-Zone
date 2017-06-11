@@ -1,4 +1,4 @@
-package inthezone.game;
+package inthezone.game.guiComponents;
 
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;

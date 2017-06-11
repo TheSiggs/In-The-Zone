@@ -7,6 +7,7 @@ import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
+import inthezone.game.guiComponents.RollingChoiceBox;
 import isogame.engine.CorruptDataException;
 import isogame.engine.FacingDirection;
 import isogame.engine.Highlighter;
@@ -49,7 +50,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		FXCollections.observableArrayList();
 	
 	private final AnchorPane guiRoot = new AnchorPane();
-	private final ComboBox<String> stage = new ComboBox<>(stages);
+	private final RollingChoiceBox<String> stage = new RollingChoiceBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
 	private final VBox buttonsPanel = new VBox(10);
 	private final Label challengingLabel = new Label();

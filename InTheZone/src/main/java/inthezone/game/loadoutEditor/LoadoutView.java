@@ -5,7 +5,7 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
-import inthezone.game.RollerScrollPane;
+import inthezone.game.guiComponents.RollerScrollPane;
 import isogame.engine.CorruptDataException;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

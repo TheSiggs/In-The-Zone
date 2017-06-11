@@ -92,12 +92,13 @@ public class LobbyView extends VBox {
 				try {
 					parent.showScreen(
 						new ChallengePane(gameData, config,
-							Optional.empty(), Player.randomPlayer()), oCmdReq ->
+							Optional.empty(), Player.randomPlayer(), s.name), oCmdReq ->
 								oCmdReq.ifPresent(cmdReq -> {
 									parent.network.challengePlayer(cmdReq, s.name);
 								}));
 				} catch (CorruptDataException e) {
-					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+					final Alert a = new Alert(Alert.AlertType.ERROR,
+						e.getMessage(), ButtonType.CLOSE);
 					a.setHeaderText("Error initialising challenge panel");
 					a.showAndWait();
 				}
@@ -161,7 +162,7 @@ public class LobbyView extends VBox {
 				try {
 					parent.showScreen(
 						new ChallengePane(gameData, config,
-							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer()),
+							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer(), player),
 							oCmdReq -> {
 								if (!oCmdReq.isPresent()) {
 									parent.network.refuseChallenge(player);

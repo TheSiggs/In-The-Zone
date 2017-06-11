@@ -48,9 +48,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		FXCollections.observableArrayList();
 	
 	private final AnchorPane guiRoot = new AnchorPane();
-	private final FlowPane toolbar = new FlowPane();
 	private final ComboBox<String> stage = new ComboBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
+	private final VBox buttonsPanel = new VBox(2);
+	private final Label challengingLabel = new Label();
 	private final Button cancelButton = new Button("Cancel");
 	private final Button doneButton = new Button("Done");
 
@@ -60,6 +61,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	private final VBox characterInfoRight = new VBox(10);
 
 	private final Player player;
+	private final String otherPlayerName;
 	private Stage currentStage = null;
 
 	private final MapView startPosChooser;
@@ -79,16 +81,16 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	 * */
 	public ChallengePane(
 		GameDataFactory gameData, ClientConfig config,
-		Optional<String> useStage, Player player
+		Optional<String> useStage, Player player, String otherPlayerName
 	)
 		throws CorruptDataException
 	{
 		this.player = player;
+		this.otherPlayerName = otherPlayerName;
 		this.gameData = gameData;
 		this.setMinSize(0, 0);
 		this.getStylesheets().add("/GUI.css");
 
-		toolbar.setFocusTraversable(false);
 		stage.setFocusTraversable(false);
 		loadout.setFocusTraversable(false);
 		cancelButton.setFocusTraversable(false);
@@ -96,15 +98,27 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		doneButton.setDisable(true);
 
-		toolbar.getChildren().addAll(
-			new Label("Stage"), stage,
-			new Label("Loadout"), loadout,
-			cancelButton, doneButton);
-		toolbar.setStyle("-fx-background-color:#FFFFFF");
+		buttonsPanel.getStyleClass().add("panel");
+		doneButton.setMaxWidth(Double.MAX_VALUE);
+		cancelButton.setMaxWidth(Double.MAX_VALUE);
+		buttonsPanel.setFillWidth(true);
+		challengingLabel.setText("Challenging:\n" + otherPlayerName);
+		buttonsPanel.setMaxWidth(260);
+		buttonsPanel.setMinWidth(260);
 
-		AnchorPane.setTopAnchor(toolbar, 0d);
-		AnchorPane.setLeftAnchor(toolbar, 0d);
-		AnchorPane.setRightAnchor(toolbar, 0d);
+		buttonsPanel.getChildren().addAll(
+			challengingLabel, cancelButton, doneButton);
+
+		AnchorPane.setTopAnchor(loadout, 0d);
+		AnchorPane.setLeftAnchor(loadout, 0d);
+
+		final StackPane stageWrapper = new StackPane(stage);
+		AnchorPane.setTopAnchor(stageWrapper, 0d);
+		AnchorPane.setLeftAnchor(stageWrapper, 0d);
+		AnchorPane.setRightAnchor(stageWrapper, 0d);
+
+		AnchorPane.setTopAnchor(buttonsPanel, 0d);
+		AnchorPane.setRightAnchor(buttonsPanel, 0d);
 
 		AnchorPane.setBottomAnchor(characterInfoLeft, 10d);
 		AnchorPane.setLeftAnchor(characterInfoLeft, 10d);
@@ -119,7 +133,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		AnchorPane.setRightAnchor(characterSelectorWrapper, 0d);
 
 		guiRoot.getChildren().addAll(
-			characterInfoLeft, characterInfoRight, toolbar, characterSelectorWrapper);
+			characterInfoLeft, characterInfoRight,
+			characterSelectorWrapper, stageWrapper, loadout, buttonsPanel);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);

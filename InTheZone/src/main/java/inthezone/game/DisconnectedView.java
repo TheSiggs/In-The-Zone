@@ -119,7 +119,7 @@ public class DisconnectedView extends FlowPane {
 			try {
 				parent.showScreen(
 					new ChallengePane(gameData, config, Optional.empty(),
-						Player.PLAYER_A), getStartSandpitCont());
+						Player.PLAYER_A, "AI"), getStartSandpitCont());
 			} catch (CorruptDataException e) {
 				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 				a.setHeaderText("Game data corrupt");

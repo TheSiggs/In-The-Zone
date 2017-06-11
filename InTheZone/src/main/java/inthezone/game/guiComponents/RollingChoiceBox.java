@@ -1,6 +1,7 @@
 package inthezone.game.guiComponents;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -10,6 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.Group;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.StringConverter;
@@ -41,13 +43,17 @@ public class RollingChoiceBox<T> extends Group {
 
 		choice.setButtonCell(new CenteredListCell<>());
 
-		this.getStyleClass().add("rolling-choice-box");
+		root.getStyleClass().add("rolling-choice-box");
 		left.getStyleClass().add("left-button");
 		right.getStyleClass().add("right-button");
 
 		left.setOnAction(event -> diffSelection(-1));
 		right.setOnAction(event -> diffSelection(+1));
 		choice.setMouseTransparent(true);
+
+		root.setOnMouseClicked(event -> {
+			if (event.getButton() == MouseButton.PRIMARY) diffSelection(+1);
+		});
 
 		left.setFocusTraversable(false);
 		choice.setFocusTraversable(false);
@@ -98,6 +104,12 @@ public class RollingChoiceBox<T> extends Group {
 	public void setValue(T v) { choice.setValue(v); }
 	public ObjectProperty<T> valueProperty() {
 		return valueProperty();
+	}
+
+	public String getPromptText() { return choice.getPromptText(); }
+	public void setPromptText(String v) { choice.setPromptText(v); }
+	public StringProperty promptTextProperty() {
+		return choice.promptTextProperty();
 	}
 }
 

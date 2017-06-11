@@ -111,12 +111,21 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		buttonsPanel.setMaxWidth(220);
 		buttonsPanel.setMinWidth(220);
 
+		final StackPane doneButtonWrapper = new StackPane(doneButton);
+		Tooltip.install(doneButtonWrapper, new Tooltip(
+			"Place all your characters on the map to start the challenge"));
+
+		doneButton.setTooltip(new Tooltip(
+			"Click here to challenge " + otherPlayerName + " to battle"));
+
 		buttonsPanel.getChildren().addAll(
-			challengingLabel, cancelButton, doneButton);
+			challengingLabel, cancelButton, doneButtonWrapper);
 
 		loadout.getStyleClass().add("gui-combo");
 		loadout.setPromptText("Choose loadout");
+		stage.setPromptText("Choose map");
 
+		Tooltip.install(stage, new Tooltip("Click here to choose a map"));
 		loadout.setTooltip(new Tooltip("Click here to choose your loadout"));
 		cancelButton.setTooltip(new Tooltip(
 			"Cancel this challenge and return to the lobby"));
@@ -231,9 +240,6 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			characterPositions.size() != l.characters.size() ;
 
 		doneButton.setDisable(disable);
-		doneButton.setTooltip(new Tooltip(disable?
-			"Place all your characters on the map to start the challenge":
-			"Click here to challenge " + otherPlayerName + " to battle"));
 	}
 
 	private void setLoadout(Loadout l) {

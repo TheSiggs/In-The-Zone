@@ -359,6 +359,39 @@
 	-fx-background-radius:4px;
 }
 
+.rolling-choice-box {
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+}
+
+.rolling-choice-box .list-cell {
+	-fx-background-color:transparent;
+	-fx-padding:10px;
+	-fx-text-fill:white;
+}
+
+.rolling-choice-box .left-button , .rolling-choice-box .right-button {
+	-fx-background-color:transparent;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+	-fx-content-display:graphic-only;
+	-fx-alignment:center;
+	-fx-padding:6px 16px 6px 16px;
+	-fx-graphic:url(/gui_assets/arrow_left.png);
+}
+
+.rolling-choice-box .combo-box {
+	-fx-background-color:transparent;
+}
+
+.rolling-choice-box .right-button {
+	-fx-graphic:url(/gui_assets/arrow_right.png);
+}
+
 .rolling-choice-box .combo-box .arrow-button {
 	-fx-background-color:transparent;
 	-fx-background-insets:0;
@@ -371,6 +404,6 @@
 	-fx-background-insets:0;
 	-fx-background-radius:0;
 	-fx-padding:0px;
-	-fx-shape: null;
+	-fx-shape:null;
 }
 

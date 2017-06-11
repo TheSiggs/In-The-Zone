@@ -23,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
@@ -50,10 +51,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	private final AnchorPane guiRoot = new AnchorPane();
 	private final ComboBox<String> stage = new ComboBox<>(stages);
 	private final ComboBox<Loadout> loadout = new ComboBox<>(loadouts);
-	private final VBox buttonsPanel = new VBox(2);
+	private final VBox buttonsPanel = new VBox(10);
 	private final Label challengingLabel = new Label();
 	private final Button cancelButton = new Button("Cancel");
-	private final Button doneButton = new Button("Done");
+	private final Button doneButton = new Button("Challenge!");
 
 	private final CharacterSelector characterSelector = new CharacterSelector();
 
@@ -96,18 +97,28 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		cancelButton.setFocusTraversable(false);
 		doneButton.setFocusTraversable(false);
 
-		doneButton.setDisable(true);
+		setDoneButtonState();
 
-		buttonsPanel.getStyleClass().add("panel");
+		buttonsPanel.getStyleClass().addAll("panel", "padded-panel");
+		challengingLabel.getStyleClass().add("character-indicator-panel-title");
+		doneButton.getStyleClass().addAll("gui-button", "gui-green-button");
+		cancelButton.getStyleClass().add("gui-button");
 		doneButton.setMaxWidth(Double.MAX_VALUE);
 		cancelButton.setMaxWidth(Double.MAX_VALUE);
 		buttonsPanel.setFillWidth(true);
-		challengingLabel.setText("Challenging:\n" + otherPlayerName);
-		buttonsPanel.setMaxWidth(260);
-		buttonsPanel.setMinWidth(260);
+		challengingLabel.setText("Challenging: " + otherPlayerName);
+		buttonsPanel.setMaxWidth(220);
+		buttonsPanel.setMinWidth(220);
 
 		buttonsPanel.getChildren().addAll(
 			challengingLabel, cancelButton, doneButton);
+
+		loadout.getStyleClass().add("gui-combo");
+		loadout.setPromptText("Choose loadout");
+
+		loadout.setTooltip(new Tooltip("Click here to choose your loadout"));
+		cancelButton.setTooltip(new Tooltip(
+			"Cancel this challenge and return to the lobby"));
 
 		AnchorPane.setTopAnchor(loadout, 0d);
 		AnchorPane.setLeftAnchor(loadout, 0d);
@@ -120,21 +131,22 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		AnchorPane.setTopAnchor(buttonsPanel, 0d);
 		AnchorPane.setRightAnchor(buttonsPanel, 0d);
 
-		AnchorPane.setBottomAnchor(characterInfoLeft, 10d);
-		AnchorPane.setLeftAnchor(characterInfoLeft, 10d);
+		AnchorPane.setBottomAnchor(characterInfoLeft, 0d);
+		AnchorPane.setLeftAnchor(characterInfoLeft, 0d);
 
-		AnchorPane.setBottomAnchor(characterInfoRight, 10d);
-		AnchorPane.setRightAnchor(characterInfoRight, 10d);
+		AnchorPane.setBottomAnchor(characterInfoRight, 0d);
+		AnchorPane.setRightAnchor(characterInfoRight, 0d);
 
 		final StackPane characterSelectorWrapper =
 			new StackPane(characterSelector);
-		AnchorPane.setBottomAnchor(characterSelectorWrapper, 10d);
+		AnchorPane.setBottomAnchor(characterSelectorWrapper, 0d);
 		AnchorPane.setLeftAnchor(characterSelectorWrapper, 0d);
 		AnchorPane.setRightAnchor(characterSelectorWrapper, 0d);
 
 		guiRoot.getChildren().addAll(
+			characterSelectorWrapper,
 			characterInfoLeft, characterInfoRight,
-			characterSelectorWrapper, stageWrapper, loadout, buttonsPanel);
+			stageWrapper, loadout, buttonsPanel);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
@@ -210,23 +222,53 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		});
 	}
 
+	private void setDoneButtonState() {
+		final String s = stage.getSelectionModel().getSelectedItem();
+		final Loadout l = loadout.getSelectionModel().getSelectedItem();
+
+		final boolean disable = s == null || l == null ||
+			characterPositions.size() != l.characters.size() ;
+
+		doneButton.setDisable(disable);
+		doneButton.setTooltip(new Tooltip(disable?
+			"Place all your characters on the map to start the challenge":
+			"Click here to challenge " + otherPlayerName + " to battle"));
+	}
+
 	private void setLoadout(Loadout l) {
 		if (l != null && l.isLegitimate()) {
 			characterSelector.setCharacters(l.characters);
+
+			for (MapPoint p : characterPositions.values())
+				currentStage.clearTileOfSprites(p);
+
 			characterInfoLeft.getChildren().clear();
 			characterInfoRight.getChildren().clear();
 
+			characterPositions.clear();
+			characterByPosition.clear();
+
 			for (int i = 0; i < l.characters.size(); i++) {
+				final CharacterProfile profile = l.characters.get(i);
 				final SmallCharacterInfoPanel panel =
-					new SmallCharacterInfoPanel(l.characters.get(i));
+					new SmallCharacterInfoPanel(profile);
+				panel.setOnMouseClicked(event ->
+					characterSelector.setSelectedCharacter(Optional.of(profile)));
+
 				if (i < 2) characterInfoLeft.getChildren().add(panel);
 				else characterInfoRight.getChildren().add(panel);
 			}
+
 		}
+
+		setDoneButtonState();
 	}
 
 	private void setStage(String s) {
 		if (s != null) {
+			characterPositions.clear();
+			characterByPosition.clear();
+
 			this.currentStage = gameData.getStage(s);
 			startPosChooser.setStage(currentStage);
 			final Collection<MapPoint> tiles = player == Player.PLAYER_A?
@@ -237,7 +279,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			}
 			startPosChooser.setSelectable(tiles);
 			startPosChooser.setHighlight(tiles, 0);
+
 		}
+
+		setDoneButtonState();
 	}
 
 	private void placeCharacter(MapPoint p) {
@@ -275,6 +320,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 					l == null || characterPositions.size() != l.characters.size());
 			}
 		});
+
+		setDoneButtonState();
 	}
 }
 

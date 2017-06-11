@@ -18,6 +18,14 @@
 	-fx-shadow-highlight-color:transparent;
 }
 
+.gui-green-button {
+	-fx-background-image:url(/gui_assets/mp.png);
+}
+
+.gui-green-button:disabled {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+}
+
 .gui-img-button {
 	-fx-background-image:url(/gui_assets/button_tex.png);
 	-fx-background-repeat:repeat;
@@ -70,6 +78,14 @@
 
 .small-character-info-panel Label {
 	-fx-padding:4px 10px 0px 10px;
+}
+
+.small-character-info-panel {
+	-fx-padding:6px 0px 6px 0px;
+}
+
+.padded-panel {
+	-fx-padding:10px;
 }
 
 .gui-textfield {
@@ -137,10 +153,6 @@
 	-fx-text-fill:white;
 	-fx-background-color:transparent;
 	-fx-border-style:none;
-}
-
-.description-panel {
-	-fx-padding:10px;
 }
 
 #add-ability-button {
@@ -213,8 +225,21 @@
 	-fx-text-fill:white;
 }
 
-#basic-ability .arrow {
+.gui-combo .label {
+	-fx-background-color:transparent;
+	-fx-padding:10px;
+	-fx-text-fill:white;
+}
+
+.gui-combo .arrow {
 	visibility:hidden;
+}
+
+.gui-combo .arrow-button {
+	-fx-background-image:url(/gui_assets/arrow_down.png);
+	-fx-background-repeat:no-repeat;
+	-fx-background-size:auto auto;
+	-fx-background-position:center center;
 }
 
 #basic-ability .arrow-button {

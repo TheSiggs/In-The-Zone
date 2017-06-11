@@ -22,6 +22,7 @@ import java.util.UUID;
 public class Client {
 	public static final int MAX_CHALLENGES = 5;
 	public static final long DISCONNECTION_TIMEOUT_MILLIS = 30 * 1000;
+	public static final int MAX_PLAYERNAME_LENGTH = 32;
 
 	private ClientState state = ClientState.HANDSHAKE;
 	private SocketChannel connection;
@@ -47,13 +48,13 @@ public class Client {
 	private final UUID sessionKey = UUID.randomUUID();
 
 	public Client(
-		String serverName,
-		SocketChannel connection,
-		Selector sel,
-		Map<String, Client> namedClients,
-		Collection<Client> pendingClients,
-		Map<UUID, Client> sessions,
-		GameDataFactory dataFactory
+		final String serverName,
+		final SocketChannel connection,
+		final Selector sel,
+		final Map<String, Client> namedClients,
+		final Collection<Client> pendingClients,
+		final Map<UUID, Client> sessions,
+		final GameDataFactory dataFactory
 	) throws IOException {
 
 		this.namedClients = namedClients;
@@ -70,7 +71,7 @@ public class Client {
 			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey, serverName));
 	}
 
-	public void resetSelector(Selector sel) throws IOException {
+	public void resetSelector(final Selector sel) throws IOException {
 		channel.resetSelector(sel, this);
 	}
 
@@ -80,7 +81,7 @@ public class Client {
 	public void receive() {
 		if (!connection.isOpen()) return;
 		try {
-			List<Message> msgs = channel.doRead();
+			final List<Message> msgs = channel.doRead();
 			for (Message msg : msgs) doNextMessage(msg);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
@@ -112,7 +113,7 @@ public class Client {
 	 * @param intentional true if this is an intentional logoff, false if it is
 	 * caused by an IO error.
 	 * */
-	public void closeConnection(boolean intentional) {
+	public void closeConnection(final boolean intentional) {
 		System.err.println("Close connection " + name);
 		if (recursiveCloseConnection) return;
 
@@ -171,7 +172,7 @@ public class Client {
 	/**
 	 * Some other player leaves the lobby, i.e. disconnects from the server.
 	 * */
-	public void leftLobby(Client client) throws ProtocolException {
+	public void leftLobby(final Client client) throws ProtocolException {
 		if (!isConnected()) return;
 		channel.requestSend(Message.PLAYER_LEAVES(client.name.orElseThrow(() ->
 			new ProtocolException("Unnamed client attempted to leave lobby"))));
@@ -181,7 +182,7 @@ public class Client {
 	/**
 	 * Some other player enters the lobby.
 	 * */
-	public void enteredLobby(Client client) throws ProtocolException {
+	public void enteredLobby(final Client client) throws ProtocolException {
 		if (!isConnected()) return;
 		channel.requestSend(Message.PLAYER_JOINS(client.name.orElseThrow(() ->
 			new ProtocolException("Unnamed client attempted to enter lobby"))));
@@ -191,7 +192,7 @@ public class Client {
 	 * Some other client has entered a game (and so isn't available for
 	 * challenges).
 	 * */
-	public void enteredGame(Client client) throws ProtocolException {
+	public void enteredGame(final Client client) throws ProtocolException {
 		if (!isConnected()) return;
 		channel.requestSend(Message.PLAYER_STARTS_GAME(client.name.orElseThrow(() ->
 			new ProtocolException("Unnamed client attempted to start game"))));
@@ -200,7 +201,7 @@ public class Client {
 	/**
 	 * Begin a game with another client.
 	 * */
-	public void startGameWith(Client client) {
+	public void startGameWith(final Client client) {
 		messages.clear();
 		state = ClientState.GAME;
 		challenges.remove(client);
@@ -210,14 +211,14 @@ public class Client {
 	/**
 	 * A challenge that this client made is rejected.
 	 * */
-	public void challengeRejected(Client client) {
+	public void challengeRejected(final Client client) {
 		challenged.remove(client);
 	}
 
 	/**
 	 * @param client The client issuing the challenge
 	 * */
-	public void challenge(Client client) {
+	public void challenge(final Client client) {
 		challenges.add(client);
 	}
 
@@ -226,7 +227,7 @@ public class Client {
 	/**
 	 * Forward a message on to this client.
 	 * */
-	public void forwardMessage(Message msg) throws ProtocolException {
+	public void forwardMessage(final Message msg) throws ProtocolException {
 		msg.setSequenceNumber(seq++);
 		messages.add(msg);
 		if (messages.size() > Protocol.MAX_GAME_MESSAGES)
@@ -238,7 +239,7 @@ public class Client {
 	/**
 	 * Replay all messages that came after the provided sequence number.
 	 * */
-	public void replayMessagesFrom(int lastSequenceNumber) {
+	public void replayMessagesFrom(final int lastSequenceNumber) {
 		for (Message m : messages) {
 			if (m.getSequenceNumber() > lastSequenceNumber) {
 				channel.requestSend(m);
@@ -297,7 +298,8 @@ public class Client {
 	/**
 	 * */
 	public void reconnect(
-		SocketChannel connection, MessageChannel channel, int lastSequenceNumber
+		final SocketChannel connection,
+		final MessageChannel channel, final int lastSequenceNumber
 	)
 		throws ProtocolException
 	{
@@ -318,7 +320,7 @@ public class Client {
 	/**
 	 * Process the next message, which may result in a state change.
 	 * */
-	private void doNextMessage(Message msg) throws ProtocolException {
+	private void doNextMessage(final Message msg) throws ProtocolException {
 		if (msg.kind == MessageKind.LOGOFF) {
 			closeConnection(true);
 			return;
@@ -329,7 +331,7 @@ public class Client {
 				if (msg.kind != MessageKind.C_VERSION)
 					throw new ProtocolException("Expected client version");
 				int v = msg.parseVersion();
-				UUID gv = msg.parseGameDataVersion();
+				final UUID gv = msg.parseGameDataVersion();
 				if (v != Protocol.PROTOCOL_VERSION)
 					throw new ProtocolException("Wrong protocol version");
 				if (gv.equals(dataFactory.getVersion())) {
@@ -341,10 +343,10 @@ public class Client {
 				break;
 
 			case NAMING:
-				String name = msg.parseName();
+				final String name = msg.parseName();
 				if (msg.kind == MessageKind.RECONNECT) {
-					UUID connectTo = msg.parseSessionKey();
-					Client old = sessions.get(connectTo);
+					final UUID connectTo = msg.parseSessionKey();
+					final Client old = sessions.get(connectTo);
 					if (old == null) {
 						channel.requestSend(Message.NOK("Cannot reconnect"));
 					} else {
@@ -364,6 +366,8 @@ public class Client {
 				} else if (msg.kind == MessageKind.REQUEST_NAME) {
 					if (namedClients.containsKey(name)) {
 						channel.requestSend(Message.NOK("That name is already in use"));
+					} else if (name.length() > MAX_PLAYERNAME_LENGTH) {
+						channel.requestSend(Message.NOK("That name is too long"));
 					} else {
 						this.name = Optional.of(name);
 						for (Client c : namedClients.values()) {
@@ -383,7 +387,7 @@ public class Client {
 			case LOBBY:
 				if (msg.kind == MessageKind.GAME_OVER) break;
 
-				Client client = namedClients.get(msg.parseName());
+				final Client client = namedClients.get(msg.parseName());
 				if (client == null) {
 					channel.requestSend(Message.NOK("No such player"));
 				} else {
@@ -400,7 +404,7 @@ public class Client {
 				break;
 
 			case GAME:
-				Client otherPlayer = inGameWith.orElseThrow(() ->
+				final Client otherPlayer = inGameWith.orElseThrow(() ->
 					new ProtocolException("In game state without a partner"));
 				if (msg.kind == MessageKind.COMMAND) {
 					otherPlayer.forwardMessage(msg);
@@ -428,7 +432,7 @@ public class Client {
 		}
 	}
 
-	private void doChallenge(Message msg, Client client)
+	private void doChallenge(final Message msg, final Client client)
 		throws ProtocolException
 	{
 		if (challenged.size() < MAX_CHALLENGES && client.name.isPresent()) {
@@ -458,7 +462,7 @@ public class Client {
 	/**
 	 * @param client The client to start the battle with
 	 * */
-	private void doAcceptChallenge(Message msg, Client client)
+	private void doAcceptChallenge(final Message msg, final Client client)
 		throws ProtocolException
 	{
 		System.err.println("challenges: " + challenges.toString() + "? " + client.toString());

@@ -287,7 +287,8 @@ public class CommandTests {
 		List<ExecutedCommand> rs = doCommands(b.getTurnStart(Player.PLAYER_B), b);
 
 		assertEquals(targetPos.add(new MapPoint(3, 0)), dan2.getPos());
-		assertEquals(6, dan2.getMP());
+		assertEquals(3, dan2.getMP());
+		assertEquals(6, dan2.getStats().mp);
 	}
 
 	@Test
@@ -441,12 +442,100 @@ public class CommandTests {
 
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
 		final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
-		System.err.println("Start commands: " + cmds);
 		assertFalse(cmds.isEmpty());
 		List<ExecutedCommand> rs = doCommands(cmds, b);
 
 		assertEquals(0, dan.getMP());
 		assertEquals(7, dan.getStats().mp);
+	}
+
+	@Test
+	public void fearSlowed() throws Exception {
+		StandardSprites stdSprites = bt.testData.getStandardSprites();
+		final Battle b = bt.simpleBattle();
+
+		final Character dan = b.battleState.getCharacterAt(bt.danPos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(dan);
+		assertNotNull(dan2);
+
+		final Ability zone1 = getAbility(b, bt.danPos, "slow_zone");
+		assertNotNull(zone1);
+
+		final MapPoint targetPos = new MapPoint(5, 5);
+		dan.teleport(targetPos, false);
+		dan2.teleport(targetPos.add(new MapPoint(3, 0)), false);
+
+		final List<MapPoint> zoneRange = new ArrayList<>();
+		zoneRange.add(new MapPoint(5, 5));
+		zoneRange.add(new MapPoint(5, 6));
+		zoneRange.add(new MapPoint (5, 4));
+		zoneRange.add(new MapPoint(4, 5));
+		zoneRange.add(new MapPoint (6, 5));
+
+		final Optional<Zone> z =
+			b.battleState.placeZone(new MapPoint(5, 5), zoneRange, zone1,
+				Optional.of(4), Optional.empty(), dan);
+
+		assertNotEquals(Optional.empty(), z);
+
+		final StatusEffect feared = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("feared 3"), 0, Optional.of(dan2));
+		dan.applyStatus(b, feared);
+
+		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+		final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
+		assertFalse(cmds.isEmpty());
+		List<ExecutedCommand> rs = doCommands(cmds, b);
+
+		assertEquals(targetPos, dan.getPos());
+		assertEquals(5, dan.getMP());
+		assertEquals(5, dan.getStats().mp);
+	}
+
+	@Test
+	public void fearedAccelerated() throws Exception {
+		StandardSprites stdSprites = bt.testData.getStandardSprites();
+		final Battle b = bt.simpleBattle();
+
+		final Character kieren = b.battleState.getCharacterAt(bt.kierenPos).get();
+		final Character dan2 = b.battleState.getCharacterAt(bt.dan2Pos).get();
+		assertNotNull(kieren);
+		assertNotNull(dan2);
+
+		final Ability zone1 = getAbility(b, bt.dan2Pos, "fast_zone");
+		assertNotNull(zone1);
+
+		final MapPoint targetPos = new MapPoint(5, 5);
+		kieren.teleport(targetPos, false);
+		dan2.teleport(targetPos.add(new MapPoint(3, 0)), false);
+
+		final List<MapPoint> zoneRange = new ArrayList<>();
+		zoneRange.add(new MapPoint(5, 5));
+		zoneRange.add(new MapPoint(5, 6));
+		zoneRange.add(new MapPoint (5, 4));
+		zoneRange.add(new MapPoint(4, 5));
+		zoneRange.add(new MapPoint (6, 5));
+
+		final Optional<Zone> z =
+			b.battleState.placeZone(new MapPoint(5, 5), zoneRange, zone1,
+				Optional.of(4), Optional.empty(), kieren);
+
+		assertNotEquals(Optional.empty(), z);
+
+		final StatusEffect feared = StatusEffectFactory.getEffect(
+			new StatusEffectInfo("feared 4"), 0, Optional.of(dan2));
+		kieren.applyStatus(b, feared);
+
+		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
+		final List<Command> cmds = b.getTurnStart(Player.PLAYER_A);
+		assertFalse(cmds.isEmpty());
+
+		final List<ExecutedCommand> rs = doCommands(cmds, b);
+
+		assertEquals(targetPos.subtract(new MapPoint(4, 0)), kieren.getPos());
+		assertEquals(0, kieren.getMP());
+		assertEquals(4, kieren.getStats().mp);
 	}
 }
 

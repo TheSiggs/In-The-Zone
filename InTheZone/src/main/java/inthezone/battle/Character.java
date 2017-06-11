@@ -9,6 +9,7 @@ import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.data.StatusEffectKind;
 import inthezone.battle.data.StatusEffectType;
 import inthezone.battle.status.Debilitated;
+import inthezone.battle.status.FearedStatusEffect;
 import inthezone.battle.status.Imprisoned;
 import inthezone.battle.status.PanickedStatusEffect;
 import inthezone.battle.status.Silenced;
@@ -154,6 +155,10 @@ public class Character extends Targetable {
 
 	public boolean isPanicked() {
 		return statusDebuff.map(s -> s instanceof PanickedStatusEffect).orElse(false);
+	}
+
+	public boolean isFeared() {
+		return statusDebuff.map(s -> s instanceof FearedStatusEffect).orElse(false);
 	}
 
 	public boolean isAbilityBlocked(Ability a) {

@@ -205,7 +205,9 @@ public class PullPush extends InstantEffect {
 				if (path.size() == 0) return new ArrayList<List<MapPoint>>(); else {
 					final Character agent =
 						battle.battleState.getCharacterAt(path.get(0)).orElse(null);
-					if (agent == null) return new ArrayList<List<MapPoint>>(); else {
+					if (agent == null || isFear && !agent.isFeared()) {
+						return new ArrayList<List<MapPoint>>();
+					}	else {
 						return battle.battleState.trigger.splitPath(agent, path);
 					}
 				}
@@ -225,7 +227,7 @@ public class PullPush extends InstantEffect {
 			// do the push/pull
 			if (!validPathSections.isEmpty()) {
 				final InstantEffect eff = new PullPush(
-					this.type, this.castFrom, validPathSections, false);
+					this.type, this.castFrom, validPathSections, true);
 				r.add(new ExecutedCommand(cmd.apply(eff), eff.apply(battle)));
 			}
 

@@ -1,29 +1,37 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Ability;
-import inthezone.battle.BattleOutcome;
-import inthezone.battle.Character;
-import inthezone.battle.data.AbilityDescription;
-import inthezone.battle.data.StandardSprites;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+
+import inthezone.battle.Ability;
+import inthezone.battle.BattleOutcome;
+import inthezone.battle.Character;
+import inthezone.battle.data.AbilityDescription;
+import inthezone.battle.data.StandardSprites;
+import inthezone.game.battle.TurnClock;
+
 public class HUD extends AnchorPane {
 	private final FlowPane characterInfoBoxes = new FlowPane();
 	private final Button endTurnButton = new Button("End turn");
 	private final Button resignButton = new Button("Resign");
+
+	private final VBox roundCounterAndClock = new VBox(10);
 	private final RoundCounter roundCounter = new RoundCounter();
+	private final TurnClock clock = new TurnClock(new Duration(2 * 60 * 1000));
+	final Tooltip clockTooltip = new Tooltip();
 
 	private final MultiTargetAssistant multiTargetAssistant;
 	private final MessageLine messageLine = new MessageLine();
@@ -55,14 +63,21 @@ public class HUD extends AnchorPane {
 
 		endTurnButton.setTooltip(new Tooltip("End your turn"));
 		resignButton.setTooltip(new Tooltip("Resign from the game"));
+		Tooltip.install(clock, clockTooltip);
 
 		pushItem = new CommandButton(sprites.pushIcon, "Push a character (1 AP)");
 		pushItem.setButtonAction(event -> view.usePush());
 		potionItem = new CommandButton(sprites.potionIcon, "Use a healing potion (1 AP)");
 		potionItem.setButtonAction(event -> view.useItem());
 
-		endTurnButton.setOnAction(event -> {view.sendEndTurn();});
-		resignButton.setOnAction(event -> view.sendResign());
+		endTurnButton.setOnAction(event -> {
+			clock.reset();
+			view.sendEndTurn();
+		});
+		resignButton.setOnAction(event -> {
+			clock.reset();
+			view.sendResign();
+		});
 
 		endTurnButton.getStyleClass().add("gui-button");
 		resignButton.getStyleClass().add("gui-button");
@@ -84,6 +99,10 @@ public class HUD extends AnchorPane {
 		actionButtons.getChildren().addAll(pushItem, potionItem);
 		actionButtons.setMaxHeight(actionButtons.getPrefHeight());
 
+		clock.setPrefWidth(100d);
+		clock.setPrefHeight(100d);
+		roundCounterAndClock.getChildren().addAll(roundCounter, clock);
+
 		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
 
@@ -93,8 +112,8 @@ public class HUD extends AnchorPane {
 		AnchorPane.setBottomAnchor(resignButton, 0d);
 		AnchorPane.setRightAnchor(resignButton, 0d);
 
-		AnchorPane.setTopAnchor(roundCounter, 0d);
-		AnchorPane.setRightAnchor(roundCounter, 0d);
+		AnchorPane.setTopAnchor(roundCounterAndClock, 0d);
+		AnchorPane.setRightAnchor(roundCounterAndClock, 0d);
 
 		AnchorPane.setBottomAnchor(actionButtons, 0d);
 		AnchorPane.setLeftAnchor(actionButtons, 0d);
@@ -106,12 +125,32 @@ public class HUD extends AnchorPane {
 
 		this.getChildren().addAll(
 			assistanceLine, characterInfoBoxes, actionButtons,
-			endTurnButton, resignButton, roundCounter
+			endTurnButton, resignButton, roundCounterAndClock
 		);
 	}
 
 	public void notifyRound() {
 		roundCounter.increment();
+		if (view.isMyTurn.get()) notifyTurn();
+		else notifyOtherTurn();
+	}
+
+	public void notifyTurn() {
+		clock.clockAnimator.setOnFinished(event -> view.sendEndTurn());
+		clockTooltip.textProperty().bind(
+			new SimpleStringProperty("You have")
+			.concat(clock.remainingTime).concat("s remaining to complete your turn"));
+		clock.reset();
+		clock.clockAnimator.play();
+	}
+
+	public void notifyOtherTurn() {
+		clock.clockAnimator.setOnFinished(null);
+		clockTooltip.textProperty().bind(
+			new SimpleStringProperty("Your turn in ")
+			.concat(clock.remainingTime).concat("s"));
+		clock.reset();
+		clock.clockAnimator.play();
 	}
 
 	public void notifyFatigue() {
@@ -136,17 +175,20 @@ public class HUD extends AnchorPane {
 	 * @param resigned True if this player resigned.
 	 * */
 	public void doEndMode(BattleOutcome outcome) {
+		clock.reset();
 		disableUI.set(true);
 		assistanceLine.getChildren().add(new EndManager(view, outcome));
 	}
 
 	public void doReconnectMode(boolean thisClientReconnecting) {
+		clock.clockAnimator.pause();
 		disableUI.set(true);
 		assistanceLine.getChildren().add(new ReconnectManager(thisClientReconnecting));
 	}
 
 	public void endReconnectMode() {
 		disableUI.set(false);
+		clock.clockAnimator.play();
 		assistanceLine.getChildren().clear();
 	}
 

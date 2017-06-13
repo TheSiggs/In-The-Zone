@@ -407,3 +407,20 @@
 	-fx-shape:null;
 }
 
+.turn-clock-face {
+	-fx-fill:image-pattern("/gui_assets/big_mixed_texture.png");
+	-fx-stroke:black;
+	-fx-stroke-width:2px;
+	-fx-stroke-type:inside;
+}
+.turn-clock-hand {
+	-fx-stroke:white;
+	-fx-stroke-width:4px;
+	-fx-stroke-line-cap:round;
+}
+.turn-clock-arc {
+	-fx-fill:transparent;
+	-fx-stroke:white;
+	-fx-stroke-width:2px;
+}
+

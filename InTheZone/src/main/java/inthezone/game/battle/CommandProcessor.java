@@ -121,7 +121,6 @@ public class CommandProcessor {
 
 		} else if (ec.cmd instanceof StartTurnCommand) {
 			StartTurnCommand cmd = (StartTurnCommand) ec.cmd;
-			view.hud.notifyRound();
 
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(true);
@@ -133,6 +132,8 @@ public class CommandProcessor {
 				view.hud.writeMessage(view.otherPlayerName + "'s turn");
 				registeredAnimations = false;
 			}
+
+			view.hud.notifyRound();
 
 		} else if (ec.cmd instanceof UseAbilityCommand && view.isMyTurn.getValue()) {
 			registeredAnimations = false;

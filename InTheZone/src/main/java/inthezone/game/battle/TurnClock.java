@@ -62,13 +62,13 @@ public class TurnClock extends Pane {
 		setAngle(0);
 	}
 
-	private String formatTime() {
-		final long s = (long) Math.floor(
-			duration.toSeconds() * ((360d - angle) / 360d));
+	private String formatTime(final long s) {
 		String us = "" + s % 60;
 		while (us.length() < 2) us = "0" + us;
 		return "" + (s / 60) + ":" + us;
 	}
+
+	private long lastS = -1;
 
 	private void setAngle(final double angle) {
 		final double w = this.getWidth();
@@ -83,7 +83,13 @@ public class TurnClock extends Pane {
 		hand.setEndX(hand.getStartX() + (Math.cos(handAngleR) * r * HAND_LENGTH));
 		hand.setEndY(hand.getStartY() + (-Math.sin(handAngleR) * r * HAND_LENGTH));
 
-		remainingTime.set(formatTime());
+		final long s = (long) Math.floor(
+			duration.toSeconds() * ((360d - angle) / 360d));
+
+		if (s != lastS) {
+			lastS = s;
+			remainingTime.set(formatTime(s));
+		}
 	}
 
 	private void resizeGraphics() {

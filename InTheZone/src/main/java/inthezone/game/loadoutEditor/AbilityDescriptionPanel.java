@@ -18,7 +18,7 @@ public class AbilityDescriptionPanel extends VBox {
 	public AbilityDescriptionPanel() {
 		super(10);
 
-		this.getStyleClass().addAll("panel", "description-panel");
+		this.getStyleClass().addAll("panel", "padded-panel");
 		abilityName.getStyleClass().add("ability-name");
 		manaAbilityName.getStyleClass().add("ability-name");
 		manaUpgrade.getStyleClass().add("mana-upgrade");

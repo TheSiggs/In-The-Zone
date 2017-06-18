@@ -1,6 +1,7 @@
 package inthezone.game.battle;
 
 import javafx.animation.Animation;
+import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -46,6 +47,7 @@ public class TurnClock extends Pane {
 		clockAnimator = new Transition() {
 			{
 				setCycleDuration(duration);
+				setInterpolator(Interpolator.LINEAR);
 			}
 
 			@Override protected void interpolate(final double f) {

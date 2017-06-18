@@ -3,17 +3,26 @@ package inthezone.game.battle;
 import inthezone.battle.Ability;
 import inthezone.battle.Casting;
 import inthezone.battle.Character;
+import inthezone.battle.Targetable;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.Targetable;
 import inthezone.comptroller.InfoAffected;
 import inthezone.comptroller.InfoAttackArea;
 import inthezone.comptroller.InfoTargeting;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -21,16 +30,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.StageStyle;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
@@ -60,7 +59,9 @@ public class ModeTarget extends Mode {
 	private final Collection<Casting> thisRoundCastings = new ArrayList<>();
 
 	public ModeTarget(
-		BattleView view, Character selectedCharacter, Ability ability
+		final BattleView view,
+		final Character selectedCharacter,
+		final Ability ability
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
@@ -72,17 +73,17 @@ public class ModeTarget extends Mode {
 	}
 
 	private ModeTarget(
-		BattleView view,
-		Character selectedCharacter,
-		Queue<MapPoint> recastFrom,
-		Ability targetingAbility,
-		MapPoint castFrom,
-		boolean canCancel,
-		int recursionLevel,
-		int remainingTargets,
-		Set<MapPoint> retargetedFrom,
-		Collection<Casting> allCastings,
-		Collection<Casting> thisRoundCastings
+		final BattleView view,
+		final Character selectedCharacter,
+		final Queue<MapPoint> recastFrom,
+		final Ability targetingAbility,
+		final MapPoint castFrom,
+		final boolean canCancel,
+		final int recursionLevel,
+		final int remainingTargets,
+		final Set<MapPoint> retargetedFrom,
+		final Collection<Casting> allCastings,
+		final Collection<Casting> thisRoundCastings
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
@@ -98,8 +99,10 @@ public class ModeTarget extends Mode {
 		this.thisRoundCastings.addAll(thisRoundCastings);
 	}
 
-	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
-		ModeTarget r = new ModeTarget(
+	@Override public Mode updateSelectedCharacter(
+		final Character selectedCharacter
+	) {
+		final ModeTarget r = new ModeTarget(
 			view, selectedCharacter, recastFrom,
 			targetingAbility, castFrom, canCancel, recursionLevel,
 			remainingTargets, retargetedFrom,
@@ -107,7 +110,9 @@ public class ModeTarget extends Mode {
 		return r;
 	}
 
-	@Override public Mode retarget(Map<MapPoint, MapPoint> retargeting) {
+	@Override public Mode retarget(
+		final Map<MapPoint, MapPoint> retargeting
+	) {
 		castFrom = retargeting.getOrDefault(castFrom, castFrom);
 		retargetedFrom = retargetedFrom.stream()
 			.map(x -> retargeting.getOrDefault(x, x))
@@ -174,7 +179,9 @@ public class ModeTarget extends Mode {
 		return this;
 	}
 
-	private static boolean isCancellableEffect(Optional<InstantEffectInfo> e) {
+	private static boolean isCancellableEffect(
+		final Optional<InstantEffectInfo> e
+	) {
 		return e.map(eff ->
 			eff.type == InstantEffectType.TELEPORT ||
 			eff.type == InstantEffectType.MOVE).orElse(false);
@@ -184,7 +191,6 @@ public class ModeTarget extends Mode {
 	 * Apply the ability instantly, offering the user to cancel if possible.
 	 * */
 	private Mode applyInstantly() {
-
 		if (this.canCancel() &&
 			!isCancellableEffect(targetingAbility.info.instantBefore)
 		) {
@@ -227,7 +233,7 @@ public class ModeTarget extends Mode {
 		return applyAbility();
 	}
 
-	private Mode addTarget(MapPoint p) {
+	private Mode addTarget(final MapPoint p) {
 		thisRoundCastings.add(new Casting(castFrom, p));
 		remainingTargets -= 1;
 		if (remainingTargets <= 0) {
@@ -295,7 +301,7 @@ public class ModeTarget extends Mode {
 
 		retargetedFrom.addAll(recastFrom);
 
-		Optional<Ability> nextAbility = targetingAbility.getSubsequent();
+		final Optional<Ability> nextAbility = targetingAbility.getSubsequent();
 
 		if (!recastFrom.isEmpty()) {
 			castFrom = recastFrom.poll();
@@ -324,8 +330,10 @@ public class ModeTarget extends Mode {
 		}
 	}
 
-	private void queueRecastPoints(Collection<Targetable> affected) {
-		Collection<MapPoint> affected1 = affected.stream()
+	private void queueRecastPoints(
+		final Collection<Targetable> affected
+	) {
+		final Collection<MapPoint> affected1 = affected.stream()
 			.filter(t -> t instanceof Character &&
 				!retargetedFrom.contains(t.getPos()))
 			.map(t -> t.getPos())
@@ -333,7 +341,7 @@ public class ModeTarget extends Mode {
 		recastFrom.addAll(affected1);
 	}
 
-	@Override public void handleSelection(MapPoint p) {
+	@Override public void handleSelection(final MapPoint p) {
 		if (view.isSelectable(p)) {
 			view.setMode(addTarget(p));
 		} else if (canCancel) {
@@ -341,8 +349,8 @@ public class ModeTarget extends Mode {
 		}
 	}
 
-	@Override public void handleMouseOver(MapPoint p) {
-		Stage stage = view.getStage();
+	@Override public void handleMouseOver(final MapPoint p) {
+		final Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
 		if (!stage.isHighlighted(p)) return;
 

@@ -23,8 +23,11 @@ public class ModeMoveEffect extends ModeMove {
 	private Character moving = null;
 
 	public ModeMoveEffect(
-		BattleView view, ModeAnimating lastMode,
-		Collection<Character> moveQueue, int moveRange, boolean canCancel
+		final BattleView view,
+		final ModeAnimating lastMode,
+		final Collection<Character> moveQueue,
+		final int moveRange,
+		final boolean canCancel
 	) {
 		super(view, null);
 		this.lastMode = lastMode;

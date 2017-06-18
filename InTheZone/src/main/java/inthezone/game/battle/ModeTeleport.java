@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
@@ -21,8 +20,11 @@ public class ModeTeleport extends Mode {
 	private final boolean canCancel;
 
 	public ModeTeleport(
-		BattleView view, ModeAnimating lastMode,
-		Collection<Character> teleportQueue, int teleportRange, boolean canCancel
+		final BattleView view,
+		final ModeAnimating lastMode,
+		final Collection<Character> teleportQueue,
+		final int teleportRange,
+		final boolean canCancel
 	) {
 		super(view);
 		this.lastMode = lastMode;
@@ -31,14 +33,16 @@ public class ModeTeleport extends Mode {
 		this.canCancel = canCancel;
 	}
 
-	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+	@Override public Mode updateSelectedCharacter(
+		final Character selectedCharacter
+	) {
 		return new ModeTeleport(view,
 			lastMode.updateSelectedCharacter(selectedCharacter),
 			teleportQueue, teleportRange, canCancel);
 	}
 
 	@Override public Mode setupMode() {
-		Character teleporting = teleportQueue.peek();
+		final Character teleporting = teleportQueue.peek();
 		if (teleporting == null) {
 			view.battle.completeEffect(teleportDestinations);
 			return lastMode;
@@ -59,7 +63,7 @@ public class ModeTeleport extends Mode {
 
 	@Override public boolean canCancel() {return canCancel;}
 
-	@Override public void handleSelection(MapPoint p) {
+	@Override public void handleSelection(final MapPoint p) {
 		if (view.isSelectable(p)) {
 			teleportDestinations.add(p);
 			teleportQueue.remove();
@@ -67,8 +71,8 @@ public class ModeTeleport extends Mode {
 		}
 	}
 
-	@Override public void handleMouseOver(MapPoint p) {
-		Stage stage = view.getStage();
+	@Override public void handleMouseOver(final MapPoint p) {
+		final Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_PATH);
 		if (view.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_PATH);
 	}

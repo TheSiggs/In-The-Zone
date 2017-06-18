@@ -271,7 +271,6 @@ public class BattleView
 	 * Send the end turn message.
 	 * */
 	public void sendEndTurn() {
-		battle.cancel();
 		selectedCharacter = Optional.empty();
 		isCharacterSelected.setValue(false);
 		hud.selectCharacter(Optional.empty());

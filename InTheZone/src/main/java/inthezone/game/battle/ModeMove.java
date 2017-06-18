@@ -16,48 +16,56 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 public class ModeMove extends Mode {
 	protected final Character selectedCharacter;
 
-	public ModeMove(BattleView view, Character selectedCharacter) {
+	public ModeMove(
+		final BattleView view, final Character selectedCharacter
+	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
-	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+	@Override public Mode updateSelectedCharacter(
+		final Character selectedCharacter
+	) {
 		return new ModeMove(view, selectedCharacter);
 	}
 
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
 
-		getFutureWithRetry(view.battle.requestInfo(new InfoMoveRange(selectedCharacter)))
-			.ifPresent(mr -> {
-				mr.stream().forEach(p -> view.getStage().setHighlight(p, HIGHLIGHT_MOVE));
-				view.setSelectable(mr);
-			});
+		getFutureWithRetry(view.battle.requestInfo(
+			new InfoMoveRange(selectedCharacter)))
+				.ifPresent(mr -> {
+					mr.stream().forEach(p ->
+						view.getStage().setHighlight(p, HIGHLIGHT_MOVE));
+					view.setSelectable(mr);
+				});
 
 		return this;
 	}
 
-	@Override public void handleSelection(MapPoint p) {
-		Optional<Character> oc = view.sprites.getCharacterAt(p);
+	@Override public void handleSelection(final MapPoint p) {
+		final Optional<Character> oc = view.sprites.getCharacterAt(p);
 
 		if (oc.isPresent() && oc.get().player == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));
 		} else if (view.isSelectable(p)) {
 			view.battle.requestCommand(
-				new MoveCommandRequest(selectedCharacter.getPos(), p, selectedCharacter.player));
+				new MoveCommandRequest(
+					selectedCharacter.getPos(), p, selectedCharacter.player));
 			view.setMode(new ModeAnimating(view));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}
 	}
 
-	@Override public void handleMouseOver(MapPoint p) {
-		Stage stage = view.getStage();
+	@Override public void handleMouseOver(final MapPoint p) {
+		final Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_PATH);
 
-		getFutureWithRetry(view.battle.requestInfo(new InfoPath(selectedCharacter, p)))
-			.ifPresent(path -> path.stream()
-				.forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH)));
+		getFutureWithRetry(view.battle.requestInfo(
+			new InfoPath(selectedCharacter, p)))
+				.ifPresent(path -> path.stream()
+					.forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH)));
 	}
 
 	@Override public void handleMouseOut() {

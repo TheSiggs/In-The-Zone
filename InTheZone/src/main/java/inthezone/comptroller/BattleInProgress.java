@@ -3,10 +3,13 @@ package inthezone.comptroller;
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleOutcome;
+import inthezone.battle.Targetable;
+import inthezone.battle.Zone;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.CommandRequest;
 import inthezone.battle.commands.EndTurnCommand;
+import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
 import inthezone.battle.commands.ResignCommandRequest;
@@ -14,20 +17,18 @@ import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartTurnCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
-import inthezone.battle.Targetable;
-import inthezone.battle.Zone;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
-import javafx.application.Platform;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import javafx.application.Platform;
 
 public class BattleInProgress implements Runnable {
 	private final Battle battle;
@@ -43,10 +44,12 @@ public class BattleInProgress implements Runnable {
 	private final Queue<Command> commandQueue = new LinkedList<>();
 	
 	public BattleInProgress(
-		StartBattleCommand cmd, Player thisPlayer,
-		CommandGenerator otherPlayer,
-		Network network,
-		GameDataFactory gameData, BattleListener listener
+		final StartBattleCommand cmd,
+		final Player thisPlayer,
+		final CommandGenerator otherPlayer,
+		final Network network,
+		final GameDataFactory gameData,
+		final BattleListener listener
 	) throws CorruptDataException {
 		this(
 			cmd.doCmd(gameData),
@@ -61,10 +64,12 @@ public class BattleInProgress implements Runnable {
 	 * @param network may be null if we are not in network mode
 	 * */
 	public BattleInProgress(
-		Battle battle, Player thisPlayer,
-		CommandGenerator otherPlayer,
-		Network network,
-		boolean thisPlayerGoesFirst, BattleListener listener
+		final Battle battle,
+		final Player thisPlayer,
+		final CommandGenerator otherPlayer,
+		final Network network,
+		final boolean thisPlayerGoesFirst,
+		final BattleListener listener
 	) {
 		this.battle = battle;
 		this.thisPlayer = thisPlayer;
@@ -76,7 +81,7 @@ public class BattleInProgress implements Runnable {
 
 	private volatile boolean accepting = true;
 	public void shutdownActionQueue() {
-		Collection<Action> actions = new ArrayList<>();
+		final Collection<Action> actions = new ArrayList<>();
 		synchronized (this) {
 			this.accepting = false;
 			commandRequests.drainTo(actions);
@@ -141,21 +146,26 @@ public class BattleInProgress implements Runnable {
 
 		while(true) {
 			try {
-				Action a = commandRequests.take();
+				final Action a = commandRequests.take();
 				a.completeAction(battle);
-				Optional<CommandRequest> crq = a.getCommandRequest();
+				final Optional<CommandRequest> crq = a.getCommandRequest();
 
 				// handle a command request
 				if (crq.isPresent()) {
 					// If we're resigning, cancel any incomplete commands first.
-					if (crq.get() instanceof ResignCommandRequest) commandQueue.clear(); 
+					if (
+						crq.get() instanceof ResignCommandRequest ||
+						crq.get() instanceof EndTurnCommandRequest
+					) {
+						commandQueue.clear(); 
+					}
 					commandQueue.addAll(crq.get().makeCommand(battle.battleState));
 					if (doCommands()) return;
 				}
 
 				// handle command completion
 				if (a instanceof ActionComplete) {
-					Command cmd = commandQueue.peek();
+					final Command cmd = commandQueue.peek();
 					if (cmd == null)
 						throw new CommandException("No command to complete");
 
@@ -171,7 +181,7 @@ public class BattleInProgress implements Runnable {
 
 				// handle command cancellation
 				if (a instanceof ActionCancel) {
-					Command cmd = commandQueue.peek();
+					final Command cmd = commandQueue.peek();
 					if (cmd != null) {
 						if (!cmd.canCancel())
 							throw new CommandException("Cannot cancel command");
@@ -261,7 +271,7 @@ public class BattleInProgress implements Runnable {
 	/**
 	 * Put an action on the queue, retrying if interrupted
 	 * */
-	private synchronized void queueActionWithRetry(Action a) {
+	private synchronized void queueActionWithRetry(final Action a) {
 		if (!accepting) throw new RuntimeException(
 			"Attempted to enqueue a action, but the queue is not accepting new actions");
 
@@ -279,7 +289,7 @@ public class BattleInProgress implements Runnable {
 	/**
 	 * Send a command request.
 	 * */
-	public synchronized void requestCommand(CommandRequest cmd) {
+	public synchronized void requestCommand(final CommandRequest cmd) {
 		if (!accepting) return;
 		queueActionWithRetry(new Action(Optional.of(cmd)));
 	}
@@ -287,7 +297,7 @@ public class BattleInProgress implements Runnable {
 	/**
 	 * Send a request for information, getting the result as a future.
 	 * */
-	public synchronized <T> Future<T> requestInfo(InfoRequest<T> r) {
+	public synchronized <T> Future<T> requestInfo(final InfoRequest<T> r) {
 		if (!accepting) r.cancel(); else {
 			queueActionWithRetry(r);
 		}
@@ -298,7 +308,7 @@ public class BattleInProgress implements Runnable {
 	 * Complete a command (e.g. a teleport command that requires extra targeting
 	 * information)
 	 * */
-	public synchronized void completeEffect(List<MapPoint> completion) {
+	public synchronized void completeEffect(final List<MapPoint> completion) {
 		if (accepting) {
 			queueActionWithRetry(new ActionComplete(battle.battleState, completion));
 		}

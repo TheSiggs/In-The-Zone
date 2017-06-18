@@ -1,15 +1,10 @@
 package inthezone.battle;
 
-import inthezone.battle.commands.AbilityAgentType;
-import inthezone.battle.data.AbilityInfo;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.data.Player;
-import inthezone.battle.data.StandardSprites;
 import isogame.engine.MapPoint;
 import isogame.engine.SlopeType;
 import isogame.engine.Stage;
 import isogame.engine.Tile;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,8 +14,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import nz.dcoder.ai.astar.AStarSearch;
+
+import inthezone.battle.commands.AbilityAgentType;
+import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.data.Player;
+import inthezone.battle.data.StandardSprites;
 
 /**
  * This class keeps track of the state of the battle.  It does not know how to
@@ -43,7 +45,10 @@ public class BattleState {
 
 	private final Set<MapPoint> terrainObstacles;
 
-	public BattleState(Stage terrain, Collection<Character> characters) {
+	public BattleState(
+		final Stage terrain,
+		final Collection<Character> characters
+	) {
 		this.trigger = new Trigger(this);
 		this.terrain = terrain;
 		this.characters.addAll(characters);
@@ -81,7 +86,7 @@ public class BattleState {
 	/**
 	 * Determine if a terrain tile is a mana zone
 	 * */
-	public boolean hasMana(MapPoint p) {
+	public boolean hasMana(final MapPoint p) {
 		return terrain.terrain.hasTile(p) &&
 			terrain.terrain.getTile(p).isManaZone;
 	}
@@ -90,9 +95,11 @@ public class BattleState {
 	 * Place a new obstacle.
 	 * */
 	public RoadBlock placeObstacle(
-		MapPoint p, Optional<AbilityInfo> a, StandardSprites sprites
+		final MapPoint p,
+		final Optional<AbilityInfo> a,
+		final StandardSprites sprites
 	) {
-		RoadBlock r = new RoadBlock(p, a, sprites);
+		final RoadBlock r = new RoadBlock(p, a, sprites);
 		targetable.add(r);
 		return r;
 	}
@@ -101,9 +108,12 @@ public class BattleState {
 	 * Place a new trap
 	 * */
 	public Trap placeTrap(
-		MapPoint p, Ability a, Character agent, StandardSprites sprites
+		final MapPoint p,
+		final Ability a,
+		final Character agent,
+		final StandardSprites sprites
 	) {
-		Trap t = new Trap(p, agent.hasMana(), a, agent, sprites);
+		final Trap t = new Trap(p, agent.hasMana(), a, agent, sprites);
 		targetable.add(t);
 		return t;
 	}
@@ -112,14 +122,18 @@ public class BattleState {
 	 * Place a new zone
 	 * */
 	public Optional<Zone> placeZone(
-		MapPoint centre, Collection<MapPoint> range,
-		Ability a, Optional<Integer> turns, Optional<RoadBlock> bind,
-		Character agent
+		final MapPoint centre,
+		final Collection<MapPoint> range,
+		final Ability a,
+		final Optional<Integer> turns,
+		final Optional<RoadBlock> bind,
+		final Character agent
 	) {
 		// make sure that this zone doesn't overlap an existing zone
-		if (range.stream().anyMatch(p -> zoneMap.containsKey(p))) return Optional.empty();
+		if (range.stream().anyMatch(p -> zoneMap.containsKey(p)))
+			return Optional.empty();
 
-		Zone z = new Zone(centre, range, turns, agent.hasMana(), a, agent);
+		final Zone z = new Zone(centre, range, turns, agent.hasMana(), a, agent);
 		zones.add(z);
 		for (MapPoint p : range) {
 			zoneMap.put(p, z);
@@ -138,7 +152,7 @@ public class BattleState {
 	}
 
 	public List<Zone> removeExpiredZones() {
-		List<Zone> r = new ArrayList<>();
+		final List<Zone> r = new ArrayList<>();
 
 		for (Zone z : zones) {
 			if (z.reap()) {
@@ -154,7 +168,7 @@ public class BattleState {
 	/**
 	 * Remove a targetable object.
 	 * */
-	public void removeObstacle(Targetable t) {
+	public void removeObstacle(final Targetable t) {
 		targetable.remove(t);
 	}
 
@@ -164,7 +178,7 @@ public class BattleState {
 	/**
 	 * Register a resignation.
 	 * */
-	public void resign(Player player, boolean logoff) {
+	public void resign(final Player player, final boolean logoff) {
 		this.resignedPlayer = Optional.of(player);
 		this.logoff = logoff;
 	}
@@ -172,7 +186,7 @@ public class BattleState {
 	/**
 	 * Determine the outcome of the battle from the point of view of a player.
 	 * */
-	public Optional<BattleOutcome> getBattleOutcome(Player player) {
+	public Optional<BattleOutcome> getBattleOutcome(final Player player) {
 		if (resignedPlayer.isPresent()) {
 			if (resignedPlayer.get() == player) {
 				return Optional.of(BattleOutcome.RESIGN);
@@ -183,11 +197,11 @@ public class BattleState {
 			}
 		}
 
-		boolean playerDead = characters.stream()
+		final boolean playerDead = characters.stream()
 			.filter(c -> c.player == player)
 			.allMatch(c -> c.isDead());
 
-		boolean otherPlayerDead = characters.stream()
+		final boolean otherPlayerDead = characters.stream()
 			.filter(c -> c.player != player)
 			.allMatch(c -> c.isDead());
 
@@ -205,8 +219,8 @@ public class BattleState {
 	/**
 	 * Get targetable objects at a particular point (if there is one).
 	 * */
-	public List<? extends Targetable> getTargetableAt(MapPoint x) {
-		List<Targetable> r = targetable.stream()
+	public List<? extends Targetable> getTargetableAt(final MapPoint x) {
+		final List<Targetable> r = targetable.stream()
 			.filter(t -> t.getPos().equals(x)).collect(Collectors.toList());
 		if (zoneMap.containsKey(x)) r.add(zoneMap.get(x));
 		return r;
@@ -215,7 +229,7 @@ public class BattleState {
 	/**
 	 * Get the trap at a particular point (if there is one).
 	 * */
-	public Optional<Trap> getTrapAt(MapPoint x) {
+	public Optional<Trap> getTrapAt(final MapPoint x) {
 		return targetable.stream()
 			.filter(t -> t instanceof Trap && t.getPos().equals(x))
 			.findFirst().map(t -> (Trap) t);
@@ -224,7 +238,7 @@ public class BattleState {
 	/**
 	 * Get the zone at a particular point (if there is one).
 	 * */
-	public Optional<Zone> getZoneAt(MapPoint x) {
+	public Optional<Zone> getZoneAt(final MapPoint x) {
 		return Optional.ofNullable(zoneMap.get(x));
 	}
 
@@ -234,7 +248,7 @@ public class BattleState {
 	/**
 	 * Determine if there is a defusing zone at a particular point.
 	 * */
-	public boolean hasDefusingZone(MapPoint x) {
+	public boolean hasDefusingZone(final MapPoint x) {
 		return getZoneAt(x).map(z ->
 			z.ability.info.instantBefore.equals(defuseEffect) ||
 			z.ability.info.instantAfter.equals(defuseEffect)).orElse(false);
@@ -243,7 +257,10 @@ public class BattleState {
 	/**
 	 * Get the agent of an ability
 	 * */
-	public Optional<? extends Targetable> getAgentAt(MapPoint x, AbilityAgentType agentType) {
+	public Optional<? extends Targetable> getAgentAt(
+		final MapPoint x,
+		final AbilityAgentType agentType
+	) {
 		switch (agentType) {
 			case CHARACTER: return getCharacterAt(x);
 			case TRAP: return getTrapAt(x);
@@ -255,7 +272,7 @@ public class BattleState {
 	/**
 	 * Get the character at a particular point (if there is one).
 	 * */
-	public Optional<Character> getCharacterAt(MapPoint x) {
+	public Optional<Character> getCharacterAt(final MapPoint x) {
 		return characters.stream().filter(c -> c.getPos().equals(x)).findFirst();
 	}
 
@@ -272,16 +289,19 @@ public class BattleState {
 	 * @return The empty list if there is no valid path
 	 * */
 	public List<MapPoint> findValidPath(
-		MapPoint start, MapPoint target, Player player, int range
+		final MapPoint start,
+		final MapPoint target,
+		final Player player,
+		final int range
 	) {
-		List<MapPoint> path = findPath(start, target, player);
+		final List<MapPoint> path = findPath(start, target, player);
 		if (canMoveRange(range, path)) return path; else return new ArrayList<>();
 	}
 
 	/**
 	 * Get a valid prefix of a potentially invalid path.
 	 * */
-	public List<MapPoint> reduceToValidPath(List<MapPoint> path) {
+	public List<MapPoint> reduceToValidPath(final List<MapPoint> path) {
 		final List<MapPoint> r = new ArrayList<>();
 		r.addAll(path);
 
@@ -296,7 +316,7 @@ public class BattleState {
 	 * character to an unoccupied square and isn't longer than the character's
 	 * mp.
 	 * */
-	public boolean canMove(List<MapPoint> path) {
+	public boolean canMove(final List<MapPoint> path) {
 		if (path.size() < 2) return false;
 		return getCharacterAt(path.get(0))
 			.map(c ->
@@ -308,7 +328,7 @@ public class BattleState {
 	/**
 	 * Calculate the mp cost of a valid path.
 	 * */
-	public int pathCost(List<MapPoint> path) {
+	public int pathCost(final List<MapPoint> path) {
 		if (path.size() < 2) return 0;
 
 		int totalCost = 0;
@@ -337,16 +357,18 @@ public class BattleState {
 	/**
 	 * Determine if a move path is valid, using a fixed range instead of mp.
 	 * */
-	public boolean canMoveRange(int range, List<MapPoint> path) {
+	public boolean canMoveRange(
+		final int range, final List<MapPoint> path
+	) {
 		if (path.size() < 2) return false;
-		MapPoint target = path.get(path.size() - 1);
+		final MapPoint target = path.get(path.size() - 1);
 		return !spaceObstacles().contains(target) && pathCost(path) <= range;
 	}
 
 	/**
 	 * Determine if it is possible to place a character in a particular tile.
 	 * */
-	public boolean isSpaceFree(MapPoint p) {
+	public boolean isSpaceFree(final MapPoint p) {
 		return terrain.terrain.hasTile(p) &&
 			!(terrainObstacles.contains(p) ||
 				targetable.stream()
@@ -357,7 +379,7 @@ public class BattleState {
 	/**
 	 * Determine if a player can move through a particular point.
 	 * */
-	public boolean canMoveThrough(MapPoint p, Player player) {
+	public boolean canMoveThrough(final MapPoint p, final Player player) {
 		return terrain.terrain.hasTile(p) && !movementObstacles(player).contains(p);
 	}
 
@@ -365,7 +387,7 @@ public class BattleState {
 	 * Points that are already occupied.
 	 * */
 	public Set<MapPoint> spaceObstacles() {
-		Set<MapPoint> r = new HashSet<>(targetable.stream()
+		final Set<MapPoint> r = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksSpace())
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		r.addAll(terrainObstacles);
@@ -373,7 +395,7 @@ public class BattleState {
 	}
 
 	public Set<MapPoint> allObstacles() {
-		Set<MapPoint> r = new HashSet<>(targetable.stream()
+		final Set<MapPoint> r = new HashSet<>(targetable.stream()
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		r.addAll(terrainObstacles);
 		return r;
@@ -382,8 +404,8 @@ public class BattleState {
 	/**
 	 * Obstacles that cannot be moved through.
 	 * */
-	public Set<MapPoint> movementObstacles(Player player) {
-		Set<MapPoint> obstacles = new HashSet<>(targetable.stream()
+	public Set<MapPoint> movementObstacles(final Player player) {
+		final Set<MapPoint> obstacles = new HashSet<>(targetable.stream()
 			.filter(c -> c.blocksPath(player))
 			.map(c -> c.getPos()).collect(Collectors.toList()));
 		obstacles.addAll(terrainObstacles);
@@ -397,16 +419,16 @@ public class BattleState {
 	 * path.
 	 * */
 	public List<MapPoint> findPath(
-		MapPoint start, MapPoint target, Player player
+		final MapPoint start, final MapPoint target, final Player player
 	) {
 		if (start.equals(target)) return new ArrayList<>();
 
-		Set<MapPoint> obstacles = movementObstacles(player);
+		final Set<MapPoint> obstacles = movementObstacles(player);
 		
-		AStarSearch<MapPoint> search = new AStarSearch<>(new PathFinderNode(
-			null, terrain.terrain, obstacles, start, target));
+		final AStarSearch<MapPoint> search = new AStarSearch<>(
+			new PathFinderNode(null, terrain.terrain, obstacles, start, target));
 
-		List<MapPoint> r = search.search().stream()
+		final List<MapPoint> r = search.search().stream()
 			.map(n -> n.getPosition()).collect(Collectors.toList());
 		if (r.size() >= 1 && !r.get(r.size() - 1).equals(target))
 			return new ArrayList<>(); else return r;
@@ -416,12 +438,13 @@ public class BattleState {
 	 * Attempt to get a valid LOS path.  Returns null if there is no such path.
 	 * */
 	private List<MapPoint> getLOS(
-		MapPoint from, MapPoint to, Set<MapPoint> obstacles
+		final MapPoint from, final MapPoint to, final Set<MapPoint> obstacles
 	) {
-		if (!terrain.terrain.hasTile(from) || !terrain.terrain.hasTile(to)) return null;
+		if (!terrain.terrain.hasTile(from) || !terrain.terrain.hasTile(to))
+			return null;
 
-		List<MapPoint> los1 = LineOfSight.getLOS(from, to, true);
-		List<MapPoint> los2 = LineOfSight.getLOS(from, to, false);
+		final List<MapPoint> los1 = LineOfSight.getLOS(from, to, true);
+		final List<MapPoint> los2 = LineOfSight.getLOS(from, to, false);
 		los1.remove(los1.size() - 1); // we only need LOS up to the square
 		los2.remove(los2.size() - 1); // the square itself may be blocked
 
@@ -440,7 +463,7 @@ public class BattleState {
 	 * Get all the tiles that can be targeted by an ability.
 	 * */
 	public Collection<MapPoint> getTargetableArea(
-		MapPoint agent, MapPoint castFrom, Ability ability
+		final MapPoint agent, final MapPoint castFrom, final Ability ability
 	) {
 		final Collection<MapPoint> diamond =
 			LineOfSight.getDiamond(castFrom, ability.info.range.range).stream()
@@ -464,10 +487,11 @@ public class BattleState {
 	 * Get all the tiles that will be affected by an ability.
 	 * */
 	public Set<MapPoint> getAffectedArea(
-		MapPoint agent, AbilityAgentType agentType,
-		Ability ability, Casting casting
+		final MapPoint agent, final AbilityAgentType agentType,
+		final Ability ability, final Casting casting
 	) {
-		final int radius = agentType == AbilityAgentType.ZONE? 0 : ability.info.range.radius;
+		final int radius =
+			agentType == AbilityAgentType.ZONE? 0 : ability.info.range.radius;
 
 		final Set<MapPoint> r =
 			LineOfSight.getDiamond(casting.target, radius).stream()
@@ -476,12 +500,12 @@ public class BattleState {
 				.collect(Collectors.toSet());
 
 		if (agentType == AbilityAgentType.CHARACTER && ability.info.range.piercing) {
-			Player player = getCharacterAt(agent).map(c -> c.player)
+			final Player player = getCharacterAt(agent).map(c -> c.player)
 				.orElseThrow(() -> new RuntimeException(
 					"Attempted to get targeting information for a non-existent character"));
 
-			Set<MapPoint> pr = new HashSet<>(r);
-			Collection<MapPoint> los =
+			final Set<MapPoint> pr = new HashSet<>(r);
+			final Collection<MapPoint> los =
 				LineOfSight.getLOS(casting.castFrom, casting.target, true);
 			if (los != null) pr.addAll(los);
 			return pr;
@@ -490,7 +514,9 @@ public class BattleState {
 		return r;
 	}
 
-	public int aoeMinimalPointCost(MapPoint castFrom, MapPoint target) {
+	public int aoeMinimalPointCost(
+		final MapPoint castFrom, final MapPoint target
+	) {
 		return Math.min(aoePointCost(castFrom, target, true),
 			aoePointCost(castFrom, target, false));
 	}
@@ -499,17 +525,21 @@ public class BattleState {
 	 * The cost in range points to reach a particular point using are area of
 	 * affect.
 	 * */
-	public int aoePointCost(MapPoint castFrom, MapPoint target, boolean bias) {
+	public int aoePointCost(
+		final MapPoint castFrom, final MapPoint target, final boolean bias
+	) {
 		if (castFrom.equals(target)) return 0;
-		List<MapPoint> path = LineOfSight.getLOS(castFrom, target, bias);
+		final List<MapPoint> path = LineOfSight.getLOS(castFrom, target, bias);
 		if (path.size() < 2) return Integer.MAX_VALUE;
 
 		int totalCost = 0;
 		Tile tile0 = terrain.terrain.getTile(path.get(0));
 		for (MapPoint p : path.subList(1, path.size())) {
 			final Tile tile = terrain.terrain.getTile(p);
-			final int elevation0 = tile0.elevation + (tile0.slope == SlopeType.NONE? 0 : 1);
-			final int elevation = tile.elevation + (tile.slope == SlopeType.NONE? 0 : 1);
+			final int elevation0 = tile0.elevation +
+				(tile0.slope == SlopeType.NONE? 0 : 1);
+			final int elevation = tile.elevation +
+				(tile.slope == SlopeType.NONE? 0 : 1);
 			if (elevation > elevation0) totalCost += 2; else totalCost += 1;
 			tile0 = tile;
 		}
@@ -518,8 +548,8 @@ public class BattleState {
 
 
 	public Collection<Targetable> getAbilityTargets(
-		MapPoint agent, AbilityAgentType agentType,
-		Ability ability, Set<MapPoint> area
+		final MapPoint agent, final AbilityAgentType agentType,
+		final Ability ability, final Set<MapPoint> area
 	) {
 		return getAgentAt(agent, agentType).map(a ->
 			area.stream()
@@ -530,8 +560,8 @@ public class BattleState {
 		).orElse(new ArrayList<>());
 	}
 
-	public Collection<MapPoint> getItemArea(MapPoint p) {
-		Item item = new HealthPotion();
+	public Collection<MapPoint> getItemArea(final MapPoint p) {
+		final Item item = new HealthPotion();
 		return LineOfSight.getDiamond(p, 1).stream()
 			.filter(t -> terrain.terrain.hasTile(t) && item.canAffect(this, t))
 			.collect(Collectors.toList());

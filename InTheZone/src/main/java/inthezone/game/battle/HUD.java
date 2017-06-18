@@ -30,7 +30,7 @@ public class HUD extends AnchorPane {
 
 	private final VBox roundCounterAndClock = new VBox(10);
 	private final RoundCounter roundCounter = new RoundCounter();
-	private final TurnClock clock = new TurnClock(new Duration(2 * 60 * 1000));
+	private final TurnClock clock = new TurnClock(new Duration(3 * 60 * 1000));
 	final Tooltip clockTooltip = new Tooltip();
 
 	private final MultiTargetAssistant multiTargetAssistant;

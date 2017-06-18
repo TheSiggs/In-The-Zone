@@ -82,8 +82,11 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	 * For the challenged, the opposite of the challenger.
 	 * */
 	public ChallengePane(
-		GameDataFactory gameData, ClientConfig config,
-		Optional<String> useStage, Player player, String otherPlayerName
+		final GameDataFactory gameData,
+		final ClientConfig config,
+		final Optional<String> useStage,
+		final Player player,
+		final String otherPlayerName
 	)
 		throws CorruptDataException
 	{
@@ -200,6 +203,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 				throw new CorruptDataException("Unknown stage " + s);
 			stage.getSelectionModel().select(s);
 			stage.setDisable(true);
+			doneButton.setText("Go!");
 		}
 
 		loadout.getSelectionModel().selectedItemProperty()
@@ -242,7 +246,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		doneButton.setDisable(disable);
 	}
 
-	private void setLoadout(Loadout l) {
+	private void setLoadout(final Loadout l) {
 		if (l != null && l.isLegitimate()) {
 			characterSelector.setCharacters(l.characters);
 
@@ -271,7 +275,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		setDoneButtonState();
 	}
 
-	private void setStage(String s) {
+	private void setStage(final String s) {
 		if (s != null) {
 			characterPositions.clear();
 			characterByPosition.clear();
@@ -292,7 +296,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		setDoneButtonState();
 	}
 
-	private void placeCharacter(MapPoint p) {
+	private void placeCharacter(final MapPoint p) {
 		final Optional<CharacterProfile> o =
 			characterSelector.getSelectedCharacter();
 

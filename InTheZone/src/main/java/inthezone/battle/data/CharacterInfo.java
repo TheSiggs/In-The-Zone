@@ -5,7 +5,7 @@ import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
 import isogame.engine.SpriteInfo;
 import isogame.resource.ResourceLocator;
-import javafx.scene.image.Image;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,12 +13,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javafx.scene.image.Image;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CharacterInfo implements HasJSONRepresentation {
 	public final String name;
+	public final String flavourText;
 	public final String portraitFile;
 	public final Image portrait;
 	public final String bigPortraitFile;
@@ -39,20 +43,22 @@ public class CharacterInfo implements HasJSONRepresentation {
 	private final Map<String, AbilityInfo> abilitiesIndex = new HashMap<>();
 
 	public CharacterInfo(
-		String name,
-		SpriteInfo sprite,
-		Image portrait,
-		String portraitFile,
-		Image bigPortrait,
-		String bigPortraitFile,
-		Stats stats,
-		Collection<AbilityInfo> abilities,
-		boolean playable,
-		List<Integer> hpCurve,
-		List<Integer> attackCurve,
-		List<Integer> defenceCurve
+		final String name,
+		final String flavourText,
+		final SpriteInfo sprite,
+		final Image portrait,
+		final String portraitFile,
+		final Image bigPortrait,
+		final String bigPortraitFile,
+		final Stats stats,
+		final Collection<AbilityInfo> abilities,
+		final boolean playable,
+		final List<Integer> hpCurve,
+		final List<Integer> attackCurve,
+		final List<Integer> defenceCurve
 	) {
 		this.name = name;
+		this.flavourText = flavourText;
 		this.stats = stats;
 		this.sprite = sprite;
 		this.portrait = portrait;
@@ -72,7 +78,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 	/**
 	 * Get an ability by name.  May return null.
 	 * */
-	public AbilityInfo lookupAbility(String name) {
+	public AbilityInfo lookupAbility(final String name) {
 		return abilitiesIndex.get(name);
 	}
 
@@ -80,6 +86,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		r.put("name", name);
+		r.put("flavour", flavourText);
 		r.put("sprite", sprite.id);
 		r.put("portrait", portraitFile);
 		r.put("bigPortrait", bigPortraitFile);
@@ -94,24 +101,25 @@ public class CharacterInfo implements HasJSONRepresentation {
 		return r;
 	}
 
-	private static JSONArray makeCurve(List<Integer> curve) {
+	private static JSONArray makeCurve(final List<Integer> curve) {
 		final JSONArray r = new JSONArray();
 		for (Integer i : curve) r.put(i);
 		return r;
 	}
 
-	private static List<Integer> decodeCurve(JSONArray a) {
-		List<Integer> r = new ArrayList<>();
+	private static List<Integer> decodeCurve(final JSONArray a) {
+		final List<Integer> r = new ArrayList<>();
 		for (int i = 0; i < a.length(); i++) r.add(a.getInt(i));
 		return r;
 	}
 
 	public static CharacterInfo fromJSON(
-		JSONObject json, ResourceLocator loc, Library lib
+		final JSONObject json, final ResourceLocator loc, final Library lib
 	) throws CorruptDataException
 	{
 		try {
 			final String name = json.getString("name");
+			final String flavour = json.optString("flavour", "");
 			final Stats stats = Stats.fromJSON(json.getJSONObject("stats"));
 			final SpriteInfo sprite = lib.getSprite(json.getString("sprite"));
 			final String portraitFile = json.getString("portrait");
@@ -142,7 +150,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 			final List<Integer> defenceCurve = decodeCurve(rdefenceCurve);
 
 			return new CharacterInfo(
-				name, sprite, portrait, portraitFile, bigPortrait, bigPortraitFile,
+				name, flavour, sprite, portrait,
+				portraitFile, bigPortrait, bigPortraitFile,
 				stats, allAbilities, playable, hpCurve, attackCurve, defenceCurve);
 
 		} catch(ClassCastException e) {

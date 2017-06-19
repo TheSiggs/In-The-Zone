@@ -1,18 +1,13 @@
 package inthezone.game.loadoutEditor;
 
-import inthezone.battle.data.AbilityDescription;
-import inthezone.battle.data.AbilityInfo;
-import inthezone.battle.data.AbilityType;
-import inthezone.battle.data.CharacterInfo;
-import inthezone.battle.data.CharacterProfile;
-import inthezone.game.guiComponents.RollerScrollPane;
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
@@ -24,9 +19,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.Node;
 import javafx.util.StringConverter;
-import java.util.List;
+
+import inthezone.battle.data.AbilityDescription;
+import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.AbilityType;
+import inthezone.battle.data.CharacterInfo;
+import inthezone.battle.data.CharacterProfile;
+import inthezone.game.guiComponents.RollerScrollPane;
 
 public class CharacterProfilePane extends HBox {
 	private final VBox leftSection = new VBox(4);
@@ -164,7 +164,7 @@ public class CharacterProfilePane extends HBox {
 
 	}
 
-	public void setProfile(CharacterProfileModel model) {
+	public void setProfile(final CharacterProfileModel model) {
 		if (this.model != null) this.model.unbindAll();
 
 		this.model = model;
@@ -225,7 +225,7 @@ public class CharacterProfilePane extends HBox {
 		private final Button remove = new Button();
 
 		public AbilityButton(
-			AbilityInfo a, boolean removable
+			final AbilityInfo a, final boolean removable
 		) {
 			this.getStyleClass().add("ability-button");
 			this.setMinWidth(60);
@@ -266,7 +266,10 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 	private final int[] values;
 
 	public PPSpinnerFactory(
-		String prefix, int init, int base, List<Integer> curve
+		final String prefix,
+		final int init,
+		final int base,
+		final List<Integer> curve
 	) {
 
 		values = new int[1 + curve.size()];
@@ -291,7 +294,7 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 		setWrapAround(false);
 	}
 
-	@Override public void decrement(int steps) {
+	@Override public void decrement(final int steps) {
 		int v0 = getValue() - steps;
 		int v1 = getValue() - steps - 1;
 		while (v1 >= 0 && values[v0] == values[v1]) {
@@ -301,7 +304,7 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 		setValue(v0 < 0? 0 : v0);
 	}
 
-	@Override public void increment(int steps) {
+	@Override public void increment(final int steps) {
 		final int v0 = getValue();
 		int v1 = getValue() + steps;
 		while (v1 < (values.length - 1) && values[v0] == values[v1]) v1 += 1;

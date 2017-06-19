@@ -37,6 +37,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 	private final Label pp = new Label("0");
 	private final GridPane info = new GridPane();
 	private final ImageView portrait = new ImageView();
+	private final Tooltip characterDescription = new Tooltip();
 
 	private final ObjectProperty<CharacterProfileModel> selectedCharacter;
 
@@ -51,8 +52,9 @@ public class CharacterIndicatorPane extends AnchorPane {
 		new ImageView(new Image("/gui_assets/arrow_right.png")));
 
 	public CharacterIndicatorPane(
-		LoadoutModel loadouts, CharacterProfileModel profile,
-		ObjectProperty<CharacterProfileModel> selectedCharacter
+		final LoadoutModel loadouts,
+		final CharacterProfileModel profile,
+		final ObjectProperty<CharacterProfileModel> selectedCharacter
 	) {
 		this.loadouts = loadouts;
 
@@ -62,6 +64,10 @@ public class CharacterIndicatorPane extends AnchorPane {
 				selectedCharacter.set(this.profile);
 		});
 
+		Tooltip.install(portrait, characterDescription);
+		characterDescription.setWrapText(true);
+		characterDescription.setMaxWidth(300);
+
 		abilitiesList.setAlignment(Pos.CENTER_LEFT);
 		abilitiesListContainer = new RollerScrollPane(abilitiesList, true);
 		abilitiesListContainer.setScrollWheelEnable(false);
@@ -69,7 +75,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 		setupCharacterProfile(profile);
 	}
 
-	private void setupCharacterProfile(CharacterProfileModel profile) {
+	private void setupCharacterProfile(final CharacterProfileModel profile) {
 		this.getChildren().removeAll();
 
 		this.profile = profile;
@@ -126,22 +132,24 @@ public class CharacterIndicatorPane extends AnchorPane {
 		updateProfileModel(profile);
 	}
 
-	private void updateProfileModel(CharacterProfileModel profile) {
+	private void updateProfileModel(final CharacterProfileModel profile) {
 		this.profile = profile;
 		profile.setProfileUpdateReceiver(this::updateProfile);
 		pp.textProperty().bind(StringExpression.stringExpression(profile.costProperty()));
 		updateProfile(profile.profileProperty().getValue());
 	}
 
-	private void updateProfile(CharacterProfile profile) {
+	private void updateProfile(final CharacterProfile profile) {
 		if (profile == null) return;
 
-		Stats baseStats = profile.getBaseStats();
+		final Stats baseStats = profile.getBaseStats();
 		this.name.setText(profile.rootCharacter.name);
 		this.power.setText("" + baseStats.power);
 		this.hp.setText("" + baseStats.hp);
 		this.attack.setText("" + baseStats.attack);
 		this.defence.setText("" + baseStats.defence);
+
+		this.characterDescription.setText(profile.rootCharacter.flavourText);
 
 		abilities.clear();
 		abilitiesList.getChildren().clear();

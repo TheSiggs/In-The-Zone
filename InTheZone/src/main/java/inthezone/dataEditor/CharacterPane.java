@@ -1,13 +1,19 @@
 package inthezone.dataEditor;
 
 import com.diffplug.common.base.Errors;
-import inthezone.battle.data.AbilityInfo;
-import inthezone.battle.data.CharacterInfo;
-import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Stats;
+
 import isogame.engine.CorruptDataException;
 import isogame.engine.SpriteInfo;
 import isogame.gui.PositiveIntegerField;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
@@ -25,13 +32,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.CharacterInfo;
+import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Stats;
 
 public class CharacterPane extends TitledPane {
 	private final File dataRoot;
@@ -51,6 +56,7 @@ public class CharacterPane extends TitledPane {
 	private final PositiveIntegerListTextField hp;
 	private final PositiveIntegerListTextField attack;
 	private final PositiveIntegerListTextField defence;
+	private final TextArea flavourText;
 	private final TreeItem<AbilityInfoModel> abilitiesRoot;
 
 	private String portraitFilename;
@@ -65,16 +71,17 @@ public class CharacterPane extends TitledPane {
 	public CharacterInfo getCharacter()
 		throws CorruptDataException
 	{
-		List<Integer> hpCurve = hp.getValue();
-		List<Integer> attackCurve = attack.getValue();
-		List<Integer> defenceCurve = defence.getValue();
+		final List<Integer> hpCurve = hp.getValue();
+		final List<Integer> attackCurve = attack.getValue();
+		final List<Integer> defenceCurve = defence.getValue();
 
-		int baseHP = hpCurve.isEmpty()? 0 : hpCurve.remove(0);
-		int baseAttack = attackCurve.isEmpty()? 0 : attackCurve.remove(0);
-		int baseDefence = defenceCurve.isEmpty()? 0 : defenceCurve.remove(0);
+		final int baseHP = hpCurve.isEmpty()? 0 : hpCurve.remove(0);
+		final int baseAttack = attackCurve.isEmpty()? 0 : attackCurve.remove(0);
+		final int baseDefence = defenceCurve.isEmpty()? 0 : defenceCurve.remove(0);
 
 		return new CharacterInfo(
 			name.getText(),
+			flavourText.getText(),
 			sprite.getValue(),
 			portraitImage,
 			portraitFilename,
@@ -173,6 +180,14 @@ public class CharacterPane extends TitledPane {
 		defence = new PositiveIntegerListTextField(decodeCurve(
 			character.stats.defence, character.defenceCurve));
 
+		flavourText = new TextArea();
+		if (!character.flavourText.equals(""))
+			flavourText.setText(character.flavourText);
+		flavourText.setWrapText(true);
+		flavourText.setMinHeight(80);
+		flavourText.setMaxWidth(260);
+		flavourText.setPromptText("General description for this character");
+
 		portrait.setOnAction(x -> {
 			changed.setValue(true);
 			updatePortrait(false);
@@ -192,6 +207,7 @@ public class CharacterPane extends TitledPane {
 		grid.addRow(7, new Label("Base HP"), hp);
 		grid.addRow(8, new Label("Base Attack"), attack);
 		grid.addRow(9, new Label("Base Defence"), defence);
+		grid.add(flavourText, 0, 10, 2, 1);
 
 		name.textProperty().addListener(c -> changed.setValue(true));
 		sprite.valueProperty().addListener(c -> changed.setValue(true));
@@ -201,6 +217,7 @@ public class CharacterPane extends TitledPane {
 		hp.textProperty().addListener(c -> changed.setValue(true));
 		attack.textProperty().addListener(c -> changed.setValue(true));
 		defence.textProperty().addListener(c -> changed.setValue(true));
+		flavourText.textProperty().addListener(c -> changed.setValue(true));
 
 		this.setText(character.name);
 		this.setContent(grid);

@@ -39,7 +39,7 @@ public class CharacterProfileModel {
 		defencePP.unbind();
 	}
 
-	public CharacterProfileModel(CharacterProfile c) {
+	public CharacterProfileModel(final CharacterProfile c) {
 		init(c);
 		InvalidationListener update = v -> {
 			CharacterProfile newProfile = encodeProfile();
@@ -56,7 +56,7 @@ public class CharacterProfileModel {
 		defencePP.addListener(update);
 	}
 
-	public void init(CharacterProfile c) {
+	public void init(final CharacterProfile c) {
 		rootCharacter = c.rootCharacter;
 		basicAbility.setValue(c.basicAbility);
 		abilities.clear();
@@ -65,7 +65,7 @@ public class CharacterProfileModel {
 		attackPP.setValue(c.attackPP);
 		defencePP.setValue(c.defencePP);
 
-		CharacterProfile newProfile = encodeProfile();
+		final CharacterProfile newProfile = encodeProfile();
 		cost.setValue(newProfile.computeCost());
 		profile.setValue(newProfile);
 	}
@@ -79,7 +79,9 @@ public class CharacterProfileModel {
 	}
 
 	Consumer<CharacterProfile> profileUpdate = x -> {};
-	public void setProfileUpdateReceiver(Consumer<CharacterProfile> profileUpdate) {
+	public void setProfileUpdateReceiver(
+		final Consumer<CharacterProfile> profileUpdate
+	) {
 		this.profileUpdate = profileUpdate;
 	}
 

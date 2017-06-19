@@ -92,7 +92,7 @@ public class CharactersPane extends VBox {
 			}
 
 			CharacterInfo c = new CharacterInfo(
-				"New character", null,
+				"New character", "", null,
 				portrait, "portrait/blank.png",
 				bigPortrait, "portrait/generic.png",
 				s, new LinkedList<>(), true,

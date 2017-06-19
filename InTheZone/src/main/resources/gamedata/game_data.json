@@ -351,6 +351,7 @@
         13,
         14
       ],
+      "flavour": "Bridget\u2019s an overachiever and she\u2019ll let you know it. Her giant mana-bot can take a hit and dish one out. She can stun her enemies and heal her friends. You can rely on Bridget to anchor the team.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -744,6 +745,7 @@
         13,
         14
       ],
+      "flavour": "Eve leaves blood everywhere she goes. Her power is near unrivalled both up close and at range. She lives and dies by the sword \u2014 her frail defences makes any advance a risk. Then again, what\u2019s a risk when Death\u2019s a welcome friend?",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -1068,6 +1070,7 @@
         13,
         14
       ],
+      "flavour": "Sar can crush the minds of the sternest warriors. He can strike behind walls and obstacles; he can also disable fighters by taking away their voice, their strength, or their sanity. When well protected, he is every soldier\u2019s nightmare.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -1501,6 +1504,7 @@
         13,
         14
       ],
+      "flavour": "Don\u2019t blink, or you might miss Zan. His natural mana abilities allow him to teleport himself and his allies around the battlefield. Slashing someone\u2019s just like real estate \u2014 location, location, location.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -1791,6 +1795,7 @@
         13,
         14
       ],
+      "flavour": "People have different strengths \u2014 Kieran\u2019s good at blowing people up. He can create explosions with mana, making him a handful at close quarters. Don\u2019t think about running either, he can pull you back in with an energy wave.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -2099,6 +2104,7 @@
         13,
         14
       ],
+      "flavour": "Daniel loves making things \u2014 obstacles, energy zones, vicious traps \u2014 he\u2019s just a kid. He\u2019d probably be recruited as a master builder If he didn\u2019t join the revolution.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -2148,6 +2154,7 @@
         "recursion": 0
       }],
       "defenceCurve": [],
+      "flavour": "An unthinking automaton, perfect for target practice.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -2504,6 +2511,7 @@
         13,
         14
       ],
+      "flavour": "Kids these days never take their jabs. Good thing you have old Galen here! You\u2019ll be in tip-top shape in no time! Well\u2026 as long as it takes for him to tell you about his time at the Academy.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -2895,6 +2903,7 @@
         13,
         14
       ],
+      "flavour": "Nettis is crafty. She can load different crystals into her rifle and pick her poison. She can deal with traps and zones, she can heal, she can control space, she can even cover her allies. Bit of a know-it-all, really.",
       "stats": {
         "mp": 3,
         "defence": 12,
@@ -9151,6 +9160,6 @@
       "sprites": []
     }
   ],
-  "version": "ec53e52f-fc7e-4df0-bd73-3644d92073f9",
-  "versionNumber": 200
+  "version": "00e71724-c674-4cf6-beb2-572892cb8f55",
+  "versionNumber": 201
 }

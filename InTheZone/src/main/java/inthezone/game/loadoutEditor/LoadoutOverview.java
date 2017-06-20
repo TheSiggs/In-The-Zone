@@ -1,10 +1,9 @@
 package inthezone.game.loadoutEditor;
 
-import inthezone.battle.data.CharacterProfile;
-import inthezone.battle.data.Loadout;
-import inthezone.game.ContentPane;
-import inthezone.game.DialogScreen;
 import isogame.engine.CorruptDataException;
+
+import java.util.Optional;
+
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -26,7 +25,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
-import java.util.Optional;
+
+import inthezone.battle.data.CharacterProfile;
+import inthezone.battle.data.Loadout;
+import inthezone.game.ContentPane;
+import inthezone.game.DialogScreen;
 
 public class LoadoutOverview extends DialogScreen<Void> {
 	private final AnchorPane root = new AnchorPane();
@@ -40,7 +43,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 
 	private final ContentPane parent;
 	
-	public LoadoutOverview(ContentPane parent) {
+	public LoadoutOverview(final ContentPane parent) {
 		this.parent = parent;
 
 		this.getStylesheets().add("/GUI.css");
@@ -146,21 +149,26 @@ public class LoadoutOverview extends DialogScreen<Void> {
 		}
 	}
 
-	public void removeLoadoutFrame(LoadoutFrame frame) {
+	public void removeLoadoutFrame(final LoadoutFrame frame) {
 		loadouts.getChildren().remove(frame);
 		loadoutsWrapper.layout();
 	}
 }
 
 class LoadoutFrame extends VBox {
+	private static final Image badLoadoutImage =
+		new Image("/gui_assets/bad_loadout.png");
+
 	private Optional<Loadout> mloadout;
 	private final StackPane topSpacer = new StackPane();
 	private final StackPane frame = new StackPane();
 	private final HBox infoLine = new HBox(10);
 	private final Label title = new Label(" ");
-
+	private final ImageView badLoadout = new ImageView(badLoadoutImage);
 	private final Button delete = new Button(null,
 		new ImageView(new Image("/gui_assets/x.png")));
+	
+	private final Tooltip frameTooltip = new Tooltip();
 
 	private static final double frameW = 651;
 	private static final double frameH = 435;
@@ -168,14 +176,21 @@ class LoadoutFrame extends VBox {
 	private static final double portraitW = 100;
 	private static final double portraitH = 380;
 
+	private static final double badLoadoutH = 320;
+
 	public LoadoutFrame(
-		ContentPane parent, LoadoutOverview overview, Optional<Loadout> mloadout
+		final ContentPane parent,
+		final LoadoutOverview overview,
+		final Optional<Loadout> mloadout
 	) {
 		this.mloadout = mloadout;
 
 		this.getStyleClass().add("loadout-cell");
 		frame.getStyleClass().add("loadout-cell-frame");
 		delete.getStyleClass().add("gui-img-button");
+
+		badLoadout.setFitHeight(badLoadoutH);
+		badLoadout.setPreserveRatio(true);
 
 		frame.setOnMouseClicked(event -> {
 			if (!event.isStillSincePress()) return;
@@ -236,13 +251,15 @@ class LoadoutFrame extends VBox {
 		topSpacer.setMaxHeight(32);
 		this.getChildren().addAll(topSpacer, frame, infoLine);
 
-		Tooltip.install(frame, new Tooltip("Click here to edit this loadout"));
+		frameTooltip.setWrapText(true);
+		frameTooltip.setMaxWidth(300);
+		Tooltip.install(frame, frameTooltip);
 		delete.setTooltip(new Tooltip("Delete this loadout"));
 
 		updateView(this.mloadout);
 	}
 
-	public void updateView(Optional<Loadout> mloadout) {
+	public void updateView(final Optional<Loadout> mloadout) {
 		this.mloadout = mloadout;
 
 		if (this.mloadout.isPresent()) {
@@ -259,12 +276,19 @@ class LoadoutFrame extends VBox {
 				characters.getChildren().add(wrapper);
 			}
 			frame.getChildren().clear();
+			if (!mloadout.get().isLegitimate()) {
+				frameTooltip.setText("There is a problem with this loadout.  Click here to fix it.");
+				frame.getChildren().add(badLoadout);
+			} else {
+				frameTooltip.setText("Click here to edit this loadout");
+			}
 			frame.getChildren().add(characters);
 
 			title.setText(this.mloadout.get().name);
 			title.setTooltip(new Tooltip(title.getText()));
 
 		} else {
+			frameTooltip.setText("Click here to make a new loadout");
 			frame.getChildren().clear();
 			frame.getChildren().add(new Label("New loadout"));
 		}

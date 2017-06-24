@@ -51,6 +51,14 @@ public class Client {
 
 	private final UUID sessionKey = UUID.randomUUID();
 
+	private final static String validNameMessage =
+		"You cannot use slashes, angle brackets, quotation marks, " +
+		"or control codes in your player name";
+	
+	private static boolean isValidPlayerName(final String name) {
+		return (!name.matches(".*(/|\\\\|>|<|\"|\\p{IsControl}).*"));
+	}
+
 	public Client(
 		final String serverName,
 		final SocketChannel connection,
@@ -423,6 +431,13 @@ public class Client {
 						Log.info(getRemoteAddress() +
 							" asked for an overly long name", null);
 						channel.requestSend(Message.NOK("That name is too long"));
+
+					} else if (!isValidPlayerName(name)) {
+						Log.info(getRemoteAddress() +
+							" asked for name " + name +
+							", which failed the validity check", null);
+
+						channel.requestSend(Message.NOK(validNameMessage));
 
 					} else {
 						this.name = Optional.of(name);

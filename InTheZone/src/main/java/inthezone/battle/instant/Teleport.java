@@ -1,49 +1,62 @@
 package inthezone.battle.instant;
 
+import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
+import inthezone.battle.Targetable;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
-import isogame.engine.MapPoint;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class Teleport extends InstantEffect {
 	public final int range;
-	public final List<Character> affectedCharacters;
+	public final List<Character> affectedCharacters = new ArrayList<>();
 
-	private final List<MapPoint> targets;
-	private List<MapPoint> destinations;
+	private final List<MapPoint> targets = new ArrayList<>();
+	private List<MapPoint> destinations = new ArrayList<>();
 
 	private Teleport(
-		List<Character> affectedCharacters,
-		int range,
-		List<MapPoint> targets,
-		List<MapPoint> destinations,
-		MapPoint agent
+		final Optional<List<Character>> affectedCharacters,
+		final int range,
+		final Optional<List<MapPoint>> targets,
+		final Optional<List<MapPoint>> destinations,
+		final MapPoint agent
 	) {
 		super(agent);
-		this.affectedCharacters = affectedCharacters;
+
+		affectedCharacters.ifPresent(a -> {
+			this.affectedCharacters.addAll(a);
+			this.targets.addAll(a.stream()
+				.map(c -> c.getPos()).collect(Collectors.toList()));
+		});
+
+		targets.ifPresent(t -> {
+			this.targets.clear();
+			this.targets.addAll(t);
+		});
+
+		destinations.ifPresent(d -> this.destinations.addAll(d));
+
 		this.range = range;
-		this.targets = targets;
-		this.destinations = destinations;
 	}
 
 	public List<MapPoint> getDestinations() {
@@ -66,7 +79,7 @@ public class Teleport extends InstantEffect {
 		return o;
 	}
 
-	public static Teleport fromJSON(JSONObject json) throws ProtocolException {
+	public static Teleport fromJSON(final JSONObject json) throws ProtocolException {
 		try {
 			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
 			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
@@ -87,7 +100,8 @@ public class Teleport extends InstantEffect {
 				destinations.add(MapPoint.fromJSON(rawDestinations.getJSONObject(i)));
 			}
 
-			return new Teleport(null, range, targets, destinations, agent);
+			return new Teleport(Optional.empty(), range, Optional.of(targets),
+				Optional.of(destinations), agent);
 
 		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing teleport effect", e);
@@ -95,23 +109,24 @@ public class Teleport extends InstantEffect {
 	}
 
 	public static Teleport getEffect(
-		BattleState battle, InstantEffectInfo info,
-		List<MapPoint> targets, MapPoint agent
+		final BattleState battle, final InstantEffectInfo info,
+		final List<MapPoint> targets, final MapPoint agent
 	) {
-		List<Character> affected = targets.stream()
+		final List<Character> affected = targets.stream()
 			.flatMap(x -> battle.getCharacterAt(x)
 				.map(v -> Stream.of(v)).orElse(Stream.empty()))
 			.collect(Collectors.toList());
-		return new Teleport(affected, info.param, targets, null, agent);
+		return new Teleport(Optional.of(affected), info.param,
+			Optional.empty(), Optional.empty(), agent);
 	}
 
-	@Override public List<Targetable> apply(Battle battle)
+	@Override public List<Targetable> apply(final Battle battle)
 		throws CommandException
 	{
 		if (destinations == null || targets.size() != destinations.size())
 			throw new CommandException("Attempted to apply incomplete teleport");
 
-		List<Targetable> r = new ArrayList<>();
+		final List<Targetable> r = new ArrayList<>();
 		for (int i = 0; i < targets.size(); i++) {
 			r.addAll(battle.doTeleport(targets.get(i), destinations.get(i)));
 		}
@@ -120,10 +135,10 @@ public class Teleport extends InstantEffect {
 	}
 
 	@Override public List<ExecutedCommand> applyComputingTriggers(
-		Battle battle, Function<InstantEffect, Command> cmd
+		final Battle battle, final Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<ExecutedCommand> r = new ArrayList<>();
+		final List<ExecutedCommand> r = new ArrayList<>();
 
 		r.add(new ExecutedCommand(cmd.apply(this), apply(battle)));
 
@@ -136,7 +151,7 @@ public class Teleport extends InstantEffect {
 	}
 
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {
-		Map<MapPoint, MapPoint> r = new HashMap<>();
+		final Map<MapPoint, MapPoint> r = new HashMap<>();
 
 		for (int i = 0; i < targets.size(); i++) {
 			r.put(targets.get(i), destinations.get(i));
@@ -145,9 +160,9 @@ public class Teleport extends InstantEffect {
 	}
 
 	@Override public InstantEffect retarget(
-		BattleState battle, Map<MapPoint, MapPoint> retarget
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		List<MapPoint> newTargets =
+		final List<MapPoint> newTargets =
 			targets.stream().map(t -> retarget.getOrDefault(t, t))
 			.collect(Collectors.toList());
 
@@ -156,8 +171,13 @@ public class Teleport extends InstantEffect {
 			newTargets, retarget.getOrDefault(agent, agent));
 	}
 
-	@Override public boolean isComplete() {return !(destinations == null);}
-	@Override public boolean complete(BattleState battle, List<MapPoint> ps) {
+	@Override public boolean isComplete() {
+		return destinations.size() == targets.size();
+	}
+
+	@Override public boolean complete(
+		final BattleState battle, final List<MapPoint> ps
+	) {
 		destinations = new ArrayList<>();
 		destinations.addAll(ps);
 		return targets.size() == destinations.size();

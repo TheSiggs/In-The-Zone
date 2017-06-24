@@ -1,6 +1,14 @@
 package inthezone.game.battle;
 
+import isogame.engine.MapPoint;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+
 import inthezone.battle.Character;
+import inthezone.battle.Targetable;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.FatigueCommand;
@@ -13,14 +21,6 @@ import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.Move;
 import inthezone.battle.instant.PullPush;
 import inthezone.battle.instant.Teleport;
-import inthezone.battle.Targetable;
-import isogame.engine.MapPoint;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
 
 /**
  * Schedule animations in response to commands from the battle layer.
@@ -34,7 +34,7 @@ public class CommandProcessor {
 
 	private boolean isComplete = false;
 
-	public CommandProcessor(BattleView view) {
+	public CommandProcessor(final BattleView view) {
 		this.view = view;
 	}
 
@@ -47,7 +47,7 @@ public class CommandProcessor {
 	/**
 	 * Put a command on the queue.
 	 * */
-	public void queueCommand(ExecutedCommand command) {
+	public void queueCommand(final ExecutedCommand command) {
 		commandQueue.add(command);
 	}
 
@@ -83,10 +83,10 @@ public class CommandProcessor {
 		}
 
 		if (ec.cmd instanceof MoveCommand) {
-			List<MapPoint> path = ((MoveCommand) ec.cmd).path;
+			final List<MapPoint> path = ((MoveCommand) ec.cmd).path;
 			if (path.size() < 2) throw new RuntimeException("Invalid move path");
 
-			Character agent = (Character) ec.affected.get(0);
+			final Character agent = (Character) ec.affected.get(0);
 			view.sprites.scheduleMovement("walk", walkSpeed, path, agent);
 			registeredAnimations = true;
 
@@ -105,7 +105,7 @@ public class CommandProcessor {
 			registeredAnimations = instantEffect(((InstantEffectCommand) ec.cmd).getEffect(), ec.affected);
 
 		} else if (ec.cmd instanceof EndTurnCommand) {
-			EndTurnCommand cmd = (EndTurnCommand) ec.cmd;
+			final EndTurnCommand cmd = (EndTurnCommand) ec.cmd;
 
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(false);
@@ -120,7 +120,7 @@ public class CommandProcessor {
 			registeredAnimations = false;
 
 		} else if (ec.cmd instanceof StartTurnCommand) {
-			StartTurnCommand cmd = (StartTurnCommand) ec.cmd;
+			final StartTurnCommand cmd = (StartTurnCommand) ec.cmd;
 
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(true);
@@ -151,11 +151,11 @@ public class CommandProcessor {
 	 * @return true if a new animation was started.
 	 * */
 	private boolean instantEffect(
-		InstantEffect effect, List<Targetable> affectedCharacters
+		final InstantEffect effect, final List<Targetable> affectedCharacters
 	) {
 		view.retargetMode(effect.getRetargeting());
 		if (effect instanceof PullPush) {
-			PullPush pullpush = (PullPush) effect;
+			final PullPush pullpush = (PullPush) effect;
 
 			if (pullpush.paths.size() != affectedCharacters.size()) {
 				throw new RuntimeException("Invalid pull or push, this cannot happen");
@@ -170,21 +170,23 @@ public class CommandProcessor {
 			return !pullpush.paths.isEmpty();
 
 		} else if (effect instanceof Teleport) {
-			Teleport teleport = (Teleport) effect;
-			List<MapPoint> destinations = teleport.getDestinations();
-			if (destinations == null || destinations.size() != affectedCharacters.size()) {
+			final Teleport teleport = (Teleport) effect;
+			final List<MapPoint> destinations = teleport.getDestinations();
+			if (destinations == null ||
+				destinations.size() != affectedCharacters.size()
+			) {
 				throw new RuntimeException("Invalid teleport, this cannot happen");
 			}
 
 			for (int i = 0; i < destinations.size(); i++) {
-				int id = ((Character) affectedCharacters.get(i)).id;
+				final int id = ((Character) affectedCharacters.get(i)).id;
 				view.sprites.scheduleTeleport(
 					view.sprites.getCharacterById(id), destinations.get(i));
 			}
 			return !destinations.isEmpty();
 
 		} else if (effect instanceof Move) {
-			Move move = (Move) effect;
+			final Move move = (Move) effect;
 
 			if (move.paths.size() != affectedCharacters.size()) {
 				throw new RuntimeException("Invalid move effect, this cannot happen");

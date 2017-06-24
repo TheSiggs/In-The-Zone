@@ -29,9 +29,9 @@ public class InstantEffectCommand extends Command {
 	}
 
 	public InstantEffectCommand(
-		InstantEffect effect,
-		Optional<UseAbilityCommand> postAbility,
-		Optional<InstantEffectCommand> postEffect
+		final InstantEffect effect,
+		final Optional<UseAbilityCommand> postAbility,
+		final Optional<InstantEffectCommand> postEffect
 	) {
 		this.effect = effect;
 		this.postAbility = postAbility;
@@ -59,7 +59,10 @@ public class InstantEffectCommand extends Command {
 	/**
 	 * Attempt to complete this command.
 	 * */
-	public void complete(BattleState battle, List<MapPoint> ps) throws CommandException {
+	public void complete(
+		final BattleState battle, final List<MapPoint> ps
+	) throws CommandException
+	{
 		if (!effect.complete(battle, ps))
 			throw new CommandException("11: Could not complete instant effect");
 		isComplete = true;
@@ -74,7 +77,7 @@ public class InstantEffectCommand extends Command {
 		return r;
 	}
 
-	public static InstantEffectCommand fromJSON(JSONObject json)
+	public static InstantEffectCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -91,7 +94,9 @@ public class InstantEffectCommand extends Command {
 		}
 	}
 
-	private void retarget(BattleState battle, Map<MapPoint, MapPoint> retarget) {
+	private void retarget(
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget
+	) {
 		this.effect = effect.retarget(battle, retarget);
 	}
 
@@ -101,8 +106,9 @@ public class InstantEffectCommand extends Command {
 		return effect.apply(battle);
 	}
 
-	@Override public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
-		throws CommandException
+	@Override public List<ExecutedCommand> doCmdComputingTriggers(
+		final Battle turn
+	) throws CommandException
 	{
 		final List<ExecutedCommand> r = effect.applyComputingTriggers(turn,
 			eff -> new InstantEffectCommand(eff, Optional.empty(), Optional.empty()));

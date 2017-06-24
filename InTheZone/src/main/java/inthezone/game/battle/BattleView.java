@@ -14,7 +14,6 @@ import inthezone.battle.data.Player;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.Move;
 import inthezone.battle.instant.Teleport;
-import inthezone.battle.Targetable;
 import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.InfoMoveRange;
@@ -27,6 +26,11 @@ import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
 import isogame.engine.Stage;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -37,12 +41,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
 import javafx.stage.StageStyle;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import static inthezone.game.battle.Highlighters.HIGHLIGHT_ZONE;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -74,10 +72,10 @@ public class BattleView
 	private Optional<Runnable> instantEffectCompletion = Optional.empty();
 
 	public BattleView(
-		StartBattleCommand startBattle, Player player,
-		String otherPlayerName,
-		CommandGenerator otherPlayer,
-		Network network, GameDataFactory gameData
+		final StartBattleCommand startBattle, final Player player,
+		final String otherPlayerName,
+		final CommandGenerator otherPlayer,
+		final Network network, final GameDataFactory gameData
 	) throws CorruptDataException {
 		super();
 		this.setMinSize(0, 0);
@@ -162,7 +160,7 @@ public class BattleView
 	/**
 	 * Switch to a different UI mode.
 	 * */
-	public void setMode(Mode mode) {
+	public void setMode(final Mode mode) {
 		this.mode = mode.setupMode();
 		this.cannotCancel.setValue(!mode.canCancel());
 		System.err.println("Set mode " + mode + " transforming to " + this.mode);
@@ -176,7 +174,7 @@ public class BattleView
 	/**
 	 * Update the UI mode to reflect characters moving around.
 	 * */
-	public void retargetMode(Map<MapPoint, MapPoint> retargeting) {
+	public void retargetMode(final Map<MapPoint, MapPoint> retargeting) {
 		this.mode = this.mode.retarget(retargeting);
 		this.cannotCancel.setValue(!mode.canCancel());
 	}
@@ -196,7 +194,7 @@ public class BattleView
 	/**
 	 * Select a particular character.
 	 * */
-	public void selectCharacterById(int id) {
+	public void selectCharacterById(final int id) {
 		if (mode.canCancel()) {
 			selectCharacter(Optional.ofNullable(sprites.getCharacterById(id)));
 		}
@@ -206,7 +204,7 @@ public class BattleView
 	 * Select or deselect a character.
 	 * @param c If empty, then deselect all characters.
 	 * */
-	public void selectCharacter(Optional<Character> c) {
+	public void selectCharacter(final Optional<Character> c) {
 		if (mode.canCancel()) {
 			outOfTurnSelect(c);
 			if (mode.isInteractive()) {
@@ -222,7 +220,7 @@ public class BattleView
 	 * Select or deselect a character when it's not your turn.
 	 * @param c If empty, the deselect all characters.
 	 * */
-	public void outOfTurnSelect(Optional<Character> c) {
+	public void outOfTurnSelect(final Optional<Character> c) {
 		battle.cancel();
 		selectedCharacter = c;
 		isCharacterSelected.setValue(c.isPresent());
@@ -236,7 +234,7 @@ public class BattleView
 	/**
 	 * Update information about the selected character.
 	 * */
-	public void updateSelectedCharacter(Character c) {
+	public void updateSelectedCharacter(final Character c) {
 		selectedCharacter.ifPresent(sc -> {
 			if (sc.id == c.id) {
 				selectedCharacter = Optional.of(c);
@@ -256,14 +254,14 @@ public class BattleView
 	/**
 	 * Set the map points that can be selected.
 	 * */
-	public void setSelectable(Collection<MapPoint> mr) {
+	public void setSelectable(final Collection<MapPoint> mr) {
 		canvas.setSelectable(mr);
 	}
 
 	/**
 	 * Determine if a map point is selectable;
 	 * */
-	public boolean isSelectable(MapPoint p) {
+	public boolean isSelectable(final MapPoint p) {
 		return canvas.isSelectable(p);
 	}
 
@@ -315,7 +313,7 @@ public class BattleView
 	/**
 	 * The selected character uses an ability.
 	 * */
-	public void useAbility(Ability ability) {
+	public void useAbility(final Ability ability) {
 		try {
 			battle.cancel();
 			setMode(new ModeTarget(this, selectedCharacter.get(), ability));
@@ -353,7 +351,7 @@ public class BattleView
 			.anyMatch(c -> anyValidMovesFor(c));
 	}
 
-	public boolean anyValidMovesFor(Character c) {
+	public boolean anyValidMovesFor(final Character c) {
 		final boolean canMove =
 			mode.getFutureWithRetry(battle.requestInfo(new InfoMoveRange(c)))
 				.map(r -> !r.isEmpty()).orElse(false);
@@ -364,13 +362,13 @@ public class BattleView
 	}
 
 	@Override
-	public void endBattle(BattleOutcome outcome) {
+	public void endBattle(final BattleOutcome outcome) {
 		selectCharacter(Optional.empty());
 		setMode(new ModeOtherTurn(this));
 		hud.doEndMode(outcome);
 	}
 
-	public void handleEndBattle(Optional<BattleOutcome> outcome) {
+	public void handleEndBattle(final Optional<BattleOutcome> outcome) {
 		onDone.accept(outcome);
 	}
 
@@ -387,7 +385,7 @@ public class BattleView
 	}
 
 	@Override
-	public void badCommand(CommandException e) {
+	public void badCommand(final CommandException e) {
 		final Alert a = new Alert(Alert.AlertType.ERROR,
 			e.getMessage(), ButtonType.CLOSE);
 		a.setHeaderText("Game error!");
@@ -396,7 +394,7 @@ public class BattleView
 	}
 
 	@Override
-	public void command(ExecutedCommand ec) {
+	public void command(final ExecutedCommand ec) {
 		System.err.println(ec.cmd.getJSON());
 		commands.queueCommand(ec);
 		if (!inAnimation) inAnimation = commands.doNextCommand();
@@ -406,14 +404,14 @@ public class BattleView
 	}
 
 	@Override
-	public void completeEffect(InstantEffect e, boolean canCancel) {
+	public void completeEffect(final InstantEffect e, final boolean canCancel) {
 		if (instantEffectCompletion.isPresent()) throw new RuntimeException(
 			"Invalid UI state.  Attempted to complete an instant effect, but we're already completing a different instant effect");
 
 		instantEffectCompletion = Optional.of(() -> {
 			if (e instanceof Teleport) {
 				hud.writeMessage("Select teleport destination");
-				Teleport teleport = (Teleport) e;
+				final Teleport teleport = (Teleport) e;
 
 				try {
 					setMode(new ModeTeleport(this, (ModeAnimating) this.mode,
@@ -425,7 +423,7 @@ public class BattleView
 
 			} else if (e instanceof Move) {
 				hud.writeMessage("Select move destination");
-				Move move = (Move) e;
+				final Move move = (Move) e;
 
 				try {
 					setMode(new ModeMoveEffect(this, (ModeAnimating) this.mode,

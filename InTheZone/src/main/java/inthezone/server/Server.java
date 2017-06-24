@@ -17,6 +17,8 @@ public class Server {
 	public static final int DEFAULT_MAXCLIENTS = 1000;
 	public static final int DEFAULT_PORT = 8000; // for now!
 
+	public static final File GAMES_DIR = new File("games");
+
 	public static void main(final String args[]) {
 		final Map<String, String> parsedArgs = new HashMap<>();
 		for (String arg : args) {
@@ -33,6 +35,12 @@ public class Server {
 			.map(x -> (new File(x)).getAbsoluteFile());
 
 		try {
+			if (!GAMES_DIR.exists()) GAMES_DIR.mkdirs();
+			if (!GAMES_DIR.isDirectory()) {
+				Log.fatal("Cannot create saved games directory ./" + GAMES_DIR, null);
+				System.exit(1);
+			}
+
 			final int port = Optional.ofNullable(parsedArgs.get("--port"))
 				.map(x -> Integer.parseInt(x)).orElse(DEFAULT_PORT);
 			final int backlog = Optional.ofNullable(parsedArgs.get("--backlog"))

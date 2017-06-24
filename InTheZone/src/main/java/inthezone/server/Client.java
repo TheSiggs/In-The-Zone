@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.json.JSONObject;
+
 import inthezone.Log;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.protocol.ClientState;
@@ -39,7 +41,7 @@ public class Client {
 
 	private Set<Client> challenges = new HashSet<>();
 	private Set<Client> challenged = new HashSet<>();
-	private Optional<Client> inGameWith = Optional.empty();
+	private Optional<Game> currentGame = Optional.empty();
 
 	private final List<Message> messages = new ArrayList<>();
 
@@ -120,6 +122,9 @@ public class Client {
 	public void closeConnection(final boolean intentional) {
 		Log.info("Closing connection to " + getClientName() +
 			(intentional ? "" : " (due to an error)"), null);
+
+		currentGame.ifPresent(x -> x.close());
+
 		if (recursiveCloseConnection) return;
 
 		pendingClients.remove(this);
@@ -129,7 +134,7 @@ public class Client {
 			// ugly, but it guarantees that both sides get closed, no matter which
 			// side gets closed first.
 			recursiveCloseConnection = true;
-			inGameWith.ifPresent(x -> x.otherGuyLoggedOff());
+			currentGame.ifPresent(x -> x.getOther(this).otherGuyLoggedOff());
 			recursiveCloseConnection = false;
 			sessions.remove(sessionKey);
 			if (name.isPresent()) {
@@ -144,7 +149,7 @@ public class Client {
 				}
 			}
 		} else {
-			inGameWith.ifPresent(x -> x.waitForReconnect());
+			currentGame.ifPresent(x -> x.getOther(this).waitForReconnect());
 			state = ClientState.DISCONNECTED;
 			disconnectedAt = System.currentTimeMillis();
 		}
@@ -206,13 +211,15 @@ public class Client {
 	/**
 	 * Begin a game with another client.
 	 * */
-	public void startGameWith(final Client client) {
+	public void startGameWith(final Client client, final Game game) {
 		Log.info(getClientName() +
 			" entered a game with " + client.getClientName(), null);
 		messages.clear();
 		state = ClientState.GAME;
 		challenges.remove(client);
-		inGameWith = Optional.of(client);
+
+		currentGame.ifPresent(g -> g.close());
+		currentGame = Optional.of(game);
 	}
 
 	/**
@@ -272,9 +279,13 @@ public class Client {
 	 * */
 	public void gameOver() {
 		Log.info(getClientName() + " has finished game with " +
-			inGameWith.map(c -> c.getClientName()).orElse("<NO GAME>"), null);
+			currentGame.map(c ->
+				c.getOther(this).getClientName()).orElse("<NO GAME>"), null);
 		state = ClientState.LOBBY;
-		inGameWith = Optional.empty();
+
+		currentGame.ifPresent(x -> x.close());
+		currentGame = Optional.empty();
+
 		messages.clear();
 	}
 
@@ -285,9 +296,13 @@ public class Client {
 		if (state == ClientState.DISCONNECTED) {
 			closeConnection(true);
 		} else {
-			Log.warn(inGameWith.map(c -> c.getClientName()).orElse("<NO GAME>") +
+			Log.warn(currentGame.map(c ->
+				c.getOther(this).getClientName()).orElse("<NO GAME>") +
 				"has logged off while in a game with " + getClientName(), null);
-			inGameWith = Optional.empty();
+			
+			currentGame.ifPresent(x -> x.close());
+			currentGame = Optional.empty();
+
 			messages.clear();
 			channel.requestSend(Message.LOGOFF());
 			if (state == ClientState.GAME) {
@@ -326,9 +341,9 @@ public class Client {
 		channel.affiliate(this);
 		this.connection = connection;
 
-		if (inGameWith.isPresent()) {
+		if (currentGame.isPresent()) {
 			this.state = ClientState.GAME;
-			inGameWith.get().otherGuyReconnected();
+			currentGame.get().getOther(this).otherGuyReconnected();
 		} else {
 			this.state = ClientState.LOBBY;
 		}
@@ -387,8 +402,8 @@ public class Client {
 						channel.requestSend(Message.OK());
 						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
 						old.replayMessagesFrom(lastSequenceNumber);
-						old.inGameWith.ifPresent(other -> {
-							if (!other.isConnected()) old.waitForReconnect();
+						old.currentGame.ifPresent(other -> {
+							if (!other.getOther(this).isConnected()) old.waitForReconnect();
 						});
 
 						// remove this client
@@ -451,9 +466,12 @@ public class Client {
 				break;
 
 			case GAME:
-				final Client otherPlayer = inGameWith.orElseThrow(() ->
-					new ProtocolException("In game state without a partner"));
+				final Client otherPlayer = currentGame.map(x -> x.getOther(this))
+					.orElseThrow(() -> new ProtocolException(
+						"In game state without a partner"));
 				if (msg.kind == MessageKind.COMMAND) {
+					final JSONObject cmd = msg.parseCommand();
+					currentGame.ifPresent(x -> x.nextCommand(cmd));
 					otherPlayer.forwardMessage(msg);
 				} else if (msg.kind == MessageKind.GAME_OVER) {
 					otherPlayer.gameOver();
@@ -548,8 +566,11 @@ public class Client {
 				doRejectChallenge(Message.REJECT_CHALLENGE(c.getClientName()), c);
 			}
 
-			startGameWith(client);
-			client.startGameWith(this);
+			final Game game = new Game(this, client);
+			game.nextCommand(msg.parseCommand());
+
+			startGameWith(client, game);
+			client.startGameWith(this, game);
 
 			for (Client c : namedClients.values()) {
 				if (c != this && c != client) {
@@ -567,11 +588,13 @@ public class Client {
 				msg.parseCommand(),
 				msg.parsePlayer(),
 				msg.parseName()));
+
 		} else {
 			Log.warn(getClientName() +
 				" attempted to accept a challenge from " + client.getClientName() +
 				", but " + client.getClientName() + " was already in a battle with " +
-				client.inGameWith.map (c -> c.getClientName()).orElse("<NO GAME>"), null);
+				client.currentGame.map (c ->
+					c.getOther(this).getClientName()).orElse("<NO GAME>"), null);
 			channel.requestSend(Message.NOK(client.name.orElse("") +
 				" is already in battle with someone else"));
 		}

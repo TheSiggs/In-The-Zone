@@ -4,3 +4,5 @@ TerrainBattle/private/
 .DS_Store
 /InTheZone/.nb-gradle/
 /InTheZone/server/build/
+InTheZone/games/
+.gitignore.swp

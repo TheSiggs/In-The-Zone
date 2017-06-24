@@ -130,6 +130,8 @@ public class Network implements Runnable {
 	private void doConnect() throws IOException, ProtocolException {
 		// connect to the server.  If this fails, terminate the thread.
 		this.socket = new Socket(host, port);
+		this.socket.setKeepAlive(true);
+		this.socket.setTcpNoDelay(true);
 		this.fromServer = new BufferedReader(
 			new InputStreamReader(socket.getInputStream(), "UTF-8"));
 		this.toServer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");

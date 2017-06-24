@@ -2,6 +2,7 @@ package inthezone.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -113,6 +114,8 @@ public class Multiplexer implements Runnable {
 			if (k == serverKey) {
 				if (k.isAcceptable()) {
 					final SocketChannel connection = serverSocket.accept();
+					connection.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+					connection.setOption(StandardSocketOptions.TCP_NODELAY, true);
 					if (connection != null) newClient(connection);
 					skeys.remove();
 				}

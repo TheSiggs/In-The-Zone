@@ -1,11 +1,13 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
-import isogame.engine.MapPoint;
+
 import java.util.Optional;
 
+import inthezone.battle.Character;
+import isogame.engine.SelectionInfo;
+
 public class ModeSelect extends Mode {
-	public ModeSelect(BattleView view) {
+	public ModeSelect(final BattleView view) {
 		super(view);
 	}
 
@@ -19,8 +21,9 @@ public class ModeSelect extends Mode {
 		}
 	}
 
-	@Override public void handleSelection(MapPoint p) {
-		Optional<Character> oc = view.sprites.getCharacterAt(p);
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final Optional<Character> oc = selection.spritePriority()
+			.flatMap(p -> view.sprites.getCharacterAt(p));
 
 		if (oc.isPresent() && oc.get().player == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));

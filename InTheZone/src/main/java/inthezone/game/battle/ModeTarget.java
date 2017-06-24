@@ -13,6 +13,7 @@ import inthezone.comptroller.InfoAffected;
 import inthezone.comptroller.InfoAttackArea;
 import inthezone.comptroller.InfoTargeting;
 import isogame.engine.MapPoint;
+import isogame.engine.SelectionInfo;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -341,7 +342,9 @@ public class ModeTarget extends Mode {
 		recastFrom.addAll(affected1);
 	}
 
-	@Override public void handleSelection(final MapPoint p) {
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final MapPoint p = selection.pointPriority().get();
+
 		if (view.isSelectable(p)) {
 			view.setMode(addTarget(p));
 		} else if (canCancel) {

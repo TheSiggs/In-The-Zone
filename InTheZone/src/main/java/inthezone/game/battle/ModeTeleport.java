@@ -3,6 +3,7 @@ package inthezone.game.battle;
 import inthezone.battle.Character;
 import inthezone.comptroller.InfoTeleportRange;
 import isogame.engine.MapPoint;
+import isogame.engine.SelectionInfo;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,7 +64,9 @@ public class ModeTeleport extends Mode {
 
 	@Override public boolean canCancel() {return canCancel;}
 
-	@Override public void handleSelection(final MapPoint p) {
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final MapPoint p = selection.pointPriority().get();
+
 		if (view.isSelectable(p)) {
 			teleportDestinations.add(p);
 			teleportQueue.remove();

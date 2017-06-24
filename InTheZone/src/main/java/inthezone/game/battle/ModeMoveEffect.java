@@ -4,6 +4,7 @@ import inthezone.battle.Character;
 import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.InfoPath;
 import isogame.engine.MapPoint;
+import isogame.engine.SelectionInfo;
 import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,9 @@ public class ModeMoveEffect extends ModeMove {
 		this.canCancel = canCancel;
 	}
 
-	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+	@Override public Mode updateSelectedCharacter(
+		final Character selectedCharacter
+	) {
 		return new ModeMoveEffect(view,
 			lastMode.updateSelectedCharacter(selectedCharacter),
 			moveQueue, moveRange, canCancel);
@@ -52,7 +55,7 @@ public class ModeMoveEffect extends ModeMove {
 			return lastMode;
 
 		} else {
-			Stage stage = view.getStage();
+			final Stage stage = view.getStage();
 			stage.clearAllHighlighting();
 			getFutureWithRetry(view.battle.requestInfo(
 				new InfoMoveRange(moving, moveRange))).ifPresent(mr -> {
@@ -65,7 +68,9 @@ public class ModeMoveEffect extends ModeMove {
 		}
 	}
 
-	@Override public void handleSelection(MapPoint p) {
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final MapPoint p = selection.pointPriority().get();
+
 		if (view.isSelectable(p)) {
 			moveDestinations.add(p);
 			moveQueue.remove();
@@ -74,7 +79,7 @@ public class ModeMoveEffect extends ModeMove {
 	}
 
 	@Override public void handleMouseOver(MapPoint p) {
-		Stage stage = view.getStage();
+		final Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_PATH);
 
 		getFutureWithRetry(view.battle.requestInfo(new InfoPath(moving, p, moveRange)))

@@ -1,14 +1,13 @@
 package inthezone.game.battle;
 
 import inthezone.battle.Character;
-import inthezone.battle.Targetable;
 import isogame.engine.MapPoint;
+import isogame.engine.SelectionInfo;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * A GUI mode.
@@ -16,7 +15,7 @@ import java.util.Optional;
 public abstract class Mode {
 	protected final BattleView view;
 
-	protected Mode(BattleView view) {
+	protected Mode(final BattleView view) {
 		this.view = view;
 	}
 
@@ -32,14 +31,14 @@ public abstract class Mode {
 	/**
 	 * Some properties of the selected character have changed.
 	 * */
-	public Mode updateSelectedCharacter(Character selected) {
+	public Mode updateSelectedCharacter(final Character selected) {
 		return this;
 	}
 
 	/**
 	 * Register retargeting information.
 	 * */
-	public Mode retarget(Map<MapPoint, MapPoint> retargeting) {
+	public Mode retarget(final Map<MapPoint, MapPoint> retargeting) {
 		return this;
 	}
 
@@ -53,12 +52,12 @@ public abstract class Mode {
 	}
 
 	public boolean isInteractive() {return true;}
-	public void handleSelection(MapPoint p) {}
-	public void handleMouseOver(MapPoint p) {}
+	public void handleSelection(final SelectionInfo selection) {}
+	public void handleMouseOver(final MapPoint p) {}
 	public void handleMouseOut() {}
 	public boolean canCancel() {return true;}
 
-	public static <T> Optional<T> getFutureWithRetry(Future<T> f) {
+	public static <T> Optional<T> getFutureWithRetry(final Future<T> f) {
 		while (true) {
 			try {
 				return Optional.of(f.get());

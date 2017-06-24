@@ -96,13 +96,13 @@ public class BattleView
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(
-			(p, button) -> {
+			(selection, button) -> {
 				if (button == MouseButton.SECONDARY) {
 					if (mode.canCancel()) cancelAbility();
-				} else if (p == null && mode.canCancel()) {
+				} else if (selection.isEmpty() && mode.canCancel()) {
 					selectCharacter(Optional.empty());
 				} else {
-					mode.handleSelection(p);
+					mode.handleSelection(selection);
 				}
 			});
 		canvas.doOnMouseOverSprite(decals::handleMouseOver);
@@ -222,13 +222,19 @@ public class BattleView
 	 * */
 	public void outOfTurnSelect(final Optional<Character> c) {
 		battle.cancel();
+		canvas.resetMouseHandlers();
+		canvas.resetMouseHandlers();
 		selectedCharacter = c;
 		isCharacterSelected.setValue(c.isPresent());
 		hud.selectCharacter(c);
 	}
 
 	public void cancelAbility() {
-		selectCharacter(selectedCharacter);
+		if (mode instanceof ModeMove) {
+			selectCharacter(Optional.empty());
+		} else {
+			selectCharacter(selectedCharacter);
+		}
 	}
 
 	/**
@@ -303,6 +309,7 @@ public class BattleView
 	public void useItem() {
 		try {
 			battle.cancel();
+			canvas.resetMouseHandlers();
 			setMode(new ModeTargetItem(this, selectedCharacter.get()));
 		} catch (NoSuchElementException e) {
 			throw new RuntimeException(
@@ -316,6 +323,7 @@ public class BattleView
 	public void useAbility(final Ability ability) {
 		try {
 			battle.cancel();
+			canvas.resetMouseHandlers();
 			setMode(new ModeTarget(this, selectedCharacter.get(), ability));
 		} catch (NoSuchElementException e) {
 			throw new RuntimeException(
@@ -338,6 +346,7 @@ public class BattleView
 	public void usePush() {
 		try {
 			battle.cancel();
+			canvas.resetMouseHandlers();
 			setMode(new ModePush(this, selectedCharacter.get()));
 		} catch (NoSuchElementException e) {
 			throw new RuntimeException(

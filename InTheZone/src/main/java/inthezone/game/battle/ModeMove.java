@@ -5,6 +5,7 @@ import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.InfoPath;
 import isogame.engine.MapPoint;
+import isogame.engine.SelectionInfo;
 import isogame.engine.Stage;
 import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_MOVE;
@@ -43,16 +44,19 @@ public class ModeMove extends Mode {
 		return this;
 	}
 
-	@Override public void handleSelection(final MapPoint p) {
-		final Optional<Character> oc = view.sprites.getCharacterAt(p);
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final Optional<Character> oc = selection.spritePriority()
+			.flatMap(p -> view.sprites.getCharacterAt(p));
 
-		if (oc.isPresent() && oc.get().player == view.player) {
-			view.selectCharacter(Optional.of(oc.get()));
-		} else if (view.isSelectable(p)) {
+		final MapPoint p = selection.pointPriority().get();
+
+		if (view.isSelectable(p)) {
 			view.battle.requestCommand(
 				new MoveCommandRequest(
 					selectedCharacter.getPos(), p, selectedCharacter.player));
 			view.setMode(new ModeAnimating(view));
+		} else if (oc.isPresent() && oc.get().player == view.player) {
+			view.selectCharacter(Optional.of(oc.get()));
 		} else {
 			view.selectCharacter(Optional.empty());
 		}

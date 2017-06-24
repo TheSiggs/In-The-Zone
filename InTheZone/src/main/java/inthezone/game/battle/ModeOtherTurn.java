@@ -1,12 +1,13 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Targetable;
-import inthezone.battle.Character;
-import isogame.engine.MapPoint;
+
 import java.util.Optional;
 
+import inthezone.battle.Character;
+import isogame.engine.SelectionInfo;
+
 public class ModeOtherTurn extends Mode {
-	public ModeOtherTurn(BattleView view) {
+	public ModeOtherTurn(final BattleView view) {
 		super(view);
 	}
 
@@ -17,8 +18,9 @@ public class ModeOtherTurn extends Mode {
 
 	@Override public boolean isInteractive() {return false;}
 
-	@Override public void handleSelection(MapPoint p) {
-		Optional<Character> oc = view.sprites.getCharacterAt(p);
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final Optional<Character> oc = selection.spritePriority()
+			.flatMap(p -> view.sprites.getCharacterAt(p));
 
 		if (oc.isPresent() && oc.get().player == view.player) {
 			view.outOfTurnSelect(Optional.of(oc.get()));

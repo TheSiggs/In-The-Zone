@@ -4,6 +4,7 @@ import inthezone.battle.Character;
 import inthezone.battle.commands.UseItemCommandRequest;
 import inthezone.comptroller.InfoTargetingItem;
 import isogame.engine.MapPoint;
+import isogame.engine.SelectionInfo;
 import isogame.engine.Stage;
 import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
@@ -12,18 +13,23 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 public class ModeTargetItem extends Mode {
 	private final Character selectedCharacter;
 
-	public ModeTargetItem(BattleView view, Character selectedCharacter) {
+	public ModeTargetItem(
+		final BattleView view, final Character selectedCharacter
+	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
-	@Override public Mode updateSelectedCharacter(Character selectedCharacter) {
+	@Override public Mode updateSelectedCharacter(
+		final Character selectedCharacter
+	) {
 		return new ModeTargetItem(view, selectedCharacter);
 	}
 
 	@Override public Mode setupMode() {
-		Stage stage = view.getStage();
-		getFutureWithRetry(view.battle.requestInfo(new InfoTargetingItem(selectedCharacter)))
+		final Stage stage = view.getStage();
+		getFutureWithRetry(view.battle.requestInfo(
+			new InfoTargetingItem(selectedCharacter)))
 			.ifPresent(tr -> {
 				tr.stream().forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_TARGET));
 				view.setSelectable(tr);
@@ -32,7 +38,9 @@ public class ModeTargetItem extends Mode {
 		return this;
 	}
 
-	@Override public void handleSelection(MapPoint p) {
+	@Override public void handleSelection(final SelectionInfo selection) {
+		final MapPoint p = selection.pointPriority().get();
+
 		if (view.isSelectable(p)) {
 			view.battle.requestCommand(new UseItemCommandRequest(
 				selectedCharacter.getPos(), p));
@@ -44,7 +52,7 @@ public class ModeTargetItem extends Mode {
 	}
 
 	@Override public void handleMouseOver(MapPoint p) {
-		Stage stage = view.getStage();
+		final Stage stage = view.getStage();
 		stage.clearHighlighting(HIGHLIGHT_ATTACKAREA);
 		if (view.isSelectable(p)) stage.setHighlight(p, HIGHLIGHT_ATTACKAREA);
 	}

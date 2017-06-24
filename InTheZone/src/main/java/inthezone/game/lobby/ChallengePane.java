@@ -209,8 +209,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		loadout.getSelectionModel().selectedItemProperty()
 			.addListener((o, s0, s) -> setLoadout(s));
 
-		startPosChooser.doOnSelection((p, button) -> {
-			if (button != MouseButton.SECONDARY) placeCharacter(p);
+		startPosChooser.doOnSelection((selection, button) -> {
+			if (button == MouseButton.PRIMARY) {
+				selection.spritePriority().ifPresent(p -> placeCharacter(p));
+			}
 		});
 
 		cancelButton.setOnAction(event -> {

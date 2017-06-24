@@ -1,16 +1,8 @@
 package inthezone.battle.instant;
 
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.data.AbilityInfo;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.Targetable;
-import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,16 +10,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.Targetable;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.protocol.ProtocolException;
 
 public class Obstacles extends InstantEffect {
 	private final Collection<MapPoint> placements = new ArrayList<>();
 	private final String abilityName;
 
 	private Obstacles(
-		Collection<MapPoint> placements, String abilityName, MapPoint agent
+		final Collection<MapPoint> placements,
+		final String abilityName, final MapPoint agent
 	) {
 		super(agent);
 		this.abilityName = abilityName;
@@ -46,7 +49,7 @@ public class Obstacles extends InstantEffect {
 		return o;
 	}
 
-	public static Obstacles fromJSON(JSONObject json)
+	public static Obstacles fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -71,16 +74,18 @@ public class Obstacles extends InstantEffect {
 	}
 
 	public static Obstacles getEffect(
-		MapPoint agent,
-		String abilityName,
-		Collection<MapPoint> targets
+		final MapPoint agent,
+		final String abilityName,
+		final Collection<MapPoint> targets
 	) {
 		return new Obstacles(targets, abilityName, agent);
 	}
 
 	private final List<MapPoint> constructedObjects = new ArrayList<>();
 
-	@Override public List<Targetable> apply(Battle battle) throws CommandException {
+	@Override public List<Targetable> apply(final Battle battle)
+		throws CommandException
+	{
 		final Optional<AbilityInfo> abilityData;
 
 		if (abilityName == null) {
@@ -105,9 +110,10 @@ public class Obstacles extends InstantEffect {
 	@Override public List<MapPoint> getConstructed() {return constructedObjects;}
 
 	@Override public InstantEffect retarget(
-		BattleState battle, Map<MapPoint, MapPoint> retarget
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		return new Obstacles(placements, abilityName, retarget.getOrDefault(agent, agent));
+		return new Obstacles(placements, abilityName,
+			retarget.getOrDefault(agent, agent));
 	}
 }
 

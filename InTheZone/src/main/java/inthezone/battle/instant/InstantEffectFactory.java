@@ -1,28 +1,31 @@
 package inthezone.battle.instant;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import inthezone.battle.BattleState;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Construct instant effects
  * */
 public class InstantEffectFactory {
 	public static InstantEffect getEffect(
-		String abilityName,
-		BattleState battleState,
-		InstantEffectInfo info,
-		MapPoint castFrom,
-		Collection<MapPoint> attackArea,
-		List<MapPoint> targets
+		final String abilityName,
+		final BattleState battleState,
+		final InstantEffectInfo info,
+		final MapPoint castFrom,
+		final Collection<MapPoint> attackArea,
+		final List<MapPoint> targets
 	) {
 		switch (info.type) {
 			case CLEANSE: /* fallthrough */
@@ -37,9 +40,12 @@ public class InstantEffectFactory {
 		}
 	}
 
-	public static InstantEffect fromJSON(JSONObject o) throws ProtocolException {
+	public static InstantEffect fromJSON(final JSONObject o)
+		throws ProtocolException
+	{
 		try {
-			final InstantEffectType kind = (new InstantEffectInfo(o.getString("kind"))).type;
+			final InstantEffectType kind =
+				(new InstantEffectInfo(o.getString("kind"))).type;
 
 			switch (kind) {
 				case CLEANSE: /* fallthrough */

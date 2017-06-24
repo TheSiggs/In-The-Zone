@@ -1,36 +1,37 @@
 package inthezone.battle.instant;
 
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.Character;
-import inthezone.battle.commands.Command;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.commands.ExecutedCommand;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.data.Player;
-import inthezone.battle.LineOfSight;
-import inthezone.battle.PathFinderNode;
-import inthezone.battle.Targetable;
-import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.function.Function;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.Character;
+import inthezone.battle.LineOfSight;
+import inthezone.battle.PathFinderNode;
+import inthezone.battle.Targetable;
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.data.Player;
+import inthezone.protocol.ProtocolException;
 
 public class PullPush extends InstantEffect {
 	private final InstantEffectInfo type;
@@ -45,10 +46,10 @@ public class PullPush extends InstantEffect {
 	 * effect, and the triggers have not been resolved yet.
 	 * */
 	private PullPush(
-		InstantEffectInfo type,
-		MapPoint castFrom,
-		List<List<MapPoint>> paths,
-		boolean isFear
+		final InstantEffectInfo type,
+		final MapPoint castFrom,
+		final List<List<MapPoint>> paths,
+		final boolean isFear
 	) {
 		super(castFrom);
 		this.type = type;
@@ -72,10 +73,14 @@ public class PullPush extends InstantEffect {
 		return o;
 	}
 
-	public static PullPush fromJSON(JSONObject json) throws ProtocolException {
+	public static PullPush fromJSON(final JSONObject json)
+		throws ProtocolException
+	{
 		try {
-			final InstantEffectInfo kind = new InstantEffectInfo(json.getString("kind"));
-			final MapPoint castFrom = MapPoint.fromJSON(json.getJSONObject("castFrom"));
+			final InstantEffectInfo kind =
+				new InstantEffectInfo(json.getString("kind"));
+			final MapPoint castFrom =
+				MapPoint.fromJSON(json.getJSONObject("castFrom"));
 			final JSONArray rawPaths = json.getJSONArray("paths");
 
 			if (!(kind.type == InstantEffectType.PULL || kind.type == InstantEffectType.PUSH))
@@ -105,11 +110,11 @@ public class PullPush extends InstantEffect {
 	 * @param isFear Same as for the constructor
 	 * */
 	public static PullPush getEffect(
-		BattleState battle,
-		InstantEffectInfo info,
-		MapPoint castFrom,
-		Collection<MapPoint> targets,
-		boolean isFear
+		final BattleState battle,
+		final InstantEffectInfo info,
+		final MapPoint castFrom,
+		final Collection<MapPoint> targets,
+		final boolean isFear
 	) {
 		final List<List<MapPoint>> paths = new ArrayList<>();
 
@@ -136,7 +141,10 @@ public class PullPush extends InstantEffect {
 	}
 
 	private static MapPoint getTo(
-		InstantEffectType type, MapPoint from, MapPoint castFrom, int range
+		final InstantEffectType type,
+		final MapPoint from,
+		final MapPoint castFrom,
+		final int range
 	) {
 		if (type == InstantEffectType.PULL) {
 			return castFrom;
@@ -148,9 +156,9 @@ public class PullPush extends InstantEffect {
 	}
 
 	private static List<MapPoint> getPullPath(
-		BattleState battle, MapPoint from, MapPoint to,
-		Set<MapPoint> occupied, Set<MapPoint> cleared,
-		int limit, boolean bias
+		final BattleState battle, final MapPoint from, final MapPoint to,
+		final Set<MapPoint> occupied, final Set<MapPoint> cleared,
+		final int limit, final boolean bias
 	) {
 		final List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
 		final List<MapPoint> path = new ArrayList<>();
@@ -188,14 +196,14 @@ public class PullPush extends InstantEffect {
 		return path.size() >= 2? path : new ArrayList<>();
 	}
 
-	@Override public List<Targetable> apply(Battle battle) {
+	@Override public List<Targetable> apply(final Battle battle) {
 		return paths.stream()
 			.flatMap(path -> battle.doPushPull(path, isFear).stream())
 			.collect(Collectors.toList());
 	}
 
 	@Override public List<ExecutedCommand> applyComputingTriggers(
-		Battle battle, Function<InstantEffect, Command> cmd
+		final Battle battle, final Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
 		final List<ExecutedCommand> r = new ArrayList<>();
@@ -264,7 +272,7 @@ public class PullPush extends InstantEffect {
 	}
 
 	@Override public InstantEffect retarget(
-		BattleState battle, Map<MapPoint, MapPoint> retarget
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
 		final Collection<MapPoint> targets =
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))

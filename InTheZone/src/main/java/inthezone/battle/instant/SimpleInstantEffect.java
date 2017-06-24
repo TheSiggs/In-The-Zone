@@ -1,30 +1,33 @@
 package inthezone.battle.instant;
 
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.Targetable;
-import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.Targetable;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.protocol.ProtocolException;
 
 public class SimpleInstantEffect extends InstantEffect {
 	private final Collection<MapPoint> targets;
 	private final InstantEffectType type;
 
 	private SimpleInstantEffect(
-		Collection<MapPoint> targets, MapPoint agent, InstantEffectType type
+		final Collection<MapPoint> targets,
+		final MapPoint agent,
+		final InstantEffectType type
 	) {
 		super(agent);
 		this.targets = targets;
@@ -41,11 +44,12 @@ public class SimpleInstantEffect extends InstantEffect {
 		return o;
 	}
 
-	public static SimpleInstantEffect fromJSON(JSONObject json)
+	public static SimpleInstantEffect fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
-			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
+			final InstantEffectType kind =
+				(new InstantEffectInfo(json.getString("kind"))).type;
 			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
 			final JSONArray rawTargets = json.getJSONArray("targets");
 
@@ -67,12 +71,13 @@ public class SimpleInstantEffect extends InstantEffect {
 	}
 
 	public static SimpleInstantEffect getEffect(
-		Collection<MapPoint> targets, MapPoint agent, InstantEffectType type
+		final Collection<MapPoint> targets,
+		final MapPoint agent, final InstantEffectType type
 	) {
 		return new SimpleInstantEffect(targets, agent, type);
 	}
 
-	@Override public List<Targetable> apply(Battle battle) {
+	@Override public List<Targetable> apply(final Battle battle) {
 		switch (type) {
 			case CLEANSE: return battle.doCleanse(targets);
 			case PURGE: return battle.doPurge(targets);
@@ -83,7 +88,7 @@ public class SimpleInstantEffect extends InstantEffect {
 	}
 
 	@Override public InstantEffect retarget(
-		BattleState battle, Map<MapPoint, MapPoint> retarget
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
 		return new SimpleInstantEffect(
 			targets.stream()

@@ -1,30 +1,33 @@
 package inthezone.battle.instant;
 
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.commands.Command;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.commands.ExecutedCommand;
-import inthezone.battle.Targetable;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
-import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.Targetable;
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.ExecutedCommand;
 
 public abstract class InstantEffect implements HasJSONRepresentation {
 	public final MapPoint agent;
 
-	protected InstantEffect(MapPoint agent) {
+	protected InstantEffect(final MapPoint agent) {
 		this.agent = agent;
 	}
 
 	/**
 	 * Apply this effect assuming traps and zones have been triggered.
 	 * */
-	public abstract List<Targetable> apply(Battle battle) throws CommandException;
+	public abstract List<Targetable> apply(final Battle battle)
+		throws CommandException;
 
 	/**
 	 * Apply this effect, triggering traps and zones.
@@ -46,7 +49,7 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 	 * Update the locations of targets to this effect.
 	 * */
 	public abstract InstantEffect retarget(
-		BattleState battle, Map<MapPoint, MapPoint> retarget);
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget);
 
 	/**
 	 * Get information pertaining to targets that were moved by this effect.
@@ -67,6 +70,8 @@ public abstract class InstantEffect implements HasJSONRepresentation {
 	 * Attempt to complete this instant effect.
 	 * @return true on success, false on fail.
 	 * */
-	public boolean complete(BattleState battle, List<MapPoint> p) {return true;}
+	public boolean complete(final BattleState battle, final List<MapPoint> p) {
+		return true;
+	}
 }
 

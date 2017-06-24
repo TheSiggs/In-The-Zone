@@ -121,11 +121,6 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 	@Override
-	public Optional<String> tryDifferentPlayerName(String name) {
-		return Optional.empty();
-	}
-
-	@Override
 	public void errorConnectingToServer(Exception e) {
 		Platform.runLater(() -> {
 			isConnected = false;

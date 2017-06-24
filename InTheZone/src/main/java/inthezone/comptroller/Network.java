@@ -1,5 +1,20 @@
 package inthezone.comptroller;
 
+import isogame.engine.CorruptDataException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.Socket;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
@@ -9,19 +24,6 @@ import inthezone.protocol.Message;
 import inthezone.protocol.MessageKind;
 import inthezone.protocol.Protocol;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.Optional;
-import java.util.UUID;
 
 public class Network implements Runnable {
 	private final static long timeout = 20*1000;
@@ -43,8 +45,8 @@ public class Network implements Runnable {
 	public final BlockingQueue<Command> readCommandQueue = new LinkedBlockingQueue<>();
 
 	public Network(
-		GameDataFactory gameData,
-		LobbyListener lobbyListener
+		final GameDataFactory gameData,
+		final LobbyListener lobbyListener
 	) {
 		this.gameData = gameData;
 		this.lobbyListener = lobbyListener;
@@ -89,7 +91,7 @@ public class Network implements Runnable {
 
 			while (true) {
 				try {
-					Message msg = sendQueue.poll(timeout, timeoutUnit);
+					final Message msg = sendQueue.poll(timeout, timeoutUnit);
 					if (msg == null) throw new InterruptedException();
 
 					toServer.write(msg.toString());
@@ -170,13 +172,8 @@ public class Network implements Runnable {
 			if (r.kind == MessageKind.OK) {
 				named = true;
 			} else {
-				Optional<String> nextPlayerName =
-					lobbyListener.tryDifferentPlayerName(playerName);
-				if (!nextPlayerName.isPresent()) {
-					throw new ProtocolException("Cannot get name on server");
-				} else {
-					playerName = nextPlayerName.get();
-				}
+				final String reason = r.parseMessage();
+				throw new IOException(reason);
 			}
 		}
 
@@ -191,7 +188,9 @@ public class Network implements Runnable {
 		}
 	}
 
-	public synchronized void connectToServer(String host, int port, String playerName) {
+	public synchronized void connectToServer(
+		final String host, final int port, final String playerName
+	) {
 		synchronized (connect) {
 			if (connect.get()) return;
 			connect.set(true);
@@ -203,7 +202,7 @@ public class Network implements Runnable {
 	}
 
 	public void challengePlayer(
-		StartBattleCommandRequest cmd, String player
+		final StartBattleCommandRequest cmd, final String player
 	) {
 		try {
 			sendQueue.put(Message.CHALLENGE_PLAYER(player, cmd.getJSON()));
@@ -217,16 +216,19 @@ public class Network implements Runnable {
 	 * @param otherPlayer The player who's challenge we're accepting
 	 * */
 	public void acceptChallenge(
-		StartBattleCommand cmd, Player player, String otherPlayer
+		final StartBattleCommand cmd,
+		final Player player,
+		final String otherPlayer
 	) {
 		try {
-			sendQueue.put(Message.ACCEPT_CHALLENGE(otherPlayer, player, cmd.getJSON()));
+			sendQueue.put(Message.ACCEPT_CHALLENGE(
+				otherPlayer, player, cmd.getJSON()));
 		} catch (InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}
 
-	public void refuseChallenge(String player) {
+	public void refuseChallenge(final String player) {
 		try {
 			sendQueue.put(Message.REJECT_CHALLENGE(player));
 		} catch (InterruptedException e) {
@@ -234,7 +236,7 @@ public class Network implements Runnable {
 		}
 	}
 
-	public void sendCommand(Command cmd) {
+	public void sendCommand(final Command cmd) {
 		try {
 			sendQueue.put(Message.COMMAND(cmd.getJSON()));
 		} catch (InterruptedException e) {

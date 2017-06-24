@@ -12,7 +12,6 @@ import java.util.Optional;
  * */
 public interface LobbyListener {
 	public void connectedToServer(String playerName, Collection<String> players);
-	public Optional<String> tryDifferentPlayerName(String name);
 	public void errorConnectingToServer(Exception e);
 	public void serverError(Exception e);
 

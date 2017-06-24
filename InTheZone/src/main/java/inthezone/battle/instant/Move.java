@@ -1,50 +1,59 @@
 package inthezone.battle.instant;
 
+import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
+import inthezone.battle.Targetable;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
-import inthezone.battle.LineOfSight;
-import inthezone.battle.PathFinderNode;
-import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
-import isogame.engine.MapPoint;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.function.Function;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class Move extends InstantEffect {
-	public List<List<MapPoint>> paths;
-	public final List<Character> affectedCharacters;
+	public final List<List<MapPoint>> paths = new ArrayList<>();
+	public final List<Character> affectedCharacters = new ArrayList<>();
 	public final int range;
 
+	private boolean isComplete;
+
 	private Move(
-		List<Character> affectedCharacters,
-		int range,
-		List<List<MapPoint>> paths,
-		MapPoint agent
+		final Optional<List<Character>> affectedCharacters,
+		final int range,
+		final Optional<List<List<MapPoint>>> paths,
+		final MapPoint agent,
+		final boolean effectComplete
 	) {
 		super(agent);
-		this.affectedCharacters = affectedCharacters;
 		this.range = range;
-		this.paths = paths;
+
+		isComplete = effectComplete;
+
+		affectedCharacters.ifPresent(a -> {
+			this.affectedCharacters.addAll(a);
+		});
+
+		paths.ifPresent(p -> {
+			this.paths.addAll(p);
+		});
 	}
 
 	@Override public JSONObject getJSON() {
@@ -62,7 +71,7 @@ public class Move extends InstantEffect {
 		return o;
 	}
 
-	public static Move fromJSON(JSONObject json) throws ProtocolException {
+	public static Move fromJSON(final JSONObject json) throws ProtocolException {
 		try {
 			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
 			int range = json.getInt("range");
@@ -83,30 +92,33 @@ public class Move extends InstantEffect {
 				paths.add(path);
 			}
 
-			return new Move(null, range, paths, agent);
+			return new Move(Optional.empty(), range, Optional.of(paths), agent, true);
 		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing move effect", e);
 		}
 	}
 
 	public static Move getEffect(
-		BattleState battle,
-		InstantEffectInfo info,
-		Collection<MapPoint> targets,
-		MapPoint agent
+		final BattleState battle,
+		final InstantEffectInfo info,
+		final Collection<MapPoint> targets,
+		final MapPoint agent
 	) {
-		List<Character> affected = targets.stream()
+		final List<Character> affected = targets.stream()
 			.flatMap(x -> battle.getCharacterAt(x)
 				.map(v -> Stream.of(v)).orElse(Stream.empty()))
 			.collect(Collectors.toList());
-		return new Move(affected, info.param, null, agent);
+
+		return new Move(
+			Optional.of(affected), info.param, Optional.empty(), agent, false);
 	}
 
-	@Override public List<Targetable> apply(Battle battle) {
+	@Override public List<Targetable> apply(final Battle battle) {
 		final List<Targetable> affected = new ArrayList<>();
 
 		for (List<MapPoint> path : paths) {
-			battle.battleState.getCharacterAt(path.get(0)).ifPresent(c -> affected.add(c));
+			battle.battleState.getCharacterAt(path.get(0))
+				.ifPresent(c -> affected.add(c));
 			battle.doMove(path, false);
 		}
 
@@ -114,10 +126,10 @@ public class Move extends InstantEffect {
 	}
 
 	@Override public List<ExecutedCommand> applyComputingTriggers(
-		Battle battle, Function<InstantEffect, Command> cmd
+		final Battle battle, final Function<InstantEffect, Command> cmd
 	) throws CommandException
 	{
-		List<ExecutedCommand> r = new ArrayList<>();
+		final List<ExecutedCommand> r = new ArrayList<>();
 
 		List<List<List<MapPoint>>> splitPaths = paths.stream()
 			.map(path -> {
@@ -131,27 +143,29 @@ public class Move extends InstantEffect {
 			}).collect(Collectors.toList());
 
 		while (!splitPaths.isEmpty()) {
-			List<List<MapPoint>> pathSections = new ArrayList<>();
+			final List<List<MapPoint>> pathSections = new ArrayList<>();
 			for (List<List<MapPoint>> sections : splitPaths) {
 				if (!sections.isEmpty()) pathSections.add(sections.remove(0));
 			}
 			splitPaths = splitPaths.stream()
 				.filter(x -> !x.isEmpty()).collect(Collectors.toList());
 
-			List<List<MapPoint>> validPathSections = pathSections.stream()
+			final List<List<MapPoint>> validPathSections = pathSections.stream()
 				.filter(x -> x.size() >= 2).collect(Collectors.toList());
 
 			// do the move
 			if (!validPathSections.isEmpty()) {
 				InstantEffect eff = new Move(
-					null, this.range, validPathSections, agent);
+					Optional.empty(), this.range,
+					Optional.of(validPathSections), agent, true);
 				r.add(new ExecutedCommand(cmd.apply(eff), eff.apply(battle)));
 			}
 
 			// do the triggers
 			for (List<MapPoint> path : pathSections) {
-				MapPoint loc = path.get(path.size() - 1);
-				List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
+				final MapPoint loc = path.get(path.size() - 1);
+				final List<Command> triggers =
+					battle.battleState.trigger.getAllTriggers(loc);
 				for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
 			}
 		}
@@ -160,7 +174,7 @@ public class Move extends InstantEffect {
 	}
 
 	@Override public Map<MapPoint, MapPoint> getRetargeting() {
-		Map<MapPoint, MapPoint> r = new HashMap<>();
+		final Map<MapPoint, MapPoint> r = new HashMap<>();
 
 		for (List<MapPoint> path : paths) {
 			r.put(path.get(0), path.get(path.size() - 1));
@@ -169,9 +183,9 @@ public class Move extends InstantEffect {
 	}
 
 	@Override public InstantEffect retarget(
-		BattleState battle, Map<MapPoint, MapPoint> retarget
+		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		Collection<MapPoint> targets =
+		final Collection<MapPoint> targets =
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
 			.collect(Collectors.toList());
 
@@ -180,18 +194,21 @@ public class Move extends InstantEffect {
 			targets, retarget.getOrDefault(agent, agent));
 	}
 
-	@Override public boolean isComplete() {return !(paths == null);}
-	@Override public boolean complete(BattleState battle, List<MapPoint> ps) {
+	@Override public boolean isComplete() {return isComplete;}
+
+	@Override public boolean complete(
+		final BattleState battle, final List<MapPoint> ps
+	) {
 		if (ps == null || affectedCharacters.size() != ps.size()) return false;
 
-		paths = new ArrayList<>();
-
 		for (int i = 0; i < ps.size(); i++) {
-			Character c = affectedCharacters.get(i);
-			List<MapPoint> path = battle.findPath(c.getPos(), ps.get(i), c.player);
+			final Character c = affectedCharacters.get(i);
+			final List<MapPoint> path =
+				battle.findPath(c.getPos(), ps.get(i), c.player);
 			if (!path.isEmpty()) paths.add(path);
 		}
 
+		isComplete = true;
 		return true;
 	}
 }

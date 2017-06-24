@@ -1,12 +1,5 @@
 package inthezone.server;
 
-import inthezone.battle.data.GameDataFactory;
-import inthezone.protocol.ClientState;
-import inthezone.protocol.Message;
-import inthezone.protocol.MessageChannel;
-import inthezone.protocol.MessageKind;
-import inthezone.protocol.Protocol;
-import inthezone.protocol.ProtocolException;
 import java.io.IOException;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -18,6 +11,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import inthezone.Log;
+import inthezone.battle.data.GameDataFactory;
+import inthezone.protocol.ClientState;
+import inthezone.protocol.Message;
+import inthezone.protocol.MessageChannel;
+import inthezone.protocol.MessageKind;
+import inthezone.protocol.Protocol;
+import inthezone.protocol.ProtocolException;
 
 public class Client {
 	public static final int MAX_CHALLENGES = 5;
@@ -75,6 +77,8 @@ public class Client {
 		channel.resetSelector(sel, this);
 	}
 
+	public String getClientName() { return name.orElse("<UNNAMED CLIENT>"); }
+
 	/**
 	 * Data from the client ready to read
 	 * */
@@ -84,10 +88,10 @@ public class Client {
 			final List<Message> msgs = channel.doRead();
 			for (Message msg : msgs) doNextMessage(msg);
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
+			Log.error("IO error reading from " + getClientName(), e);
 			closeConnection(false);
 		} catch (ProtocolException e) {
-			e.printStackTrace(System.err);
+			Log.error("Protocol error reading from " + getClientName(), e);
 			closeConnection(false);
 		}
 	}
@@ -100,7 +104,7 @@ public class Client {
 		try {
 			channel.doWrite();
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
+			Log.error("IO error writing to " + getClientName(), e);
 			closeConnection(false);
 		}
 	}
@@ -114,7 +118,8 @@ public class Client {
 	 * caused by an IO error.
 	 * */
 	public void closeConnection(final boolean intentional) {
-		System.err.println("Close connection " + name);
+		Log.info("Closing connection to " + getClientName() +
+			(intentional ? "" : " (due to an error)"), null);
 		if (recursiveCloseConnection) return;
 
 		pendingClients.remove(this);
@@ -202,6 +207,8 @@ public class Client {
 	 * Begin a game with another client.
 	 * */
 	public void startGameWith(final Client client) {
+		Log.info(getClientName() +
+			" entered a game with " + client.getClientName(), null);
 		messages.clear();
 		state = ClientState.GAME;
 		challenges.remove(client);
@@ -210,15 +217,21 @@ public class Client {
 
 	/**
 	 * A challenge that this client made is rejected.
+	 * @param client The client that rejected the challenge
 	 * */
 	public void challengeRejected(final Client client) {
+		Log.info("A challenge made by " + getClientName() +
+			" has been rejected by " + client.getClientName(), null);
 		challenged.remove(client);
 	}
 
 	/**
+	 * This client is challenged to a battle.
 	 * @param client The client issuing the challenge
 	 * */
 	public void challenge(final Client client) {
+		Log.info(getClientName() +
+			" has been challenged by " + client.getClientName(), null);
 		challenges.add(client);
 	}
 
@@ -258,6 +271,8 @@ public class Client {
 	 * The game that this client was playing is now over.
 	 * */
 	public void gameOver() {
+		Log.info(getClientName() + " has finished game with " +
+			inGameWith.map(c -> c.getClientName()).orElse("<NO GAME>"), null);
 		state = ClientState.LOBBY;
 		inGameWith = Optional.empty();
 		messages.clear();
@@ -270,7 +285,8 @@ public class Client {
 		if (state == ClientState.DISCONNECTED) {
 			closeConnection(true);
 		} else {
-			System.err.println("Other player logged off");
+			Log.warn(inGameWith.map(c -> c.getClientName()).orElse("<NO GAME>") +
+				"has logged off while in a game with " + getClientName(), null);
 			inGameWith = Optional.empty();
 			messages.clear();
 			channel.requestSend(Message.LOGOFF());
@@ -296,6 +312,7 @@ public class Client {
 	}
 
 	/**
+	 * Attempt to reconnect this client
 	 * */
 	public void reconnect(
 		final SocketChannel connection,
@@ -317,11 +334,20 @@ public class Client {
 		}
 	}
 
+	public String getRemoteAddress() {
+		try {
+			return connection.getRemoteAddress().toString();
+		} catch (IOException e) {
+			return "Unknown address (" + e.getMessage() + ")";
+		}
+	}
+
 	/**
 	 * Process the next message, which may result in a state change.
 	 * */
 	private void doNextMessage(final Message msg) throws ProtocolException {
 		if (msg.kind == MessageKind.LOGOFF) {
+			Log.info(getClientName() + " logged off", null);
 			closeConnection(true);
 			return;
 		}
@@ -339,6 +365,7 @@ public class Client {
 				} else {
 					channel.requestSend(Message.DATA(dataFactory.getJSON()));
 				}
+
 				state = ClientState.NAMING;
 				break;
 
@@ -348,10 +375,15 @@ public class Client {
 					final UUID connectTo = msg.parseSessionKey();
 					final Client old = sessions.get(connectTo);
 					if (old == null) {
+						Log.info("Someone attempted to connect to session" +
+							connectTo + ", but the session has expired", null);
 						channel.requestSend(Message.NOK("Cannot reconnect"));
 					} else {
 						final	int lastSequenceNumber = msg.parseLastSequenceNumber();
 						old.reconnect(connection, channel, lastSequenceNumber);
+
+						Log.info(old.getClientName() + " reconnected to the server", null);
+
 						channel.requestSend(Message.OK());
 						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
 						old.replayMessagesFrom(lastSequenceNumber);
@@ -363,11 +395,20 @@ public class Client {
 						pendingClients.remove(this);
 						sessions.remove(sessionKey);
 					}
+
 				} else if (msg.kind == MessageKind.REQUEST_NAME) {
 					if (namedClients.containsKey(name)) {
+						Log.info(getRemoteAddress() +
+							" asked for name " + name +
+							", but someone else is already logged in with that name", null);
+
 						channel.requestSend(Message.NOK("That name is already in use"));
+
 					} else if (name.length() > MAX_PLAYERNAME_LENGTH) {
+						Log.info(getRemoteAddress() +
+							" asked for an overly long name", null);
 						channel.requestSend(Message.NOK("That name is too long"));
+
 					} else {
 						this.name = Optional.of(name);
 						for (Client c : namedClients.values()) {
@@ -377,6 +418,9 @@ public class Client {
 						pendingClients.remove(this);
 						channel.requestSend(Message.OK());
 						channel.requestSend(Message.PLAYERS_JOIN(namedClients.keySet()));
+
+						Log.info(getClientName() + " logged in from " +
+							getRemoteAddress(), null);
 						state = ClientState.LOBBY;
 					}
 				} else {
@@ -389,7 +433,10 @@ public class Client {
 
 				final Client client = namedClients.get(msg.parseName());
 				if (client == null) {
+					Log.warn(getClientName() + " attempted to interact with " +
+						msg.parseName() + ", but there is no such client on the server", null);
 					channel.requestSend(Message.NOK("No such player"));
+
 				} else {
 					if (msg.kind == MessageKind.CHALLENGE_PLAYER) {
 						doChallenge(msg, client);
@@ -428,33 +475,57 @@ public class Client {
 					"Cannot receive messages while disconnected, unless it's ghosts.  Must be ghosts.");
 
 			default:
-				throw new RuntimeException("This cannot happen");
+				Log.fatal("Unknown client state, this cannot happen", null);
+				throw new RuntimeException("Unknown client state, this cannot happen");
 		}
 	}
 
+	/**
+	 * This client challenges another client
+	 * @param client The client to challenge
+	 * */
 	private void doChallenge(final Message msg, final Client client)
 		throws ProtocolException
 	{
 		if (challenged.size() < MAX_CHALLENGES && client.name.isPresent()) {
+			Log.info(getClientName() +
+				" challenged " + client.getClientName() + " to battle!", null);
 			challenged.add(client);
 			client.challenge(this);
 			channel.requestSend(Message.ISSUE_CHALLENGE(client.name.get()));
 			msg.substitute("name", this.name.orElse(""));
 			client.forwardMessage(msg);
+
 		} else {
+			Log.info(getClientName() +
+				" challenged " + client.getClientName() + " to battle, but " +
+				 (!client.name.isPresent() ?
+					client.getClientName() + " is not ready to accept challenges" :
+					getClientName() + " has too many unanswered challenges"), null);
+
 			channel.requestSend(
 				Message.NOK("Cannot challenge " + client.name.orElse("")));
 		}
 	}
 
-	private void doRejectChallenge(Message msg, Client client)
+	/**
+	 * Reject a challenge from another client
+	 * @param client The client who's challenge we are rejecting
+	 * */
+	private void doRejectChallenge(final Message msg, final	Client client)
 		throws ProtocolException
 	{
 		if (challenges.contains(client)) {
+			Log.info(getClientName() +
+				" rejects a challenge from " + client.getClientName(), null);
 			challenges.remove(client);
 			client.challengeRejected(this);
 			client.forwardMessage(msg);
 		} else {
+			Log.warn(getClientName() +
+				" attempted to reject a challenge from" + client.getClientName() +
+				", but " + client.getClientName() +
+				" never challenged " + getClientName(), null);
 			channel.requestSend(Message.NOK("No such challenge to reject"));
 		}
 	}
@@ -465,9 +536,18 @@ public class Client {
 	private void doAcceptChallenge(final Message msg, final Client client)
 		throws ProtocolException
 	{
-		System.err.println("challenges: " + challenges.toString() + "? " + client.toString());
+		Log.info(getClientName() +
+			" with these active challenges (" + challenges.toString() + ")" +
+			" starts a battle with " + client.getClientName(), null);
 		if (challenges.contains(client) && client.isReadyToPlay()) {
 			challenges.remove(client);
+
+			// reject any other challenges
+			while (!challenges.isEmpty()) {
+				final Client c = challenges.iterator().next();
+				doRejectChallenge(Message.REJECT_CHALLENGE(c.getClientName()), c);
+			}
+
 			startGameWith(client);
 			client.startGameWith(this);
 
@@ -488,6 +568,10 @@ public class Client {
 				msg.parsePlayer(),
 				msg.parseName()));
 		} else {
+			Log.warn(getClientName() +
+				" attempted to accept a challenge from " + client.getClientName() +
+				", but " + client.getClientName() + " was already in a battle with " +
+				client.inGameWith.map (c -> c.getClientName()).orElse("<NO GAME>"), null);
 			channel.requestSend(Message.NOK(client.name.orElse("") +
 				" is already in battle with someone else"));
 		}

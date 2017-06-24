@@ -1,6 +1,5 @@
 package inthezone.server;
 
-import inthezone.battle.data.GameDataFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -14,6 +13,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
+
+import inthezone.Log;
+import inthezone.battle.data.GameDataFactory;
 
 public class Multiplexer implements Runnable {
 	private final static long timeout = 30 * 1000;
@@ -56,11 +58,10 @@ public class Multiplexer implements Runnable {
 	@Override
 	public void run() {
 		while (!killThread) {
-			System.out.println("In multiplexer");
 			try {
 				doSelect();
 			} catch (Exception e) {
-				e.printStackTrace(System.err);
+				Log.error("IO error in multiplexer", e);
 				if (!selector.isOpen()) restoreSelector();
 			}
 		}
@@ -86,7 +87,7 @@ public class Multiplexer implements Runnable {
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Cannot get selector, quitting");
+			Log.fatal("Cannot get selector, quitting", e);
 			killThread = true;
 		}
 	}
@@ -100,26 +101,24 @@ public class Multiplexer implements Runnable {
 	 * Block until an IO operation is ready to run.
 	 * */
 	private void doSelect() throws IOException {
-		System.out.println("blocking " + (debugCounter++));
 		selector.select(timeout);
-		System.out.println("unblocked");
 
 		// do IO operations
 		for (
 			Iterator<SelectionKey> skeys = selector.selectedKeys().iterator();
 			skeys.hasNext();
 		) {
-			SelectionKey k = skeys.next();
+			final SelectionKey k = skeys.next();
 
 			if (k == serverKey) {
 				if (k.isAcceptable()) {
-					SocketChannel connection = serverSocket.accept();
+					final SocketChannel connection = serverSocket.accept();
 					if (connection != null) newClient(connection);
 					skeys.remove();
 				}
 
 			} else {
-				Client c = (Client) k.attachment();
+				final Client c = (Client) k.attachment();
 				if (k.isValid() && k.isWritable()) c.send();
 				if (k.isValid() && k.isReadable()) c.receive();
 				skeys.remove();
@@ -136,7 +135,8 @@ public class Multiplexer implements Runnable {
 			if (c.isDisconnected()) {
 				if (c.isDisconnectedTimeout()) expiredClients.add(c);
 			} else if (!c.isConnected()) {
-				System.err.println("Dropped connection");
+				Log.warn("Dropped connection to " +
+					c.name.orElse("<UNNAMED CLIENT>"), null);
 				disconnectedClients.add(c);
 			}
 		}
@@ -146,24 +146,37 @@ public class Multiplexer implements Runnable {
 	}
 
 	private void removeClient(Client c) {
-		System.err.println("Removing client " + c);
+		Log.info("Removing client " +
+			c.name.orElse("<UNNAMED CLIENT>"), null);
 		c.closeConnection(true);
 	}
 
 	private void newClient(SocketChannel connection) {
 		try {
 			if (sessions.size() >= maxClients) {
-				// if this happens, assume we're under attack and just close the connection.
-				System.err.println("Refused connection to " +
+				// if this happens, assume we're under attack and just close the
+				// connection.
+				Log.warn("Refused connection to " +
 					connection.getRemoteAddress().toString() +
-					", max clients (" + maxClients + ") reached");
+					", max clients (" + maxClients + ") reached", null);
+
 				connection.close();
 			} else {
+				Log.info("Client pending from " +
+					connection.getRemoteAddress().toString(), null);
 				pendingClients.add(new Client(
 					name, connection, selector, namedClients,
 					pendingClients, sessions, dataFactory));
 			}
 		} catch (IOException e) {
+			try {
+				Log.error("IO error receiving connection from " +
+					connection.getRemoteAddress().toString(), e);
+			} catch (IOException e2) {
+				Log.error("IO error receiving connection from unknown address (" +
+					e2.getMessage() + ") ", e);
+			}
+
 			try {
 				connection.close();
 			} catch (IOException e2) {

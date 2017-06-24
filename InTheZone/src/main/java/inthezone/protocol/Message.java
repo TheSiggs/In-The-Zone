@@ -153,6 +153,9 @@ public class Message {
 		return new Message(MessageKind.ACCEPT_CHALLENGE, o);
 	}
 
+	/**
+	 * @param name The name of the player we are rejecting
+	 * */
 	public static Message REJECT_CHALLENGE(String name) {
 		final JSONObject o = new JSONObject();
 		o.put("name", name);

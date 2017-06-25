@@ -49,15 +49,13 @@ public class HUD extends AnchorPane {
 
 	public final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 
-	private StandardSprites sprites;
+	private final StandardSprites sprites;
 
-	public HUD(BattleView view, StandardSprites sprites) {
-		super();
+	public HUD(final BattleView view, final StandardSprites sprites) {
 		this.setMinSize(0, 0);
 		this.getStylesheets().add("HUD.css");
 
 		this.sprites = sprites;
-
 		this.view = view;
 		this.multiTargetAssistant = new MultiTargetAssistant(view);
 
@@ -65,19 +63,15 @@ public class HUD extends AnchorPane {
 		resignButton.setTooltip(new Tooltip("Resign from the game"));
 		Tooltip.install(clock, clockTooltip);
 
-		pushItem = new CommandButton(sprites.pushIcon, "Push a character (1 AP)");
+		pushItem = new CommandButton(sprites.pushIcon,
+			"Push a character (1 AP)");
 		pushItem.setButtonAction(event -> view.usePush());
-		potionItem = new CommandButton(sprites.potionIcon, "Use a healing potion (1 AP)");
+		potionItem = new CommandButton(sprites.potionIcon,
+			"Use a healing potion (1 AP)");
 		potionItem.setButtonAction(event -> view.useItem());
 
-		endTurnButton.setOnAction(event -> {
-			clock.reset();
-			view.sendEndTurn();
-		});
-		resignButton.setOnAction(event -> {
-			clock.reset();
-			view.sendResign();
-		});
+		endTurnButton.setOnAction(event -> view.sendEndTurn());
+		resignButton.setOnAction(event -> view.sendResign());
 
 		endTurnButton.getStyleClass().add("gui-button");
 		resignButton.getStyleClass().add("gui-button");
@@ -130,6 +124,7 @@ public class HUD extends AnchorPane {
 	}
 
 	public void notifyRound() {
+		clock.reset();
 		roundCounter.increment();
 		if (view.isMyTurn.get()) notifyTurn();
 		else notifyOtherTurn();
@@ -140,7 +135,6 @@ public class HUD extends AnchorPane {
 		clockTooltip.textProperty().bind(
 			new SimpleStringProperty("You have")
 			.concat(clock.remainingTime).concat("s remaining to complete your turn"));
-		clock.reset();
 		clock.clockAnimator.play();
 	}
 
@@ -157,11 +151,11 @@ public class HUD extends AnchorPane {
 		roundCounter.setFatigue();
 	}
 
-	public void writeMessage(String message) {
+	public void writeMessage(final String message) {
 		messageLine.writeMessage(message);
 	}
 
-	public void selectCharacter(Optional<Character> oc) {
+	public void selectCharacter(final Optional<Character> oc) {
 		final int id = oc.map(c -> c.id).orElse(-1);
 		oc.ifPresent(c -> updateAbilities(c, c.hasMana()));
 
@@ -169,21 +163,30 @@ public class HUD extends AnchorPane {
 			box.setSelected(box.id == id);
 	}
 
+	public void modalStart() {
+		disableUI.set(true);
+	}
+
+	public void modalEnd() {
+		disableUI.set(false);
+	}
+
 	/**
 	 * Switch to battle end mode.
 	 * @param outcome The outcome, or nothing if a player resigned.
 	 * @param resigned True if this player resigned.
 	 * */
-	public void doEndMode(BattleOutcome outcome) {
+	public void doEndMode(final BattleOutcome outcome) {
 		clock.reset();
 		disableUI.set(true);
 		assistanceLine.getChildren().add(new EndManager(view, outcome));
 	}
 
-	public void doReconnectMode(boolean thisClientReconnecting) {
+	public void doReconnectMode(final boolean thisClientReconnecting) {
 		clock.clockAnimator.pause();
 		disableUI.set(true);
-		assistanceLine.getChildren().add(new ReconnectManager(thisClientReconnecting));
+		assistanceLine.getChildren().add(
+			new ReconnectManager(thisClientReconnecting));
 	}
 
 	public void endReconnectMode() {
@@ -192,8 +195,9 @@ public class HUD extends AnchorPane {
 		assistanceLine.getChildren().clear();
 	}
 
-	public void updateAbilities(Character c, boolean mana) {
-		final Ability basicAbility = mana ? c.basicAbility.getMana() : c.basicAbility;
+	public void updateAbilities(final Character c, final boolean mana) {
+		final Ability basicAbility =
+			mana ? c.basicAbility.getMana() : c.basicAbility;
 
 		final CommandButton attackItem = new CommandButton(sprites.attackIcon,
 			(new AbilityDescription(basicAbility.info)).toString());
@@ -204,10 +208,13 @@ public class HUD extends AnchorPane {
 
 		final boolean notMyTurn = !view.isMyTurn.get();
 
-		attackItem.cannotUseThis.set(c.isAbilityBlocked(basicAbility) || c.getAP() < 1 || notMyTurn);
-		potionItem.cannotUseThis.set(c.isDead() || c.isStunned() || c.getAP() < 1 || notMyTurn ||
+		attackItem.cannotUseThis.set(c.isAbilityBlocked(basicAbility) ||
+			c.getAP() < 1 || notMyTurn);
+		potionItem.cannotUseThis.set(c.isDead() || c.isStunned() ||
+			c.getAP() < 1 || notMyTurn ||
 			view.remainingPotions.get() <= 0);
-		pushItem.cannotUseThis.set(c.isDead() || c.isStunned() || c.getAP() < 1 || notMyTurn);
+		pushItem.cannotUseThis.set(c.isDead() || c.isStunned() ||
+			c.getAP() < 1 || notMyTurn);
 
 		for (Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
@@ -225,11 +232,11 @@ public class HUD extends AnchorPane {
 		}
 	}
 
-	public void init(Collection<Character> characters) {
+	public void init(final Collection<Character> characters) {
 		for (Character c : characters) {
-			CharacterInfoBox box = new CharacterInfoBox(c, sprites);
+			final CharacterInfoBox box = new CharacterInfoBox(c, sprites);
 			box.setOnMouseClicked(event -> {
-				view.selectCharacterById(c.id);
+				if (!disableUI.get()) view.selectCharacterById(c.id);
 			});
 			this.characters.put(c.id, box);
 			characterInfoBoxes.getChildren().add(box);

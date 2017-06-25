@@ -1,5 +1,31 @@
 package inthezone.game.battle;
 
+import isogame.engine.CorruptDataException;
+import isogame.engine.KeyBinding;
+import isogame.engine.MapPoint;
+import isogame.engine.MapView;
+import isogame.engine.Sprite;
+import isogame.engine.Stage;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
@@ -20,27 +46,6 @@ import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
 import inthezone.game.InTheZoneKeyBinding;
-import isogame.engine.CorruptDataException;
-import isogame.engine.KeyBinding;
-import isogame.engine.MapPoint;
-import isogame.engine.MapView;
-import isogame.engine.Sprite;
-import isogame.engine.Stage;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.MouseButton;
-import javafx.stage.StageStyle;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -56,6 +61,7 @@ public class BattleView
 	// UI components
 	private final MapView canvas;
 	public final HUD hud;
+	public final AbilityConfirmationDialog abilityConfirmation;
 
 	// Status properties for the HUD
 	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
@@ -71,14 +77,31 @@ public class BattleView
 	// Instant effect completions must be delayed until the command queue is empty.
 	private Optional<Runnable> instantEffectCompletion = Optional.empty();
 
+	private boolean isModalDialogShowing = false;
+
+	public void modalStart() {
+		isModalDialogShowing = true;
+		hud.modalStart();
+	}
+
+	public void modalEnd() {
+		isModalDialogShowing = false;
+		hud.modalEnd();
+	}
+
 	public BattleView(
-		final StartBattleCommand startBattle, final Player player,
+		final StartBattleCommand startBattle,
+		final Player player,
 		final String otherPlayerName,
 		final CommandGenerator otherPlayer,
-		final Network network, final GameDataFactory gameData
+		final Network network,
+		final GameDataFactory gameData,
+		final Window window
 	) throws CorruptDataException {
-		super();
 		this.setMinSize(0, 0);
+
+		this.abilityConfirmation =
+			new AbilityConfirmationDialog(this, window);
 
 		this.player = player;
 		this.otherPlayerName = otherPlayerName;
@@ -97,7 +120,9 @@ public class BattleView
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(
 			(selection, button) -> {
-				if (button == MouseButton.SECONDARY) {
+				if (isModalDialogShowing) {
+					return;
+				} else if (button == MouseButton.SECONDARY) {
 					if (mode.canCancel()) cancelAbility();
 				} else if (selection.isEmpty() && mode.canCancel()) {
 					selectCharacter(Optional.empty());
@@ -274,6 +299,8 @@ public class BattleView
 	 * Send the end turn message.
 	 * */
 	public void sendEndTurn() {
+		abilityConfirmation.hide();
+
 		selectedCharacter = Optional.empty();
 		isCharacterSelected.setValue(false);
 		hud.selectCharacter(Optional.empty());
@@ -285,21 +312,41 @@ public class BattleView
 	 * Send the resign message
 	 * */
 	public void sendResign() {
+		abilityConfirmation.hide();
+
 		final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
 			null, ButtonType.NO, ButtonType.YES);
 		a.initStyle(StageStyle.UNDECORATED);
+		a.initModality(Modality.NONE);
+		a.initOwner(this.getScene().getWindow());
+		a.setResizable(false);
+
+		final javafx.stage.Stage stage = (javafx.stage.Stage)
+			a.getDialogPane().getScene().getWindow();
+		stage.setAlwaysOnTop(true);
+		stage.setResizable(false);
+		stage.toFront();
+
 		a.getDialogPane().getStylesheets().add("dialogs.css");
 		a.setHeaderText(null);
 		a.setGraphic(null);
 		a.setContentText("Really resign?");
 
-		if (a.showAndWait().map(r -> r == ButtonType.YES).orElse(false)) {
-			selectedCharacter = Optional.empty();
-			isCharacterSelected.setValue(false);
-			hud.selectCharacter(Optional.empty());
-			battle.requestCommand(new ResignCommandRequest(player));
-			setMode(new ModeAnimating(this));
-		}
+		a.setOnHiding(event -> modalEnd());
+		a.resultProperty().addListener((v, r0, r) -> {
+			modalEnd();
+			a.hide();
+			if (r == ButtonType.YES) {
+				selectedCharacter = Optional.empty();
+				isCharacterSelected.setValue(false);
+				hud.selectCharacter(Optional.empty());
+				battle.requestCommand(new ResignCommandRequest(player));
+				setMode(new ModeAnimating(this));
+			}
+		});
+
+		modalStart();
+		a.show();
 	}
 
 	/**

@@ -41,12 +41,12 @@ public class DisconnectedView extends FlowPane {
 	private int port;
 
 	public DisconnectedView(
-		ContentPane parent,
-		GameDataFactory gameData,
-		ClientConfig config,
-		String server,
-		int port,
-		Optional<String> cachedName
+		final ContentPane parent,
+		final GameDataFactory gameData,
+		final ClientConfig config,
+		final String server,
+		final int port,
+		final Optional<String> cachedName
 	) {
 		this.network = parent.network;
 		this.gameData = gameData;
@@ -97,7 +97,8 @@ public class DisconnectedView extends FlowPane {
 					config.port = this.port;
 					config.writeConfig();
 				} else {
-					Alert a = new Alert(Alert.AlertType.INFORMATION, "Enter \"server:port\"");
+					final Alert a = new Alert(
+						Alert.AlertType.INFORMATION, "Enter \"server:port\"");
 					a.setHeaderText("Invalid server name");
 					a.showAndWait();
 				}
@@ -110,8 +111,10 @@ public class DisconnectedView extends FlowPane {
 
 		sandpit.setOnAction(event -> {
 			if (config.loadouts.size() < 1) {
-				Alert a = new Alert(Alert.AlertType.INFORMATION, null, ButtonType.OK);
-				a.setHeaderText("You must create at least one loadout before starting a game");
+				final Alert a = new Alert(
+					Alert.AlertType.INFORMATION, null, ButtonType.OK);
+				a.setHeaderText(
+					"You must create at least one loadout before starting a game");
 				a.showAndWait();
 				return;
 			}
@@ -121,7 +124,8 @@ public class DisconnectedView extends FlowPane {
 					new ChallengePane(gameData, config, Optional.empty(),
 						Player.PLAYER_A, "AI"), getStartSandpitCont());
 			} catch (CorruptDataException e) {
-				Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+				final Alert a = new Alert(Alert.AlertType.ERROR,
+					e.getMessage(), ButtonType.CLOSE);
 				a.setHeaderText("Game data corrupt");
 				a.showAndWait();
 				System.exit(1);
@@ -136,25 +140,27 @@ public class DisconnectedView extends FlowPane {
 			ostart.ifPresent(start -> {
 				try {
 					// prepare the AI position
-					Player op = start.getOtherPlayer();
-					Stage si = gameData.getStage(start.stage);
+					final Player op = start.getOtherPlayer();
+					final Stage si = gameData.getStage(start.stage);
 					Collection<MapPoint> startTiles = op == Player.PLAYER_A ?
 						si.terrain.getPlayerStartTiles() :
 						si.terrain.getAIStartTiles();
-					Loadout l = makeSandpitLoadout(start, startTiles, gameData);
+					final Loadout l = makeSandpitLoadout(start, startTiles, gameData);
 
 					// prepare the battle
-					StartBattleCommand ready =
+					final StartBattleCommand ready =
 						(new StartBattleCommandRequest(start.stage, op, l,
 							startTiles.stream().collect(Collectors.toList())))
 							.makeCommand(start, gameData);
 
 					// start the battle
 					parent.showScreen(new BattleView(
-						ready, Player.PLAYER_A, "AI", new SimpleAI(), null, gameData),
+						ready, Player.PLAYER_A, "AI", new SimpleAI(),
+						null, gameData, this.getScene().getWindow()),
 						winCond -> System.err.println("Battle over: " + winCond));
 				} catch (CorruptDataException e) {
-					Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+					final Alert a = new Alert(Alert.AlertType.ERROR,
+						e.getMessage(), ButtonType.OK);
 					a.setHeaderText("Error starting game");
 					a.showAndWait();
 				}
@@ -163,11 +169,11 @@ public class DisconnectedView extends FlowPane {
 	}
 	
 	private static Loadout makeSandpitLoadout(
-		StartBattleCommandRequest start,
-		Collection<MapPoint> startTiles,
-		GameDataFactory gameData
+		final StartBattleCommandRequest start,
+		final Collection<MapPoint> startTiles,
+		final GameDataFactory gameData
 	) throws CorruptDataException {
-		List<CharacterProfile> characters = new ArrayList<>();
+		final List<CharacterProfile> characters = new ArrayList<>();
 		for (int i = 0; i < startTiles.size(); i++)
 			characters.add(new CharacterProfile(gameData.getCharacter("Robot")));
 

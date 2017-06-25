@@ -1,22 +1,20 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
-import inthezone.battle.data.StandardSprites;
-import inthezone.battle.data.StatusEffectDescription;
-import inthezone.battle.data.StatusEffectType;
-import inthezone.battle.status.StatusEffect;
+import java.util.Optional;
+
 import javafx.animation.RotateTransition;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-import java.util.Optional;
+
+import inthezone.battle.Character;
+import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.StatusEffectDescription;
+import inthezone.battle.status.StatusEffect;
 
 /**
  * Displays information about a character during battle.
@@ -38,11 +36,11 @@ public class CharacterInfoBox extends AnchorPane {
 
 	private final StandardSprites sprites;
 
-	public CharacterInfoBox(Character character, StandardSprites sprites) {
-		super();
-
+	public CharacterInfoBox(
+		final Character character,
+		final StandardSprites sprites
+	) {
 		this.sprites = sprites;
-
 		this.id = character.id;
 
 		Tooltip.install(ap, new Tooltip("Action points: you spend action points when you attack, push, use a potion, or do an ability"));
@@ -84,7 +82,9 @@ public class CharacterInfoBox extends AnchorPane {
 	}
 
 	private void updateStatus(
-		Character c, Optional<StatusEffect> buff, Optional<StatusEffect> debuff
+		final Character c,
+		final Optional<StatusEffect> buff,
+		final Optional<StatusEffect> debuff
 	) {
 		statusLine.getChildren().clear();
 		buff.ifPresent(s -> statusLine.getChildren().add(statusEffectImage(s)));
@@ -94,40 +94,45 @@ public class CharacterInfoBox extends AnchorPane {
 		}
 	}
 
-	private ImageView statusEffectImage(StatusEffect s) {
-		final ImageView r = new ImageView(sprites.statusEffects.get(s.getInfo().type));
-		final Tooltip t = new Tooltip((new StatusEffectDescription(s.getInfo())).toString());
+	private ImageView statusEffectImage(final StatusEffect s) {
+		final ImageView r = new ImageView(
+			sprites.statusEffects.get(s.getInfo().type));
+		final Tooltip t = new Tooltip((new StatusEffectDescription(
+			s.getInfo())).toString());
 		t.setWrapText(true);
 		t.setPrefWidth(300);
 		Tooltip.install(r, t);
 		return r;
 	}
 
-	private ImageView revengeImage(Character c) {
+	private ImageView revengeImage(final Character c) {
 		final ImageView r = new ImageView(sprites.revengeIcon);
 		final Tooltip t = new Tooltip(c.name + " is angry!\n" +
-			c.name + " gets a revenge bonus of " + Math.round(c.getRevengeBonus() * 100) + "%");
+			c.name + " gets a revenge bonus of " +
+			Math.round(c.getRevengeBonus() * 100) + "%");
 		t.setWrapText(true);
 		t.setPrefWidth(300);
 		Tooltip.install(r, t);
 		return r;
 	}
 
-	public void updateCharacter(Character c) {
+	public void updateCharacter(final Character c) {
 		ap.update(c.hasMana()? "ap_mana" : "ap", c.getAP(), c.getStats().ap, false);
 		mp.update("mp", c.getMP(), c.getStats().mp, false);
-		hp.update(c.hasCover()? "hp_cover" : "hp", c.getHP(), c.getMaxHP(), c.hasCover());
+		hp.update(c.hasCover()? "hp_cover" : "hp",
+			c.getHP(), c.getMaxHP(), c.hasCover());
 		updateStatus(c, c.getStatusBuff(), c.getStatusDebuff());
 	}
 
-	public void setSelected(boolean isSelected) {
+	public void setSelected(final boolean isSelected) {
 		if (this.isSelected != isSelected) {
 			this.isSelected = isSelected;
 			selectedImage.setVisible(isSelected);
 			if (isSelected) {
 				this.getStyleClass().add("character-info-box-selected");
 
-				RotateTransition rt = new RotateTransition(Duration.millis(1000), selectedImage);
+				final RotateTransition rt =
+					new RotateTransition(Duration.millis(1000), selectedImage);
 				rt.setFromAngle(0);
 				rt.setByAngle(-360);
 				rt.setCycleCount(1);

@@ -28,8 +28,8 @@ public class Game extends Application {
 	private static final double MIN_HEIGHT = 720.0;
 
 	@Override
-	public void start(Stage primaryStage) {
-		Map<String, String> args = getParameters().getNamed();
+	public void start(final Stage primaryStage) {
+		final Map<String, String> args = getParameters().getNamed();
 		System.err.println("args: " + args.toString());
 
 		try {
@@ -55,8 +55,8 @@ public class Game extends Application {
 				basedir = Optional.empty();
 			}
 
-			final GameDataFactory gameData =
-				new GameDataFactory(basedir.map(x -> (new File(x)).getAbsoluteFile()), false);
+			final GameDataFactory gameData = new GameDataFactory(
+				basedir.map(x -> (new File(x)).getAbsoluteFile()), false);
 			final ClientConfig config = new ClientConfig(gameData);
 
 			final String server = serverOverride.orElse(config.server);
@@ -86,13 +86,14 @@ public class Game extends Application {
 			primaryStage.setY(primaryStage.getY() - 1);
 
 		} catch (Exception e) {
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			final Alert a = new Alert(Alert.AlertType.ERROR,
+				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Error starting game client");
 			a.showAndWait();
 		}
 	}
 
-	public String getDataDir(Stage primaryStage) {
+	public String getDataDir(final Stage primaryStage) {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Select data directory...");
 		File dataDir = directoryChooser.showDialog(primaryStage);

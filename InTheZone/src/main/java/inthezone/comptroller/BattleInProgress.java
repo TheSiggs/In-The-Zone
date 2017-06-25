@@ -159,6 +159,7 @@ public class BattleInProgress implements Runnable {
 					) {
 						commandQueue.clear(); 
 					}
+					System.err.println("requested " + crq);
 					commandQueue.addAll(crq.get().makeCommand(battle.battleState));
 					if (doCommands()) return;
 				}

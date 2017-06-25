@@ -6,7 +6,6 @@ import inthezone.battle.Character;
 import inthezone.battle.Targetable;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
-import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.comptroller.InfoAffected;
@@ -24,13 +23,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
-import javafx.stage.StageStyle;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
@@ -195,31 +187,11 @@ public class ModeTarget extends Mode {
 		if (this.canCancel() &&
 			!isCancellableEffect(targetingAbility.info.instantBefore)
 		) {
-			final Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-			a.initStyle(StageStyle.UNDECORATED);
-			a.getDialogPane().getStylesheets().add("dialogs.css");
-			a.setHeaderText(null);
-			final String description =
-				(new AbilityDescription(targetingAbility.info)).toString();
 
-			final Text text = new Text(description);
-			final StackPane textWrapper = new StackPane(text);
-			textWrapper.getStyleClass().add("text-container");
-			text.setWrappingWidth(400);
-			text.getStyleClass().add("text");
-			a.getDialogPane().setContent(textWrapper);
-			a.setGraphic(new ImageView(targetingAbility.info.media.icon));
+			view.abilityConfirmation.showConfirmation(targetingAbility.info,
+				() -> view.setMode(applyAbility()));
+			return this;
 
-			final ButtonType confirmButton =
-				new ButtonType("Confirm", ButtonData.OK_DONE);
-
-			a.getButtonTypes().clear();
-			a.getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
-			if (a.showAndWait().map(r -> r == confirmButton).orElse(false)) {
-				return applyAbility();
-			} else {
-				return this;
-			}
 		} else {
 			return applyAbility();
 		}

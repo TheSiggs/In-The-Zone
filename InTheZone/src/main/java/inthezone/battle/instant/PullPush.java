@@ -174,7 +174,6 @@ public class PullPush extends InstantEffect {
 			los = LineOfSight.getLOS(from, to, bias);
 		}
 		
-		System.err.println("LOS: " + los);
 		final List<MapPoint> path = new ArrayList<>();
 
 		// make sure there is a character to pull and a path to pull along

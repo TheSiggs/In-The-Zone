@@ -5,6 +5,7 @@ import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -126,9 +127,14 @@ public class PullPush extends InstantEffect {
 
 		for (MapPoint t : sortedTargets) {
 			final MapPoint to = getTo(info.type, t, castFrom, info.param);
-			final List<MapPoint> path1 = getPullPath(battle, t, to, occupied, cleared, info.param, true);
-			final List<MapPoint> path2 = getPullPath(battle, t, to, occupied, cleared, info.param, false);
+			final List<MapPoint> path1 =
+				getPullPath(battle, t, to, occupied, cleared, info.param,
+					to.equals(castFrom), true);
+			final List<MapPoint> path2 =
+				getPullPath(battle, t, to, occupied, cleared, info.param,
+					to.equals(castFrom), false);
 
+			System.err.println("Pull paths: " + path1 + " and " + path2);
 			final List<MapPoint> path = path1.size() > path2.size()?  path1 : path2; 
 			if (path.size() > 0) {
 				paths.add(path);
@@ -158,9 +164,17 @@ public class PullPush extends InstantEffect {
 	private static List<MapPoint> getPullPath(
 		final BattleState battle, final MapPoint from, final MapPoint to,
 		final Set<MapPoint> occupied, final Set<MapPoint> cleared,
-		final int limit, final boolean bias
+		final int limit, final boolean isPull, final boolean bias
 	) {
-		final List<MapPoint> los = LineOfSight.getLOS(from, to, bias);
+		final List<MapPoint> los;
+		if (isPull) {
+			los = LineOfSight.getLOS(to, from, bias);
+			Collections.reverse(los);
+		} else {
+			los = LineOfSight.getLOS(from, to, bias);
+		}
+		
+		System.err.println("LOS: " + los);
 		final List<MapPoint> path = new ArrayList<>();
 
 		// make sure there is a character to pull and a path to pull along

@@ -223,7 +223,6 @@ public class BattleView
 	public void outOfTurnSelect(final Optional<Character> c) {
 		battle.cancel();
 		canvas.resetMouseHandlers();
-		canvas.resetMouseHandlers();
 		selectedCharacter = c;
 		isCharacterSelected.setValue(c.isPresent());
 		hud.selectCharacter(c);

@@ -4,8 +4,8 @@ import isogame.engine.MapPoint;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
-
 
 import inthezone.battle.Character;
 import inthezone.battle.Targetable;
@@ -122,6 +122,7 @@ public class CommandProcessor {
 		} else if (ec.cmd instanceof StartTurnCommand) {
 			final StartTurnCommand cmd = (StartTurnCommand) ec.cmd;
 
+			view.outOfTurnSelect(Optional.empty());
 			if (cmd.player == view.player) {
 				view.isMyTurn.setValue(true);
 				view.setMode(new ModeAnimating(view));

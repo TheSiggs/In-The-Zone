@@ -19,11 +19,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 import inthezone.ai.CommandGenerator;
@@ -61,7 +60,6 @@ public class BattleView
 	// UI components
 	private final MapView canvas;
 	public final HUD hud;
-	public final AbilityConfirmationDialog abilityConfirmation;
 
 	// Status properties for the HUD
 	public final BooleanProperty isMyTurn = new SimpleBooleanProperty(true);
@@ -77,17 +75,7 @@ public class BattleView
 	// Instant effect completions must be delayed until the command queue is empty.
 	private Optional<Runnable> instantEffectCompletion = Optional.empty();
 
-	private boolean isModalDialogShowing = false;
-
-	public void modalStart() {
-		isModalDialogShowing = true;
-		hud.modalStart();
-	}
-
-	public void modalEnd() {
-		isModalDialogShowing = false;
-		hud.modalEnd();
-	}
+	public final ModalDialog modalDialog = new ModalDialog(this);
 
 	public BattleView(
 		final StartBattleCommand startBattle,
@@ -99,9 +87,6 @@ public class BattleView
 		final Window window
 	) throws CorruptDataException {
 		this.setMinSize(0, 0);
-
-		this.abilityConfirmation =
-			new AbilityConfirmationDialog(this, window);
 
 		this.player = player;
 		this.otherPlayerName = otherPlayerName;
@@ -120,8 +105,10 @@ public class BattleView
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(
 			(selection, button) -> {
-				if (isModalDialogShowing) {
-					return;
+				if (modalDialog.isShowing()) {
+					if (button == MouseButton.SECONDARY) {
+						modalDialog.doCancel();
+					}
 				} else if (button == MouseButton.SECONDARY) {
 					if (mode.canCancel()) cancelAbility();
 				} else if (selection.isEmpty() && mode.canCancel()) {
@@ -140,8 +127,21 @@ public class BattleView
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ENTER), InTheZoneKeyBinding.enter);
 
-		canvas.doOnKeyReleased(action -> {if (action == InTheZoneKeyBinding.cancel) cancelAbility();});
+		canvas.doOnKeyReleased(action -> {
+			if (action == InTheZoneKeyBinding.cancel) {
+				if (modalDialog.isShowing()) {
+					modalDialog.doCancel();
+				} else {
+					cancelAbility();
+				}
+			} else if (action == InTheZoneKeyBinding.enter) {
+				if (modalDialog.isShowing()) {
+					modalDialog.doDefault();
+				}
+			}
+		});
 
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
 		this.sprites = new SpriteManager(
@@ -175,7 +175,7 @@ public class BattleView
 		if (startTiles.size() > 0) canvas.centreOnTile(startTiles.get(0));
 
 		setMode(new ModeOtherTurn(this));
-		this.getChildren().addAll(canvas, hud);
+		this.getChildren().addAll(canvas, hud, modalDialog);
 	}
 
 	private Mode mode;
@@ -299,7 +299,11 @@ public class BattleView
 	 * Send the end turn message.
 	 * */
 	public void sendEndTurn() {
-		abilityConfirmation.hide();
+		if (modalDialog.getCurrentDialog().map(d ->
+			d instanceof AbilityConfirmationDialog).orElse(false)
+		) {
+			modalDialog.closeModalDialog();
+		}
 
 		selectedCharacter = Optional.empty();
 		isCharacterSelected.setValue(false);
@@ -312,30 +316,21 @@ public class BattleView
 	 * Send the resign message
 	 * */
 	public void sendResign() {
-		abilityConfirmation.hide();
+		if (modalDialog.getCurrentDialog().map(d ->
+			d instanceof AbilityConfirmationDialog).orElse(false)
+		) {
+			modalDialog.closeModalDialog();
+		}
 
-		final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-			null, ButtonType.NO, ButtonType.YES);
-		a.initStyle(StageStyle.UNDECORATED);
-		a.initModality(Modality.NONE);
-		a.initOwner(this.getScene().getWindow());
-		a.setResizable(false);
+		final DialogPane dialog = new DialogPane();
+		dialog.getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
 
-		final javafx.stage.Stage stage = (javafx.stage.Stage)
-			a.getDialogPane().getScene().getWindow();
-		stage.setAlwaysOnTop(true);
-		stage.setResizable(false);
-		stage.toFront();
+		dialog.getStylesheets().add("dialogs.css");
+		dialog.setHeaderText(null);
+		dialog.setGraphic(null);
+		dialog.setContentText("Really resign?");
 
-		a.getDialogPane().getStylesheets().add("dialogs.css");
-		a.setHeaderText(null);
-		a.setGraphic(null);
-		a.setContentText("Really resign?");
-
-		a.setOnHiding(event -> modalEnd());
-		a.resultProperty().addListener((v, r0, r) -> {
-			modalEnd();
-			a.hide();
+		modalDialog.showDialog(dialog, r -> {
 			if (r == ButtonType.YES) {
 				selectedCharacter = Optional.empty();
 				isCharacterSelected.setValue(false);
@@ -344,9 +339,6 @@ public class BattleView
 				setMode(new ModeAnimating(this));
 			}
 		});
-
-		modalStart();
-		a.show();
 	}
 
 	/**

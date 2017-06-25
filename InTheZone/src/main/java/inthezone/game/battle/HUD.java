@@ -178,12 +178,14 @@ public class HUD extends AnchorPane {
 	 * */
 	public void doEndMode(final BattleOutcome outcome) {
 		clock.reset();
+		view.modalDialog.doCancel();
 		disableUI.set(true);
 		assistanceLine.getChildren().add(new EndManager(view, outcome));
 	}
 
 	public void doReconnectMode(final boolean thisClientReconnecting) {
 		clock.clockAnimator.pause();
+		view.modalDialog.doCancel();
 		disableUI.set(true);
 		assistanceLine.getChildren().add(
 			new ReconnectManager(thisClientReconnecting));

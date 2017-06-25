@@ -188,8 +188,17 @@ public class ModeTarget extends Mode {
 			!isCancellableEffect(targetingAbility.info.instantBefore)
 		) {
 
-			view.abilityConfirmation.showConfirmation(targetingAbility.info,
-				() -> view.setMode(applyAbility()));
+			AbilityConfirmationDialog dialog =
+				new AbilityConfirmationDialog(targetingAbility.info);
+
+			view.modalDialog.showDialog(dialog, r -> {
+				if (r == dialog.confirmButton) {
+					view.setMode(applyAbility());
+				} else {
+					view.selectCharacter(view.getSelectedCharacter());
+				}
+			});
+
 			return this;
 
 		} else {

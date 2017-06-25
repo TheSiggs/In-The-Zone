@@ -486,7 +486,7 @@ public class Client {
 						"In game state without a partner"));
 				if (msg.kind == MessageKind.COMMAND) {
 					final JSONObject cmd = msg.parseCommand();
-					currentGame.ifPresent(x -> x.nextCommand(cmd));
+					currentGame.ifPresent(x -> x.nextCommand(cmd, this));
 					otherPlayer.forwardMessage(msg);
 				} else if (msg.kind == MessageKind.GAME_OVER) {
 					otherPlayer.gameOver();
@@ -582,7 +582,7 @@ public class Client {
 			}
 
 			final Game game = new Game(this, client);
-			game.nextCommand(msg.parseCommand());
+			game.nextCommand(msg.parseCommand(), this);
 
 			startGameWith(client, game);
 			client.startGameWith(this, game);

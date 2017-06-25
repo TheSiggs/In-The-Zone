@@ -40,8 +40,9 @@ public class Game {
 		return clientA == me? clientB : clientA;
 	}
 
-	public void nextCommand(final JSONObject cmd) {
-		if (out != null) out.println(cmd.toString());
+	public void nextCommand(final JSONObject cmd, final Client player) {
+		if (out != null)
+			out.println(player.getClientName() + "/" + cmd.toString());
 	}
 
 	public void close() {

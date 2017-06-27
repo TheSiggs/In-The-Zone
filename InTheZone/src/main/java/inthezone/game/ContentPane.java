@@ -1,5 +1,19 @@
 package inthezone.game;
 
+import isogame.engine.CorruptDataException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.function.Consumer;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
@@ -10,17 +24,6 @@ import inthezone.comptroller.Network;
 import inthezone.comptroller.NetworkCommandGenerator;
 import inthezone.game.battle.BattleView;
 import inthezone.game.lobby.LobbyView;
-import isogame.engine.CorruptDataException;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.Optional;
-import java.util.Stack;
 
 public class ContentPane extends StackPane implements LobbyListener {
 	private final DisconnectedView disconnected;
@@ -260,7 +263,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 				final BattleView newBattle = new BattleView(
 					ready, player, playerName,
 					new NetworkCommandGenerator(network.readCommandQueue),
-					network, gameData);
+					Optional.of(network), gameData);
 				currentBattle = Optional.of(newBattle);
 				showScreen(newBattle, oWinCond -> {
 					currentBattle = Optional.empty();

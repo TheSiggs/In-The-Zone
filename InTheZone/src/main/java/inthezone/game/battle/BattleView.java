@@ -82,7 +82,7 @@ public class BattleView
 		final Player player,
 		final String otherPlayerName,
 		final CommandGenerator otherPlayer,
-		final Network network,
+		final Optional<Network> network,
 		final GameDataFactory gameData
 	) throws CorruptDataException {
 		this.setMinSize(0, 0);
@@ -163,7 +163,7 @@ public class BattleView
 		});
 
 		battle = new BattleInProgress(
-			startBattle, player, otherPlayer, network, gameData, this);
+			startBattle, player, Optional.empty(), otherPlayer, network, gameData, this);
 		(new Thread(battle)).start();
 
 		// init the mode

@@ -14,7 +14,7 @@ public class StartTurnCommand extends Command {
 
 	private final List<Targetable> affected;
 
-	public StartTurnCommand( Player player, List<Targetable> affected) {
+	public StartTurnCommand(final Player player, final List<Targetable> affected) {
 		this.affected = affected;
 		this.player = player;
 	}
@@ -27,7 +27,7 @@ public class StartTurnCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle turn) {
+	public List<Targetable> doCmd(final Battle turn) {
 		return affected;
 	}
 }

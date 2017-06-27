@@ -155,7 +155,7 @@ public class DisconnectedView extends FlowPane {
 
 					// start the battle
 					parent.showScreen(new BattleView(
-						ready, Player.PLAYER_A, "AI", new SimpleAI(), null, gameData),
+						ready, Player.PLAYER_A, "AI", new SimpleAI(), Optional.empty(), gameData),
 						winCond -> System.err.println("Battle over: " + winCond));
 				} catch (CorruptDataException e) {
 					final Alert a = new Alert(Alert.AlertType.ERROR,

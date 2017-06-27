@@ -35,9 +35,11 @@ public class BattleInProgress implements Runnable {
 	private final Player thisPlayer;
 	private final boolean thisPlayerGoesFirst;
 	private final BattleListener listener;
-	private final CommandGenerator otherPlayer;
 
-	private final Network network;
+	private final Optional<CommandGenerator> thisPlayerGenerator;
+	private final CommandGenerator otherPlayerGenerator;
+
+	private final Optional<Network> network;
 	private final BlockingQueue<Action> commandRequests =
 		new LinkedBlockingQueue<>();
 	
@@ -46,15 +48,17 @@ public class BattleInProgress implements Runnable {
 	public BattleInProgress(
 		final StartBattleCommand cmd,
 		final Player thisPlayer,
-		final CommandGenerator otherPlayer,
-		final Network network,
+		final Optional<CommandGenerator> thisPlayerGenerator,
+		final CommandGenerator otherPlayerGenerator,
+		final Optional<Network> network,
 		final GameDataFactory gameData,
 		final BattleListener listener
 	) throws CorruptDataException {
 		this(
 			cmd.doCmd(gameData),
 			thisPlayer,
-			otherPlayer,
+			thisPlayerGenerator,
+			otherPlayerGenerator,
 			network,
 			cmd.p1GoesFirst == (thisPlayer == Player.PLAYER_A),
 			listener);
@@ -66,14 +70,16 @@ public class BattleInProgress implements Runnable {
 	public BattleInProgress(
 		final Battle battle,
 		final Player thisPlayer,
-		final CommandGenerator otherPlayer,
-		final Network network,
+		final Optional<CommandGenerator> thisPlayerGenerator,
+		final CommandGenerator otherPlayerGenerator,
+		final Optional<Network> network,
 		final boolean thisPlayerGoesFirst,
 		final BattleListener listener
 	) {
 		this.battle = battle;
 		this.thisPlayer = thisPlayer;
-		this.otherPlayer = otherPlayer;
+		this.thisPlayerGenerator = thisPlayerGenerator;
+		this.otherPlayerGenerator = otherPlayerGenerator;
 		this.network = network;
 		this.thisPlayerGoesFirst = thisPlayerGoesFirst;
 		this.listener = listener;
@@ -107,7 +113,7 @@ public class BattleInProgress implements Runnable {
 			outcome = battle.battleState.getBattleOutcome(thisPlayer);
 		}
 
-		if (network != null) network.gameOver();
+		network.ifPresent(n -> n.gameOver());
 		final BattleOutcome finalOutcome = outcome.get();
 		Platform.runLater(() -> listener.endBattle(finalOutcome));
 
@@ -134,6 +140,12 @@ public class BattleInProgress implements Runnable {
 					listener.badCommand(e);
 				}
 			});
+
+			if (thisPlayerGenerator.isPresent()) {
+				commandQueue.clear();
+				thisPlayerGenerator.get().generateCommands(battle, listener, thisPlayer);
+				return;
+			}
 
 			if (doCommands()) return;
 
@@ -238,7 +250,7 @@ public class BattleInProgress implements Runnable {
 				// locally.  This allows the commands to update themselves when we have
 				// instant effects that mess with the game state.  Also important for
 				// dealing with triggers.
-				if (network != null) network.sendCommand(ec.cmd);
+				network.ifPresent(n -> n.sendCommand(ec.cmd));
 			}
 
 			if (battle.battleState.getBattleOutcome(thisPlayer).isPresent()) {
@@ -266,7 +278,8 @@ public class BattleInProgress implements Runnable {
 			}
 		});
 
-		otherPlayer.generateCommands(battle, listener, thisPlayer.otherPlayer());
+		otherPlayerGenerator.generateCommands(
+			battle, listener, thisPlayer.otherPlayer());
 	}
 
 	/**

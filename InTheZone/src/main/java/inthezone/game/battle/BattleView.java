@@ -83,8 +83,7 @@ public class BattleView
 		final String otherPlayerName,
 		final CommandGenerator otherPlayer,
 		final Network network,
-		final GameDataFactory gameData,
-		final Window window
+		final GameDataFactory gameData
 	) throws CorruptDataException {
 		this.setMinSize(0, 0);
 

@@ -90,7 +90,7 @@ public class BattleView
 		this.player = player;
 		this.otherPlayerName = otherPlayerName;
 		this.commands = new CommandProcessor(this);
-		this.hud = new HUD(this, gameData.getStandardSprites());
+		this.hud = new StandardHUD(this, gameData.getStandardSprites());
 
 		final DecalRenderer decals = new DecalRenderer(this, gameData.getStandardSprites());
 

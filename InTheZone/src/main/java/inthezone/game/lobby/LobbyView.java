@@ -36,12 +36,10 @@ public class LobbyView extends VBox {
 	private final ClientConfig config;
 
 	public LobbyView(
-		ContentPane parent,
-		GameDataFactory gameData,
-		ClientConfig config
+		final ContentPane parent,
+		final GameDataFactory gameData,
+		final ClientConfig config
 	) {
-		super();
-
 		this.parent = parent;
 		this.gameData = gameData;
 		this.config = config;
@@ -91,8 +89,8 @@ public class LobbyView extends VBox {
 			} else if (s != null) {
 				try {
 					parent.showScreen(
-						new ChallengePane(gameData, config,
-							Optional.empty(), Player.randomPlayer(), s.name), oCmdReq ->
+						new ChallengePane(gameData, config, Optional.empty(),
+							Player.randomPlayer(), playerName, s.name), oCmdReq ->
 								oCmdReq.ifPresent(cmdReq -> {
 									parent.network.challengePlayer(cmdReq, s.name);
 								}));
@@ -108,9 +106,10 @@ public class LobbyView extends VBox {
 
 	private String playerName = null;
 
-	public void joinLobby(String playerName, Collection<String> players) {
+	public void joinLobby(
+		final String playerName, final Collection<String> players
+	) {
 		this.playerName = playerName;
-
 		this.players.clear();
 
 		players.stream()
@@ -122,32 +121,34 @@ public class LobbyView extends VBox {
 			});
 	}
 
-	public void playerJoins(String player) {
+	public void playerJoins(final String player) {
 		if (player == playerName) return;
 
-		ServerPlayer p = playerNames.get(player);
-		if (p != null) {
-			p.reset();
+		final ServerPlayer oldPlayer = playerNames.get(player);
+		if (oldPlayer != null) {
+			oldPlayer.reset();
 			playerList.refresh();
 		} else {
-			p = new ServerPlayer(player, false);
+			final ServerPlayer p = new ServerPlayer(player, false);
 			playerNames.put(player, p);
 			players.add(p);
 		}
 	}
 
-	public void playerLeaves(String player) {
-		ServerPlayer p = playerNames.remove(player);
+	public void playerLeaves(final String player) {
+		final ServerPlayer p = playerNames.remove(player);
 		if (p != null) players.remove(p);
 	}
 
-	public void playerEntersGame(String player) {
-		ServerPlayer p = playerNames.get(player);
+	public void playerEntersGame(final String player) {
+		final ServerPlayer p = playerNames.get(player);
 		if (p != null) p.setInGame();
 		playerList.refresh();
 	}
 
-	public void challengeFrom(String player, StartBattleCommandRequest otherCmd) {
+	public void challengeFrom(
+		final String player, final StartBattleCommandRequest otherCmd
+	) {
 		if (config.loadouts.isEmpty()) {
 			// Automatically refuse the challenge
 			parent.network.refuseChallenge(player);
@@ -161,8 +162,8 @@ public class LobbyView extends VBox {
 			if (r == ButtonType.YES) {
 				try {
 					parent.showScreen(
-						new ChallengePane(gameData, config,
-							Optional.of(otherCmd.stage), otherCmd.player.otherPlayer(), player),
+						new ChallengePane(gameData, config, Optional.of(otherCmd.stage),
+							otherCmd.player.otherPlayer(), playerName, player),
 							oCmdReq -> {
 								if (!oCmdReq.isPresent()) {
 									parent.network.refuseChallenge(player);
@@ -201,7 +202,7 @@ class ServerPlayer {
 
 	private boolean inGame;
 
-	public ServerPlayer(String name, boolean inGame) {
+	public ServerPlayer(final String name, final boolean inGame) {
 		this.name = name;
 		this.inGame = inGame;
 	}

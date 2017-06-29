@@ -63,6 +63,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 	private final VBox characterInfoRight = new VBox(10);
 
 	private final Player player;
+	private final String thisPlayerName;
 	private final String otherPlayerName;
 	private Stage currentStage = null;
 
@@ -86,11 +87,13 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		final ClientConfig config,
 		final Optional<String> useStage,
 		final Player player,
+		final String thisPlayerName,
 		final String otherPlayerName
 	)
 		throws CorruptDataException
 	{
 		this.player = player;
+		this.thisPlayerName = thisPlayerName;
 		this.otherPlayerName = otherPlayerName;
 		this.gameData = gameData;
 		this.setMinSize(0, 0);
@@ -225,7 +228,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			if (s == null || l == null ||
 				characterPositions.size() != l.characters.size())
 			{
-				Alert a = new Alert(Alert.AlertType.ERROR,
+				final Alert a = new Alert(Alert.AlertType.ERROR,
 					"Stage, loadout, or placement not complete", ButtonType.OK);
 				a.showAndWait();
 			} else {
@@ -233,7 +236,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 					.map(c -> characterPositions.get(c.rootCharacter.name))
 					.collect(Collectors.toList());
 				onDone.accept(Optional.of(new StartBattleCommandRequest(
-					s, player, l, startTiles)));
+					s, player, thisPlayerName, l, startTiles)));
 			}
 		});
 	}

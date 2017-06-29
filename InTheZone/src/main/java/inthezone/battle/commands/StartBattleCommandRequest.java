@@ -1,20 +1,22 @@
 package inthezone.battle.commands;
 
-import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Loadout;
-import inthezone.battle.data.Player;
-import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Loadout;
+import inthezone.battle.data.Player;
+import inthezone.protocol.ProtocolException;
 
 /**
  * This one works a bit different.  Player 1 generates a
@@ -26,6 +28,7 @@ import org.json.JSONObject;
 public class StartBattleCommandRequest implements HasJSONRepresentation {
 	public final String stage;
 	public final Player player;
+	public final String playerName;
 	private final Loadout me;
 	private final List<MapPoint> startTiles;
 
@@ -36,10 +39,15 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 	 * listed in the loadout.
 	 * */
 	public StartBattleCommandRequest(
-		String stage, Player player, Loadout me, List<MapPoint> startTiles
+		final String stage,
+		final Player player,
+		final String playerName,
+		final Loadout me,
+		final List<MapPoint> startTiles
 	) {
 		this.stage = stage;
 		this.player = player;
+		this.playerName = playerName;
 		this.me = me;
 		this.startTiles = startTiles;
 	}
@@ -52,6 +60,7 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		r.put("name", "startBattleReq");
 		r.put("stage", stage);
 		r.put("player", player.toString());
+		r.put("playerName", playerName);
 		r.put("starts", a);
 		r.put("loadout", me.getJSON());
 		return r;
@@ -62,11 +71,12 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 	}
 
 	public static StartBattleCommandRequest fromJSON(
-		JSONObject json, GameDataFactory gameData
+		final JSONObject json, final GameDataFactory gameData
 	) throws ProtocolException {
 
 		try {
 			final String name = json.getString("name");
+			final String playerName = json.getString("playerName");
 			final String stage = json.getString("stage");
 			final Player player = Player.fromString(json.getString("player"));
 			final JSONArray rawStarts = json.getJSONArray("starts");
@@ -80,7 +90,8 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 			if (!name.equals("startBattleReq"))
 				throw new ProtocolException("Expected start battle request");
 
-			return new StartBattleCommandRequest(stage, player, loadout, starts);
+			return new StartBattleCommandRequest(
+				stage, player, playerName, loadout, starts);
 
 		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Parse error in start battle request", e);
@@ -92,12 +103,12 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 	 * back to the challenger.
 	 * */
 	public StartBattleCommand makeCommand(
-		StartBattleCommandRequest op, GameDataFactory factory
+		final StartBattleCommandRequest op, final GameDataFactory factory
 	) throws CorruptDataException {
 		if (op.player == this.player)
 			throw new CorruptDataException("Both parties tried to play the same side");
 
-		Stage si = factory.getStage(stage);
+		final Stage si = factory.getStage(stage);
 		Collection<MapPoint> myps = getStartTiles(si, player);
 		Collection<MapPoint> opps = getStartTiles(si, op.player);
 
@@ -119,14 +130,18 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 
 		if (player == Player.PLAYER_A) {
 			return new StartBattleCommand(
-				stage, Math.random() < 0.5, me, op.me, startTiles, op.startTiles);
+				stage, Math.random() < 0.5, me, op.me,
+				startTiles, op.startTiles, playerName, op.playerName);
 		} else {
 			return new StartBattleCommand(
-				stage, Math.random() < 0.5, op.me, me, op.startTiles, startTiles);
+				stage, Math.random() < 0.5, op.me, me,
+				op.startTiles, startTiles, op.playerName, playerName);
 		}
 	}
 
-	private static Collection<MapPoint> getStartTiles(Stage s, Player p) {
+	private static Collection<MapPoint> getStartTiles(
+		final Stage s, final Player p
+	) {
 		return p == Player.PLAYER_A ?
 			s.terrain.getPlayerStartTiles() :
 			s.terrain.getAIStartTiles();

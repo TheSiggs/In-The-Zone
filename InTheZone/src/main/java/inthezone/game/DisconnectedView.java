@@ -122,7 +122,7 @@ public class DisconnectedView extends FlowPane {
 			try {
 				parent.showScreen(
 					new ChallengePane(gameData, config, Optional.empty(),
-						Player.PLAYER_A, "AI"), getStartSandpitCont());
+						Player.PLAYER_A, "You", "AI"), getStartSandpitCont());
 			} catch (CorruptDataException e) {
 				final Alert a = new Alert(Alert.AlertType.ERROR,
 					e.getMessage(), ButtonType.CLOSE);
@@ -149,7 +149,7 @@ public class DisconnectedView extends FlowPane {
 
 					// prepare the battle
 					final StartBattleCommand ready =
-						(new StartBattleCommandRequest(start.stage, op, l,
+						(new StartBattleCommandRequest(start.stage, op, "AI", l,
 							startTiles.stream().collect(Collectors.toList())))
 							.makeCommand(start, gameData);
 

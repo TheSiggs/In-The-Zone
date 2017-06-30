@@ -7,6 +7,10 @@ import isogame.engine.MapView;
 import isogame.engine.Sprite;
 import isogame.engine.Stage;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +27,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
-import javafx.stage.Window;
 
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
@@ -45,6 +48,7 @@ import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.Network;
 import inthezone.game.DialogScreen;
 import inthezone.game.InTheZoneKeyBinding;
+import inthezone.protocol.ProtocolException;
 
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
@@ -77,6 +81,9 @@ public class BattleView
 
 	public final ModalDialog modalDialog = new ModalDialog(this);
 
+	/**
+	 * Start a standard battle
+	 * */
 	public BattleView(
 		final StartBattleCommand startBattle,
 		final Player player,
@@ -85,12 +92,45 @@ public class BattleView
 		final Optional<Network> network,
 		final GameDataFactory gameData
 	) throws CorruptDataException {
+		this(startBattle, player, otherPlayerName,
+			Optional.empty(), otherPlayer, network, gameData,
+			new StandardHUD(gameData.getStandardSprites()));
+	}
+
+	/**
+	 * Start a saved battle in replay mode
+	 * */
+	public BattleView(
+		final PlaybackGenerator pb,
+		final InputStream in,
+		final GameDataFactory gameData
+	) throws IOException, ProtocolException, CorruptDataException {
+		this(
+			pb.start(new BufferedReader(new InputStreamReader(in, "UTF-8")), gameData),
+			Player.PLAYER_OBSERVER,
+			"",
+			Optional.of(pb), pb,
+			Optional.empty(), gameData,
+			new ReplayHUD(gameData.getStandardSprites()));
+	}
+
+	public BattleView(
+		final StartBattleCommand startBattle,
+		final Player player,
+		final String otherPlayerName,
+		final Optional<CommandGenerator> thisPlayerGenerator,
+		final CommandGenerator otherPlayer,
+		final Optional<Network> network,
+		final GameDataFactory gameData,
+		final HUD hud
+	) throws CorruptDataException {
 		this.setMinSize(0, 0);
 
 		this.player = player;
 		this.otherPlayerName = otherPlayerName;
 		this.commands = new CommandProcessor(this);
-		this.hud = new StandardHUD(this, gameData.getStandardSprites());
+		this.hud = hud;
+		hud.setView(this);
 
 		final DecalRenderer decals = new DecalRenderer(this, gameData.getStandardSprites());
 

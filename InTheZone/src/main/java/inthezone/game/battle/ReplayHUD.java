@@ -6,8 +6,8 @@ import inthezone.battle.BattleOutcome;
 import inthezone.battle.data.StandardSprites;
 
 public class ReplayHUD extends HUD {
-	public ReplayHUD(final BattleView view, final StandardSprites sprites) {
-		super(view, sprites);
+	public ReplayHUD(final StandardSprites sprites) {
+		super(sprites);
 	}
 
 	@Override public void doEndMode(final BattleOutcome outcome) {

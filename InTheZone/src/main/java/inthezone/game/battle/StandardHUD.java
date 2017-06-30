@@ -36,8 +36,8 @@ public class StandardHUD extends HUD {
 
 	private final VBox assistanceLine = new VBox();
 
-	public StandardHUD(final BattleView view, final StandardSprites sprites) {
-		super(view, sprites);
+	public StandardHUD(final StandardSprites sprites) {
+		super(sprites);
 
 		this.setMinSize(0, 0);
 		this.getStylesheets().add("HUD.css");

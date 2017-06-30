@@ -27,12 +27,15 @@ public abstract class HUD extends AnchorPane {
 
 	protected final BooleanProperty disableUI = new SimpleBooleanProperty(false);
 
-	protected final BattleView view;
+	protected BattleView view = null;
 	protected final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 	protected final StandardSprites sprites;
 
-	protected HUD(final BattleView view, final StandardSprites sprites) {
+	public final void setView(final BattleView view) {
 		this.view = view;
+	}
+
+	protected HUD(final StandardSprites sprites) {
 		this.sprites = sprites;
 
 		pushItem = new CommandButton(sprites.pushIcon,

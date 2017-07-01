@@ -195,15 +195,19 @@ public class CharacterProfilePane extends HBox {
 		model.basicAbility.bind(
 			basicAbility.getSelectionModel().selectedItemProperty());
 
-		/*abilities.setPrefHeight(abilitiesList.size() * 30 + 6);
-		scrollAbilities.layout();*/
-
 		hp.setValueFactory(new PPSpinnerFactory("Health: ",
 			profile.hpPP, info.stats.hp, info.hpCurve));
 		attack.setValueFactory(new PPSpinnerFactory("Attack: ",
 			profile.attackPP, info.stats.attack, info.attackCurve));
 		defence.setValueFactory(new PPSpinnerFactory("Defence: ",
 			profile.defencePP, info.stats.defence, info.defenceCurve));
+
+		hp.getValueFactory().setValue(10);
+		hp.getValueFactory().setValue(profile.hpPP);
+		attack.getValueFactory().setValue(10);
+		attack.getValueFactory().setValue(profile.attackPP);
+		defence.getValueFactory().setValue(10);
+		defence.getValueFactory().setValue(profile.defencePP);
 
 		model.hpPP.bind(hp.valueProperty());
 		model.attackPP.bind(attack.valueProperty());
@@ -271,7 +275,6 @@ class PPSpinnerFactory extends SpinnerValueFactory<Integer> {
 		final int base,
 		final List<Integer> curve
 	) {
-
 		values = new int[1 + curve.size()];
 		values[0] = base;
 		for (int i = 0; i < curve.size(); i++) values[i + 1] = curve.get(i);

@@ -1115,7 +1115,7 @@
           },
           "media": {"icon": "abilities/teleport.png"},
           "type": "special",
-          "ap": 2,
+          "ap": 1,
           "zone": "None",
           "instantBefore": "TELEPORT 3",
           "name": "Teleport",
@@ -9169,6 +9169,6 @@
       "sprites": []
     }
   ],
-  "version": "7447d907-ad60-4f44-8a6f-7cb7bcb2c247",
-  "versionNumber": 203
+  "version": "40742b07-3ccb-4e83-955e-a6040de4c803",
+  "versionNumber": 204
 }

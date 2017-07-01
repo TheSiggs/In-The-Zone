@@ -1,24 +1,23 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
-import inthezone.battle.data.StandardSprites;
-import inthezone.battle.RoadBlock;
-import inthezone.battle.Targetable;
-import inthezone.battle.Trap;
-import inthezone.battle.Zone;
 import isogame.engine.AnimationChain;
 import isogame.engine.MapPoint;
 import isogame.engine.Sprite;
 import isogame.engine.Stage;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import inthezone.battle.Character;
+import inthezone.battle.RoadBlock;
+import inthezone.battle.Targetable;
+import inthezone.battle.Trap;
+import inthezone.battle.Zone;
+import inthezone.battle.data.StandardSprites;
 
 /**
  * A class to keep track of all the sprites.
@@ -137,8 +136,7 @@ public class SpriteManager {
 					decals.registerCharacter(c);
 				}
 			}
-			view.hud.init(this.characters.values().stream()
-				.filter(c -> c.player == view.player).collect(Collectors.toList()));
+			view.hud.init(this.characters.values());
 
 		} else {
 			for (Targetable t : characters) {

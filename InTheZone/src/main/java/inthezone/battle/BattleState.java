@@ -187,6 +187,9 @@ public class BattleState {
 	 * Determine the outcome of the battle from the point of view of a player.
 	 * */
 	public Optional<BattleOutcome> getBattleOutcome(final Player player) {
+		if (player == Player.PLAYER_OBSERVER)
+			return getBattleOutcome(Player.PLAYER_A);
+
 		if (resignedPlayer.isPresent()) {
 			if (resignedPlayer.get() == player) {
 				return Optional.of(BattleOutcome.RESIGN);

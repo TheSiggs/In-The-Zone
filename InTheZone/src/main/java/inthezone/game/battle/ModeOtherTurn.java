@@ -1,9 +1,9 @@
 package inthezone.game.battle;
 
-
 import java.util.Optional;
 
 import inthezone.battle.Character;
+import inthezone.battle.data.Player;
 import isogame.engine.SelectionInfo;
 
 public class ModeOtherTurn extends Mode {
@@ -22,7 +22,9 @@ public class ModeOtherTurn extends Mode {
 		final Optional<Character> oc = selection.spritePriority()
 			.flatMap(p -> view.sprites.getCharacterAt(p));
 
-		if (oc.isPresent() && oc.get().player == view.player) {
+		if (oc.isPresent() &&
+			(view.player == Player.PLAYER_OBSERVER || oc.get().player == view.player)
+		) {
 			view.outOfTurnSelect(Optional.of(oc.get()));
 		} else {
 			view.outOfTurnSelect(Optional.empty());

@@ -1,5 +1,7 @@
 package inthezone.game;
 
+import static javafx.stage.FileChooser.ExtensionFilter;
+
 import inthezone.ai.SimpleAI;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
@@ -9,22 +11,29 @@ import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.battle.BattleView;
+import inthezone.game.battle.PlaybackGenerator;
 import inthezone.game.loadoutEditor.LoadoutOverview;
 import inthezone.game.lobby.ChallengePane;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import javafx.stage.FileChooser;
 
 public class DisconnectedView extends FlowPane {
 	private final Network network;
@@ -33,6 +42,7 @@ public class DisconnectedView extends FlowPane {
 	private final Button setServer = new Button("Set server");
 	private final Button loadout = new Button("Edit loadouts offline");
 	private final Button sandpit = new Button("Sandpit mode");
+	private final Button replay = new Button("Replay recorded game");
 
 	private final GameDataFactory gameData;
 	private final ContentPane parent;
@@ -131,8 +141,42 @@ public class DisconnectedView extends FlowPane {
 				System.exit(1);
 			}
 		});
+		
+		replay.setOnAction(event -> {
+			final FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Choose replay file");
+			fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter("Game files", "*.game"),
+				new ExtensionFilter("All files", "*.*"));
 
-		this.getChildren().addAll(login, setServer, loadout, sandpit);
+			final File file =
+				fileChooser.showOpenDialog(this.getScene().getWindow());
+
+			if (file != null) {
+				try {
+					final PlaybackGenerator playback = new PlaybackGenerator();
+					final InputStream in = new FileInputStream(file);
+
+					parent.showScreen(new BattleView(playback, in, gameData),
+						winCond -> System.err.println("Replay complete: " + winCond));
+
+				} catch (IOException e) {
+					final Alert a = new Alert(Alert.AlertType.ERROR,
+						e.getMessage(), ButtonType.CLOSE);
+					a.setHeaderText("Cannot read saved game file");
+					a.showAndWait();
+
+				} catch (ProtocolException|CorruptDataException e) {
+					final Alert a = new Alert(Alert.AlertType.ERROR,
+						e.getMessage(), ButtonType.CLOSE);
+					a.setHeaderText("Saved game corrupted");
+					a.showAndWait();
+				}
+			}
+
+		});
+
+		this.getChildren().addAll(login, setServer, loadout, sandpit, replay);
 	}
 
 	private Consumer<Optional<StartBattleCommandRequest>> getStartSandpitCont() {
@@ -155,7 +199,7 @@ public class DisconnectedView extends FlowPane {
 
 					// start the battle
 					parent.showScreen(new BattleView(
-						ready, Player.PLAYER_A, "AI", new SimpleAI(), Optional.empty(), gameData),
+						ready, Player.PLAYER_A, new SimpleAI(), Optional.empty(), gameData),
 						winCond -> System.err.println("Battle over: " + winCond));
 				} catch (CorruptDataException e) {
 					final Alert a = new Alert(Alert.AlertType.ERROR,

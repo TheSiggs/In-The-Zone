@@ -14,6 +14,7 @@ import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
 import inthezone.battle.data.AbilityDescription;
+import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 
 public abstract class HUD extends AnchorPane {
@@ -27,15 +28,12 @@ public abstract class HUD extends AnchorPane {
 
 	protected final BooleanProperty disableUI = new SimpleBooleanProperty(false);
 
-	protected BattleView view = null;
+	protected final BattleView view;
 	protected final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 	protected final StandardSprites sprites;
 
-	public final void setView(final BattleView view) {
+	protected HUD(final BattleView view, final StandardSprites sprites) {
 		this.view = view;
-	}
-
-	protected HUD(final StandardSprites sprites) {
 		this.sprites = sprites;
 
 		pushItem = new CommandButton(sprites.pushIcon,
@@ -123,6 +121,9 @@ public abstract class HUD extends AnchorPane {
 
 	public void init(final Collection<Character> characters) {
 		for (Character c : characters) {
+			if (c.player != view.player && view.player != Player.PLAYER_OBSERVER)
+				continue;
+
 			final CharacterInfoBox box = new CharacterInfoBox(c, sprites);
 			box.setOnMouseClicked(event -> {
 				if (!disableUI.get()) view.selectCharacterById(c.id);

@@ -17,6 +17,7 @@ import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.commands.PushCommand;
 import inthezone.battle.commands.StartTurnCommand;
 import inthezone.battle.commands.UseAbilityCommand;
+import inthezone.battle.data.Player;
 import inthezone.battle.instant.InstantEffect;
 import inthezone.battle.instant.Move;
 import inthezone.battle.instant.PullPush;
@@ -130,7 +131,12 @@ public class CommandProcessor {
 				registeredAnimations = false;
 			} else {
 				view.isMyTurn.setValue(false);
-				view.hud.writeMessage(view.otherPlayerName + "'s turn");
+
+				final String playerName;
+				if (cmd.player == Player.PLAYER_A) playerName = view.playerAName;
+				else playerName = view.playerBName;
+
+				view.hud.writeMessage(playerName + "'s turn");
 				registeredAnimations = false;
 			}
 

@@ -34,8 +34,8 @@ public class StartBattleCommand implements HasJSONRepresentation {
 	private final List<MapPoint> p1start;
 	private final List<MapPoint> p2start;
 
-	private final String p1Name;
-	private final String p2Name;
+	public final String p1Name;
+	public final String p2Name;
 
 	private final Collection<Character> characters;
 

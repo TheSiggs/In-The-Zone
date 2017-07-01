@@ -126,7 +126,9 @@ public class BattleInProgress implements Runnable {
 		try {
 			commandQueue.addAll(battle.getTurnStart(thisPlayer));
 
-			final boolean commandsComming = !commandQueue.isEmpty();
+			final boolean commandsComming =
+				!commandQueue.isEmpty() && !thisPlayerGenerator.isPresent();
+
 			Platform.runLater(() -> {
 				final List<Targetable> affected = new ArrayList<>();
 				affected.addAll(battle.battleState.cloneCharacters());
@@ -271,8 +273,9 @@ public class BattleInProgress implements Runnable {
 			affected.addAll(battle.battleState.cloneCharacters());
 			affected.addAll(zones);
 			try {
-				listener.command((new StartTurnCommand(thisPlayer.otherPlayer(), affected))
-					.doCmdComputingTriggers(battle).get(0));
+				listener.command((new StartTurnCommand(
+					thisPlayer.otherPlayer(), affected))
+						.doCmdComputingTriggers(battle).get(0).markLastInSequence());
 			} catch (CommandException e) {
 				listener.badCommand(e);
 			}

@@ -1,12 +1,7 @@
 package inthezone.game.battle;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,10 +11,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
-import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.Character;
-import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.StandardSprites;
 import inthezone.game.battle.TurnClock;
 
@@ -36,8 +29,8 @@ public class StandardHUD extends HUD {
 
 	private final VBox assistanceLine = new VBox();
 
-	public StandardHUD(final StandardSprites sprites) {
-		super(sprites);
+	public StandardHUD(final BattleView view, final StandardSprites sprites) {
+		super(view, sprites);
 
 		this.setMinSize(0, 0);
 		this.getStylesheets().add("HUD.css");

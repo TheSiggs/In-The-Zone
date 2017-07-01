@@ -8,6 +8,7 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
@@ -22,9 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PlaybackGenerator implements CommandGenerator {
-	public PlaybackGenerator() {
-	}
-
 	private BufferedReader inReader = null;
 
 	public StartBattleCommand start(
@@ -61,21 +59,68 @@ public class PlaybackGenerator implements CommandGenerator {
 		}
 	}
 
-	@Override public void generateCommands(
+	/**
+	 * Release the next command
+	 * */
+	public synchronized void nextCommand() {
+		this.notify();
+	}
+
+	/* A hack to make these values available for the close method*/
+	Battle battle = null;
+	BattleListener listener = null;
+	Player forPlayer = null;
+
+	/**
+	 * Close this playback generator.
+	 * */
+	public synchronized void close() {
+		if (inReader != null) {
+			try {
+				inReader.close();
+
+				if (forPlayer != null && battle != null && listener != null) {
+					final Command cmd = new ResignCommand(forPlayer, true);
+					final ExecutedCommand ec =
+						new ExecutedCommand(cmd, cmd.doCmd(battle));
+					Platform.runLater(() -> listener.command(ec.markLastInSequence())); 
+				}
+
+			} catch (CommandException e) {
+				Platform.runLater(() -> listener.badCommand(e));
+
+			} catch (IOException e) {
+				/* ignore */
+			}
+		}
+	}
+
+
+	/**
+	 * Generate the commands.  Waits for each command to be released before
+	 * passing it on.
+	 * */
+	@Override public synchronized void generateCommands(
 		final Battle battle,
 		final BattleListener listener,
 		final Player forPlayer
 	) {
+		this.battle = battle;
+		this.listener = listener;
+		this.forPlayer = forPlayer;
+
 		while (true) {
 			try {
 				final RecordedLine inLine = new RecordedLine(inReader.readLine());
 				if (inLine.isEOF) {
-					inReader.close();
+					this.close();
 					return;
 				}
 
 				System.err.println("Next command " +
 					inLine.playerName + "/" + inLine.cmd);
+
+				this.wait(); // wait for this command to be released
 
 				final Command cmd = Command.fromJSON(inLine.cmd);
 				final ExecutedCommand ec =
@@ -86,25 +131,23 @@ public class PlaybackGenerator implements CommandGenerator {
 					return;
 				}
 
-				if (cmd instanceof EndTurnCommand) {
-					inReader.close();
-					return;
-				}
+				if (cmd instanceof EndTurnCommand) return;
+
 			} catch (IOException|JSONException|ProtocolException e) {
 					Platform.runLater(() -> {
-						final Alert a = new Alert(AlertType.ERROR, e.getMessage(), ButtonType.OK);
+						final Alert a = new Alert(AlertType.ERROR,
+							e.getMessage(), ButtonType.OK);
 						a.setHeaderText("Error parsing playback file");
 						a.showAndWait();
 					});
 
-					try {
-						inReader.close();
-					} catch (IOException e2)  {
-						/* ignore */
-					}
+					this.close();
 
 			} catch (CommandException e) {
 				Platform.runLater(() -> listener.badCommand(e));
+
+			} catch (InterruptedException e) {
+				/* ignore */
 			}
 		}
 	}

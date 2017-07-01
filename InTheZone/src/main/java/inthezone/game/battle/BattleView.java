@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -56,7 +57,10 @@ public class BattleView
 	// battle state
 	public final BattleInProgress battle;
 	public final Player player;
-	public final String otherPlayerName;
+
+	public final String playerAName;
+	public final String playerBName;
+
 	public final CommandProcessor commands;
 	public final SpriteManager sprites;
 	private Optional<Character> selectedCharacter = Optional.empty();
@@ -87,14 +91,13 @@ public class BattleView
 	public BattleView(
 		final StartBattleCommand startBattle,
 		final Player player,
-		final String otherPlayerName,
 		final CommandGenerator otherPlayer,
 		final Optional<Network> network,
 		final GameDataFactory gameData
 	) throws CorruptDataException {
-		this(startBattle, player, otherPlayerName,
+		this(startBattle, player,
 			Optional.empty(), otherPlayer, network, gameData,
-			new StandardHUD(gameData.getStandardSprites()));
+			view -> new StandardHUD(view, gameData.getStandardSprites()));
 	}
 
 	/**
@@ -108,36 +111,38 @@ public class BattleView
 		this(
 			pb.start(new BufferedReader(new InputStreamReader(in, "UTF-8")), gameData),
 			Player.PLAYER_OBSERVER,
-			"",
 			Optional.of(pb), pb,
 			Optional.empty(), gameData,
-			new ReplayHUD(gameData.getStandardSprites()));
+			view -> new ReplayHUD(view, gameData.getStandardSprites(), pb));
 	}
 
 	public BattleView(
 		final StartBattleCommand startBattle,
 		final Player player,
-		final String otherPlayerName,
 		final Optional<CommandGenerator> thisPlayerGenerator,
 		final CommandGenerator otherPlayer,
 		final Optional<Network> network,
 		final GameDataFactory gameData,
-		final HUD hud
+		final Function<BattleView, HUD> hud
 	) throws CorruptDataException {
 		this.setMinSize(0, 0);
 
 		this.player = player;
-		this.otherPlayerName = otherPlayerName;
-		this.commands = new CommandProcessor(this);
-		this.hud = hud;
-		hud.setView(this);
+		this.playerAName = startBattle.p1Name;
+		this.playerBName = startBattle.p2Name;
 
-		final DecalRenderer decals = new DecalRenderer(this, gameData.getStandardSprites());
+		this.commands = new CommandProcessor(this);
+		this.hud = hud.apply(this);
+
+		final DecalRenderer decals = new DecalRenderer(this,
+			gameData.getStandardSprites());
 
 		System.err.println("Playing as " + player);
 
 		this.canvas = new MapView(this,
-			gameData.getStage(startBattle.stage), true, false, Highlighters.highlights);
+			gameData.getStage(startBattle.stage), true, false,
+			Highlighters.highlights);
+
 		canvas.widthProperty().bind(this.widthProperty());
 		canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
@@ -202,8 +207,21 @@ public class BattleView
 				}
 		});
 
+		final Player firstPlayer;
+		if (player == Player.PLAYER_OBSERVER) {
+			if (startBattle.p1GoesFirst) {
+				firstPlayer = Player.PLAYER_A;
+			} else {
+				firstPlayer = Player.PLAYER_B;
+			}
+		} else {
+			firstPlayer = player;
+		}
+
 		battle = new BattleInProgress(
-			startBattle, player, Optional.empty(), otherPlayer, network, gameData, this);
+			startBattle, firstPlayer, thisPlayerGenerator,
+			otherPlayer, network, gameData, this);
+
 		(new Thread(battle)).start();
 
 		// init the mode
@@ -214,7 +232,7 @@ public class BattleView
 		if (startTiles.size() > 0) canvas.centreOnTile(startTiles.get(0));
 
 		setMode(new ModeOtherTurn(this));
-		this.getChildren().addAll(canvas, hud, modalDialog);
+		this.getChildren().addAll(canvas, this.hud, modalDialog);
 	}
 
 	private Mode mode;

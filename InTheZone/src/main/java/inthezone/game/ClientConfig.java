@@ -34,7 +34,7 @@ public class ClientConfig implements HasJSONRepresentation {
 	private final File configFile =
 		new File(GameDataFactory.gameDataCacheDir, "client.json");
 
-	public ClientConfig(GameDataFactory gameData) {
+	public ClientConfig(final GameDataFactory gameData) {
 		try (
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 				new FileInputStream(configFile), "UTF-8"))
@@ -50,13 +50,6 @@ public class ClientConfig implements HasJSONRepresentation {
 
 		} catch (Exception e) {
 			System.err.println("Error reading config file: " + e.getMessage());
-
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
-			a.setHeaderText("Error reading config file \"" + configFile.toString() +
-				"\"\nA new config file has been generated.  Click OK to continue. ");
-			a.setContentText(e.getMessage());
-			a.showAndWait();
-
 			resetConfigFile();
 		}
 	}
@@ -67,9 +60,10 @@ public class ClientConfig implements HasJSONRepresentation {
 	public String server = DEFAULT_SERVER;
 	public int port = DEFAULT_PORT;
 
-	public void loadConfig(JSONObject json, GameDataFactory gameData)
-		throws CorruptDataException
-	{
+	public void loadConfig(
+		final JSONObject json, final GameDataFactory gameData
+	) throws CorruptDataException {
+
 		this.defaultPlayerName = Optional.empty();
 		loadouts.clear();
 
@@ -120,7 +114,8 @@ public class ClientConfig implements HasJSONRepresentation {
 		) {
 			out.print(getJSON().toString());
 		} catch (IOException e) {
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			final Alert a = new Alert(Alert.AlertType.ERROR,
+				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Cannot create configuration file \"" +
 				configFile.toString() + "\".  Your loadouts cannot be saved.");
 			a.setContentText(e.getMessage());
@@ -128,9 +123,9 @@ public class ClientConfig implements HasJSONRepresentation {
 		}
 	}
 
-	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
-		throws ClassCastException
-	{
+	private static <T> List<T> jsonArrayToList(
+		final JSONArray a, final Class<T> clazz
+	) throws ClassCastException {
 		final List<T> r = new ArrayList<>();
 		int limit = a.length();
 		for (int i = 0; i < limit; i++) {

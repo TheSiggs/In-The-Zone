@@ -361,7 +361,6 @@
         "ap": 2
       },
       "name": "Bridget",
-      "sprite": "bridget",
       "hpCurve": [
         220,
         240,
@@ -369,11 +368,13 @@
       ],
       "portrait": "portrait/bridget.png",
       "bigPortrait": "portrait/bridget_big.png",
+      "spriteB": "bridget_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "bridget",
       "playable": true
     },
     {
@@ -755,7 +756,6 @@
         "ap": 2
       },
       "name": "Eve",
-      "sprite": "eve",
       "hpCurve": [
         105,
         125,
@@ -763,11 +763,13 @@
       ],
       "portrait": "portrait/eve.png",
       "bigPortrait": "portrait/eve_big.png",
+      "spriteB": "eve_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "eve",
       "playable": true
     },
     {
@@ -1080,7 +1082,6 @@
         "ap": 2
       },
       "name": "Sar",
-      "sprite": "sar",
       "hpCurve": [
         125,
         145,
@@ -1088,11 +1089,13 @@
       ],
       "portrait": "portrait/sar.png",
       "bigPortrait": "portrait/sar_big.png",
+      "spriteB": "sar_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "sar",
       "playable": true
     },
     {
@@ -1514,7 +1517,6 @@
         "ap": 2
       },
       "name": "Zan",
-      "sprite": "zan",
       "hpCurve": [
         125,
         145,
@@ -1522,11 +1524,13 @@
       ],
       "portrait": "portrait/zan.png",
       "bigPortrait": "portrait/zan_big.png",
+      "spriteB": "zan_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "zan",
       "playable": true
     },
     {
@@ -1805,7 +1809,6 @@
         "ap": 2
       },
       "name": "Kieran",
-      "sprite": "kieren",
       "hpCurve": [
         170,
         190,
@@ -1813,11 +1816,13 @@
       ],
       "portrait": "portrait/kieran.png",
       "bigPortrait": "portrait/kieran_big.png",
+      "spriteB": "kieren_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "kieren",
       "playable": true
     },
     {
@@ -2114,7 +2119,6 @@
         "ap": 2
       },
       "name": "Daniel",
-      "sprite": "daniel",
       "hpCurve": [
         125,
         145,
@@ -2122,11 +2126,13 @@
       ],
       "portrait": "portrait/dan.png",
       "bigPortrait": "portrait/dan_big.png",
+      "spriteB": "dan_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "daniel",
       "playable": true
     },
     {
@@ -2164,11 +2170,12 @@
         "ap": 2
       },
       "name": "Robot",
-      "sprite": "robot",
       "hpCurve": [],
       "portrait": "portrait/robot.png",
       "bigPortrait": "portrait/generic.png",
+      "spriteB": "robot",
       "attackCurve": [],
+      "spriteA": "robot",
       "playable": false
     },
     {
@@ -2521,7 +2528,6 @@
         "ap": 2
       },
       "name": "Galen",
-      "sprite": "galen",
       "hpCurve": [
         140,
         160,
@@ -2529,11 +2535,13 @@
       ],
       "portrait": "portrait/galen.png",
       "bigPortrait": "portrait/galen_big.png",
+      "spriteB": "galen_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "galen",
       "playable": true
     },
     {
@@ -2913,7 +2921,6 @@
         "ap": 2
       },
       "name": "Nettis",
-      "sprite": "nettis",
       "hpCurve": [
         125,
         145,
@@ -2921,11 +2928,13 @@
       ],
       "portrait": "portrait/nettis.png",
       "bigPortrait": "portrait/nettis_big.png",
+      "spriteB": "nettis_b",
       "attackCurve": [
         17,
         17,
         18
       ],
+      "spriteA": "nettis",
       "playable": true
     }
   ],
@@ -9160,6 +9169,6 @@
       "sprites": []
     }
   ],
-  "version": "00e71724-c674-4cf6-beb2-572892cb8f55",
-  "versionNumber": 201
+  "version": "7447d907-ad60-4f44-8a6f-7cb7bcb2c247",
+  "versionNumber": 203
 }

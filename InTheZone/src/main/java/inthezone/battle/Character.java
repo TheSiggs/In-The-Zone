@@ -121,7 +121,9 @@ public class Character extends Targetable {
 		this.id = id;
 		this.name = profile.rootCharacter.name;
 		this.player = player;
-		this.sprite = profile.rootCharacter.sprite;
+		this.sprite = player == Player.PLAYER_A?
+			profile.rootCharacter.spriteA:
+			profile.rootCharacter.spriteB;
 		this.portrait = profile.rootCharacter.portrait;
 		this.baseStats = profile.getBaseStats();
 		this.abilities.addAll(profile.abilities.stream()

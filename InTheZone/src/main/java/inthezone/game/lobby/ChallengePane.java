@@ -253,7 +253,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 	private void setLoadout(final Loadout l) {
 		if (l != null && l.isLegitimate()) {
-			characterSelector.setCharacters(l.characters);
+			characterSelector.setCharacters(l.characters, player);
 
 			for (MapPoint p : characterPositions.values())
 				currentStage.clearTileOfSprites(p);
@@ -307,7 +307,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 
 		o.ifPresent(c -> {
 			if (currentStage != null) {
-				final Sprite s = new Sprite(c.rootCharacter.sprite);
+				final Sprite s = new Sprite(player == Player.PLAYER_A?
+					c.rootCharacter.spriteA : c.rootCharacter.spriteB);
 				s.setAnimation("walk");
 				s.pos = p;
 				s.direction = FacingDirection.UP;

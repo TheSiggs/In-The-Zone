@@ -47,7 +47,8 @@ public class CharacterPane extends TitledPane {
 	private final Button bigPortrait;
 	private final TextField name;
 	private final CheckBox playable;
-	private final ComboBox<SpriteInfo> sprite;
+	private final ComboBox<SpriteInfo> spriteA;
+	private final ComboBox<SpriteInfo> spriteB;
 	private final ObservableList<SpriteInfo> spriteList =
 		FXCollections.observableArrayList();
 	private final PositiveIntegerField ap;
@@ -82,7 +83,8 @@ public class CharacterPane extends TitledPane {
 		return new CharacterInfo(
 			name.getText(),
 			flavourText.getText(),
-			sprite.getValue(),
+			spriteA.getValue(),
+			spriteB.getValue(),
 			portraitImage,
 			portraitFilename,
 			bigPortraitImage,
@@ -99,7 +101,8 @@ public class CharacterPane extends TitledPane {
 	public Collection<AbilityInfo> getAbilities() throws CorruptDataException {
 		try {
 			return abilitiesRoot.getChildren().stream()
-				.map(Errors.rethrow().wrapFunction(i -> AbilitiesPane.encodeAbility(i, false)))
+				.map(Errors.rethrow()
+				.wrapFunction(i -> AbilitiesPane.encodeAbility(i, false)))
 				.collect(Collectors.toList());
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof CorruptDataException) {
@@ -109,12 +112,13 @@ public class CharacterPane extends TitledPane {
 	}
 
 	private static void decodeAbility(
-		AbilityInfo a, boolean isMana, boolean isSubsequent,
-		TreeItem<AbilityInfoModel> parent
+		final AbilityInfo a, final boolean isMana,
+		final boolean isSubsequent,
+		final TreeItem<AbilityInfoModel> parent
 	) {
-		AbilityInfoModel base = new AbilityInfoModel(isMana, isSubsequent);
+		final AbilityInfoModel base = new AbilityInfoModel(isMana, isSubsequent);
 		base.init(a);
-		TreeItem<AbilityInfoModel> baseItem = new TreeItem<>(base);
+		final TreeItem<AbilityInfoModel> baseItem = new TreeItem<>(base);
 		AbilitiesPane.setItemGraphic(baseItem);
 		parent.getChildren().add(baseItem);
 
@@ -125,26 +129,28 @@ public class CharacterPane extends TitledPane {
 			decodeAbility(a.mana.get(), true, false, baseItem);
 	}
 
-	private static ImageView makePortraitImage(Image img) {
-		ImageView r = new ImageView(img);
+	private static ImageView makePortraitImage(final Image img) {
+		final ImageView r = new ImageView(img);
 		r.setFitHeight(80);
 		r.setPreserveRatio(true);
 		return r;
 	}
 
-	private List<Integer> decodeCurve(int base, List<Integer> curve) {
-		List<Integer> r = new ArrayList<>();
+	private List<Integer> decodeCurve(
+		final int base, final List<Integer> curve
+	) {
+		final List<Integer> r = new ArrayList<>();
 		r.add(base);
 		r.addAll(curve);
 		return r;
 	}
 
 	public CharacterPane(
-		File dataRoot,
-		CharacterInfo character,
-		GameDataFactory gameData,
-		WritableValue<Boolean> changed,
-		AbilitiesPane abilities
+		final File dataRoot,
+		final CharacterInfo character,
+		final GameDataFactory gameData,
+		final WritableValue<Boolean> changed,
+		final AbilitiesPane abilities
 	) {
 		super();
 
@@ -168,7 +174,8 @@ public class CharacterPane extends TitledPane {
 		name = new TextField(character.name);
 		playable = new CheckBox("Playable");
 		playable.setSelected(character.playable);
-		sprite = new ComboBox<>(spriteList);
+		spriteA = new ComboBox<>(spriteList);
+		spriteB = new ComboBox<>(spriteList);
 		ap = new PositiveIntegerField(character.stats.ap);
 		mp = new PositiveIntegerField(character.stats.mp);
 		power = new PositiveIntegerField(character.stats.power);
@@ -200,17 +207,19 @@ public class CharacterPane extends TitledPane {
 		grid.add(new HBox(portrait, bigPortrait), 1, 0);
 		grid.addRow(1, new Label("Name"), name);
 		grid.add(playable, 1, 2);
-		grid.addRow(3, new Label("Sprite"), sprite);
-		grid.addRow(4, new Label("Base AP"), ap);
-		grid.addRow(5, new Label("Base MP"), mp);
-		grid.addRow(6, new Label("Base Power"), power);
-		grid.addRow(7, new Label("Base HP"), hp);
-		grid.addRow(8, new Label("Base Attack"), attack);
-		grid.addRow(9, new Label("Base Defence"), defence);
-		grid.add(flavourText, 0, 10, 2, 1);
+		grid.addRow(3, new Label("Player A Sprite"), spriteA);
+		grid.addRow(4, new Label("Player B Sprite"), spriteB);
+		grid.addRow(5, new Label("Base AP"), ap);
+		grid.addRow(6, new Label("Base MP"), mp);
+		grid.addRow(7, new Label("Base Power"), power);
+		grid.addRow(8, new Label("Base HP"), hp);
+		grid.addRow(9, new Label("Base Attack"), attack);
+		grid.addRow(10, new Label("Base Defence"), defence);
+		grid.add(flavourText, 0, 11, 2, 1);
 
 		name.textProperty().addListener(c -> changed.setValue(true));
-		sprite.valueProperty().addListener(c -> changed.setValue(true));
+		spriteA.valueProperty().addListener(c -> changed.setValue(true));
+		spriteB.valueProperty().addListener(c -> changed.setValue(true));
 		ap.textProperty().addListener(c -> changed.setValue(true));
 		mp.textProperty().addListener(c -> changed.setValue(true));
 		power.textProperty().addListener(c -> changed.setValue(true));
@@ -227,7 +236,8 @@ public class CharacterPane extends TitledPane {
 		for (SpriteInfo i : gameData.getGlobalSprites()) {
 			if (i.priority == CHARACTER) spriteList.add(i);
 		}
-		sprite.getSelectionModel().select(character.sprite);
+		spriteA.getSelectionModel().select(character.spriteA);
+		spriteB.getSelectionModel().select(character.spriteB);
 
 		this.expandedProperty().addListener((v, oldv, newv) -> {
 			if (newv) {
@@ -236,17 +246,17 @@ public class CharacterPane extends TitledPane {
 		});
 	}
 
-	private void updatePortrait(boolean big) {
-		FileChooser fc = new FileChooser();
+	private void updatePortrait(final boolean big) {
+		final FileChooser fc = new FileChooser();
 		fc.setTitle("Choose portrait file");
 		fc.setInitialDirectory(gfxRoot);
 		fc.getExtensionFilters().addAll(new ExtensionFilter("Graphics files",
 			"*.png", "*.PNG", "*.jpg", "*.JPG",
 			"*.jpeg", "*.JPEG", "*.bmp", "*.BMP"));
-		File r = fc.showOpenDialog(this.getScene().getWindow());
+		final File r = fc.showOpenDialog(this.getScene().getWindow());
 		if (r != null) {
 			try {
-				String path = gfxRoot.toPath().relativize(r.toPath()).toString();
+				final String path = gfxRoot.toPath().relativize(r.toPath()).toString();
 				if (big) {
 					bigPortraitImage = new Image(new FileInputStream(r));
 					bigPortraitFilename = path;
@@ -257,7 +267,7 @@ public class CharacterPane extends TitledPane {
 					portrait.setGraphic(makePortraitImage(portraitImage));
 				}
 			} catch (IOException e) {
-				Alert error = new Alert(Alert.AlertType.ERROR);
+				final Alert error = new Alert(Alert.AlertType.ERROR);
 				error.setTitle("Cannot load image from file " + r.toString());
 				error.setHeaderText(e.toString());
 				error.showAndWait();

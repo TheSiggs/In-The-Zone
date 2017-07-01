@@ -27,7 +27,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public final Image portrait;
 	public final String bigPortraitFile;
 	public final Image bigPortrait;
-	public final SpriteInfo sprite;
+	public final SpriteInfo spriteA;
+	public final SpriteInfo spriteB;
 	public final Stats stats;
 	public final Collection<AbilityInfo> abilities;
 	public final boolean playable;
@@ -45,7 +46,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 	public CharacterInfo(
 		final String name,
 		final String flavourText,
-		final SpriteInfo sprite,
+		final SpriteInfo spriteA,
+		final SpriteInfo spriteB,
 		final Image portrait,
 		final String portraitFile,
 		final Image bigPortrait,
@@ -60,7 +62,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 		this.name = name;
 		this.flavourText = flavourText;
 		this.stats = stats;
-		this.sprite = sprite;
+		this.spriteA = spriteA;
+		this.spriteB = spriteB;
 		this.portrait = portrait;
 		this.portraitFile = portraitFile;
 		this.bigPortrait = bigPortrait;
@@ -87,7 +90,8 @@ public class CharacterInfo implements HasJSONRepresentation {
 		final JSONObject r = new JSONObject();
 		r.put("name", name);
 		r.put("flavour", flavourText);
-		r.put("sprite", sprite.id);
+		r.put("spriteA", spriteA.id);
+		r.put("spriteB", spriteB.id);
 		r.put("portrait", portraitFile);
 		r.put("bigPortrait", bigPortraitFile);
 		r.put("playable", playable);
@@ -121,9 +125,21 @@ public class CharacterInfo implements HasJSONRepresentation {
 			final String name = json.getString("name");
 			final String flavour = json.optString("flavour", "");
 			final Stats stats = Stats.fromJSON(json.getJSONObject("stats"));
-			final SpriteInfo sprite = lib.getSprite(json.getString("sprite"));
+
+			final SpriteInfo spriteA;
+			final SpriteInfo spriteB;
+
+			if (json.has("spriteA") && json.has("spriteB")) {
+				spriteA = lib.getSprite(json.getString("spriteA"));
+				spriteB = lib.getSprite(json.getString("spriteB"));
+			} else {
+				spriteA = lib.getSprite(json.getString("sprite"));
+				spriteB = spriteA;
+			}
+			
 			final String portraitFile = json.getString("portrait");
-			final String bigPortraitFile = json.optString("bigPortrait", "portrait/generic.png");
+			final String bigPortraitFile =
+				json.optString("bigPortrait", "portrait/generic.png");
 			final boolean playable = json.getBoolean("playable");
 			final JSONArray abilities = json.getJSONArray("abilities");
 			final JSONArray rhpCurve = json.getJSONArray("hpCurve");
@@ -150,7 +166,7 @@ public class CharacterInfo implements HasJSONRepresentation {
 			final List<Integer> defenceCurve = decodeCurve(rdefenceCurve);
 
 			return new CharacterInfo(
-				name, flavour, sprite, portrait,
+				name, flavour, spriteA, spriteB, portrait,
 				portraitFile, bigPortrait, bigPortraitFile,
 				stats, allAbilities, playable, hpCurve, attackCurve, defenceCurve);
 

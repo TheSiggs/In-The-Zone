@@ -34,8 +34,8 @@ public class CharactersPane extends VBox {
 	private final File dataDir;
 	private final GameDataFactory gameData;
 
-	private List<File> getStages(File baseDir) {
-		List<File> r = Arrays.stream(baseDir.listFiles())
+	private List<File> getStages(final File baseDir) {
+		final List<File> r = Arrays.stream(baseDir.listFiles())
 			.filter(f -> f.getName().endsWith(".map"))
 			.collect(Collectors.toList());
 		r.addAll(Arrays.stream(baseDir.listFiles())
@@ -46,10 +46,10 @@ public class CharactersPane extends VBox {
 	}
 
 	public CharactersPane(
-		GameDataFactory gameData,
-		File dataDir,
-		BooleanProperty changed,
-		AbilitiesPane abilities
+		final GameDataFactory gameData,
+		final File dataDir,
+		final BooleanProperty changed,
+		final AbilitiesPane abilities
 	) {
 		super();
 
@@ -73,7 +73,7 @@ public class CharactersPane extends VBox {
 		save.setOnAction(event -> saveGameData());
 
 		add.setOnAction(event -> {
-			Stats s = new Stats(3, 3, 1, 1, 1, 1);
+			final Stats s = new Stats(3, 3, 1, 1, 1, 1);
 
 			Image portrait;
 			try {
@@ -91,13 +91,13 @@ public class CharactersPane extends VBox {
 				bigPortrait = null;
 			}
 
-			CharacterInfo c = new CharacterInfo(
-				"New character", "", null,
+			final CharacterInfo c = new CharacterInfo(
+				"New character", "", null, null,
 				portrait, "portrait/blank.png",
 				bigPortrait, "portrait/generic.png",
 				s, new LinkedList<>(), true,
 				new LinkedList<>(), new LinkedList<>(), new LinkedList<>());
-			CharacterPane pane =
+			final CharacterPane pane =
 				new CharacterPane(dataDir, c, gameData, changed, abilities);
 			characters.getPanes().add(pane);
 			characters.setExpandedPane(pane);
@@ -105,7 +105,7 @@ public class CharactersPane extends VBox {
 		});
 
 		remove.setOnAction(event -> {
-			CharacterPane r = (CharacterPane) characters.getExpandedPane();
+			final CharacterPane r = (CharacterPane) characters.getExpandedPane();
 			if (r != null) {
 				Alert m = new Alert(Alert.AlertType.CONFIRMATION, null,
 					ButtonType.NO, ButtonType.YES);

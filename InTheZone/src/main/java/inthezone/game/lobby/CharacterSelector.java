@@ -1,17 +1,21 @@
 package inthezone.game.lobby;
 
-import inthezone.battle.data.CharacterProfile;
+import isogame.GlobalConstants;
 import isogame.engine.CameraAngle;
 import isogame.engine.FacingDirection;
 import isogame.engine.SpriteAnimation;
-import isogame.GlobalConstants;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import isogame.engine.SpriteInfo;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+
+import inthezone.battle.data.CharacterProfile;
+import inthezone.battle.data.Player;
 
 public class CharacterSelector extends Canvas {
 	private final List<CharacterProfile> characters = new ArrayList<>();
@@ -22,19 +26,27 @@ public class CharacterSelector extends Canvas {
 	private int w = 0;
 	private int h = 0;
 
+	private Player player = Player.PLAYER_OBSERVER;
+
 	final double scaleFactor = 2;
 
 	public CharacterSelector() {
-		this(new ArrayList<>());
+		this(new ArrayList<>(), Player.PLAYER_OBSERVER);
 	}
 
-	public CharacterSelector(Collection<CharacterProfile> characters) {
-		super();
+	public CharacterSelector(
+		final Collection<CharacterProfile> characters, final Player player
+	) {
+		this.player = player;
 		this.getGraphicsContext2D().scale(1.0d/scaleFactor, 1.0d/scaleFactor);
-		setCharacters(characters);
+		setCharacters(characters, player);
 	}
 
-	public void setCharacters(Collection<CharacterProfile> characters) {
+	public void setCharacters(
+		final Collection<CharacterProfile> characters,
+		final Player player
+	) {
+		this.player = player;
 		this.characters.clear();
 		this.enabled.clear();
 		this.selected = Optional.empty();
@@ -43,8 +55,9 @@ public class CharacterSelector extends Canvas {
 		for (CharacterProfile p : characters) this.enabled.add(true);
 
 		if (characters.size() > 0) {
-			final SpriteAnimation a =
-				this.characters.get(0).rootCharacter.sprite.defaultAnimation;
+			final SpriteAnimation a = player == Player.PLAYER_A?
+				this.characters.get(0).rootCharacter.spriteA.defaultAnimation:
+				this.characters.get(0).rootCharacter.spriteB.defaultAnimation;
 			this.cw = a.w;
 			this.w = cw * characters.size();
 			this.h = a.h;
@@ -57,8 +70,9 @@ public class CharacterSelector extends Canvas {
 					(double) h + GlobalConstants.TILEH);
 				int i = (int) Math.floor((double) x / GlobalConstants.TILEW);
 				x = (int) ((double) x - ((double) i * GlobalConstants.TILEW));
-				final SpriteAnimation anim =
-					this.characters.get(i).rootCharacter.sprite.animations.get("idle");
+				final SpriteAnimation anim = player == Player.PLAYER_A?
+					this.characters.get(i).rootCharacter.spriteA.animations.get("idle"):
+					this.characters.get(i).rootCharacter.spriteB.animations.get("idle");
 				if (anim.hitTest(x, y, 0, CameraAngle.UL, FacingDirection.DOWN)) {
 					selected = Optional.of(this.characters.get(i));
 					render();
@@ -81,10 +95,15 @@ public class CharacterSelector extends Canvas {
 		}
 	}
 
-	private void renderCharacter(GraphicsContext gx, CharacterProfile p, int i) {
+	private void renderCharacter(
+		final GraphicsContext gx, final CharacterProfile p, final int i
+	) {
 		if (!enabled.get(i)) return;
 
-		final SpriteAnimation a = p.rootCharacter.sprite.animations.get(
+		final SpriteInfo sprite = player == Player.PLAYER_A?
+			p.rootCharacter.spriteA: p.rootCharacter.spriteB;
+
+		final SpriteAnimation a = sprite.animations.get(
 			selected.map(c -> {
 				if (c.rootCharacter.name.equals(p.rootCharacter.name))
 					return "selected"; else return "idle";}).orElse("idle"));
@@ -100,12 +119,14 @@ public class CharacterSelector extends Canvas {
 		return selected;
 	}
 
-	public void setSelectedCharacter(Optional<CharacterProfile> c) {
+	public void setSelectedCharacter(final Optional<CharacterProfile> c) {
 		selected = c;
 		render();
 	}
 
-	public void setCharacterEnabled(CharacterProfile character, boolean enabled) {
+	public void setCharacterEnabled(
+		final CharacterProfile character, final boolean enabled
+	) {
 		final int i = characters.indexOf(character);
 
 		if (i >= 0 && i < this.enabled.size()) this.enabled.set(i, enabled);

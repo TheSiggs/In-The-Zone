@@ -17,6 +17,7 @@ import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.battle.Trap;
 import inthezone.battle.Zone;
+import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 
 /**
@@ -218,7 +219,9 @@ public class SpriteManager {
 
 				} else if (!traps.containsKey(t.getPos())) {
 					final Sprite s;
-					if (((Trap) t).parent.player.equals(view.player)) {
+					if (view.player == Player.PLAYER_OBSERVER ||
+						((Trap) t).parent.player.equals(view.player)
+					) {
 						s = new Sprite(t.getSprite());
 					} else {
 						s = new Sprite(standardSprites.trap);

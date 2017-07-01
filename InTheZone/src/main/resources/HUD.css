@@ -1,8 +1,24 @@
 .character-info-box {
 	-fx-background-image:url(gui_assets/character_box_tex.png);
-	-fx-border-color:black;
 	-fx-border-width:2px;
 	-fx-border-style:solid;
+}
+
+.character-info-boxA {
+	-fx-border-color:red;
+}
+
+.character-info-boxB {
+	-fx-border-color:blue;
+}
+
+.character-info-box-selected {
+	-fx-border-color:yellow;
+}
+
+.character-info-box-dead {
+	-fx-border-color:black;
+	-fx-background-image:url(gui_assets/character_box_tex_dead.png);
 }
 
 #statusLine {
@@ -30,8 +46,6 @@
 #selectedCharacterImage {
 	-fx-image:url(gui_assets/selected.png);
 }
-
-.character-info-box-selected { }
 
 .message-line {
 	-fx-opacity:0.0;

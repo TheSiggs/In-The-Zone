@@ -5,6 +5,7 @@ import java.util.Optional;
 import javafx.animation.RotateTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Tooltip;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -12,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import inthezone.battle.Character;
+import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.StatusEffectDescription;
 import inthezone.battle.status.StatusEffect;
@@ -36,6 +38,8 @@ public class CharacterInfoBox extends AnchorPane {
 
 	private final StandardSprites sprites;
 
+	private final ColorAdjust deadEffect = new ColorAdjust();
+
 	public CharacterInfoBox(
 		final Character character,
 		final StandardSprites sprites
@@ -53,11 +57,18 @@ public class CharacterInfoBox extends AnchorPane {
 		selectedImage.setVisible(false);
 
 		this.getStyleClass().add("character-info-box");
+		this.getStyleClass().add("character-info-box" +
+			(character.player == Player.PLAYER_A? "A" : "B"));
 		this.getChildren().addAll(portrait, grid, selectedImage);
 		this.setPrefWidth(162);
 		this.setPrefHeight(274);
 		this.setMaxWidth(this.getPrefWidth());
 		this.setMaxHeight(this.getPrefHeight());
+
+		this.portrait.setEffect(deadEffect);
+		this.ap.setEffect(deadEffect);
+		this.mp.setEffect(deadEffect);
+		this.hp.setEffect(deadEffect);
 
 		AnchorPane.setTopAnchor(selectedImage, 4d);
 		AnchorPane.setRightAnchor(selectedImage, 4d);
@@ -91,6 +102,13 @@ public class CharacterInfoBox extends AnchorPane {
 		debuff.ifPresent(s -> statusLine.getChildren().add(statusEffectImage(s)));
 		if (c.getRevengeBonus() != 0) {
 			statusLine.getChildren().add(revengeImage(c));
+		}
+
+		deadEffect.setSaturation(c.isDead()? -1.0d : 0d);
+		if (c.isDead()) {
+			this.getStyleClass().add("character-info-box-dead");
+		} else {
+			this.getStyleClass().remove("character-info-box-dead");
 		}
 	}
 

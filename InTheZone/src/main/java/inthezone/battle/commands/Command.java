@@ -1,27 +1,30 @@
 package inthezone.battle.commands;
 
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.Targetable;
-import inthezone.protocol.ProtocolException;
-import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
+
+import isogame.engine.HasJSONRepresentation;
+
 import org.json.JSONObject;
+
+import inthezone.battle.Battle;
+import inthezone.battle.Targetable;
+import inthezone.protocol.ProtocolException;
 
 public abstract class Command implements HasJSONRepresentation {
 	/**
 	 * Do a command.
 	 * @return All the characters that were affected by the command
 	 * */
-	public abstract List<? extends Targetable> doCmd(Battle turn) throws CommandException;
+	public abstract List<? extends Targetable> doCmd(
+		final Battle turn) throws CommandException;
 
 	/**
 	 * Do a command, computing trap and zone triggers
 	 * @param turn The state of the battle
 	 * @return A new set of commands, including all the trap and zone effects.
 	 * */
-	public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
+	public List<ExecutedCommand> doCmdComputingTriggers(final Battle turn)
 		throws CommandException
 	{
 		final List<ExecutedCommand> r = new ArrayList<>();
@@ -38,10 +41,10 @@ public abstract class Command implements HasJSONRepresentation {
 	/**
 	 * Parse a command.
 	 * */
-	public static Command fromJSON(JSONObject json)
+	public static Command fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
-		Object okind = json.get("kind");
+		final Object okind = json.get("kind");
 		if (okind == null) throw new ProtocolException("Missing command kind");
 		switch (CommandKind.fromString((String) okind)) {
 			case ENDTURN: return EndTurnCommand.fromJSON(json);
@@ -53,6 +56,7 @@ public abstract class Command implements HasJSONRepresentation {
 			case ITEM: return UseItemCommand.fromJSON(json);
 			case RESIGN: return ResignCommand.fromJSON(json);
 			case FATIGUE: return FatigueCommand.fromJSON(json);
+			case NULL: return NullCommand.fromJSON(json);
 			default: throw new RuntimeException("This cannot happen");
 		}
 	}

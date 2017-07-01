@@ -1,10 +1,12 @@
 package inthezone.battle.commands;
 
-import inthezone.battle.BattleState;
-import inthezone.battle.data.Player;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import inthezone.battle.BattleState;
+import inthezone.battle.data.Player;
 
 public class MoveCommandRequest extends CommandRequest {
 	private final MapPoint start;
@@ -12,7 +14,7 @@ public class MoveCommandRequest extends CommandRequest {
 	private final Player player;
 
 	public MoveCommandRequest(
-		MapPoint start, MapPoint target, Player player
+		final MapPoint start, final MapPoint target, final Player player
 	) {
 		this.start = start;
 		this.target = target;
@@ -20,10 +22,12 @@ public class MoveCommandRequest extends CommandRequest {
 	}
 	
 	@Override
-	public List<Command> makeCommand(BattleState battleState) throws CommandException {
-		List<MapPoint> path = battleState.findPath(start, target, player);
+	public List<Command> makeCommand(final BattleState battleState)
+		throws CommandException
+	{
+		final List<MapPoint> path = battleState.findPath(start, target, player);
 		if (battleState.canMove(path)) {
-			List<Command> r = new ArrayList<>();
+			final List<Command> r = new ArrayList<>();
 			r.add(new MoveCommand(path, false));
 			return r;
 		} else {

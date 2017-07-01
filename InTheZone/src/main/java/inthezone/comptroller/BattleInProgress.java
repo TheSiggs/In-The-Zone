@@ -12,6 +12,7 @@ import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.InstantEffectCommand;
+import inthezone.battle.commands.NullCommand;
 import inthezone.battle.commands.ResignCommandRequest;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartTurnCommand;
@@ -238,7 +239,7 @@ public class BattleInProgress implements Runnable {
 				final ExecutedCommand last;
 				if (allCmds.isEmpty()) {
 					// cmd does nothing, so we can get away with this.
-					last = new ExecutedCommand(cmd, new ArrayList<>()); 
+					last = new ExecutedCommand(new NullCommand(), new ArrayList<>()); 
 				} else {
 					last = allCmds.remove(allCmds.size() - 1);
 				}

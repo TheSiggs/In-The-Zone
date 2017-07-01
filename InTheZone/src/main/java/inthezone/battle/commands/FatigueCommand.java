@@ -1,29 +1,23 @@
 package inthezone.battle.commands;
 
-import java.util.Collection;
 
-import inthezone.battle.Ability;
-import inthezone.battle.Battle;
-import inthezone.battle.Character;
-import inthezone.battle.DamageToTarget;
-import inthezone.battle.Targetable;
-import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FatigueCommand extends Command {
-	private Collection<DamageToTarget> targets;
+import inthezone.battle.Battle;
+import inthezone.battle.DamageToTarget;
+import inthezone.battle.Targetable;
+import inthezone.protocol.ProtocolException;
 
-	public FatigueCommand(Collection<DamageToTarget> targets) {
+public class FatigueCommand extends Command {
+	private final Collection<DamageToTarget> targets;
+
+	public FatigueCommand(final Collection<DamageToTarget> targets) {
 		this.targets = targets;
 	}
 
@@ -37,7 +31,7 @@ public class FatigueCommand extends Command {
 		return r;
 	}
 
-	public static FatigueCommand fromJSON(JSONObject json)
+	public static FatigueCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -45,7 +39,7 @@ public class FatigueCommand extends Command {
 			final JSONArray rawTargets = json.getJSONArray("targets");
 
 			if (kind != CommandKind.FATIGUE)
-				throw new ProtocolException("Expected ability command");
+				throw new ProtocolException("Expected fatigue command");
 
 			final Collection<DamageToTarget> targets = new ArrayList<>();
 			for (int i = 0; i < rawTargets.length(); i++) {
@@ -59,10 +53,12 @@ public class FatigueCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
-		List<Targetable> r = new ArrayList<>();
+	public List<Targetable> doCmd(final Battle battle) throws CommandException {
+		final List<Targetable> r = new ArrayList<>();
+
 		for (DamageToTarget d : targets) {
-			battle.battleState.getTargetableAt(d.target.target).forEach(t -> r.add(t));
+			battle.battleState.getTargetableAt(d.target.target)
+				.forEach(t -> r.add(t));
 		}
 
 		battle.doFatigue(targets);

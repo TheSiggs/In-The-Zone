@@ -156,11 +156,15 @@ public class Character extends Targetable {
 	}
 
 	public boolean isPanicked() {
-		return statusDebuff.map(s -> s instanceof PanickedStatusEffect).orElse(false);
+		return
+			(lastDebuff != null && lastDebuff instanceof PanickedStatusEffect) ||
+			statusDebuff.map(s -> s instanceof PanickedStatusEffect).orElse(false);
 	}
 
 	public boolean isFeared() {
-		return statusDebuff.map(s -> s instanceof FearedStatusEffect).orElse(false);
+		return
+			(lastDebuff != null && lastDebuff instanceof FearedStatusEffect) ||
+			statusDebuff.map(s -> s instanceof FearedStatusEffect).orElse(false);
 	}
 
 	public boolean isAbilityBlocked(Ability a) {
@@ -408,6 +412,8 @@ public class Character extends Targetable {
 			}
 
 		} else {
+			lastDebuff = null;
+
 			if (!statusDebuff.map(s -> s.info.equals(status.info)).orElse(false)) {
 				statusDebuff = Optional.empty();
 				clampPoints();

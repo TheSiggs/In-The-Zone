@@ -1,17 +1,20 @@
 package inthezone.battle.commands;
 
+import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MoveCommand extends Command {
 	public final List<MapPoint> path;
@@ -103,8 +106,9 @@ public class MoveCommand extends Command {
 				turn.battleState.trigger.shrinkPath(agent, path));
 		
 		if (path1.size() >= 2) {
-			final Command move1 = new MoveCommand(path1, false);
-			r.add(new ExecutedCommand(move1, move1.doCmd(turn)));
+			final MoveCommand move1 = new MoveCommand(path1, false);
+			final List<Targetable> r1 = move1.doCmd(turn);
+			if (!r1.isEmpty()) r.add(new ExecutedCommand(move1, r1));
 		}
 
 		final MapPoint loc = path1.isEmpty()?

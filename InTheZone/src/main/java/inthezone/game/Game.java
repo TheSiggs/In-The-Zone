@@ -1,18 +1,18 @@
 package inthezone.game;
 
-import inthezone.battle.data.GameDataFactory;
-import inthezone.comptroller.Network;
-import inthezone.server.Server;
-import javafx.application.Application;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.Scene;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
+
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
+import inthezone.battle.data.GameDataFactory;
+import inthezone.comptroller.Network;
 
 public class Game extends Application {
 	/* TODO: find a way to set these from the build system */
@@ -29,6 +29,15 @@ public class Game extends Application {
 
 	@Override
 	public void start(final Stage primaryStage) {
+		Thread.currentThread().setUncaughtExceptionHandler((thread, e) -> {
+			e.printStackTrace();
+			final Alert a = new Alert(Alert.AlertType.ERROR,
+				e.getMessage(), ButtonType.CLOSE);
+			a.setHeaderText("Unexpected error");
+			a.showAndWait();
+		});
+		
+
 		final Map<String, String> args = getParameters().getNamed();
 		System.err.println("args: " + args.toString());
 

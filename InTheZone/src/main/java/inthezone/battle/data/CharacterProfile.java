@@ -16,11 +16,9 @@ public class CharacterProfile implements HasJSONRepresentation {
 	public final Collection<AbilityInfo> abilities;
 	public final AbilityInfo basicAbility;
 	public final int attackPP;
-	public final int defencePP;
 	public final int hpPP;
 
 	private final int extraAttack;
-	private final int extraDefence;
 	private final int extraHP;
 
 	public Collection<AbilityInfo> allAbilities() {
@@ -42,11 +40,9 @@ public class CharacterProfile implements HasJSONRepresentation {
 			.findFirst().orElseThrow(() ->
 				new CorruptDataException("No basic ability for " + rootCharacter.name));
 		extraAttack = 0;
-		extraDefence = 0;
 		extraHP = 0;
 
 		attackPP = 0;
-		defencePP = 0;
 		hpPP = 0;
 	}
 
@@ -55,7 +51,6 @@ public class CharacterProfile implements HasJSONRepresentation {
 		Collection<AbilityInfo> abilities,
 		AbilityInfo basicAbility,
 		int attackPP,
-		int defencePP,
 		int hpPP
 	) throws CorruptDataException {
 		this.rootCharacter = rootCharacter;
@@ -63,20 +58,15 @@ public class CharacterProfile implements HasJSONRepresentation {
 		this.basicAbility = basicAbility;
 
 		this.attackPP = attackPP;
-		this.defencePP = defencePP;
 		this.hpPP = hpPP;
 
 		if (attackPP < 0 || attackPP > rootCharacter.attackCurve.size())
 			throw new CorruptDataException("Invalid attack pp " + attackPP);
-		if (defencePP < 0 || defencePP > rootCharacter.defenceCurve.size())
-			throw new CorruptDataException("Invalid defence pp " + defencePP);
 		if (hpPP < 0 || hpPP > rootCharacter.hpCurve.size())
 			throw new CorruptDataException("Invalid hp pp " + hpPP);
 
 		this.extraAttack = attackPP == 0? 0 :
 			rootCharacter.attackCurve.get(attackPP - 1) - rootCharacter.stats.attack;
-		this.extraDefence = defencePP == 0? 0 :
-			rootCharacter.defenceCurve.get(defencePP - 1) - rootCharacter.stats.defence;
 		this.extraHP = hpPP == 0? 0 :
 			rootCharacter.hpCurve.get(hpPP - 1) - rootCharacter.stats.hp;
 	}
@@ -86,14 +76,14 @@ public class CharacterProfile implements HasJSONRepresentation {
 	 * */
 	public Stats getBaseStats() {
 		return rootCharacter.stats.add(new Stats(
-			0, 0, 0, extraHP, extraAttack, extraDefence));
+			0, 0, 0, extraHP, extraAttack, 0));
 	}
 
 	/**
 	 * Compute the cost of this profile in PP.
 	 * */
 	public int computeCost() {
-		return hpPP + attackPP + defencePP + basicAbility.pp +
+		return hpPP + attackPP + basicAbility.pp +
 			abilities.stream().map(a -> a.pp).collect(
 				Collectors.summingInt(x -> (int) x));
 	}
@@ -107,7 +97,6 @@ public class CharacterProfile implements HasJSONRepresentation {
 		r.put("abilities", a);
 		r.put("basicAbility", basicAbility.name);
 		r.put("attack", attackPP);
-		r.put("defence", defencePP);
 		r.put("HP", hpPP);
 		return r;
 	}
@@ -132,11 +121,10 @@ public class CharacterProfile implements HasJSONRepresentation {
 				throw new CorruptDataException("No such ability error in character profile");
 
 			final int attack = json.getInt("attack");
-			final int defence = json.getInt("defence");
 			final int hp = json.getInt("HP");
 
 			return new CharacterProfile(
-				root, abilities, basicAbility, attack, defence, hp);
+				root, abilities, basicAbility, attack, hp);
 
 		} catch (ClassCastException e) {
 			throw new CorruptDataException("Type error in character profile", e);

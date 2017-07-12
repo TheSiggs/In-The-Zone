@@ -24,7 +24,6 @@ public class CharacterProfileModel {
 
 	public final IntegerProperty hpPP = new SimpleIntegerProperty(0);
 	public final IntegerProperty attackPP = new SimpleIntegerProperty(0);
-	public final IntegerProperty defencePP = new SimpleIntegerProperty(0);
 
 	private final ReadOnlyIntegerWrapper cost = new ReadOnlyIntegerWrapper(0);
 	private final ReadOnlyObjectWrapper<CharacterProfile> profile =
@@ -36,7 +35,6 @@ public class CharacterProfileModel {
 		basicAbility.unbind();
 		hpPP.unbind();
 		attackPP.unbind();
-		defencePP.unbind();
 	}
 
 	public CharacterProfileModel(final CharacterProfile c) {
@@ -53,7 +51,6 @@ public class CharacterProfileModel {
 		abilities.addListener(update);
 		hpPP.addListener(update);
 		attackPP.addListener(update);
-		defencePP.addListener(update);
 	}
 
 	public void init(final CharacterProfile c) {
@@ -63,7 +60,6 @@ public class CharacterProfileModel {
 		for (AbilityInfo a : c.abilities) abilities.add(a);
 		hpPP.setValue(c.hpPP);
 		attackPP.setValue(c.attackPP);
-		defencePP.setValue(c.defencePP);
 
 		final CharacterProfile newProfile = encodeProfile();
 		cost.setValue(newProfile.computeCost());
@@ -90,8 +86,7 @@ public class CharacterProfileModel {
 			return new CharacterProfile(
 				rootCharacter, new ArrayList<>(abilities),
 				basicAbility.getValue(), 
-				attackPP.getValue(), defencePP.getValue(),
-				hpPP.getValue());
+				attackPP.getValue(), hpPP.getValue());
 		} catch (CorruptDataException e) {
 			throw new RuntimeException("Invalid character profile", e);
 		}

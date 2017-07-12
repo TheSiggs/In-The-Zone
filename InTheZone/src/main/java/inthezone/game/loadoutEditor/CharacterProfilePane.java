@@ -41,7 +41,6 @@ public class CharacterProfilePane extends HBox {
 	private final VBox stats = new VBox(4);
 	private final Spinner<Integer> hp = new Spinner<>();
 	private final Spinner<Integer> attack = new Spinner<>();
-	private final Spinner<Integer> defence = new Spinner<>();
 
 	private final ComboBox<AbilityInfo> basicAbility = new ComboBox<>();
 	private final AbilityDescriptionPanel basicDescriptionPanel =
@@ -99,7 +98,7 @@ public class CharacterProfilePane extends HBox {
 		basicDescriptionPanel.setMinWidth(basicsWidth);
 		basicDescriptionPanel.setMaxWidth(basicsWidth);
 
-		stats.getChildren().addAll(hp, attack, defence,
+		stats.getChildren().addAll(hp, attack,
 			basicAbility, basicDescriptionPanel);
 		VBox.setVgrow(basicDescriptionPanel, Priority.ALWAYS);
 
@@ -109,11 +108,9 @@ public class CharacterProfilePane extends HBox {
 
 		hp.getStyleClass().addAll("panel", "gui-spinner");
 		attack.getStyleClass().addAll("panel", "gui-spinner");
-		defence.getStyleClass().addAll("panel", "gui-spinner");
 
 		hp.setMaxWidth(Double.MAX_VALUE);
 		attack.setMaxWidth(Double.MAX_VALUE);
-		defence.setMaxWidth(Double.MAX_VALUE);
 		stats.setFillWidth(true);
 
 		VBox.setVgrow(leftSpacer1, Priority.ALWAYS);
@@ -150,8 +147,6 @@ public class CharacterProfilePane extends HBox {
 			"Increase or decrease health points (costs PP)"));
 		attack.setTooltip(new Tooltip(
 			"Increase or decrease attack stat (costs PP)"));
-		defence.setTooltip(new Tooltip(
-			"Increase or decrease defence stat (costs PP)"));
 		basicAbility.setTooltip(new Tooltip(
 			"Choose a basic ability for this character"));
 
@@ -199,19 +194,14 @@ public class CharacterProfilePane extends HBox {
 			profile.hpPP, info.stats.hp, info.hpCurve));
 		attack.setValueFactory(new PPSpinnerFactory("Attack: ",
 			profile.attackPP, info.stats.attack, info.attackCurve));
-		defence.setValueFactory(new PPSpinnerFactory("Defence: ",
-			profile.defencePP, info.stats.defence, info.defenceCurve));
 
 		hp.getValueFactory().setValue(10);
 		hp.getValueFactory().setValue(profile.hpPP);
 		attack.getValueFactory().setValue(10);
 		attack.getValueFactory().setValue(profile.attackPP);
-		defence.getValueFactory().setValue(10);
-		defence.getValueFactory().setValue(profile.defencePP);
 
 		model.hpPP.bind(hp.valueProperty());
 		model.attackPP.bind(attack.valueProperty());
-		model.defencePP.bind(defence.valueProperty());
 
 		bottomSection.getChildren().clear();
 		for (AbilityInfo a : profile.abilities) {

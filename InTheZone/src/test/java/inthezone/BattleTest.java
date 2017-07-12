@@ -58,7 +58,7 @@ public class BattleTest {
 
 	private CharacterProfile theWorks(CharacterInfo i) throws Exception {
 		return new CharacterProfile(i, i.abilities,
-			i.abilities.stream().filter(a -> a.type == AbilityType.BASIC).findFirst().get(), 0, 0, 0);
+			i.abilities.stream().filter(a -> a.type == AbilityType.BASIC).findFirst().get(), 0, 0);
 	}
 
 	public Battle simpleBattle() throws Exception {

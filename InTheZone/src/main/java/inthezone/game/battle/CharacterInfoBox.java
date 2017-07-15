@@ -106,6 +106,7 @@ public class CharacterInfoBox extends AnchorPane {
 
 		deadEffect.setSaturation(c.isDead()? -1.0d : 0d);
 		if (c.isDead()) {
+			this.getStyleClass().remove("character-info-box-dead");
 			this.getStyleClass().add("character-info-box-dead");
 		} else {
 			this.getStyleClass().remove("character-info-box-dead");

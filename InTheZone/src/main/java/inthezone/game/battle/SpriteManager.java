@@ -43,9 +43,9 @@ public class SpriteManager {
 	private final StandardSprites standardSprites;
 
 	public SpriteManager(
-		BattleView view, Collection<Sprite> sprites,
-		StandardSprites standardSprites,
-		DecalRenderer decals, Runnable onAnimationsFinished
+		final BattleView view, final Collection<Sprite> sprites,
+		final StandardSprites standardSprites,
+		final DecalRenderer decals, final Runnable onAnimationsFinished
 	) {
 		this.view = view;
 		this.sprites.addAll(sprites);
@@ -77,7 +77,7 @@ public class SpriteManager {
 	/**
 	 * Get a character by its id.
 	 * */
-	public Character getCharacterById(int id) {return characters.get(id);}
+	public Character getCharacterById(final int id) {return characters.get(id);}
 
 	/**
 	 * Get a character by its position.
@@ -90,7 +90,7 @@ public class SpriteManager {
 	/**
 	 * Schedule a teleport operation.
 	 * */
-	public void scheduleTeleport(Character a, MapPoint t) {
+	public void scheduleTeleport(final Character a, final MapPoint t) {
 		final Stage stage = view.getStage();
 
 		final int id = a.id;
@@ -105,7 +105,10 @@ public class SpriteManager {
 	 * Schedule a movement operation.
 	 * */
 	public void scheduleMovement(
-		String animation, double speed, List<MapPoint> path, Character affected
+		final String animation,
+		final double speed,
+		final List<MapPoint> path,
+		final Character affected
 	) {
 		final Stage stage = view.getStage();
 		MapPoint start = path.get(0);
@@ -128,7 +131,7 @@ public class SpriteManager {
 	/**
 	 * Update the character models.
 	 * */
-	public void updateCharacters(List<? extends Targetable> characters) {
+	public void updateCharacters(final List<? extends Targetable> characters) {
 		if (this.characters.isEmpty()) {
 			for (Targetable t : characters) {
 				if (t instanceof Character) {
@@ -152,7 +155,8 @@ public class SpriteManager {
 						decals.updateCharacter(c);
 
 						final Sprite characterSprite = view.getStage().allSprites.stream()
-							.filter(x -> x.userData != null && x.userData.equals(c.id)).findFirst().get();
+							.filter(x -> x.userData != null &&
+								x.userData.equals(c.id)).findFirst().get();
 
 						if (c.isDead()) {
 							characterSprite.setAnimation("dead");
@@ -170,7 +174,9 @@ public class SpriteManager {
 		handleTemporaryImmobileObjects(characters);
 	}
 
-	private void handleTemporaryImmobileObjects(Collection<? extends Targetable> tios) {
+	private void handleTemporaryImmobileObjects(
+		final Collection<? extends Targetable> tios
+	) {
 		for (Targetable t : tios) {
 			if (t instanceof Character) {
 				continue;
@@ -195,15 +201,15 @@ public class SpriteManager {
 				}
 
 			} else if (t instanceof RoadBlock) {
-				if (!roadblocks.containsKey(t.getPos())) {
+				if (t.reap()) {
+					final Sprite s = roadblocks.remove(t.getPos());
+					if (s != null) view.getStage().removeSprite(s);
+
+				} else if (!roadblocks.containsKey(t.getPos())) {
 					final Sprite s = new Sprite(t.getSprite());
 					s.pos = t.getPos();
 					view.getStage().addSprite(s);
 					roadblocks.put(t.getPos(), s);
-
-				} else if (t.reap()) {
-					final Sprite s = roadblocks.remove(t.getPos());
-					if (s != null) view.getStage().removeSprite(s);
 
 				} else {
 					final Sprite s = roadblocks.get(t.getPos());

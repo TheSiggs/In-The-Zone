@@ -35,7 +35,7 @@ public class ExecutedCommand {
 
 		final Set<Targetable> seen = new HashSet<>();
 		for (Targetable t : affected) {
-			if (!seen.contains(t)) this.affected.add(t);
+			if (!seen.contains(t)) this.affected.add(t.clone());
 			seen.add(t);
 		}
 	}

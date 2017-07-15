@@ -165,7 +165,9 @@ public class CommandProcessor {
 			final PullPush pullpush = (PullPush) effect;
 
 			if (pullpush.paths.size() != affectedCharacters.size()) {
-				throw new RuntimeException("Invalid pull or push, this cannot happen");
+				throw new RuntimeException("Invalid pull or push.  Expected " +
+					pullpush.paths.size() + " affected characters, saw " +
+					affectedCharacters.size());
 			}
 
 			for (int i = 0; i < pullpush.paths.size(); i++) {

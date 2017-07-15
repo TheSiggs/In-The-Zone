@@ -49,23 +49,23 @@ public class Character extends Targetable {
 	public double getRevengeBonus() { return isDead()? 0 : revengeBonus; }
 
 	private Character(
-		int id,
-		String name,
-		Player player,
-		SpriteInfo sprite,
-		Image portrait,
-		Collection<Ability> abilities,
-		Ability basicAbility,
-		Stats baseStats,
-		Optional<StatusEffect> statusBuff,
-		Optional<StatusEffect> statusDebuff,
-		boolean hasMana,
-		boolean hasCover,
-		MapPoint pos,
-		int ap,
-		int mp,
-		int hp,
-		double revengeBonus
+		final int id,
+		final String name,
+		final Player player,
+		final SpriteInfo sprite,
+		final Image portrait,
+		final Collection<Ability> abilities,
+		final Ability basicAbility,
+		final Stats baseStats,
+		final Optional<StatusEffect> statusBuff,
+		final Optional<StatusEffect> statusDebuff,
+		final boolean hasMana,
+		final boolean hasCover,
+		final MapPoint pos,
+		final int ap,
+		final int mp,
+		final int hp,
+		final double revengeBonus
 	) {
 		this.id = id;
 		this.name = name;
@@ -112,11 +112,11 @@ public class Character extends Targetable {
 	}
 
 	public Character(
-		CharacterProfile profile,
-		Player player,
-		boolean hasMana,
-		MapPoint pos,
-		int id
+		final CharacterProfile profile,
+		final Player player,
+		final boolean hasMana,
+		final MapPoint pos,
+		final int id
 	) {
 		this.id = id;
 		this.name = profile.rootCharacter.name;
@@ -167,7 +167,7 @@ public class Character extends Targetable {
 			statusDebuff.map(s -> s instanceof FearedStatusEffect).orElse(false);
 	}
 
-	public boolean isAbilityBlocked(Ability a) {
+	public boolean isAbilityBlocked(final Ability a) {
 		if (isDead() || isStunned()) {
 			return true;
 		} else if (a.info.type == AbilityType.SKILL) {
@@ -193,7 +193,7 @@ public class Character extends Targetable {
 	/**
 	 * Buff or debuff this character's points.
 	 * */
-	public void pointsBuff(int ap, int mp, int hp) {
+	public void pointsBuff(int ap, int mp, final int hp) {
 		if (buffedAP && ap > 0) ap = 0;
 		if (buffedMP && mp > 0) mp = 0;
 		if (debuffedAP && ap < 0) ap = 0;
@@ -230,8 +230,10 @@ public class Character extends Targetable {
 	/**
 	 * Move the character spending movement points
 	 * */
-	public void moveTo(MapPoint p, int mp, boolean hasMana) {
-		if (isDead() || statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+	public void moveTo(final MapPoint p, final int mp, final boolean hasMana) {
+		if (isDead() ||
+			statusDebuff.map(s -> s instanceof Imprisoned).orElse(false))
+		{
 			return;
 		}
 
@@ -241,7 +243,7 @@ public class Character extends Targetable {
 		this.pos = p;
 	}
 
-	public void useAbility(Ability ability) {
+	public void useAbility(final Ability ability) {
 		if (ability.subsequentLevel == 0) {
 			ap -= ability.info.ap;
 			mp -= ability.info.mp;
@@ -250,7 +252,7 @@ public class Character extends Targetable {
 		}
 	}
 
-	public void useItem(Item item) {
+	public void useItem(final Item item) {
 		ap = Math.max(0, ap - 1);
 	}
 
@@ -269,8 +271,19 @@ public class Character extends Targetable {
 		return hp == 0;
 	}
 
-	public void teleport(MapPoint p, boolean hasMana) {
-		if (isDead() || statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
+	public void teleport(final MapPoint p, final boolean hasMana) {
+		if (isDead() ||
+			statusDebuff.map(s -> s instanceof Imprisoned).orElse(false))
+		{
+			return;
+		}
+
+		this.hasMana = hasMana;
+		this.pos = p;
+	}
+
+	public void push(final MapPoint p, final boolean hasMana) {
+		if (statusDebuff.map(s -> s instanceof Imprisoned).orElse(false)) {
 			return;
 		}
 
@@ -282,7 +295,7 @@ public class Character extends Targetable {
 	 * Call this at the start of each turn.
 	 * @param player The player who's turn is starting
 	 * */
-	public List<Command> turnReset(Battle battle, Player player) {
+	public List<Command> turnReset(final Battle battle, final Player player) {
 		final List<Command> r = new ArrayList<>();
 		if (this.player != player) return r;
 
@@ -336,7 +349,7 @@ public class Character extends Targetable {
 	/**
 	 * Continue the turn reset, after it was interrupted by a trigger.
 	 * */
-	public List<Command> continueTurnReset(Battle battle) {
+	public List<Command> continueTurnReset(final Battle battle) {
 		final List<Command> r = new ArrayList<>();
 		statusDebuff.ifPresent(s -> {
 			if (s.isBeforeTurnExhaustive()) r.addAll(s.doBeforeTurn(battle, this));
@@ -373,7 +386,7 @@ public class Character extends Targetable {
 		return statusBuff.map(s -> s.getChanceBuff()).orElse(0.0);
 	}
 
-	@Override public void dealDamage(int damage) {
+	@Override public void dealDamage(final int damage) {
 		if (hasCover || isDead()) return;
 		hp = Math.min(getStats().hp, Math.max(0, hp - damage));
 		if (hp == 0) kill();
@@ -395,7 +408,9 @@ public class Character extends Targetable {
 
 	@Override public void purge() { return; }
 
-	@Override public void applyStatus(Battle battle, StatusEffect status) {
+	@Override public void applyStatus(
+		final Battle battle, final StatusEffect status
+	) {
 		if (isDead()) return;
 
 		final StatusEffectInfo info = status.getInfo();
@@ -435,7 +450,7 @@ public class Character extends Targetable {
 
 	@Override public boolean blocksSpace() { return true; }
 
-	@Override public boolean blocksPath(Player player) {
+	@Override public boolean blocksPath(final Player player) {
 		return !(isDead() || this.player == player);
 	}
 }

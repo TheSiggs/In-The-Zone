@@ -18,12 +18,17 @@ public class ExecutedCommand {
 	 * */
 	public final boolean lastInSequence;
 
-	public ExecutedCommand(Command cmd, List<? extends Targetable> affected) {
+	public ExecutedCommand(
+		final Command cmd,
+		final List<? extends Targetable> affected
+	) {
 		this(cmd, affected, false);
 	}
 
 	private ExecutedCommand(
-		Command cmd, List<? extends Targetable> affected, boolean lastInSequence
+		final Command cmd,
+		final List<? extends Targetable> affected,
+		final boolean lastInSequence
 	) {
 		this.cmd = cmd;
 		this.lastInSequence = lastInSequence;

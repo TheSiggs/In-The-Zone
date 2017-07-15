@@ -243,7 +243,8 @@ public class PullPush extends InstantEffect {
 				.filter(x -> !x.isEmpty()).collect(Collectors.toList());
 
 			final List<List<MapPoint>> validPathSections = pathSections.stream()
-				.filter(x -> x.size() >= 2).collect(Collectors.toList());
+				.filter(x -> battle.canPushPull(x))
+				.collect(Collectors.toList());
 
 			// do the push/pull
 			if (!validPathSections.isEmpty()) {

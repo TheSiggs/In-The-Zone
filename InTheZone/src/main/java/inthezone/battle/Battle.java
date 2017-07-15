@@ -46,7 +46,7 @@ public class Battle {
 	 * @param player The player who's turn is starting.
 	 * @return A list of affected zones
 	 * */
-	public List<Zone> doTurnStart(Player player) {
+	public List<Zone> doTurnStart(final Player player) {
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
@@ -58,7 +58,7 @@ public class Battle {
 	 * Get the commands that happen on turn start
 	 * @param player The player who's turn is starting
 	 * */
-	public List<Command> getTurnStart(Player player) {
+	public List<Command> getTurnStart(final Player player) {
 		final List<Command> r = new ArrayList<>();
 
 		// apply fatigue damage first
@@ -109,7 +109,7 @@ public class Battle {
 	 * Perform a move operation on a character.  Assumes the path has been fully
 	 * validated.
 	 * */
-	public void doMove(List<MapPoint> path, boolean useMP) {
+	public void doMove(final List<MapPoint> path, final boolean useMP) {
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
 			MapPoint target = path.get(path.size() - 1);
 			if (useMP) c.moveTo(target,
@@ -129,10 +129,10 @@ public class Battle {
 	 * trap or zone.
 	 * */
 	public void doAbility(
-		MapPoint agent,
-		AbilityAgentType agentType,
-		Ability ability,
-		Collection<DamageToTarget> targets
+		final MapPoint agent,
+		final AbilityAgentType agentType,
+		final Ability ability,
+		final Collection<DamageToTarget> targets
 	) throws CommandException {
 		if (agentType == AbilityAgentType.TRAP) {
 			battleState.getTrapAt(agent).ifPresent(t -> t.defuse());
@@ -178,7 +178,9 @@ public class Battle {
 	 * Create traps.
 	 * */
 	public List<Trap> createTrap(
-		Ability ability, Character agent, Collection<MapPoint> ps
+		final Ability ability,
+		final Character agent,
+		final Collection<MapPoint> ps
 	) {
 		agent.useAbility(ability);
 		final List<Trap> r = new ArrayList<>();
@@ -196,7 +198,10 @@ public class Battle {
 	 * @return at most one zone.
 	 * */
 	public List<Zone> createZone(
-		Ability ability, Character agent, Optional<RoadBlock> bind, Collection<MapPoint> ps
+		final Ability ability,
+		final Character agent,
+		final Optional<RoadBlock> bind,
+		final Collection<MapPoint> ps
 	) {
 		final Set<MapPoint> range = new HashSet<>();
 		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
@@ -215,7 +220,7 @@ public class Battle {
 	/**
 	 * Handle fatigue damage.
 	 * */
-	public void doFatigue(Collection<DamageToTarget> targets) {
+	public void doFatigue(final Collection<DamageToTarget> targets) {
 		for (DamageToTarget d : targets) {
 			final Character t = battleState.getCharacterAt(d.target.target)
 				.orElseThrow(() -> new RuntimeException(
@@ -228,7 +233,9 @@ public class Battle {
 	/**
 	 * Handle item effects.
 	 * */
-	public void doUseItem(MapPoint agent, MapPoint target, Item item) {
+	public void doUseItem(
+		final MapPoint agent, final MapPoint target, final Item item
+	) {
 		battleState.getCharacterAt(agent).ifPresent(a ->
 			battleState.getCharacterAt(target).ifPresent(t -> {
 				item.doEffect(t);
@@ -240,16 +247,18 @@ public class Battle {
 	/**
 	 * Handle the push and pull effects.
 	 * */
-	public List<Targetable> doPushPull(List<MapPoint> path, boolean isFear) {
+	public List<Targetable> doPushPull(
+		final List<MapPoint> path, final boolean isFear
+	) {
 		final List<Targetable> r = new ArrayList<>();
 		if (path.size() < 2) return r;
 
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
-			MapPoint t = path.get(path.size() - 1);
+			final MapPoint t = path.get(path.size() - 1);
 			if (isFear) {
 				c.moveTo(t, battleState.pathCost(path), battleState.hasMana(t));
 			} else {
-				c.teleport(t, battleState.hasMana(t));
+				c.push(t, battleState.hasMana(t));
 			}
 			r.add(c);
 		});
@@ -259,9 +268,21 @@ public class Battle {
 	}
 
 	/**
+	 * Determine if a push/pull is possible
+	 * */
+	public boolean canPushPull(final List<MapPoint> path) {
+		if (path.size() < 2) return false;
+
+		return battleState.getCharacterAt(path.get(0)).map(c ->
+			battleState.isSpaceFree(path.get(path.size() - 1))).orElse(false);
+	}
+
+	/**
 	 * Handle the teleport effect.
 	 * */
-	public List<Targetable> doTeleport(MapPoint source, MapPoint destination) {
+	public List<Targetable> doTeleport(
+		final MapPoint source, final MapPoint destination
+	) {
 		battleState.updateRevengeBonus();
 		return battleState.getCharacterAt(source).map(c -> {
 			c.teleport(destination, battleState.hasMana(destination));
@@ -272,7 +293,7 @@ public class Battle {
 	/**
 	 * Handle the cleanse effect.
 	 * */
-	public List<Targetable> doCleanse(Collection<MapPoint> targets) {
+	public List<Targetable> doCleanse(final Collection<MapPoint> targets) {
 		battleState.updateRevengeBonus();
 		return targets.stream().flatMap(ot ->
 				battleState.getTargetableAt(ot).stream()
@@ -283,7 +304,7 @@ public class Battle {
 	/**
 	 * Handle the defuse effect.
 	 * */
-	public List<Targetable> doDefuse(Collection<MapPoint> targets) {
+	public List<Targetable> doDefuse(final Collection<MapPoint> targets) {
 		final List<Targetable> r = targets.stream().flatMap(ot ->
 				battleState.getTargetableAt(ot).stream()
 					.map(t -> {t.defuse(); return t;})
@@ -297,7 +318,7 @@ public class Battle {
 	/**
 	 * Handle the purge effect.
 	 * */
-	public List<Targetable> doPurge(Collection<MapPoint> targets) {
+	public List<Targetable> doPurge(final Collection<MapPoint> targets) {
 		final List<Targetable> r = targets.stream().flatMap(ot ->
 				battleState.getTargetableAt(ot).stream()
 					.map(t -> {t.purge(); return t;})
@@ -312,7 +333,7 @@ public class Battle {
 	 * Handle the obstacles effect
 	 * */
 	public List<Targetable> doObstacles(
-		Optional<AbilityInfo> a, Collection<MapPoint> obstacles
+		final Optional<AbilityInfo> a, final Collection<MapPoint> obstacles
 	) {
 		final List<Targetable> r = new ArrayList<>();
 		for (MapPoint p : obstacles) {
@@ -325,7 +346,7 @@ public class Battle {
 	/**
 	 * Handle the revive effect.
 	 * */
-	public List<Targetable> doRevive(Collection<MapPoint> targets) {
+	public List<Targetable> doRevive(final Collection<MapPoint> targets) {
 		final List<Targetable> r = new ArrayList<>();
 
 		for (MapPoint t : targets) {
@@ -344,7 +365,7 @@ public class Battle {
 	/**
 	 * Handle the resign effect
 	 * */
-	public void doResign(Player player, boolean logoff) {
+	public void doResign(final Player player, final boolean logoff) {
 		battleState.resign(player, logoff);
 	}
 }

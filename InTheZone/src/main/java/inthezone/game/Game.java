@@ -5,9 +5,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -33,8 +35,10 @@ public class Game extends Application {
 			e.printStackTrace();
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 			a.setHeaderText("Unexpected error");
 			a.showAndWait();
+			Platform.exit();
 		});
 		
 

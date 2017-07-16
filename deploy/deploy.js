@@ -29,7 +29,13 @@ function srv(req, res){
     res.end()
     let proc = spawn('./GitLabHook.sh')
     proc.stderr.on("data", (x)=>{ERR(x+'')})
-    proc.stdout.on("data", (x)=>{log('-')/*log(x+'')*/})
+    proc.stdout.on("data", (x)=>{
+      if(x+''=='BUILD SUCCESSFUL\n'){
+        log('new')
+        lastBuild = new Date()
+      }
+      //log(x+'')
+    })
     return
   }
 
@@ -52,7 +58,7 @@ function srv(req, res){
 
 }
 
-
+var lastBuild = new Date(0)
 var clients = {}
 
 function clientsHTML(){
@@ -64,10 +70,10 @@ function clientsHTML(){
     </head>
     <body>
 
-     <ul><li>
+      <ul><li>
         <a href="./client/client-latest.jar">Latest</a>
-      </li></ukl>
-
+      </li></ul>
+      <br> Last Build ${lastBuild}
     <body>
   </html>
 `

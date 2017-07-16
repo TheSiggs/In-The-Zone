@@ -16,7 +16,7 @@ for p in lib/*.jar; do
 	export CLASSPATH="$CLASSPATH:$p"
 done
 
-cp client/build/libs/client-0.1.2-all.jar .
-java -Dprism.order=sw -Xmx500m -jar client-0.1.2-all.jar "$@"
+cp client/build/libs/client-0.1.3-all.jar .
+java -Dprism.order=sw -Xmx500m -jar client-0.1.3-all.jar "$@"
 
 

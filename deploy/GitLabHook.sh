@@ -1,4 +1,4 @@
-cd ~/itz/in-the-zone
+cd ..
 
 git pull
 
@@ -11,6 +11,4 @@ cp ./client/build/libs/* ../../
 
 
 cp ./server/build/libs/* ./server/build/libs/server-latest.jar
-cp ./server/build/libs/* /home/itz/server/
-
-
+cp ./server/build/libs/* ../../

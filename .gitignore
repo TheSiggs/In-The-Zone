@@ -7,3 +7,5 @@ TerrainBattle/private/
 InTheZone/games/
 .gitignore.swp
 InTheZone/tags
+client*.jar
+server*.jar

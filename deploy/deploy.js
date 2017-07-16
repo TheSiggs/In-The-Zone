@@ -25,9 +25,11 @@ function srv(req, res){
   log(req.url)
 
   if(req.url=='/b9b81349ba29f5b8f8c684c822040b1a'){ //b9b81349ba29f5b8f8c684c822040b1a
+    res.writeHead(200)
+    res.end()
     let proc = spawn('./GitLabHook.sh')
-    proc.stderr.on("data", ERR)
-    proc.stdout.on("data", log)
+    proc.stderr.on("data", (x)=>{ERR(x+'')})
+    proc.stdout.on("data", (x)=>{log('-')/*log(x+'')*/})
     return
   }
 
@@ -77,7 +79,7 @@ clientsHTML()
 
 function srvFile(res, file){
   log('srvFile/'+file)
-  fs.readFile('.' + file, function(err, b) {
+  fs.readFile('../../' + file, function(err, b) {
     if (err) {
       res.writeHead(404)
       res.end()

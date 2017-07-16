@@ -533,7 +533,9 @@ public class BattleState {
 	) {
 		if (castFrom.equals(target)) return 0;
 		final List<MapPoint> path = LineOfSight.getLOS(castFrom, target, bias);
-		if (path.size() < 2) return Integer.MAX_VALUE;
+		if (path.size() < 2 || !terrain.terrain.hasTile(path.get(0)))
+			return Integer.MAX_VALUE;
+		
 
 		int totalCost = 0;
 		Tile tile0 = terrain.terrain.getTile(path.get(0));

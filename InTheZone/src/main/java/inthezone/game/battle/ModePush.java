@@ -40,11 +40,11 @@ public class ModePush extends Mode {
 	}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final MapPoint p = selection.pointPriority().get();
+		final Optional<MapPoint> p = selection.pointPriority();
 
-		if (view.isSelectable(p)) {
+		if (p.isPresent() && view.isSelectable(p.get())) {
 			view.battle.requestCommand(
-				new PushCommandRequest(selectedCharacter.getPos(), p));
+				new PushCommandRequest(selectedCharacter.getPos(), p.get()));
 			view.setMode(new ModeAnimating(view));
 		} else {
 			view.selectCharacter(Optional.empty());

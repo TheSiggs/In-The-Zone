@@ -48,12 +48,12 @@ public class ModeMove extends Mode {
 		final Optional<Character> oc = selection.spritePriority()
 			.flatMap(p -> view.sprites.getCharacterAt(p));
 
-		final MapPoint p = selection.pointPriority().get();
+		final Optional<MapPoint> p = selection.pointPriority();
 
-		if (view.isSelectable(p)) {
+		if (p.isPresent() && view.isSelectable(p.get())) {
 			view.battle.requestCommand(
 				new MoveCommandRequest(
-					selectedCharacter.getPos(), p, selectedCharacter.player));
+					selectedCharacter.getPos(), p.get(), selectedCharacter.player));
 			view.setMode(new ModeAnimating(view));
 		} else if (oc.isPresent() && oc.get().player == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));

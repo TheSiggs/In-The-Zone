@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
@@ -65,10 +66,10 @@ public class ModeTeleport extends Mode {
 	@Override public boolean canCancel() {return canCancel;}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final MapPoint p = selection.pointPriority().get();
+		final Optional<MapPoint> p = selection.pointPriority();
 
-		if (view.isSelectable(p)) {
-			teleportDestinations.add(p);
+		if (p.isPresent() && view.isSelectable(p.get())) {
+			teleportDestinations.add(p.get());
 			teleportQueue.remove();
 			view.setMode(setupMode());
 		}

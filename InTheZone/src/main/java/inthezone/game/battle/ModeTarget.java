@@ -324,10 +324,10 @@ public class ModeTarget extends Mode {
 	}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final MapPoint p = selection.pointPriority().get();
+		final Optional<MapPoint> p = selection.pointPriority();
 
-		if (view.isSelectable(p)) {
-			view.setMode(addTarget(p));
+		if (p.isPresent() && view.isSelectable(p.get())) {
+			view.setMode(addTarget(p.get()));
 		} else if (canCancel) {
 			view.selectCharacter(Optional.empty());
 		}

@@ -39,11 +39,11 @@ public class ModeTargetItem extends Mode {
 	}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final MapPoint p = selection.pointPriority().get();
+		final Optional<MapPoint> p = selection.pointPriority();
 
-		if (view.isSelectable(p)) {
+		if (p.isPresent() && view.isSelectable(p.get())) {
 			view.battle.requestCommand(new UseItemCommandRequest(
-				selectedCharacter.getPos(), p));
+				selectedCharacter.getPos(), p.get()));
 			view.remainingPotions.set(view.remainingPotions.get() - 1);
 			view.setMode(new ModeAnimating(view));
 		} else {

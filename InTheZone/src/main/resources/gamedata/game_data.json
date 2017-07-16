@@ -2380,7 +2380,7 @@
             "range": 3,
             "targetMode": "A",
             "radius": 0,
-            "nTargets": 2
+            "nTargets": 1
           },
           "media": {"icon": "abilities/musclre_enhancers.png"},
           "type": "skill",
@@ -2390,7 +2390,7 @@
           "heal": false,
           "banned": false,
           "trap": false,
-          "recursion": 0
+          "recursion": 1
         },
         {
           "pp": 1,
@@ -9169,6 +9169,6 @@
       "sprites": []
     }
   ],
-  "version": "cab50e68-d4da-4a62-9434-da1592d8bd4d",
-  "versionNumber": 206
+  "version": "b9a97193-b218-4c5d-8a08-25815af6e542",
+  "versionNumber": 207
 }

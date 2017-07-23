@@ -346,11 +346,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Bridget\u2019s an overachiever and she\u2019ll let you know it. Her giant mana-bot can take a hit and dish one out. She can stun her enemies and heal her friends. You can rely on Bridget to anchor the team.",
       "stats": {
         "mp": 3,
@@ -741,11 +737,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Eve leaves blood everywhere she goes. Her power is near unrivalled both up close and at range. She lives and dies by the sword \u2014 her frail defences makes any advance a risk. Then again, what\u2019s a risk when Death\u2019s a welcome friend?",
       "stats": {
         "mp": 3,
@@ -1067,11 +1059,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Sar can crush the minds of the sternest warriors. He can strike behind walls and obstacles; he can also disable fighters by taking away their voice, their strength, or their sanity. When well protected, he is every soldier\u2019s nightmare.",
       "stats": {
         "mp": 3,
@@ -1494,7 +1482,7 @@
           "type": "skill",
           "ap": 2,
           "zone": "None",
-          "instantBefore": "TELEPORT 3",
+          "instantBefore": "TELEPORT 2",
           "name": "Deliver",
           "heal": false,
           "banned": false,
@@ -1502,11 +1490,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Don\u2019t blink, or you might miss Zan. His natural mana abilities allow him to teleport himself and his allies around the battlefield. Slashing someone\u2019s just like real estate \u2014 location, location, location.",
       "stats": {
         "mp": 3,
@@ -1633,15 +1617,15 @@
         {
           "pp": 1,
           "mp": 0,
-          "chance": 0.75,
-          "eff": 1.6,
+          "chance": 1,
+          "eff": 0.6,
           "statusEffect": "imprisoned",
           "range": {
             "los": true,
             "piercing": false,
-            "range": 0,
+            "range": 3,
             "targetMode": "E",
-            "radius": 1,
+            "radius": 0,
             "nTargets": 1
           },
           "media": {"icon": "abilities/earths_grip.png"},
@@ -1792,13 +1776,33 @@
           "banned": false,
           "trap": false,
           "recursion": 0
+        },
+        {
+          "pp": 1,
+          "mp": 0,
+          "chance": 1,
+          "eff": 1,
+          "statusEffect": "slowed",
+          "range": {
+            "los": false,
+            "piercing": true,
+            "range": 3,
+            "targetMode": "EA",
+            "radius": 0,
+            "nTargets": 1
+          },
+          "media": {"icon": "abilities/earths_grip.png"},
+          "type": "spell",
+          "ap": 2,
+          "zone": "None",
+          "name": "Seismic wave",
+          "heal": false,
+          "banned": false,
+          "trap": false,
+          "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "People have different strengths \u2014 Kieran\u2019s good at blowing people up. He can create explosions with mana, making him a handful at close quarters. Don\u2019t think about running either, he can pull you back in with an energy wave.",
       "stats": {
         "mp": 3,
@@ -2104,11 +2108,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Daniel loves making things \u2014 obstacles, energy zones, vicious traps \u2014 he\u2019s just a kid. He\u2019d probably be recruited as a master builder If he didn\u2019t join the revolution.",
       "stats": {
         "mp": 3,
@@ -2513,11 +2513,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Kids these days never take their jabs. Good thing you have old Galen here! You\u2019ll be in tip-top shape in no time! Well\u2026 as long as it takes for him to tell you about his time at the Academy.",
       "stats": {
         "mp": 3,
@@ -2621,8 +2617,7 @@
           "pp": 1,
           "mp": 0,
           "chance": 1,
-          "eff": 0.8,
-          "statusEffect": "slowed",
+          "eff": 0.6,
           "range": {
             "los": true,
             "piercing": false,
@@ -2906,11 +2901,7 @@
           "recursion": 0
         }
       ],
-      "defenceCurve": [
-        13,
-        13,
-        14
-      ],
+      "defenceCurve": [],
       "flavour": "Nettis is crafty. She can load different crystals into her rifle and pick her poison. She can deal with traps and zones, she can heal, she can control space, she can even cover her allies. Bit of a know-it-all, really.",
       "stats": {
         "mp": 3,
@@ -2939,6 +2930,2830 @@
     }
   ],
   "stages": [
+    {
+      "cliffTextures": [],
+      "terrains": [],
+      "stage": {
+        "name": "Checkerboard",
+        "terrain": {
+          "data": [
+            {
+              "p": {
+                "x": 0,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            }
+          ],
+          "w": 10,
+          "h": 10
+        },
+        "sprites": []
+      },
+      "sprites": []
+    },
+    {
+      "cliffTextures": [],
+      "terrains": [],
+      "stage": {
+        "name": "Example",
+        "terrain": {
+          "data": [
+            {
+              "p": {
+                "x": 0,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "AI",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 0
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 1
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 2
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "mana",
+              "isManaZone": true,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 3
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 4
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 5
+              },
+              "elevation": 1,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 5
+              },
+              "elevation": 2,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 5
+              },
+              "elevation": 1,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 5
+              },
+              "elevation": 1,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "W"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 5
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "N"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "cliffTexture": "cliffs",
+              "slope": "N"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 6
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 7
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 8
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 9
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 10
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 0,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 1,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 2,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "PLAYER",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 3,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 4,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "white",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 5,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 6,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 7,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 8,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 9,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 10,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            },
+            {
+              "p": {
+                "x": 11,
+                "y": 11
+              },
+              "elevation": 0,
+              "startZone": "NONE",
+              "texture": "black",
+              "isManaZone": false,
+              "slope": "NONE"
+            }
+          ],
+          "w": 12,
+          "h": 12
+        },
+        "sprites": [
+          {
+            "pos": {
+              "x": 10,
+              "y": 3
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 5,
+              "y": 1
+            },
+            "sprite": "Wall",
+            "direction": "UP",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 8,
+              "y": 3
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 3,
+              "y": 5
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 4,
+              "y": 5
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 5,
+              "y": 2
+            },
+            "sprite": "Wall",
+            "direction": "UP",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 5,
+              "y": 0
+            },
+            "sprite": "Wall",
+            "direction": "UP",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 5,
+              "y": 5
+            },
+            "sprite": "Wall",
+            "direction": "RIGHT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 2,
+              "y": 5
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 11,
+              "y": 3
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 9,
+              "y": 3
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          }
+        ]
+      },
+      "sprites": []
+    },
     {
       "cliffTextures": [],
       "terrains": [],
@@ -9295,2832 +12110,8 @@
         ]
       },
       "sprites": []
-    },
-    {
-      "cliffTextures": [],
-      "terrains": [],
-      "stage": {
-        "name": "Checkerboard",
-        "terrain": {
-          "data": [
-            {
-              "p": {
-                "x": 0,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            }
-          ],
-          "w": 10,
-          "h": 10
-        },
-        "sprites": []
-      },
-      "sprites": []
-    },
-    {
-      "cliffTextures": [],
-      "terrains": [],
-      "stage": {
-        "name": "Example",
-        "terrain": {
-          "data": [
-            {
-              "p": {
-                "x": 0,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "AI",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 0
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 1
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 2
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "mana",
-              "isManaZone": true,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 3
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 4
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 5
-              },
-              "elevation": 1,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 5
-              },
-              "elevation": 2,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 5
-              },
-              "elevation": 1,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 5
-              },
-              "elevation": 1,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "W"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 5
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "N"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "cliffTexture": "cliffs",
-              "slope": "N"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 6
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 7
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 8
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 9
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 10
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 0,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 1,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 2,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "PLAYER",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 3,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 4,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "white",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 5,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 6,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 7,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 8,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 9,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 10,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            },
-            {
-              "p": {
-                "x": 11,
-                "y": 11
-              },
-              "elevation": 0,
-              "startZone": "NONE",
-              "texture": "black",
-              "isManaZone": false,
-              "slope": "NONE"
-            }
-          ],
-          "w": 12,
-          "h": 12
-        },
-        "sprites": [
-          {
-            "pos": {
-              "x": 10,
-              "y": 3
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 5,
-              "y": 1
-            },
-            "sprite": "Wall",
-            "direction": "UP",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 8,
-              "y": 3
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 3,
-              "y": 5
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 4,
-              "y": 5
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 5,
-              "y": 2
-            },
-            "sprite": "Wall",
-            "direction": "UP",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 5,
-              "y": 0
-            },
-            "sprite": "Wall",
-            "direction": "UP",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 5,
-              "y": 5
-            },
-            "sprite": "Wall",
-            "direction": "RIGHT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 2,
-              "y": 5
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 11,
-              "y": 3
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 9,
-              "y": 3
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          }
-        ]
-      },
-      "sprites": []
     }
   ],
-  "version": "31805ad1-7fd7-4714-924e-85f0b9b49282",
-  "versionNumber": 208
+  "version": "2c572f12-6cee-4afe-a153-7b7972dee615",
+  "versionNumber": 212
 }

@@ -8778,7 +8778,7 @@
               },
               "elevation": 1,
               "startZone": "NONE",
-              "texture": "white",
+              "texture": "mana",
               "isManaZone": true,
               "cliffTexture": "cliffs",
               "slope": "NONE"
@@ -8860,7 +8860,7 @@
               },
               "elevation": 1,
               "startZone": "NONE",
-              "texture": "white",
+              "texture": "mana",
               "isManaZone": true,
               "cliffTexture": "cliffs",
               "slope": "NONE"
@@ -8930,7 +8930,7 @@
               "elevation": 0,
               "startZone": "NONE",
               "texture": "white",
-              "isManaZone": true,
+              "isManaZone": false,
               "slope": "NONE"
             },
             {
@@ -9359,7 +9359,7 @@
               },
               "elevation": 1,
               "startZone": "NONE",
-              "texture": "white",
+              "texture": "mana",
               "isManaZone": true,
               "cliffTexture": "cliffs",
               "slope": "NONE"
@@ -9549,7 +9549,7 @@
               },
               "elevation": 1,
               "startZone": "NONE",
-              "texture": "white",
+              "texture": "mana",
               "isManaZone": true,
               "cliffTexture": "cliffs",
               "slope": "NONE"
@@ -10050,7 +10050,7 @@
               },
               "elevation": 1,
               "startZone": "NONE",
-              "texture": "white",
+              "texture": "mana",
               "isManaZone": true,
               "cliffTexture": "cliffs",
               "slope": "NONE"
@@ -10132,7 +10132,7 @@
               },
               "elevation": 1,
               "startZone": "NONE",
-              "texture": "white",
+              "texture": "mana",
               "isManaZone": true,
               "cliffTexture": "cliffs",
               "slope": "NONE"
@@ -10910,7 +10910,25 @@
         "sprites": [
           {
             "pos": {
+              "x": 8,
+              "y": 13
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
               "x": 7,
+              "y": 2
+            },
+            "sprite": "Wall",
+            "direction": "LEFT",
+            "animation": "static"
+          },
+          {
+            "pos": {
+              "x": 8,
               "y": 2
             },
             "sprite": "Wall",
@@ -10921,24 +10939,6 @@
             "pos": {
               "x": 7,
               "y": 13
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 8,
-              "y": 13
-            },
-            "sprite": "Wall",
-            "direction": "LEFT",
-            "animation": "static"
-          },
-          {
-            "pos": {
-              "x": 8,
-              "y": 2
             },
             "sprite": "Wall",
             "direction": "LEFT",
@@ -12112,6 +12112,6 @@
       "sprites": []
     }
   ],
-  "version": "2c572f12-6cee-4afe-a153-7b7972dee615",
-  "versionNumber": 212
+  "version": "982fd9ff-4ddf-4f72-a8e8-3a0b3e3304f3",
+  "versionNumber": 213
 }

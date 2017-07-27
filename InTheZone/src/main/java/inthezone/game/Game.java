@@ -32,13 +32,16 @@ public class Game extends Application {
 	@Override
 	public void start(final Stage primaryStage) {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, e) -> {
-			e.printStackTrace();
-			final Alert a = new Alert(Alert.AlertType.ERROR,
-				e.getMessage(), ButtonType.CLOSE);
-			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-			a.setHeaderText("Unexpected error");
-			a.showAndWait();
-			Platform.exit();
+			try {
+				e.printStackTrace();
+				final Alert a = new Alert(Alert.AlertType.ERROR,
+					e.getMessage(), ButtonType.CLOSE);
+				a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+				a.setHeaderText("Unexpected error");
+				a.showAndWait();
+			} finally {
+				Platform.exit();
+			}
 		});
 		
 

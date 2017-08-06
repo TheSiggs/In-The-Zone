@@ -41,23 +41,23 @@ public class UseAbilityCommand extends Command {
 	public boolean placedZones = false;
 
 	public UseAbilityCommand(
-		MapPoint agent, AbilityAgentType agentType,
-		String ability,
-		Collection<MapPoint> targetSquares,
-		Collection<DamageToTarget> targets,
-		int subsequentLevel
+		final MapPoint agent, final AbilityAgentType agentType,
+		final String ability,
+		final Collection<MapPoint> targetSquares,
+		final Collection<DamageToTarget> targets,
+		final int subsequentLevel
 	) {
 		this(agent, agentType, ability, targetSquares,
 			targets, new ArrayList<>(), subsequentLevel);
 	}
 
 	public UseAbilityCommand(
-		MapPoint agent, AbilityAgentType agentType,
-		String ability,
-		Collection<MapPoint> targetSquares,
-		Collection<DamageToTarget> targets,
-		Collection<MapPoint> constructed,
-		int subsequentLevel
+		final MapPoint agent, final AbilityAgentType agentType,
+		final String ability,
+		final Collection<MapPoint> targetSquares,
+		final Collection<DamageToTarget> targets,
+		final Collection<MapPoint> constructed,
+		final int subsequentLevel
 	) {
 		this.agent = agent;
 		this.agentType = agentType;
@@ -99,7 +99,7 @@ public class UseAbilityCommand extends Command {
 		return r;
 	}
 
-	public static UseAbilityCommand fromJSON(JSONObject json)
+	public static UseAbilityCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -140,10 +140,10 @@ public class UseAbilityCommand extends Command {
 	}
 
 	@Override
-	public List<? extends Targetable> doCmd(Battle battle) throws CommandException {
+	public List<? extends Targetable> doCmd(final Battle battle) throws CommandException {
 		final Ability abilityData = battle.battleState.getCharacterAt(agent)
 			.flatMap(c -> Stream.concat(Stream.of(c.basicAbility), c.abilities.stream())
-				.filter(a -> a.info.name.equals(ability)).findFirst())
+				.filter(a -> a.rootName.equals(ability)).findFirst())
 			.flatMap(a -> a.getNext(
 				battle.battleState.hasMana(agent), subsequentLevel))
 			.orElse(null);
@@ -215,7 +215,7 @@ public class UseAbilityCommand extends Command {
 	 * Called when the targets are moved by an instant effect.
 	 * @param retarget A mapping from old character positions to their new positions.
 	 * */
-	public void retarget(Map<MapPoint, MapPoint> retarget) {
+	public void retarget(final Map<MapPoint, MapPoint> retarget) {
 		this.agent = retarget.getOrDefault(agent, agent);
 		this.targets = targets.stream()
 			.map(t -> t.retarget(new Casting(
@@ -227,7 +227,7 @@ public class UseAbilityCommand extends Command {
 	/**
 	 * Called when new objects are created by instant effects.
 	 * */
-	public void registerConstructedObjects(List<MapPoint> constructed) {
+	public void registerConstructedObjects(final List<MapPoint> constructed) {
 		this.constructed.addAll(constructed);
 	}
 }

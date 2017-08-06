@@ -16,6 +16,11 @@ public class Ability {
 	public final String rootName;
 	public final int subsequentLevel;
 
+	@Override public String toString() {
+		return "(ability " + rootName + ":" + info.name +
+			", mana:" + isMana + ", subsequentLevel:" + subsequentLevel + ")";
+	}
+
 	public Ability(AbilityInfo info) {
 		this.info = info;
 		this.rootName = info.name;
@@ -24,8 +29,8 @@ public class Ability {
 	}
 
 	private Ability(
-		AbilityInfo info, String name,
-		int subsequentLevel, boolean isMana
+		final AbilityInfo info, final String name,
+		final int subsequentLevel, final boolean isMana
 	) {
 		this.info = info;
 		this.rootName = name;
@@ -43,19 +48,19 @@ public class Ability {
 	}
 
 	public Optional<Ability> getNext(
-		boolean mana, int subsequentLevel
+		final boolean mana, final int subsequentLevel
 	) {
 		Optional<Ability> r = Optional.of(this);
 
 		if (mana) {
-			Optional<Ability> manaAbility =
+			final Optional<Ability> manaAbility =
 				r.flatMap(a -> a.info.mana.map(aa ->
 					new Ability(aa, rootName, 0, true)));
 			if (manaAbility.isPresent()) r = manaAbility;
 		}
 
 		for (int i = 0; i < subsequentLevel; i++) {
-			r = r.flatMap(a -> getSubsequent());
+			r = r.flatMap(a -> a.getSubsequent());
 		}
 
 		return r;
@@ -67,7 +72,7 @@ public class Ability {
 	 * @param target The target of the ability
 	 * @return true if agent can target the target, otherwise false.
 	 * */
-	public boolean canTarget(Targetable agent, Targetable target) {
+	public boolean canTarget(final Targetable agent, final Targetable target) {
 		if (target.getPos().equals(agent.getPos())) {
 			return info.range.targetMode.self;
 		} else if (agent instanceof Character) {
@@ -92,12 +97,12 @@ public class Ability {
 	 * The damage formula.
 	 * */
 	public static double damageFormulaStatic(
-		double q,
-		double manaBonus,
-		double r,
-		double attackBuff,
-		double defenceBuff,
-		Stats a, Stats t
+		final double q,
+		final double manaBonus,
+		final double r,
+		final double attackBuff,
+		final double defenceBuff,
+		final Stats a, Stats t
 	) {
 		return
 			q * (1 + manaBonus + attackBuff - defenceBuff + r) *
@@ -107,11 +112,11 @@ public class Ability {
 	}
 
 	private double damageFormula(
-		boolean agentHasMana,
-		double r,
-		double attackBuff,
-		double defenceBuff,
-		Stats a, Stats t
+		final boolean agentHasMana,
+		final double r,
+		final double attackBuff,
+		final double defenceBuff,
+		final Stats a, Stats t
 	) {
 		double q = info.type == AbilityType.BASIC? 1 : info.eff;
 		double manaBonus = agentHasMana && !isMana? const_m : 0;
@@ -119,7 +124,7 @@ public class Ability {
 	}
 
 
-	private double healingFormula(boolean manaBonus, double q, Stats t) {
+	private double healingFormula(final boolean manaBonus, final double q, Stats t) {
 		return (const_h * (q + (manaBonus? const_m : 0)) *
 			(0.9 + (0.2 * Math.random())) *
 			(double) t.hp) / const_i;
@@ -131,20 +136,20 @@ public class Ability {
 	 * @param r Revenge bonus
 	 * */
 	public DamageToTarget computeDamageToTarget(
-		Targetable a, Targetable t, MapPoint castFrom, double r
+		final Targetable a, final Targetable t, final MapPoint castFrom, final double r
 	) {
-		Stats aStats = a.getStats();
-		Stats tStats = t.getStats();
+		final Stats aStats = a.getStats();
+		final Stats tStats = t.getStats();
 
 		double damage = info.heal?
 			healingFormula(a.hasMana(), info.eff, tStats) :
 			damageFormula(a.hasMana(), r, a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats);
 		if (t.isDead() && info.heal) damage = 0; // healing doesn't affect the dead
-		int rdamage = ((int) Math.ceil(damage)) * (info.heal? -1 : 1);
+		final int rdamage = ((int) Math.ceil(damage)) * (info.heal? -1 : 1);
 
-		double chance = info.chance + a.getChanceBuff();
+		final double chance = info.chance + a.getChanceBuff();
 
-		Optional<Character> characterAgent =
+		final Optional<Character> characterAgent =
 			Optional.ofNullable(a instanceof Character? (Character) a : null);
 
 		return new DamageToTarget(new Casting(castFrom, t.getPos()),
@@ -156,20 +161,20 @@ public class Ability {
 	}
 
 	public DamageToTarget computeVampirismEffect(
-		BattleState battle, Character a, Collection<DamageToTarget> targets
+		final BattleState battle, final Character a, final Collection<DamageToTarget> targets
 	) {
-		long characterTargets = targets.stream().filter(d ->
+		final long characterTargets = targets.stream().filter(d ->
 			d.damage > 0 && battle.getCharacterAt(d.target.target).isPresent()
 		).count();
-		double qh = ((double) characterTargets) * const_f * info.eff;
-		int damage =
+		final double qh = ((double) characterTargets) * const_f * info.eff;
+		final int damage =
 			(int) (-1d * Math.ceil(healingFormula(a.hasMana(), qh, a.getStats())));
 
 		return new DamageToTarget(new Casting(a.getPos(), a.getPos()),
 			false, false, damage, Optional.empty(), false, false);
 	}
 
-	private <T> Optional<T> imposeEffect(double p, T effect) {
+	private <T> Optional<T> imposeEffect(final double p, final T effect) {
 		return Optional.ofNullable(Math.random() < p ? effect : null);
 	}
 }

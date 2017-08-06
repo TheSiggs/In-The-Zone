@@ -4,6 +4,7 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,11 +22,17 @@ import inthezone.battle.data.InstantEffectType;
 import inthezone.protocol.ProtocolException;
 
 public class Revive extends InstantEffect {
-	public final List<MapPoint> targets;
+	public final List<MapPoint> targets = new ArrayList<>();
 
-	protected Revive(MapPoint agent, List<MapPoint> targets) {
+	protected Revive(final MapPoint agent, final Collection<MapPoint> targets) {
 		super(agent);
-		this.targets = targets;
+		this.targets.addAll(targets);
+	}
+
+	public static Revive getEffect(
+		final Collection<MapPoint> targets, final MapPoint agent
+	) {
+		return new Revive(agent, targets);
 	}
 
 	@Override public JSONObject getJSON() {

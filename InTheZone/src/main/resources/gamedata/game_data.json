@@ -353,7 +353,7 @@
         "defence": 12,
         "attack": 16,
         "hp": 200,
-        "power": 18,
+        "power": 16,
         "ap": 2
       },
       "name": "Bridget",
@@ -476,7 +476,7 @@
           "pp": 1,
           "mp": 0,
           "chance": 1,
-          "eff": 2,
+          "eff": 1.8,
           "statusEffect": "energized",
           "range": {
             "los": true,
@@ -594,7 +594,7 @@
             "pp": 0,
             "mp": 0,
             "chance": 1,
-            "eff": 0.5,
+            "eff": 1,
             "range": {
               "los": true,
               "piercing": false,
@@ -12112,6 +12112,6 @@
       "sprites": []
     }
   ],
-  "version": "982fd9ff-4ddf-4f72-a8e8-3a0b3e3304f3",
-  "versionNumber": 213
+  "version": "dc876117-1f56-4bb1-b842-3d4c9c8e3bd4",
+  "versionNumber": 214
 }

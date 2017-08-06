@@ -54,7 +54,8 @@ public class InfoTargeting extends InfoRequest<Collection<MapPoint>> {
 			ability.info.instantAfter.map(i -> i.isField()).orElse(false)
 		) {
 			complete.complete(area.stream()
-				.filter(p -> battle.battleState.isSpaceFree(p))
+				.filter(p -> battle.battleState.isSpaceFree(p) &&
+					!battle.battleState.getTrapAt(p).isPresent())
 				.collect(Collectors.toList()));
 
 		} else if (ability.info.zone == AbilityZoneType.ZONE) {

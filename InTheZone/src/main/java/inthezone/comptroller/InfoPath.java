@@ -1,9 +1,13 @@
 package inthezone.comptroller;
 
+import isogame.engine.MapPoint;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
-import isogame.engine.MapPoint;
-import java.util.List;
 
 /**
  * Get the path the character will follow to a specific point.
@@ -13,21 +17,27 @@ public class InfoPath extends InfoRequest<List<MapPoint>> {
 	private final MapPoint target;
 	private final int range;
 
-	public InfoPath(Character subject, MapPoint target) {
+	public InfoPath(final Character subject, final MapPoint target) {
 		this.subject = subject;
 		this.target = target;
 		this.range = subject.getMP();
 	}
 
-	public InfoPath(Character subject, MapPoint target, int range) {
+	public InfoPath(
+		final Character subject, final MapPoint target, final int range
+	) {
 		this.subject = subject;
 		this.target = target;
 		this.range = range;
 	}
 
-	@Override public void completeAction(Battle battle) {
-		complete.complete(battle.battleState.findValidPath(
-			subject.getPos(), target, subject.player, range));
+	@Override public void completeAction(final Battle battle) {
+		if (subject.isImprisoned()) {
+			complete.complete(new LinkedList<>());
+		} else {
+			complete.complete(battle.battleState.findValidPath(
+				subject.getPos(), target, subject.player, range));
+		}
 	}
 }
 

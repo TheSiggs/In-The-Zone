@@ -67,7 +67,7 @@
             "piercing": false,
             "range": 1,
             "targetMode": "E",
-            "radius": 1,
+            "radius": 0,
             "nTargets": 1
           },
           "media": {"icon": "abilities/default.png"},
@@ -1570,8 +1570,8 @@
         {
           "pp": 0,
           "mp": 0,
-          "chance": 1,
-          "eff": 0,
+          "chance": 0,
+          "eff": 1,
           "range": {
             "los": true,
             "piercing": false,
@@ -2307,8 +2307,8 @@
             "los": true,
             "piercing": false,
             "range": 3,
-            "targetMode": "SA",
-            "radius": 1,
+            "targetMode": "SEA",
+            "radius": 0,
             "nTargets": 1
           },
           "media": {"icon": "abilities/disinfect.png"},
@@ -2469,7 +2469,7 @@
         {
           "pp": 1,
           "mp": 0,
-          "chance": 0.75,
+          "chance": 1,
           "eff": 1,
           "statusEffect": "weakened",
           "range": {
@@ -2679,7 +2679,7 @@
           },
           "media": {"icon": "abilities/silverdust.png"},
           "type": "skill",
-          "ap": 1,
+          "ap": 2,
           "zone": "None",
           "instantBefore": "CLEANSE",
           "name": "Silverdust shell",
@@ -12137,6 +12137,6 @@
       "sprites": []
     }
   ],
-  "version": "490bfcf8-4779-425a-b16a-0002032a5d37",
-  "versionNumber": 215
+  "version": "000f1ed0-edf4-4265-9bc5-51f807d289d5",
+  "versionNumber": 216
 }

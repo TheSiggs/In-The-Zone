@@ -60,6 +60,21 @@ public class ClientConfig implements HasJSONRepresentation {
 	public String server = DEFAULT_SERVER;
 	public int port = DEFAULT_PORT;
 
+	public String newLoadoutName() {
+		final String base = "New loadout";
+		String r = base;
+		int n = 2;
+		while (!isValidLoadoutName(r)) {
+			r = base + " " + n;
+			n += 1;
+		}
+		return r;
+	}
+
+	public boolean isValidLoadoutName(final String n) {
+		return !loadouts.stream().anyMatch(l -> l.name.equals(n));
+	}
+
 	public void loadConfig(
 		final JSONObject json, final GameDataFactory gameData
 	) throws CorruptDataException {

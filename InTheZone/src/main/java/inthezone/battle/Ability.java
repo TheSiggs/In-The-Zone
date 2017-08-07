@@ -13,7 +13,13 @@ public class Ability {
 	public final AbilityInfo info;
 
 	public final boolean isMana;
+
+	// the name of the base ability
 	public final String rootName;
+
+	// the name of the base mana ability (same as rootName if this isn't a mana ability)
+	public final String manaRootName;
+
 	public final int subsequentLevel;
 
 	@Override public String toString() {
@@ -24,27 +30,29 @@ public class Ability {
 	public Ability(AbilityInfo info) {
 		this.info = info;
 		this.rootName = info.name;
+		this.manaRootName = info.name;
 		this.subsequentLevel = 0;
 		this.isMana = false;
 	}
 
 	private Ability(
-		final AbilityInfo info, final String name,
+		final AbilityInfo info, final String name, final String manaName,
 		final int subsequentLevel, final boolean isMana
 	) {
 		this.info = info;
 		this.rootName = name;
+		this.manaRootName = manaName;
 		this.subsequentLevel = subsequentLevel;
 		this.isMana = isMana;
 	}
 
 	public Ability getMana() {
-		return info.mana.map(m -> new Ability(m, rootName, 0, true)).orElse(this);
+		return info.mana.map(m -> new Ability(m, rootName, m.name, 0, true)).orElse(this);
 	}
 
 	public Optional<Ability> getSubsequent() {
 		return info.subsequent.map(i ->
-			new Ability(i, rootName, subsequentLevel + 1, isMana));
+			new Ability(i, rootName, manaRootName, subsequentLevel + 1, isMana));
 	}
 
 	public Optional<Ability> getNext(
@@ -55,7 +63,7 @@ public class Ability {
 		if (mana) {
 			final Optional<Ability> manaAbility =
 				r.flatMap(a -> a.info.mana.map(aa ->
-					new Ability(aa, rootName, 0, true)));
+					new Ability(aa, rootName, manaRootName, 0, true)));
 			if (manaAbility.isPresent()) r = manaAbility;
 		}
 

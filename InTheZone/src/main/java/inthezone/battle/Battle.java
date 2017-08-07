@@ -256,8 +256,10 @@ public class Battle {
 		battleState.getCharacterAt(path.get(0)).ifPresent(c -> {
 			final MapPoint t = path.get(path.size() - 1);
 			if (isFear) {
+				System.err.println("Moving " + c);
 				c.moveTo(t, battleState.pathCost(path), battleState.hasMana(t));
 			} else {
+				System.err.println("Pushing " + c);
 				c.push(t, battleState.hasMana(t));
 			}
 			r.add(c);

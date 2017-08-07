@@ -65,6 +65,7 @@ public class PullPush extends InstantEffect {
 		final JSONArray a = new JSONArray();
 		o.put("kind", type.toString());
 		o.put("castFrom", castFrom.getJSON());
+		o.put("isFear", isFear);
 		for (List<MapPoint> path : paths) {
 			JSONArray pp = new JSONArray();
 			for (MapPoint p : path) pp.put(p.getJSON());
@@ -82,6 +83,7 @@ public class PullPush extends InstantEffect {
 				new InstantEffectInfo(json.getString("kind"));
 			final MapPoint castFrom =
 				MapPoint.fromJSON(json.getJSONObject("castFrom"));
+			final boolean isFear = json.getBoolean("isFear");
 			final JSONArray rawPaths = json.getJSONArray("paths");
 
 			if (!(kind.type == InstantEffectType.PULL || kind.type == InstantEffectType.PUSH))
@@ -98,9 +100,7 @@ public class PullPush extends InstantEffect {
 				paths.add(path);
 			}
 
-			// isFear is always false here because the triggers have been resolved at
-			// this point
-			return new PullPush(kind, castFrom, paths, false);
+			return new PullPush(kind, castFrom, paths, isFear);
 
 		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing push/pull effect", e);
@@ -249,7 +249,7 @@ public class PullPush extends InstantEffect {
 			// do the push/pull
 			if (!validPathSections.isEmpty()) {
 				final InstantEffect eff = new PullPush(
-					this.type, this.castFrom, validPathSections, true);
+					this.type, this.castFrom, validPathSections, isFear);
 				r.add(new ExecutedCommand(cmd.apply(eff), eff.apply(battle)));
 			}
 

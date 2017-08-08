@@ -48,7 +48,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	 * @param a The agent targetable.
 	 * */
 	private Collection<DamageToTarget> computeDamageToTargets(
-		BattleState battleState, Targetable a
+		final BattleState battleState, final Targetable a
 	) {
 		System.err.println("Computing damage for " + a);
 		final double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
@@ -68,7 +68,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			targeted.addAll(targets.stream()
 				.map(t -> t.getPos()).collect(Collectors.toList()));
 			for (Targetable t : targets) r.add(
-				ability.computeDamageToTarget(a, t, casting.castFrom, revengeBonus));
+				ability.computeDamageToTarget(battleState, a, t, casting.castFrom, revengeBonus));
 		}
 
 		return r;

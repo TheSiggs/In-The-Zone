@@ -254,23 +254,18 @@ public class PullPush extends InstantEffect {
 			}
 
 			// do the triggers
-			boolean doneContinueTurn = false;
 			for (List<MapPoint> path : pathSections) {
 				final MapPoint loc = path.get(path.size() - 1);
 				final List<Command> triggers = battle.battleState.trigger.getAllTriggers(loc);
 				for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
 
-				if (isFear && !triggers.isEmpty()) {
-					final Optional<Character> oc = battle.battleState.getCharacterAt(loc);
-					if (oc.isPresent()) {
-						final List<Command> cont = oc.get().continueTurnReset(battle);
-						for (Command c : cont) r.addAll(c.doCmdComputingTriggers(battle));
-						doneContinueTurn = true;
-					}
+				final Optional<Character> oc = battle.battleState.getCharacterAt(loc);
+
+				// if the character is no longer feared, stop the effect
+				if (isFear && oc.map(c -> !c.isFeared()).orElse(false)) {
+					return r;
 				}
 			}
-
-			if (doneContinueTurn) break;
 		}
 
 		return r;

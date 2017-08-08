@@ -157,13 +157,11 @@ public class Character extends Targetable {
 
 	public boolean isPanicked() {
 		return
-			(lastDebuff != null && lastDebuff instanceof PanickedStatusEffect) ||
 			statusDebuff.map(s -> s instanceof PanickedStatusEffect).orElse(false);
 	}
 
 	public boolean isFeared() {
 		return
-			(lastDebuff != null && lastDebuff instanceof FearedStatusEffect) ||
 			statusDebuff.map(s -> s instanceof FearedStatusEffect).orElse(false);
 	}
 
@@ -313,14 +311,11 @@ public class Character extends Targetable {
 		hasCover = false;
 		statusBuff.ifPresent(s -> {
 			r.addAll(s.doBeforeTurn(battle, this));
-			if (s.canRemoveNow()) this.statusBuff = Optional.empty();
 		});
 
 		if (statusDebuff.map(x -> !x.info.type.causesMovement()).orElse(false)) {
 			statusDebuff.ifPresent(s -> {
 				r.addAll(s.doBeforeTurn(battle, this));
-				lastDebuff = s;
-				if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
 			});
 		}
 
@@ -334,17 +329,11 @@ public class Character extends Targetable {
 		if (statusDebuff.map(x -> x.info.type.causesMovement()).orElse(false)) {
 			statusDebuff.ifPresent(s -> {
 				r.addAll(s.doBeforeTurn(battle, this));
-				lastDebuff = s;
-				if (s.canRemoveNow()) this.statusDebuff = Optional.empty();
 			});
 		}
 
 		return r;
 	}
-
-	// need to hold on to the last debuff, because we might need to know what it
-	// was even after it's removed.
-	private StatusEffect lastDebuff = null;
 
 	/**
 	 * Continue the turn reset, after it was interrupted by a trigger.
@@ -354,12 +343,22 @@ public class Character extends Targetable {
 		statusDebuff.ifPresent(s -> {
 			if (s.isBeforeTurnExhaustive()) r.addAll(s.doBeforeTurn(battle, this));
 		});
-
-		if (!statusDebuff.isPresent()) {
-			if (lastDebuff != null && lastDebuff.isBeforeTurnExhaustive())
-			 r.addAll(lastDebuff.doBeforeTurn(battle, this));
-		}
 		return r;
+	}
+
+	/**
+	 * Update the status effects on this character
+	 * */
+	public void cleanupStatus(final Battle battle) {
+		statusBuff.ifPresent(s -> {
+			if (s.canRemoveNow(battle.battleState.getTurnNumber()))
+				statusBuff = Optional.empty();
+		});
+		statusDebuff.ifPresent(s -> {
+			if (s.canRemoveNow(battle.battleState.getTurnNumber()))
+				statusDebuff = Optional.empty();
+		});
+		clampPoints();
 	}
 
 	@Override public Stats getStats() {
@@ -396,7 +395,6 @@ public class Character extends Targetable {
 	@Override public void defuse() { return; }
 
 	@Override public void cleanse() {
-		lastDebuff = null;
 		statusBuff = Optional.empty();
 		statusDebuff = Optional.empty();
 		clampPoints();
@@ -427,8 +425,6 @@ public class Character extends Targetable {
 			}
 
 		} else {
-			lastDebuff = null;
-
 			if (!statusDebuff.map(s -> s.info.equals(status.info)).orElse(false)) {
 				statusDebuff = Optional.empty();
 				clampPoints();

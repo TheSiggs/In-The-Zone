@@ -144,7 +144,11 @@ public class Ability {
 	 * @param r Revenge bonus
 	 * */
 	public DamageToTarget computeDamageToTarget(
-		final Targetable a, final Targetable t, final MapPoint castFrom, final double r
+		final BattleState battle,
+		final Targetable a,
+		final Targetable t,
+		final MapPoint castFrom,
+		final double r
 	) {
 		final Stats aStats = a.getStats();
 		final Stats tStats = t.getStats();
@@ -163,7 +167,8 @@ public class Ability {
 		return new DamageToTarget(new Casting(castFrom, t.getPos()),
 			t instanceof Trap, t instanceof Zone, rdamage,
 			imposeEffect(chance, info.statusEffect
-				.map(i -> StatusEffectFactory.getEffect(i, rdamage, characterAgent))
+				.map(i -> StatusEffectFactory.getEffect(
+					i, battle.getTurnNumber(), rdamage, characterAgent))
 				.orElse(null)),
 			Math.random() < chance, Math.random() < chance);
 	}

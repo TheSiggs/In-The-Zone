@@ -280,7 +280,7 @@ public class CommandTests {
 		dan2.teleport(targetPos, false);
 
 		final StatusEffect feared = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("feared 3"), 0, Optional.of(dan));
+			new StatusEffectInfo("feared 3"), b.battleState.getTurnNumber(), 0, Optional.of(dan));
 		dan2.applyStatus(b, feared);
 
 		assertTrue(b.doTurnStart(Player.PLAYER_B).isEmpty());
@@ -319,7 +319,7 @@ public class CommandTests {
 			b.battleState.placeTrap(new MapPoint(6, 6), trap1, dan2, stdSprites);
 
 			final StatusEffect panicked = StatusEffectFactory.getEffect(
-				new StatusEffectInfo("panicked"), 0, Optional.empty());
+				new StatusEffectInfo("panicked"), b.battleState.getTurnNumber(), 0, Optional.empty());
 			dan.applyStatus(b, panicked);
 
 			assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
@@ -357,7 +357,7 @@ public class CommandTests {
 		b.battleState.placeTrap(new MapPoint(6, 6), trap1, dan2, stdSprites);
 
 		final StatusEffect panicked = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("panicked"), 0, Optional.empty());
+			new StatusEffectInfo("panicked"), b.battleState.getTurnNumber(), 0, Optional.empty());
 		dan.applyStatus(b, panicked);
 
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
@@ -397,7 +397,7 @@ public class CommandTests {
 		assertNotEquals(Optional.empty(), z);
 
 		final StatusEffect panicked = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("panicked"), 0, Optional.empty());
+			new StatusEffectInfo("panicked"), b.battleState.getTurnNumber(), 0, Optional.empty());
 		dan.applyStatus(b, panicked);
 
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
@@ -437,7 +437,7 @@ public class CommandTests {
 		assertNotEquals(Optional.empty(), z);
 
 		final StatusEffect panicked = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("panicked"), 0, Optional.empty());
+			new StatusEffectInfo("panicked"), b.battleState.getTurnNumber(), 0, Optional.empty());
 		dan.applyStatus(b, panicked);
 
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
@@ -480,7 +480,7 @@ public class CommandTests {
 		assertNotEquals(Optional.empty(), z);
 
 		final StatusEffect feared = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("feared 3"), 0, Optional.of(dan2));
+			new StatusEffectInfo("feared 3"), b.battleState.getTurnNumber(), 0, Optional.of(dan2));
 		dan.applyStatus(b, feared);
 
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());
@@ -524,7 +524,7 @@ public class CommandTests {
 		assertNotEquals(Optional.empty(), z);
 
 		final StatusEffect feared = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("feared 4"), 0, Optional.of(dan2));
+			new StatusEffectInfo("feared 4"), b.battleState.getTurnNumber(), 0, Optional.of(dan2));
 		kieren.applyStatus(b, feared);
 
 		assertTrue(b.doTurnStart(Player.PLAYER_A).isEmpty());

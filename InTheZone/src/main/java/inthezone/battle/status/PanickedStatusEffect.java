@@ -15,11 +15,13 @@ import java.util.Set;
 import nz.dcoder.ai.astar.Node;
 
 public class PanickedStatusEffect extends StatusEffect {
-	public PanickedStatusEffect(StatusEffectInfo info) {
-		super(info);
+	public PanickedStatusEffect(
+		final StatusEffectInfo info, final int startTurn
+	) {
+		super(info, startTurn);
 	}
 
-	public List<Command> doBeforeTurn(Battle battle, Character c) {
+	public List<Command> doBeforeTurn(final Battle battle, final Character c) {
 		if (c.isDead()) return new LinkedList<>();
 
 		final Set<MapPoint> obstacles = battle.battleState.spaceObstacles();

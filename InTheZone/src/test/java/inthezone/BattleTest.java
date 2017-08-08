@@ -132,7 +132,7 @@ public class BattleTest {
 		assertEquals(6, dan.getStats().mp);
 
 		final StatusEffect accelerated = StatusEffectFactory.getEffect(
-			new StatusEffectInfo("accelerated"), 0, Optional.empty());
+			new StatusEffectInfo("accelerated"), b.battleState.getTurnNumber(), 0, Optional.empty());
 		assertNotNull(accelerated);
 
 		dan.applyStatus(b, accelerated);

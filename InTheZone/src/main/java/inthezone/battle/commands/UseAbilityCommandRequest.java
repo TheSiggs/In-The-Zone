@@ -48,7 +48,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	 * @param a The agent targetable.
 	 * */
 	private Collection<DamageToTarget> computeDamageToTargets(
-		BattleState battleState, Targetable a
+		final BattleState battleState, final Targetable a
 	) {
 		System.err.println("Computing damage for " + a);
 		final double revengeBonus = (agentType != AbilityAgentType.CHARACTER)? 0 :
@@ -68,7 +68,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			targeted.addAll(targets.stream()
 				.map(t -> t.getPos()).collect(Collectors.toList()));
 			for (Targetable t : targets) r.add(
-				ability.computeDamageToTarget(a, t, casting.castFrom, revengeBonus));
+				ability.computeDamageToTarget(battleState, a, t, casting.castFrom, revengeBonus));
 		}
 
 		return r;
@@ -83,7 +83,7 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 		if ((ability.info.trap) && agentType == AbilityAgentType.CHARACTER) {
 			commands.add(new UseAbilityCommand(agent, agentType,
-				ability.rootName, targetSquares, new ArrayList<>(), 0));
+				ability.rootName, ability.manaRootName, targetSquares, new ArrayList<>(), 0));
 
 		} else {
 			// get the targets
@@ -133,9 +133,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 			
 			// Main damage
 			mainEffect = new UseAbilityCommand(
-				agent, agentType, ability.rootName,
-				targetSquares,
-				allTargets, ability.subsequentLevel);
+				agent, agentType, ability.rootName, ability.manaRootName,
+				targetSquares, allTargets, ability.subsequentLevel);
 				
 			// Post instant effect
 			if (postTargets.size() > 0 && ability.info.instantAfter.isPresent()) {

@@ -27,6 +27,7 @@ public class UseAbilityCommand extends Command {
 	private MapPoint agent;
 	public final AbilityAgentType agentType;
 	public final String ability;
+	public final String friendlyAbilityName;
 	private final Collection<MapPoint> targetSquares;
 	private Collection<DamageToTarget> targets;
 	public final int subsequentLevel;
@@ -43,17 +44,19 @@ public class UseAbilityCommand extends Command {
 	public UseAbilityCommand(
 		final MapPoint agent, final AbilityAgentType agentType,
 		final String ability,
+		final String friendlyAbilityName,
 		final Collection<MapPoint> targetSquares,
 		final Collection<DamageToTarget> targets,
 		final int subsequentLevel
 	) {
-		this(agent, agentType, ability, targetSquares,
-			targets, new ArrayList<>(), subsequentLevel);
+		this(agent, agentType, ability, friendlyAbilityName,
+			targetSquares, targets, new ArrayList<>(), subsequentLevel);
 	}
 
 	public UseAbilityCommand(
 		final MapPoint agent, final AbilityAgentType agentType,
 		final String ability,
+		final String friendlyAbilityName,
 		final Collection<MapPoint> targetSquares,
 		final Collection<DamageToTarget> targets,
 		final Collection<MapPoint> constructed,
@@ -61,6 +64,7 @@ public class UseAbilityCommand extends Command {
 	) {
 		this.agent = agent;
 		this.agentType = agentType;
+		this.friendlyAbilityName = friendlyAbilityName;
 		this.ability = ability;
 		this.targetSquares = targetSquares;
 		this.targets = targets;
@@ -84,6 +88,7 @@ public class UseAbilityCommand extends Command {
 		r.put("agent", agent.getJSON());
 		r.put("agentType", agentType.toString());
 		r.put("ability", ability);
+		r.put("fability", friendlyAbilityName);
 		r.put("subsequentLevel", subsequentLevel);
 		final JSONArray ta = new JSONArray();
 		for (DamageToTarget d : targets) ta.put(d.getJSON());
@@ -107,6 +112,7 @@ public class UseAbilityCommand extends Command {
 			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
 			final AbilityAgentType agentType = AbilityAgentType.fromString(json.getString("agentType"));
 			final String ability = json.getString("ability");
+			final String friendlyAbilityName = json.getString("fability");
 			final JSONArray rawTargets = json.getJSONArray("targets");
 			final JSONArray rawTargetSquares = json.getJSONArray("targetSquares");
 			final JSONArray rawConstructed = json.getJSONArray("constructed");
@@ -131,8 +137,8 @@ public class UseAbilityCommand extends Command {
 			}
 
 			return new UseAbilityCommand(
-				agent, agentType, ability, targetSquares, targets,
-				constructed, subsequentLevel);
+				agent, agentType, ability, friendlyAbilityName,
+				targetSquares, targets, constructed, subsequentLevel);
 
 		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing ability command, " + e.getMessage(), e);
@@ -149,7 +155,7 @@ public class UseAbilityCommand extends Command {
 			.orElse(null);
 
 		if (abilityData == null && agentType == AbilityAgentType.CHARACTER)
-			throw new CommandException("52: No such ability");
+			throw new CommandException("52: No such ability " + ability);
 
 		final List<Targetable> r = new ArrayList<>();
 
@@ -164,7 +170,7 @@ public class UseAbilityCommand extends Command {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));
 			r.addAll(battle.battleState.getCharacterAt(agent)
 				.map(c -> battle.createTrap(abilityData, c, realTargets))
-				.orElseThrow(() -> new CommandException("53: Missing ability agent")));
+				.orElseThrow(() -> new CommandException("53: Missing ability agent for " + ability)));
 
 		} else {
 			battle.battleState.getCharacterAt(agent).ifPresent(c -> r.add(c));

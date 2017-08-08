@@ -17,8 +17,10 @@ import org.json.JSONObject;
 public class HPStatusEffect extends StatusEffect {
 	private final int hp;
 
-	public HPStatusEffect(StatusEffectInfo info, int hp) {
-		super(info);
+	public HPStatusEffect(
+		final StatusEffectInfo info, final int hp, final int startTurn
+	) {
+		super(info, startTurn);
 
 		this.hp = hp;
 	}
@@ -27,25 +29,29 @@ public class HPStatusEffect extends StatusEffect {
 	public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		r.put("info", info.toString());
+		r.put("startTurn", startTurn);
 		r.put("hp", hp);
 		return r;
 	}
 
-	public static HPStatusEffect fromJSON(JSONObject o)
+	public static HPStatusEffect fromJSON(final JSONObject o)
 		throws ProtocolException
 	{
 		try {
 			final StatusEffectInfo info = new StatusEffectInfo(o.getString("info"));
+			final int startTurn = o.getInt("startTurn");
 			final int hp = o.getInt("hp");
 
-			return new HPStatusEffect(info, hp);
+			return new HPStatusEffect(info, hp, startTurn);
 
 		} catch (JSONException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing hp status effect", e);
 		}
 	}
 
-	@Override public List<Command> doBeforeTurn(Battle battle, Character c) {
+	@Override public List<Command> doBeforeTurn(
+		final Battle battle, final Character c
+	) {
 		c.pointsBuff(0, 0, hp);
 		return new ArrayList<>();
 	}

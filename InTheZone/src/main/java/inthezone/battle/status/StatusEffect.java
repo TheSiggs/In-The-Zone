@@ -14,21 +14,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class StatusEffect implements HasJSONRepresentation {
-	private static final int TOTAL_ROUNDS = 2;
-	private int remainingTurns = TOTAL_ROUNDS;
+	private static final int TOTAL_TURNS = 4;
+	protected final int startTurn;
 	public StatusEffectInfo info;
 
 	@Override public String toString() {
 		return info.toString();
 	}
 
-	public StatusEffect(StatusEffectInfo info) {
+	public StatusEffect(final StatusEffectInfo info, final int startTurn) {
 		this.info = info;
+		this.startTurn = startTurn;
 	}
 
-	public final boolean canRemoveNow() {
-		remainingTurns -= 1;
-		return remainingTurns <= 0;
+	public final boolean canRemoveNow(final int turn) {
+		return turn - startTurn >= TOTAL_TURNS;
 	}
 
 	public final StatusEffectInfo getInfo() {
@@ -38,7 +38,7 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	public double getAttackBuff() {return 0.0;}
 	public double getDefenceBuff() {return 0.0;}
 	public double getChanceBuff() {return 0.0;}
-	public List<Command> doBeforeTurn(Battle battle, Character c) {
+	public List<Command> doBeforeTurn(final Battle battle, final Character c) {
 		return new ArrayList<>();
 	}
 
@@ -46,7 +46,7 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 		return new Stats();
 	}
 
-	public List<Command> doNow(Character c) {
+	public List<Command> doNow(final Character c) {
 		return new ArrayList<>();
 	}
 
@@ -57,7 +57,7 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	 * time.  This command supplies the extra information.  It should be called
 	 * before applying a status effect to a character.
 	 * */
-	public StatusEffect resolve(BattleState battle) throws ProtocolException {
+	public StatusEffect resolve(final BattleState battle) throws ProtocolException {
 		return this;
 	}
 

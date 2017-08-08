@@ -133,6 +133,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 	public void newLoadout() {
 		try {
 			final LoadoutModel m = new LoadoutModel(parent.gameData);
+			m.name.setValue(parent.config.newLoadoutName());
 			final LoadoutFrame cell =
 				new LoadoutFrame(parent, this, Optional.of(m.encodeLoadout()));
 			loadouts.getChildren().add(0, cell);
@@ -142,7 +143,8 @@ public class LoadoutOverview extends DialogScreen<Void> {
 				v -> cell.updateView(v));
 
 		} catch (CorruptDataException e) {
-			Alert a = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+			final Alert a = new Alert(
+				Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Game data corrupt");
 			a.showAndWait();
 			System.exit(1);

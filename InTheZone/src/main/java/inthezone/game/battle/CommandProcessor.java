@@ -71,7 +71,7 @@ public class CommandProcessor {
 
 					if (ua.placedTraps) view.hud.writeMessage(name + " sets a trap!");
 					else if (ua.placedZones) view.hud.writeMessage(name + " places a zone!");
-					else view.hud.writeMessage(name + " uses " + ua.ability + "!");
+					else view.hud.writeMessage(name + " uses " + ua.friendlyAbilityName + "!");
 
 					break;
 				case ZONE:

@@ -45,6 +45,9 @@ public class BattleState {
 
 	private final Set<MapPoint> terrainObstacles;
 
+	private int turn = 0;
+	public int getTurnNumber() { return turn; }
+
 	public BattleState(
 		final Stage terrain,
 		final Collection<Character> characters
@@ -148,6 +151,7 @@ public class BattleState {
 	 * To be called once at the start of each turn.
 	 * */
 	public void notifyTurn() {
+		turn += 1;
 		for (Zone z : zones) z.notifyTurn();
 	}
 

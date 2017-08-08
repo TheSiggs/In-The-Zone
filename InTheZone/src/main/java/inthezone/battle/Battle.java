@@ -47,10 +47,12 @@ public class Battle {
 	 * @return A list of affected zones
 	 * */
 	public List<Zone> doTurnStart(final Player player) {
+		battleState.notifyTurn();
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
-		battleState.notifyTurn();
+		for (Character c : battleState.characters) c.cleanupStatus(this);
+
 		return battleState.removeExpiredZones();
 	}
 	

@@ -8,10 +8,10 @@ public class BasicStatusEffect extends StatusEffect {
 	private final double chanceBuff;
 
 	public BasicStatusEffect(
-		StatusEffectInfo info,
-		double attackBuff, double defenceBuff, double chanceBuff
+		final StatusEffectInfo info, final int startTurn,
+		final double attackBuff, final double defenceBuff, final double chanceBuff
 	) {
-		super(info);
+		super(info, startTurn);
 
 		this.attackBuff = attackBuff;
 		this.defenceBuff = defenceBuff;

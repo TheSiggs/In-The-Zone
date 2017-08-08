@@ -24,8 +24,10 @@ public class FearedStatusEffect extends StatusEffect {
 	private final Character agent;
 	private final int g;
 
-	public FearedStatusEffect(StatusEffectInfo info, Character agent) {
-		super(info);
+	public FearedStatusEffect(
+		final StatusEffectInfo info, final Character agent, final int startTurn
+	) {
+		super(info, startTurn);
 		this.agentPos = agent.getPos();
 		this.agent = agent;
 		g = info.param;
@@ -34,8 +36,10 @@ public class FearedStatusEffect extends StatusEffect {
 	/**
 	 * Construct an unresolved FearedStatusEffect
 	 * */
-	private FearedStatusEffect(StatusEffectInfo info, MapPoint agent) {
-		super(info);
+	private FearedStatusEffect(
+		final StatusEffectInfo info, final MapPoint agent, final int startTurn
+	) {
+		super(info, startTurn);
 		this.agent = null;
 		this.agentPos = agent;
 		g = info.param;
@@ -45,18 +49,20 @@ public class FearedStatusEffect extends StatusEffect {
 	public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		r.put("info", info.toString());
+		r.put("startTurn", startTurn);
 		r.put("agent", agentPos.getJSON());
 		return r;
 	}
 
-	public static FearedStatusEffect fromJSON(JSONObject o)
+	public static FearedStatusEffect fromJSON(final JSONObject o)
 		throws ProtocolException
 	{
 		try {
 			final MapPoint agent = MapPoint.fromJSON(o.getJSONObject("agent"));
+			final int startTurn = o.getInt("startTurn");
 			final StatusEffectInfo info = new StatusEffectInfo(o.getString("info"));
 
-			return new FearedStatusEffect(info, agent);
+			return new FearedStatusEffect(info, agent, startTurn);
 
 		} catch (JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing feared status effect", e);
@@ -64,15 +70,15 @@ public class FearedStatusEffect extends StatusEffect {
 	}
 
 	@Override
-	public StatusEffect resolve(BattleState battle) throws ProtocolException {
+	public StatusEffect resolve(final BattleState battle) throws ProtocolException {
 		if (agent != null) return this; else {
 			return new FearedStatusEffect(info, 
 				battle.getCharacterAt(agentPos).orElseThrow(() ->
-					new ProtocolException("Cannot find feared agent")));
+					new ProtocolException("Cannot find feared agent")), startTurn);
 		}
 	}
 
-	public List<Command> doBeforeTurn(Battle battle, Character c) {
+	public List<Command> doBeforeTurn(final Battle battle, final Character c) {
 		if (c.isDead()) return new ArrayList<>();
 
 		final Collection<MapPoint> targets = new ArrayList<>();

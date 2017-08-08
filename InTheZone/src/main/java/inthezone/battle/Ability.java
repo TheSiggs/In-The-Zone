@@ -132,10 +132,12 @@ public class Ability {
 	}
 
 
-	private double healingFormula(final boolean manaBonus, final double q, Stats t) {
+	private double healingFormula(
+		final boolean manaBonus, final double q, final Stats t
+	) {
 		return (const_h * (q + (manaBonus? const_m : 0)) *
 			(0.9 + (0.2 * Math.random())) *
-			(double) t.hp) / const_i;
+			Math.max(1.0, (double) (t.hp))) / const_i;
 	}
 
 	/**
@@ -156,7 +158,6 @@ public class Ability {
 		double damage = info.heal?
 			healingFormula(a.hasMana(), info.eff, tStats) :
 			damageFormula(a.hasMana(), r, a.getAttackBuff(), t.getDefenceBuff(), aStats, tStats);
-		if (t.isDead() && info.heal) damage = 0; // healing doesn't affect the dead
 		final int rdamage = ((int) Math.ceil(damage)) * (info.heal? -1 : 1);
 
 		final double chance = info.chance + a.getChanceBuff();

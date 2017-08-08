@@ -25,16 +25,16 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	private final Set<MapPoint> ineligible;
 
 	public UseAbilityCommandRequest(
-		MapPoint agent, AbilityAgentType agentType,
-		Ability ability, Collection<Casting> castings
+		final MapPoint agent, final AbilityAgentType agentType,
+		final Ability ability, final Collection<Casting> castings
 	) {
 		this(agent, agentType, ability, new HashSet<>(), castings);
 	}
 
 	public UseAbilityCommandRequest(
-		MapPoint agent, AbilityAgentType agentType,
-		Ability ability, Collection<MapPoint> ineligible,
-		Collection<Casting> castings
+		final MapPoint agent, final AbilityAgentType agentType,
+		final Ability ability, final Collection<MapPoint> ineligible,
+		final Collection<Casting> castings
 	) {
 		this.agent = agent;
 		this.agentType = agentType;
@@ -59,9 +59,11 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		for (Casting casting : castings) {
 			final Set<MapPoint> area = battleState.getAffectedArea(agent, agentType, ability, casting);
 
-			Collection<Targetable> targets = battleState.getAbilityTargets(agent, agentType, ability, area)
-				.stream().filter(t -> !targeted.contains(t.getPos()) && !ineligible.contains(t.getPos()))
-				.collect(Collectors.toList());
+			final Collection<Targetable> targets =
+				battleState.getAbilityTargets(agent, agentType, ability, area)
+					.stream().filter(t ->
+						!targeted.contains(t.getPos()) && !ineligible.contains(t.getPos()))
+					.collect(Collectors.toList());
 
 			System.err.println("Casting " + casting + " with agent " + agent + " yielded " + targets + " with aoe " + ability.info.range.radius + " in area " + area);
 
@@ -75,7 +77,9 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	}
 
 	@Override
-	public List<Command> makeCommand(BattleState battleState) throws CommandException {
+	public List<Command> makeCommand(final BattleState battleState)
+		throws CommandException
+	{
 		final Collection<MapPoint> targetSquares = castings.stream()
 			.map(c -> c.target).collect(Collectors.toList());
 
@@ -162,11 +166,11 @@ public class UseAbilityCommandRequest extends CommandRequest {
 	}
 
 	private InstantEffectCommand makeInstantEffect(
-		BattleState battleState,
-		List<Casting> effectTargets,
-		InstantEffectInfo effect,
-		Optional<UseAbilityCommand> postCommand,
-		Optional<InstantEffectCommand> postEffect
+		final BattleState battleState,
+		final List<Casting> effectTargets,
+		final InstantEffectInfo effect,
+		final Optional<UseAbilityCommand> postCommand,
+		final Optional<InstantEffectCommand> postEffect
 	) throws CommandException {
 		Collection<MapPoint> targetArea = castings.stream()
 			.flatMap(casting -> battleState.getAffectedArea(

@@ -2200,7 +2200,7 @@
             "pp": 0,
             "mp": 0,
             "chance": 1,
-            "eff": 0,
+            "eff": 1.5,
             "range": {
               "los": true,
               "piercing": false,
@@ -2215,30 +2215,7 @@
             "zone": "None",
             "instantBefore": "REVIVE",
             "name": "Revive",
-            "heal": false,
-            "subsequent": {
-              "pp": 0,
-              "mp": 0,
-              "chance": 1,
-              "eff": 1.5,
-              "range": {
-                "los": true,
-                "piercing": false,
-                "range": 0,
-                "targetMode": "SA",
-                "radius": 0,
-                "nTargets": 1
-              },
-              "media": {"icon": "abilities/default.png"},
-              "type": "special",
-              "ap": 0,
-              "zone": "None",
-              "name": "Revive II",
-              "heal": true,
-              "banned": false,
-              "trap": false,
-              "recursion": 0
-            },
+            "heal": true,
             "banned": false,
             "trap": false,
             "recursion": 0
@@ -12112,6 +12089,6 @@
       "sprites": []
     }
   ],
-  "version": "dc876117-1f56-4bb1-b842-3d4c9c8e3bd4",
-  "versionNumber": 214
+  "version": "a2f91502-a3f1-4ec2-a1ab-9efeddabd65f",
+  "versionNumber": 215
 }

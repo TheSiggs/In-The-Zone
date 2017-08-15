@@ -80,7 +80,7 @@ public class SpriteManager {
 	/**
 	 * Get a character by its position.
 	 * */
-	public Optional<Character> getCharacterAt(MapPoint p) {
+	public Optional<Character> getCharacterAt(final MapPoint p) {
 		return characters.values().stream()
 			.filter(c -> c.getPos().equals(p)).findFirst();
 	}
@@ -133,7 +133,7 @@ public class SpriteManager {
 	 * */
 	public void updateCharacters(final List<? extends Targetable> characters) {
 		if (this.characters.isEmpty()) {
-			for (Targetable t : characters) {
+			for (final Targetable t : characters) {
 				if (t instanceof Character) {
 					final Character c = (Character) t;
 					this.characters.put(c.id, c);
@@ -143,7 +143,7 @@ public class SpriteManager {
 			view.hud.init(this.characters.values());
 
 		} else {
-			for (Targetable t : characters) {
+			for (final Targetable t : characters) {
 				if (t instanceof Character) {
 					final Character c = (Character) t;
 					final Character old = this.characters.get(c.id);
@@ -177,7 +177,7 @@ public class SpriteManager {
 	private void handleTemporaryImmobileObjects(
 		final Collection<? extends Targetable> tios
 	) {
-		for (Targetable t : tios) {
+		for (final Targetable t : tios) {
 			if (t instanceof Character) {
 				continue;
 
@@ -186,13 +186,13 @@ public class SpriteManager {
 				final Stage stage = view.getStage();
 
 				if (z.reap()) {
-					for (MapPoint p : z.range) {
+					for (final MapPoint p : z.range) {
 						final Sprite s = zones.remove(p);
 						if (s != null) stage.removeSprite(s);
 					}
 
 				} else if (!zones.containsKey(z.centre)) {
-					for (MapPoint p : z.range) {
+					for (final MapPoint p : z.range) {
 						final Sprite s = new Sprite(z.getSprite());
 						s.setPos(p);
 						zones.put(p, s);

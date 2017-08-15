@@ -109,7 +109,7 @@ public class ReplayHUD extends HUD {
 	@Override public void init(final Collection<Character> characters) {
 		super.init(characters);
 
-		for (Character c : characters) {
+		for (final Character c : characters) {
 			if (c.player == Player.PLAYER_A) {
 				characterInfoBoxes1.getChildren().add(this.characters.get(c.id));
 			} else if (c.player == Player.PLAYER_B) {

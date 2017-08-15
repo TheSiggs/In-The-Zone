@@ -33,7 +33,7 @@ public class ModalDialog extends Group {
 	) {
 		closeModalDialog();
 
-		for (ButtonType bt : pane.getButtonTypes()) {
+		for (final ButtonType bt : pane.getButtonTypes()) {
 			pane.lookupButton(bt).setOnMouseClicked(event -> {
 				if (event.getButton() == MouseButton.PRIMARY) {
 					closeModalDialog();

@@ -68,7 +68,7 @@ public abstract class HUD extends AnchorPane {
 		final int id = oc.map(c -> c.id).orElse(-1);
 		oc.ifPresent(c -> updateAbilities(c, c.hasMana()));
 
-		for (CharacterInfoBox box : characters.values())
+		for (final CharacterInfoBox box : characters.values())
 			box.setSelected(box.id == id);
 	}
 
@@ -103,7 +103,7 @@ public abstract class HUD extends AnchorPane {
 		pushItem.cannotUseThis.set(c.isDead() || c.isStunned() ||
 			c.getAP() < 1 || notMyTurn);
 
-		for (Ability a : c.abilities) {
+		for (final Ability a : c.abilities) {
 			final Ability ability = mana ? a.getMana() : a;
 
 			final CommandButton i = new CommandButton(ability.info.media.icon,
@@ -120,7 +120,7 @@ public abstract class HUD extends AnchorPane {
 	}
 
 	public void init(final Collection<Character> characters) {
-		for (Character c : characters) {
+		for (final Character c : characters) {
 			if (c.player != view.player && view.player != Player.PLAYER_OBSERVER)
 				continue;
 

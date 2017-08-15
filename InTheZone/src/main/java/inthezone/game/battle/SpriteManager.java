@@ -1,10 +1,5 @@
 package inthezone.game.battle;
 
-import isogame.engine.AnimationChain;
-import isogame.engine.MapPoint;
-import isogame.engine.Sprite;
-import isogame.engine.Stage;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,6 +14,11 @@ import inthezone.battle.Trap;
 import inthezone.battle.Zone;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
+import isogame.engine.MapPoint;
+import isogame.engine.MoveSpriteAnimation;
+import isogame.engine.Sprite;
+import isogame.engine.Stage;
+import isogame.engine.TeleportAnimation;
 
 /**
  * A class to keep track of all the sprites.
@@ -52,20 +52,18 @@ public class SpriteManager {
 		this.standardSprites = standardSprites;
 		this.decals = decals;
 
-		for (Sprite s : this.sprites) {
-			final Stage stage = view.getStage();
-			stage.addSprite(s);
-			s.setDecalRenderer(decals);
+		for (final Sprite s : this.sprites) {
+			view.getStage().addSprite(s);
+			// TODO: hook decals here
 
-			final AnimationChain chain = new AnimationChain(s);
-			stage.registerAnimationChain(chain);
-			chain.doOnFinished(() -> {
+			s.doOnExternalAnimationFinished(() -> {
 				final Character c = characters.get((Integer) s.userData);
 				s.setAnimation(c.isDead()? "dead" : "idle");
 
 				spritesInMotion -= 1;
 				if (spritesInMotion < 0) {
-					throw new RuntimeException("Invalid UI state.  Untracked animation detected");
+					throw new RuntimeException(
+						"Invalid UI state.  Untracked animation detected");
 				} else if (spritesInMotion == 0) {
 					spritesInMotion = 0;
 					onAnimationsFinished.run();
@@ -91,13 +89,12 @@ public class SpriteManager {
 	 * Schedule a teleport operation.
 	 * */
 	public void scheduleTeleport(final Character a, final MapPoint t) {
-		final Stage stage = view.getStage();
-
 		final int id = a.id;
-		final Sprite s = stage.allSprites.stream()
-			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
+		final Sprite s = view.getStage().allSprites.stream()
+			.filter(x -> x.userData != null && x.userData.equals(id))
+			.findFirst().get();
 
-		stage.queueTeleportSprite(s, t);
+		s.queueExternalAnimation(new TeleportAnimation(s, t));
 		spritesInMotion += 1;
 	}
 
@@ -116,15 +113,18 @@ public class SpriteManager {
 
 		final int id = affected.id;
 		final Sprite s = stage.allSprites.stream()
-			.filter(x -> x.userData != null && x.userData.equals(id)).findFirst().get();
+			.filter(x -> x.userData != null && x.userData.equals(id))
+			.findFirst().get();
 
-		for (MapPoint p : path.subList(2, path.size())) {
-			stage.queueMoveSprite(s, start, end, animation, speed);
+		for (final MapPoint p : path.subList(2, path.size())) {
+			s.queueExternalAnimation(new MoveSpriteAnimation(
+				start, end, s, animation, speed, stage.terrain));
 			start = end;
 			end = p;
 		}
 
-		stage.queueMoveSprite(s, start, end, animation, speed);
+		s.queueExternalAnimation(new MoveSpriteAnimation(
+			start, end, s, animation, speed, stage.terrain));
 		spritesInMotion += 1;
 	}
 
@@ -194,7 +194,7 @@ public class SpriteManager {
 				} else if (!zones.containsKey(z.centre)) {
 					for (MapPoint p : z.range) {
 						final Sprite s = new Sprite(z.getSprite());
-						s.pos = p;
+						s.setPos(p);
 						zones.put(p, s);
 						stage.addSprite(s);
 					}
@@ -207,7 +207,7 @@ public class SpriteManager {
 
 				} else if (!roadblocks.containsKey(t.getPos())) {
 					final Sprite s = new Sprite(t.getSprite());
-					s.pos = t.getPos();
+					s.setPos(t.getPos());
 					view.getStage().addSprite(s);
 					roadblocks.put(t.getPos(), s);
 
@@ -233,7 +233,7 @@ public class SpriteManager {
 						s = new Sprite(standardSprites.trap);
 					}
 
-					s.pos = t.getPos();
+					s.setPos(t.getPos());
 					view.getStage().addSprite(s);
 					traps.put(t.getPos(), s);
 				}

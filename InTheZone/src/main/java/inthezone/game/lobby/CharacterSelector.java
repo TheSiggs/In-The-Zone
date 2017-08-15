@@ -110,8 +110,7 @@ public class CharacterSelector extends Canvas {
 
 		gx.save();
 		gx.translate(i * cw, 0);
-		a.renderFrame(gx, 0, (int) GlobalConstants.TILEW, 0,
-			CameraAngle.UL, FacingDirection.DOWN);
+		a.drawFrame(gx, 0, CameraAngle.UL, FacingDirection.DOWN);
 		gx.restore();
 	}
 

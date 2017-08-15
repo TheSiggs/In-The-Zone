@@ -58,7 +58,7 @@ public class BattleState {
 		this.targetable.addAll(characters);
 
 		terrainObstacles = new HashSet<>(terrain.allSprites.stream()
-			.map(s -> s.pos).collect(Collectors.toList()));
+			.map(s -> s.getPos()).collect(Collectors.toList()));
 
 		updateRevengeBonus();
 	}

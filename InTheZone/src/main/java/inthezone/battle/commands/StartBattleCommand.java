@@ -84,8 +84,8 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		for (Character c : characters) {
 			Sprite s = new Sprite(c.sprite);
 			s.userData = c.id;
-			s.pos = c.getPos();
-			s.direction = FacingDirection.DOWN;
+			s.setPos(c.getPos());
+			s.setDirection(FacingDirection.DOWN);
 			sprites.add(s);
 		}
 

@@ -1,24 +1,14 @@
 package inthezone.game.lobby;
 
-import inthezone.battle.commands.StartBattleCommandRequest;
-import inthezone.battle.data.CharacterProfile;
-import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Loadout;
-import inthezone.battle.data.Player;
-import inthezone.game.ClientConfig;
-import inthezone.game.DialogScreen;
-import inthezone.game.guiComponents.RollingChoiceBox;
-import isogame.engine.CorruptDataException;
-import isogame.engine.FacingDirection;
-import isogame.engine.Highlighter;
-import isogame.engine.KeyBinding;
-import isogame.engine.MapPoint;
-import isogame.engine.MapView;
-import isogame.engine.Sprite;
-import isogame.engine.Stage;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -29,16 +19,26 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import javafx.scene.paint.Paint;
+
+import inthezone.battle.commands.StartBattleCommandRequest;
+import inthezone.battle.data.CharacterProfile;
+import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Loadout;
+import inthezone.battle.data.Player;
+import inthezone.game.ClientConfig;
+import inthezone.game.DialogScreen;
+import inthezone.game.guiComponents.RollingChoiceBox;
+import isogame.engine.CorruptDataException;
+import isogame.engine.FacingDirection;
+import isogame.engine.KeyBinding;
+import isogame.engine.MapPoint;
+import isogame.engine.MapView;
+import isogame.engine.Sprite;
+import isogame.engine.Stage;
 
 /**
  * Gather all the information required to issue / respond to a challenge.
@@ -167,14 +167,14 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
 		for (Loadout l : config.loadouts) loadouts.add(l);
 
-		final Highlighter[] highlights =
-			new Highlighter[] {new Highlighter(Color.rgb(0x00, 0x00, 0xFF, 0.2))};
+		final Paint[] highlights =
+			new Paint[] {Color.rgb(0x00, 0x00, 0xFF, 0.2)};
 
 		this.startPosChooser = new MapView(this,
 			useStage.map(s -> gameData.getStage(s)).orElse(null),
 			true, false, highlights);
-		startPosChooser.widthProperty().bind(this.widthProperty());
-		startPosChooser.heightProperty().bind(this.heightProperty());
+		//startPosChooser.widthProperty().bind(this.widthProperty());
+		//startPosChooser.heightProperty().bind(this.heightProperty());
 		startPosChooser.startAnimating();
 
 		startPosChooser.keyBindings.keys.put(
@@ -310,8 +310,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 				final Sprite s = new Sprite(player == Player.PLAYER_A?
 					c.rootCharacter.spriteA : c.rootCharacter.spriteB);
 				s.setAnimation("walk");
-				s.pos = p;
-				s.direction = FacingDirection.UP;
+				s.setPos(p);
+				s.setDirection(FacingDirection.UP);
 
 				characterSelector.setSelectedCharacter(Optional.empty());
 

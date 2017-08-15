@@ -143,8 +143,6 @@ public class BattleView
 			gameData.getStage(startBattle.stage), true, false,
 			Highlighters.highlights);
 
-		//canvas.widthProperty().bind(this.widthProperty());
-		//canvas.heightProperty().bind(this.heightProperty());
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
 		canvas.doOnSelection(

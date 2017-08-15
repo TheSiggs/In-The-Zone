@@ -173,8 +173,6 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		this.startPosChooser = new MapView(this,
 			useStage.map(s -> gameData.getStage(s)).orElse(null),
 			true, false, highlights);
-		//startPosChooser.widthProperty().bind(this.widthProperty());
-		//startPosChooser.heightProperty().bind(this.heightProperty());
 		startPosChooser.startAnimating();
 
 		startPosChooser.keyBindings.keys.put(
@@ -295,7 +293,6 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			}
 			startPosChooser.setSelectable(tiles);
 			startPosChooser.setHighlight(tiles, 0);
-
 		}
 
 		setDoneButtonState();

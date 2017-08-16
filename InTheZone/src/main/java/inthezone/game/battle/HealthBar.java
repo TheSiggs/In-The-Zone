@@ -48,7 +48,9 @@ public class HealthBar extends Group {
 		this.getChildren().addAll(background, health, hpChangeLabel);
 	}
 
-	public void updateHP(int hp, int maxHP, boolean cover) {
+	public void updateHP(
+		final int hp, final int maxHP, final boolean cover
+	) {
 		this.cover = cover;
 		final int hpChange1 = hp - this.hp;
 		this.hp = hp;

@@ -471,6 +471,7 @@ public class BattleView
 	}
 
 	public void handleEndBattle(final Optional<BattleOutcome> outcome) {
+		canvas.stopAnimating();
 		onDone.accept(outcome);
 	}
 

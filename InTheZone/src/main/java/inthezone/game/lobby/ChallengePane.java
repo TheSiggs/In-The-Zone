@@ -217,6 +217,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		});
 
 		cancelButton.setOnAction(event -> {
+			startPosChooser.stopAnimating();
 			onDone.accept(Optional.empty());
 		});
 
@@ -233,6 +234,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 				final List<MapPoint> startTiles = l.characters.stream()
 					.map(c -> characterPositions.get(c.rootCharacter.name))
 					.collect(Collectors.toList());
+				startPosChooser.stopAnimating();
 				onDone.accept(Optional.of(new StartBattleCommandRequest(
 					s, player, thisPlayerName, l, startTiles)));
 			}

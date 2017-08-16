@@ -1,26 +1,21 @@
 package inthezone.game.battle;
 
-import isogame.engine.Sprite;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+
 import static isogame.GlobalConstants.TILEH;
 import static isogame.GlobalConstants.TILEW;
 
-public class HealthBar {
-	private int hp;
-	private int maxHP;
+public class HealthBar extends Group {
+	private int hp = 0;
+	private int maxHP = 0;
+	private boolean cover = false;
 
 	private int hpChange = 0;
-
-	private double targetPosition;
-	private double position = 1.0;
-	private double untilFade = 0.0;
-	private double alpha = 0;
-	private boolean hiding = true;
-
-	private long t0 = 0;
 
 	private final static double nanos = 1000000000.0;
 	private final static double hidingSpeed = 2.0 / nanos;
@@ -30,93 +25,55 @@ public class HealthBar {
 	// The delay before fading after changes to a character's health
 	private final static double fadeDelay = 2.0 * nanos;
 
-	private final static Paint background = Color.color(1.0f, 0.0f, 0.0f);
-	private final static Paint health = Color.color(0.0f, 1.0f, 0.0f);
-	private final static Paint cover_background = Color.color(1.0f, 0.65f, 0.0f);
-	private final static Paint cover_health = Color.color(1.0f, 1.00f, 0.0f);
+	private final static Paint backgroundPaint = Color.color(1.0f, 0.0f, 0.0f);
+	private final static Paint healthPaint = Color.color(0.0f, 1.0f, 0.0f);
+	private final static Paint coverBackgroundPaint = Color.color(1.0f, 0.65f, 0.0f);
+	private final static Paint coverHealthPaint = Color.color(1.0f, 1.00f, 0.0f);
+
+	private static final Font hpChangeFont = new Font(48d);
 
 	private final static double X = TILEW * 0.35;
 	private final static double Y = 0;
 	private final static double W = TILEW * 0.3;
 	private final static double H = TILEH * 1.0/16.0;
 
-	public HealthBar(int hp, int maxHP) {
+	private final Rectangle health = new Rectangle(X, Y, W, H);
+	private final Rectangle background = new Rectangle(X + W, Y, 0, H);
+	private final Text hpChangeLabel = new Text();
+
+	public HealthBar() {
+		hpChangeLabel.setVisible(false);
+		hpChangeLabel.setFont(hpChangeFont);
+		hpChangeLabel.setFill(Color.RED);
+		this.getChildren().addAll(background, health, hpChangeLabel);
+	}
+
+	public void updateHP(int hp, int maxHP, boolean cover) {
+		this.cover = cover;
+		final int hpChange1 = hp - this.hp;
 		this.hp = hp;
 		this.maxHP = maxHP;
-		targetPosition = (double) hp / (double) maxHP;
-	}
 
-	public void updateHP(int hp, int maxHP) {
-		hpChange = hp - this.hp;
-		this.hp = hp;
-		this.maxHP = maxHP;
-		targetPosition = (double) hp / (double) maxHP;
-	}
+		final double d = (W * (double) maxHP) / (double) hp;
 
-	public void show() {
-		hiding = false;
-	}
+		health.setWidth(d);
+		background.setX(X + d);
+		background.setWidth(W - d);
 
-	public void hide() {
-		hiding = true;
-	}
-
-	private static final Font hpChangeFont = new Font(48d);
-
-	/**
-	 * Render a health bar
-	 * @param t The timestamp of the current frame in nanoseconds
-	 * */
-	public void render(GraphicsContext cx, Sprite s, long t, boolean cover) {
-		updateAnimations(t);
-		if (alpha == 0) return;
-
-		double d = W * position;
-
-		cx.save();
-		cx.setGlobalAlpha(alpha);
-		cx.setFill(cover? cover_background : background);
-		cx.fillRect(X + d, Y, W - d, H);
-		cx.setFill(cover? cover_health : health);
-		cx.fillRect(X, Y, d, H);
-		cx.restore();
-
-		if (hpChange != 0) {
-			cx.setFill(background);
-			cx.setFont(hpChangeFont);
-			cx.fillText("" + hpChange, X, Y - H);
-		}
-	}
-
-	private void updateAnimations(long t) {
-		if (t0 == 0) t0 = t;
-		double delta = (double) (t - t0);
-		t0 = t;
-
-		if (untilFade > 0) untilFade -= delta;
-
-		if ((!hiding || position != targetPosition) && alpha != 1.0) {
-			alpha += delta * showingSpeed;
-			if (alpha > 1.0) alpha = 1.0;
-		}
-
-		if (position < targetPosition) {
-			position += delta * animatingSpeed;
-			if (position >= targetPosition) {
-				position = targetPosition;
-				untilFade = fadeDelay;
-			}
-
-		} else if (position > targetPosition) {
-			position -= delta * animatingSpeed;
-			if (position <= targetPosition) {
-				position = targetPosition;
-				untilFade = fadeDelay;
-			}
-
+		if (cover) {
+			health.setFill(coverHealthPaint);
+			background.setFill(coverBackgroundPaint);
 		} else {
-			if (hiding && alpha != 0 && untilFade <= 0) alpha -= delta * hidingSpeed;
-			if (alpha < 0) alpha = 0;
+			health.setFill(healthPaint);
+			background.setFill(backgroundPaint);
+		}
+
+		if (hpChange1 != hpChange && hpChange1 != 0) {
+			hpChangeLabel.setVisible(false);
+		} else {
+			hpChangeLabel.setVisible(true);
+			hpChangeLabel.setText("" + hpChange1);
+			this.hpChange = hpChange1;
 		}
 	}
 }

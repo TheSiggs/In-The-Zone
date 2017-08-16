@@ -38,23 +38,27 @@ public class SpriteManager {
 
 	private int spritesInMotion = 0;
 
-	private final DecalRenderer decals;
+	private final Map<Integer, DecalPanel> decals = new HashMap<>();
 
 	private final StandardSprites standardSprites;
 
 	public SpriteManager(
 		final BattleView view, final Collection<Sprite> sprites,
 		final StandardSprites standardSprites,
-		final DecalRenderer decals, final Runnable onAnimationsFinished
+		final Runnable onAnimationsFinished
 	) {
 		this.view = view;
 		this.sprites.addAll(sprites);
 		this.standardSprites = standardSprites;
-		this.decals = decals;
 
 		for (final Sprite s : this.sprites) {
 			view.getStage().addSprite(s);
-			// TODO: hook decals here
+
+			s.setOnChange(parent -> {
+				final DecalPanel panel = decals.get((Integer) s.userData);
+				if (panel != null && !parent.getChildren().contains(panel))
+					parent.getChildren().add(panel);
+			});
 
 			s.doOnExternalAnimationFinished(() -> {
 				final Character c = characters.get((Integer) s.userData);
@@ -128,6 +132,14 @@ public class SpriteManager {
 		spritesInMotion += 1;
 	}
 
+	public void updateSelectionStatus() {
+		final int selectedId =
+			view.getSelectedCharacter().map(c -> c.id).orElse(-1);
+		for (final Integer i : decals.keySet()) {
+			decals.get(i).updateSelectionStatus(i == selectedId);
+		}
+	}
+
 	/**
 	 * Update the character models.
 	 * */
@@ -136,8 +148,11 @@ public class SpriteManager {
 			for (final Targetable t : characters) {
 				if (t instanceof Character) {
 					final Character c = (Character) t;
+					final boolean isSelected = view.getSelectedCharacter()
+						.map(s -> s.id == c.id).orElse(false);
 					this.characters.put(c.id, c);
-					decals.registerCharacter(c);
+					decals.put(c.id, new DecalPanel(standardSprites));
+					decals.get(c.id).updateCharacter(c, isSelected);
 				}
 			}
 			view.hud.init(this.characters.values());
@@ -152,7 +167,10 @@ public class SpriteManager {
 					if (old != null) {
 						final CharacterInfoBox box = view.hud.characters.get(c.id);
 						if (box != null) box.updateCharacter(c);
-						decals.updateCharacter(c);
+
+						final boolean isSelected = view.getSelectedCharacter()
+							.map(s -> s.id == c.id).orElse(false);
+						decals.get(c.id).updateCharacter(c, isSelected);
 
 						final Sprite characterSprite = view.getStage().allSprites.stream()
 							.filter(x -> x.userData != null &&

@@ -134,9 +134,6 @@ public class BattleView
 		this.commands = new CommandProcessor(this);
 		this.hud = hud.apply(this);
 
-		final DecalRenderer decals = new DecalRenderer(this,
-			gameData.getStandardSprites());
-
 		System.err.println("Playing as " + player);
 
 		this.canvas = new MapView(this,
@@ -159,8 +156,6 @@ public class BattleView
 					mode.handleSelection(selection);
 				}
 			});
-		canvas.doOnMouseOverSprite(decals::handleMouseOver);
-		canvas.doOnMouseOutSprite(decals::handleMouseOut);
 		canvas.doOnMouseOver(p -> mode.handleMouseOver(p));
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
 
@@ -187,7 +182,7 @@ public class BattleView
 
 		final Collection<Sprite> allSprites = startBattle.makeSprites();
 		this.sprites = new SpriteManager(
-			this, allSprites, gameData.getStandardSprites(), decals,
+			this, allSprites, gameData.getStandardSprites(),
 			() -> {
 				inAnimation = false;
 
@@ -306,6 +301,7 @@ public class BattleView
 		selectedCharacter = c;
 		isCharacterSelected.setValue(c.isPresent());
 		hud.selectCharacter(c);
+		sprites.updateSelectionStatus();
 	}
 
 	public void cancelAbility() {
@@ -361,6 +357,7 @@ public class BattleView
 		}
 
 		selectedCharacter = Optional.empty();
+		sprites.updateSelectionStatus();
 		isCharacterSelected.setValue(false);
 		hud.selectCharacter(Optional.empty());
 		battle.requestCommand(new EndTurnCommandRequest(player));
@@ -388,6 +385,7 @@ public class BattleView
 		modalDialog.showDialog(dialog, r -> {
 			if (r == ButtonType.YES) {
 				selectedCharacter = Optional.empty();
+				sprites.updateSelectionStatus();
 				isCharacterSelected.setValue(false);
 				hud.selectCharacter(Optional.empty());
 				battle.requestCommand(new ResignCommandRequest(player));

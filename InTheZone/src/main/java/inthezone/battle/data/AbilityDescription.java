@@ -34,6 +34,36 @@ public class AbilityDescription {
 		return s.toString();
 	}
 
+	/**
+	 * Get a description of the object that was created by this ability
+	 * @param mine true if this object was created by one of the player's own
+	 * abilities
+	 * */
+	public String getCreatedObjectDescription(final boolean mine) {
+		if (ability.trap) {
+			final StringBuilder s = new StringBuilder();
+			s.append(ability.name).append("\n\n");
+			generateTrap(s, ability, true);
+			return s.toString();
+
+		} else if (ability.zone != AbilityZoneType.NONE) {
+			final StringBuilder s1 = new StringBuilder();
+			s1.append(ability.name);
+			if (mine) s1.append(" (created by you)");
+			s1.append("\n\n");
+
+			final StringBuilder s2 = new StringBuilder();
+			generateAbility(s2, 0, ability);
+
+			final String zone = s2.toString();
+
+			return s1.toString() +
+				zone.substring(0, 1).toUpperCase() + zone.substring(1);
+		} else {
+			return "";
+		}
+	}
+
 	public String getDescription() {
 		StringBuilder s = new StringBuilder();
 		generateBannedNotice(s, ability);
@@ -99,7 +129,7 @@ public class AbilityDescription {
 		final int maxDistanceFromSelf, final AbilityInfo a
 	) {
 		if (a.trap) {
-			generateTrap(s, a);
+			generateTrap(s, a, false);
 		} else if (a.zone != AbilityZoneType.NONE) {
 			generateZone(s, a);
 		} else {
@@ -163,8 +193,17 @@ public class AbilityDescription {
 		}
 	}
 
-	private static void generateTrap(final StringBuilder s, final AbilityInfo a) {
-		s.append("Place a trap which is activated when stepped on by ");
+	private static void generateTrap(
+		final StringBuilder s,
+		final AbilityInfo a,
+		final boolean describeCreatedObject
+	) {
+		if (describeCreatedObject) {
+			s.append("Activated when stepped on by ");
+		} else {
+			s.append("Place a trap which is activated when stepped on by ");
+		}
+
 		if (a.range.targetMode.enemies && a.range.targetMode.allies && a.range.targetMode.self) {
 			s.append("anyone");
 		} else if (a.range.targetMode.enemies && a.range.targetMode.allies) {

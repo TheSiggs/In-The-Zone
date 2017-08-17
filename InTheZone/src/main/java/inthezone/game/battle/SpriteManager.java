@@ -264,7 +264,8 @@ public class SpriteManager {
 						((Trap) t).parent.player.equals(view.player)
 					) {
 						tooltip = new Tooltip(
-							(new AbilityDescription(((Trap) t).ability.info)).toString());
+							(new AbilityDescription(((Trap) t).ability.info))
+								.getCreatedObjectDescription(true));
 						tooltip.setWrapText(true);
 						tooltip.setPrefWidth(300);
 						s = new Sprite(t.getSprite());

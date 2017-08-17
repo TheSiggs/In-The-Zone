@@ -1,36 +1,31 @@
 package inthezone.game.battle;
 
+import javafx.animation.Animation;
+import javafx.animation.Transition;
+import javafx.animation.TranslateTransition;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import static isogame.GlobalConstants.TILEH;
+import javafx.util.Duration;
 import static isogame.GlobalConstants.TILEW;
+import static isogame.GlobalConstants.TILEH;
 
 public class HealthBar extends Group {
 	private int hp = 0;
 	private int maxHP = 0;
-	private boolean cover = false;
 
-	private int hpChange = 0;
-
-	private final static double nanos = 1000000000d;
-	private final static double hidingSpeed = 2d / nanos;
-	private final static double showingSpeed = 8d / nanos;
-	private final static double animatingSpeed = 1d / nanos;
-
-	// The delay before fading after changes to a character's health
-	private final static double fadeDelay = 2d * nanos;
-
+	private final static Duration animatingSpeed = new Duration(250d);
 	private final static Paint backgroundPaint = Color.color(1.0f, 0.0f, 0.0f);
 	private final static Paint healthPaint = Color.color(0.0f, 1.0f, 0.0f);
 	private final static Paint coverBackgroundPaint = Color.color(1.0f, 0.65f, 0.0f);
 	private final static Paint coverHealthPaint = Color.color(1.0f, 1.00f, 0.0f);
 
+	private static final Paint hpChangeColor = Color.RED;
 	private static final Font hpChangeFont = new Font(32d);
+	private final static double hpChangeTranslation = -30d;
 
 	private final static double X = TILEW * 0.35d;
 	private final static double Y = 0d;
@@ -39,29 +34,43 @@ public class HealthBar extends Group {
 
 	private final Rectangle health = new Rectangle(X, Y, W, H);
 	private final Rectangle background = new Rectangle(X + W, Y, 0d, H);
-	private final Text hpChangeLabel = new Text();
+
+	private boolean inited = false;
+	private double d = W;
+	private Animation hpAnimation = null;
 
 	public HealthBar() {
-		hpChangeLabel.setVisible(false);
+		this.getChildren().addAll(background, health);
+		health.setWidth(d);
+		background.setX(X + d);
+		background.setWidth(W - d);
+	}
+
+	private void doDamage(final String damage) {
+		final Text hpChangeLabel = new Text();
+		this.getChildren().add(hpChangeLabel);
 		hpChangeLabel.setFont(hpChangeFont);
-		hpChangeLabel.setFill(Color.RED);
+		hpChangeLabel.setFill(hpChangeColor);
 		hpChangeLabel.setY(Y - H - 4d);
-		this.getChildren().addAll(background, health, hpChangeLabel);
+		hpChangeLabel.setText(damage);
+		hpChangeLabel.setX((TILEW / 2d) -
+			(hpChangeLabel.getBoundsInLocal().getWidth() / 2d));
+
+		final TranslateTransition animation =
+			new TranslateTransition(new Duration(1000d), hpChangeLabel);
+
+		animation.setByY(hpChangeTranslation);
+		animation.setOnFinished(event -> this.getChildren().remove(hpChangeLabel));
+		animation.play();
 	}
 
 	public void updateHP(
 		final int hp, final int maxHP, final boolean cover
 	) {
-		this.cover = cover;
-		final int hpChange1 = hp - this.hp;
+		final int hp0 = this.hp;
+		final int hpChange = hp - hp0;
 		this.hp = hp;
 		this.maxHP = maxHP;
-
-		final double d = (W * (double) hp) / (double) maxHP;
-
-		health.setWidth(d);
-		background.setX(X + d);
-		background.setWidth(W - d);
 
 		if (cover) {
 			health.setFill(coverHealthPaint);
@@ -71,15 +80,30 @@ public class HealthBar extends Group {
 			background.setFill(backgroundPaint);
 		}
 
-		if (hpChange1 != hpChange && hpChange1 != 0) {
-			hpChangeLabel.setVisible(true);
-			hpChangeLabel.setText("" + hpChange1);
-			hpChangeLabel.setX((TILEW / 2d) -
-				(hpChangeLabel.getBoundsInLocal().getWidth() / 2d));
-		} else {
-			hpChangeLabel.setVisible(false);
+		if (hpChange != 0 && inited) {
+			doDamage("" + hpChange);
+
+			final double d0 = d;
+			final double d1 = (W * (double) hp) / (double) maxHP;
+
+			if (hpAnimation != null) hpAnimation.stop();
+
+			hpAnimation = new Transition() {
+				{
+					setCycleDuration(animatingSpeed);
+				}
+
+				@Override protected void interpolate(final double f) {
+					d = d0 + ((d1 - d0) * f);
+					health.setWidth(d);
+					background.setX(X + d);
+					background.setWidth(W - d);
+				}
+			};
+
+			hpAnimation.play();
 		}
-		this.hpChange = hpChange1;
+		this.inited = true;
 	}
 }
 

@@ -2,9 +2,11 @@ package inthezone.game.battle;
 
 import inthezone.battle.Character;
 import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.StatusEffectDescription;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -22,6 +24,9 @@ public class DecalPanel extends Group {
 	final private ImageView debuff = new ImageView();
 	final private HealthBar healthBar = new HealthBar();
 	final private Shape selectionIndicator;
+
+	final private Tooltip buffTooltip = new Tooltip();
+	final private Tooltip debuffTooltip = new Tooltip();
 
 	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9f);
 
@@ -57,6 +62,17 @@ public class DecalPanel extends Group {
 		debuff.setTranslateX(DEBUFF_X);
 		debuff.setTranslateY(DEBUFF_Y);
 
+		Tooltip.install(buff, buffTooltip);
+		Tooltip.install(debuff, debuffTooltip);
+
+		buff.setMouseTransparent(false);
+		buffTooltip.setWrapText(true);
+		buffTooltip.setPrefWidth(300);
+
+		debuff.setMouseTransparent(false);
+		debuffTooltip.setWrapText(true);
+		debuffTooltip.setPrefWidth(300);
+
 		this.setTranslateY(DECAL_Y);
 	}
 
@@ -80,11 +96,15 @@ public class DecalPanel extends Group {
 
 		c.getStatusBuff().ifPresent(effect -> {
 			buff.setImage(sprites.statusEffects.get(effect.info.type));
+			buffTooltip.setText(new StatusEffectDescription(
+				effect.getInfo()).toString());
 			graph.add(buff);
 		});
 
 		c.getStatusDebuff().ifPresent(effect -> {
 			debuff.setImage(sprites.statusEffects.get(effect.info.type));
+			debuffTooltip.setText(new StatusEffectDescription(
+				effect.getInfo()).toString());
 			graph.add(debuff);
 		});
 	}

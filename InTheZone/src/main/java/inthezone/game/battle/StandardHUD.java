@@ -88,7 +88,13 @@ public class StandardHUD extends HUD {
 		AnchorPane.setLeftAnchor(assistanceLine, 0d);
 		AnchorPane.setRightAnchor(assistanceLine, 0d);
 
+		AnchorPane.setTopAnchor(view.canvas, 0d);
+		AnchorPane.setBottomAnchor(view.canvas, 0d);
+		AnchorPane.setLeftAnchor(view.canvas, 0d);
+		AnchorPane.setRightAnchor(view.canvas, 0d);
+
 		this.getChildren().addAll(
+			view.canvas,
 			assistanceLine, characterInfoBoxes, actionButtons,
 			endTurnButton, resignButton, roundCounterAndClock
 		);

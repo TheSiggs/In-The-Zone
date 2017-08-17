@@ -66,7 +66,7 @@ public class BattleView
 	private Optional<Character> selectedCharacter = Optional.empty();
 
 	// UI components
-	private final MapView canvas;
+	public final MapView canvas;
 	public final HUD hud;
 
 	// Status properties for the HUD
@@ -132,13 +132,15 @@ public class BattleView
 		this.playerBName = startBattle.p2Name;
 
 		this.commands = new CommandProcessor(this);
-		this.hud = hud.apply(this);
 
-		System.err.println("Playing as " + player);
-
+		// must construct the canvas first, because it has to be a child of the HUD
 		this.canvas = new MapView(this,
 			gameData.getStage(startBattle.stage), true, false,
 			Highlighters.highlights);
+
+		this.hud = hud.apply(this);
+
+		System.err.println("Playing as " + player);
 
 		canvas.startAnimating();
 		canvas.setFocusTraversable(true);
@@ -225,7 +227,7 @@ public class BattleView
 		if (startTiles.size() > 0) canvas.centreOnTile(startTiles.get(0));
 
 		setMode(new ModeOtherTurn(this));
-		this.getChildren().addAll(canvas, this.hud, modalDialog);
+		this.getChildren().addAll(this.hud, modalDialog);
 	}
 
 	private Mode mode;

@@ -9,7 +9,7 @@ public class AbilityDescription {
 	private final AbilityInfo ability;
 	private String description;
 
-	public AbilityDescription(AbilityInfo ability) {
+	public AbilityDescription(final AbilityInfo ability) {
 		this.ability = ability;
 		this.description = generateDescription(ability);
 	}
@@ -46,7 +46,7 @@ public class AbilityDescription {
 		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
 	}
 
-	private static String generateDescription(AbilityInfo a) {
+	private static String generateDescription(final AbilityInfo a) {
 		StringBuilder s = new StringBuilder();
 		s.append(a.name).append(" ");
 		generateInfoLine(s, a);
@@ -59,7 +59,9 @@ public class AbilityDescription {
 		return p1 + p2.substring(0, 1).toUpperCase() + p2.substring(1);
 	}
 
-	private static void generateInfoLine(StringBuilder s, AbilityInfo a) {
+	private static void generateInfoLine(
+		final StringBuilder s, final AbilityInfo a
+	) {
 		s.append("(").append(a.type.toString());
 		if (a.isMana) s.append(" / mana");
 		s.append(")");
@@ -73,7 +75,9 @@ public class AbilityDescription {
 		}
 	}
 
-	private static void generateBannedNotice(StringBuilder s, AbilityInfo a) {
+	private static void generateBannedNotice(
+		final StringBuilder s, final AbilityInfo a
+	) {
 		if (a.banned) {
 			s.append("\n");
 			s.append("=== NOTICE ===");
@@ -83,14 +87,16 @@ public class AbilityDescription {
 		}
 	}
 
-	private static void generateAbilityDescription(StringBuilder s, AbilityInfo a) {
+	private static void generateAbilityDescription(
+		final StringBuilder s, final AbilityInfo a
+	) {
 		if (a.isMana) s.append("when standing on a mana zone, ");
 		generateTopLevelAbility(s, true, 0, a);
 	}
 
 	private static void generateTopLevelAbility(
-		StringBuilder s, boolean doItOnce,
-		int maxDistanceFromSelf, AbilityInfo a
+		final StringBuilder s, final boolean doItOnce,
+		final int maxDistanceFromSelf, final AbilityInfo a
 	) {
 		if (a.trap) {
 			generateTrap(s, a);
@@ -123,7 +129,7 @@ public class AbilityDescription {
 		}
 	}
 
-	private static void generateZone(StringBuilder s, AbilityInfo a) {
+	private static void generateZone(final StringBuilder s, final AbilityInfo a) {
 		final boolean isBound = a.zone == AbilityZoneType.BOUND_ZONE;
 		final InstantEffectInfo obstacles;
 
@@ -157,7 +163,7 @@ public class AbilityDescription {
 		}
 	}
 
-	private static void generateTrap(StringBuilder s, AbilityInfo a) {
+	private static void generateTrap(final StringBuilder s, final AbilityInfo a) {
 		s.append("Place a trap which is activated when stepped on by ");
 		if (a.range.targetMode.enemies && a.range.targetMode.allies && a.range.targetMode.self) {
 			s.append("anyone");
@@ -179,7 +185,7 @@ public class AbilityDescription {
 	}
 
 	private static void generateAbility(
-		StringBuilder s, int maxDistanceFromSelf, AbilityInfo a
+		final StringBuilder s, final int maxDistanceFromSelf, final AbilityInfo a
 	) {
 		final int nextMaxDistanceFromSelf = maxDistanceFromSelf + a.range.range;
 
@@ -289,7 +295,7 @@ public class AbilityDescription {
 		}
 	}
 
-	private static String formatDouble(double d, int decimalPlaces) {
+	private static String formatDouble(final double d, final int decimalPlaces) {
 		String r = "" + Math.round(d * (Math.pow(10, decimalPlaces)));
 		while (r.length() < (decimalPlaces + 1)) r = "0" + r;
 		while (r.endsWith("0")) r = r.substring(0, r.length() - 1);
@@ -297,14 +303,14 @@ public class AbilityDescription {
 		if (r.endsWith(".")) return r.substring(0, r.length() - 1); else return r;
 	}
 
-	private static String formatPercent(double d) {
+	private static String formatPercent(final double d) {
 		return "" + Math.round(d * 100) + "%";
 	}
 
 	private static void generateInstantEffect(
-		StringBuilder s, AbilityInfo a,
-		int maxDistanceFromSelf, InstantEffectInfo e,
-		boolean isSecondaryEffect
+		final StringBuilder s, final AbilityInfo a,
+		final int maxDistanceFromSelf, final InstantEffectInfo e,
+		final boolean isSecondaryEffect
 	) {
 		switch (e.type) {
 			case CLEANSE:
@@ -374,7 +380,7 @@ public class AbilityDescription {
 	}
 
 	private static void generateSecondaryTargetMode(
-		StringBuilder s, AbilityInfo a, boolean noTargetCharacters
+		final StringBuilder s, final AbilityInfo a, final boolean noTargetCharacters
 	) {
 		boolean trapZone = a.trap || a.zone == AbilityZoneType.BOUND_ZONE;
 
@@ -397,8 +403,11 @@ public class AbilityDescription {
 	private static final TargetMode selfOnly = new TargetMode("S");
 
 	private static void generateTargetMode(
-		StringBuilder s, AbilityInfo a, int maxDistanceFromSelf,
-		boolean isSecondary, boolean noTargetCharacters
+		final StringBuilder s,
+		final AbilityInfo a,
+		final int maxDistanceFromSelf,
+		final boolean isSecondary,
+		final boolean noTargetCharacters
 	) {
 		if (isSecondary) {
 			generateSecondaryTargetMode(s, a, noTargetCharacters);

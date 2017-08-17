@@ -1,5 +1,11 @@
 package inthezone.game.battle;
 
+import isogame.engine.MapPoint;
+import isogame.engine.MoveSpriteAnimation;
+import isogame.engine.Sprite;
+import isogame.engine.Stage;
+import isogame.engine.TeleportAnimation;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,18 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.scene.control.Tooltip;
+
 import inthezone.battle.Character;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.battle.Trap;
 import inthezone.battle.Zone;
+import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
-import isogame.engine.MapPoint;
-import isogame.engine.MoveSpriteAnimation;
-import isogame.engine.Sprite;
-import isogame.engine.Stage;
-import isogame.engine.TeleportAnimation;
 
 /**
  * A class to keep track of all the sprites.
@@ -41,6 +45,12 @@ public class SpriteManager {
 	private final Map<Integer, DecalPanel> decals = new HashMap<>();
 
 	private final StandardSprites standardSprites;
+
+	private final Tooltip destructibleObjectTooltip =
+		new Tooltip("A destructible obstacle, can be destroyed in 2 hits");
+
+	private final Tooltip destructibleObjectTooltip2 =
+		new Tooltip("A destructible obstacle, can be destroyed in 1 hit");
 
 	public SpriteManager(
 		final BattleView view, final Collection<Sprite> sprites,
@@ -227,6 +237,7 @@ public class SpriteManager {
 
 				} else if (!roadblocks.containsKey(t.getPos())) {
 					final Sprite s = new Sprite(t.getSprite());
+					Tooltip.install(s.sceneGraphNode, destructibleObjectTooltip);
 					s.setPos(t.getPos());
 					view.getStage().addSprite(s);
 					roadblocks.put(t.getPos(), s);
@@ -235,6 +246,9 @@ public class SpriteManager {
 					final Sprite s = roadblocks.get(t.getPos());
 					if (s != null && ((RoadBlock) t).hasBeenHit()) {
 						s.setAnimation("hit");
+						Tooltip.install(s.sceneGraphNode, destructibleObjectTooltip2);
+					} else {
+						Tooltip.install(s.sceneGraphNode, destructibleObjectTooltip);
 					}
 				}
 
@@ -245,13 +259,21 @@ public class SpriteManager {
 
 				} else if (!traps.containsKey(t.getPos())) {
 					final Sprite s;
+					final Tooltip tooltip;
 					if (view.player == Player.PLAYER_OBSERVER ||
 						((Trap) t).parent.player.equals(view.player)
 					) {
+						tooltip = new Tooltip(
+							(new AbilityDescription(((Trap) t).ability.info)).toString());
+						tooltip.setWrapText(true);
+						tooltip.setPrefWidth(300);
 						s = new Sprite(t.getSprite());
 					} else {
+						tooltip = new Tooltip("It's a trap!");
 						s = new Sprite(standardSprites.trap);
 					}
+
+					Tooltip.install(s.sceneGraphNode, tooltip);
 
 					s.setPos(t.getPos());
 					view.getStage().addSprite(s);

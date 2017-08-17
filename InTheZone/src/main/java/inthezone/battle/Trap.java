@@ -24,11 +24,11 @@ public class Trap extends Targetable implements HasParentAgent {
 	@Override public Character getParent() {return parent;}
 
 	public Trap(
-		MapPoint pos,
-		boolean hasMana,
-		Ability ability,
-		Character agent,
-		StandardSprites sprites
+		final MapPoint pos,
+		final boolean hasMana,
+		final Ability ability,
+		final Character agent,
+		final StandardSprites sprites
 	) {
 		this.pos = pos;
 		this.hasMana = hasMana;
@@ -43,16 +43,16 @@ public class Trap extends Targetable implements HasParentAgent {
 	}
 
 	public Trap(
-		MapPoint pos,
-		Ability ability,
-		Character parent,
-		boolean hasMana,
-		double chanceBuff,
-		double attackBuff,
-		double defenceBuff,
-		Stats stats,
-		SpriteInfo sprite,
-		boolean defused
+		final MapPoint pos,
+		final Ability ability,
+		final Character parent,
+		final boolean hasMana,
+		final double chanceBuff,
+		final double attackBuff,
+		final double defenceBuff,
+		final Stats stats,
+		final SpriteInfo sprite,
+		final boolean defused
 	) {
 		this.pos = pos;
 		this.ability = ability;
@@ -73,14 +73,15 @@ public class Trap extends Targetable implements HasParentAgent {
 	@Override public MapPoint getPos() {return pos;}
 	@Override public double getAttackBuff() {return attackBuff;}
 	@Override public double getDefenceBuff() {return defenceBuff;}
-	@Override public void dealDamage(int damage) {return;}
+	@Override public void dealDamage(final int damage) {return;}
 	@Override public void defuse() {defused = true;}
 	@Override public void cleanse() {return;}
 	@Override public void purge() {return;}
 	@Override public void revive() {return;}
-	@Override public void applyStatus(Battle battle, StatusEffect status) {return;}
+	@Override public void applyStatus(
+		final Battle battle, final StatusEffect status) {}
 	@Override public boolean isPushable() {return false;}
-	@Override public boolean isEnemyOf(Character character) {return true;}
+	@Override public boolean isEnemyOf(final Character character) {return true;}
 	@Override public boolean isDead() {return defused;}
 	@Override public SpriteInfo getSprite() {return sprite;}
 	@Override public boolean reap() {return defused;}

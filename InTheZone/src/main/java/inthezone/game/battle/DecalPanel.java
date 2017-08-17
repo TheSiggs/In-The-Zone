@@ -23,15 +23,17 @@ public class DecalPanel extends Group {
 	final private HealthBar healthBar = new HealthBar();
 	final private Shape selectionIndicator;
 
-	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9);
+	private final Color sarrowColor = Color.rgb(0x00, 0xFF, 0x00, 0.9f);
 
-	private static final double BUFF_SCALE = 2.0;
-	private static final double BUFF_X_OFFSET = -40.0;
-	private static final double DEBUFF_X_OFFSET = 25.0;
+	private static final double BUFF_SCALE = 1.5d;
 
-	private final static double BUFF_Y = -20;
-	private final static double BUFF_X = BUFF_X_OFFSET;
-	private final static double DEBUFF_X = DEBUFF_X_OFFSET;
+	private static final double BUFF_X = 34d;
+	private static final double DEBUFF_X = 34d;
+
+	private final static double BUFF_Y = -20d;
+	private final static double DEBUFF_Y = 18d;
+
+	private final static double DECAL_Y = -88d;
 
 	public DecalPanel(final StandardSprites sprites) {
 		this.sprites = sprites;
@@ -44,6 +46,18 @@ public class DecalPanel extends Group {
 		});
 		selectionIndicator = si;
 		selectionIndicator.setFill(sarrowColor);
+
+		buff.setScaleX(BUFF_SCALE);
+		buff.setScaleY(BUFF_SCALE);
+		buff.setTranslateX(BUFF_X);
+		buff.setTranslateY(BUFF_Y);
+
+		debuff.setScaleX(BUFF_SCALE);
+		debuff.setScaleY(BUFF_SCALE);
+		debuff.setTranslateX(DEBUFF_X);
+		debuff.setTranslateY(DEBUFF_Y);
+
+		this.setTranslateY(DECAL_Y);
 	}
 
 	public void updateSelectionStatus(final boolean isSelected) {

@@ -54,12 +54,6 @@ public class SpriteManager {
 		for (final Sprite s : this.sprites) {
 			view.getStage().addSprite(s);
 
-			s.setOnChange(parent -> {
-				final DecalPanel panel = decals.get((Integer) s.userData);
-				if (panel != null && !parent.getChildren().contains(panel))
-					parent.getChildren().add(panel);
-			});
-
 			s.doOnExternalAnimationFinished(() -> {
 				final Character c = characters.get((Integer) s.userData);
 				s.setAnimation(c.isDead()? "dead" : "idle");
@@ -150,9 +144,17 @@ public class SpriteManager {
 					final Character c = (Character) t;
 					final boolean isSelected = view.getSelectedCharacter()
 						.map(s -> s.id == c.id).orElse(false);
+
 					this.characters.put(c.id, c);
-					decals.put(c.id, new DecalPanel(standardSprites));
-					decals.get(c.id).updateCharacter(c, isSelected);
+					final DecalPanel panel = new DecalPanel(standardSprites);
+					decals.put(c.id, panel);
+					panel.updateCharacter(c, isSelected);
+
+					final Sprite characterSprite = view.getStage().allSprites.stream()
+						.filter(x -> x.userData != null &&
+							x.userData.equals(c.id)).findFirst().get();
+
+					characterSprite.sceneGraph.getChildren().add(panel);
 				}
 			}
 			view.hud.init(this.characters.values());

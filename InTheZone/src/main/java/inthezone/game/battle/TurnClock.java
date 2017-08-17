@@ -5,10 +5,12 @@ import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.CacheHint;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 public class TurnClock extends Pane {
@@ -29,6 +31,8 @@ public class TurnClock extends Pane {
 
 	private final Duration duration;
 
+	private final Rotate rotation = new Rotate();
+
 	public TurnClock(final Duration duration) {
 		this.duration = duration;
 
@@ -40,6 +44,13 @@ public class TurnClock extends Pane {
 
 		this.widthProperty().addListener(o -> resizeGraphics());
 		this.heightProperty().addListener(o -> resizeGraphics());
+
+		face.setCache(true);
+		hand.setCache(false);
+		handBase.setCache(true);
+		arc.setCache(false);
+
+		hand.getTransforms().add(rotation);
 
 		arc.setStartAngle(90d);
 		resizeGraphics();
@@ -73,24 +84,23 @@ public class TurnClock extends Pane {
 	private long lastS = -1;
 
 	private void setAngle(final double angle) {
-		final double w = this.getWidth();
-		final double h = this.getHeight();
-		final double r = Math.min(w, h) / 2;
-		this.angle = angle;
-		final double handAngle = ((360d + 90d - angle) % 360d);
-		final double handAngleR = handAngle * (Math.PI / 180d);
-
-		arc.setStartAngle(handAngle);
-		arc.setLength(angle);
-		hand.setEndX(hand.getStartX() + (Math.cos(handAngleR) * r * HAND_LENGTH));
-		hand.setEndY(hand.getStartY() + (-Math.sin(handAngleR) * r * HAND_LENGTH));
-
 		final long s = (long) Math.floor(
-			duration.toSeconds() * ((360d - angle) / 360d));
+			(duration.toMillis() / 250) * ((360d - angle) / 360d));
 
 		if (s != lastS) {
+			final double w = this.getWidth();
+			final double h = this.getHeight();
+			final double r = Math.min(w, h) / 2;
+			this.angle = angle;
+			final double handAngle = ((360d + 90d - angle) % 360d);
+			final double handAngleR = handAngle * (Math.PI / 180d);
+
+			arc.setStartAngle(handAngle);
+			arc.setLength(angle);
+			rotation.setAngle(angle);
+
 			lastS = s;
-			remainingTime.set(formatTime(s));
+			if (s % 4 == 0) remainingTime.set(formatTime(s / 4));
 		}
 	}
 
@@ -109,6 +119,12 @@ public class TurnClock extends Pane {
 
 		hand.setStartX(w / 2);
 		hand.setStartY(h / 2);
+
+		rotation.setPivotX(hand.getStartX());
+		rotation.setPivotY(hand.getStartY());
+
+		hand.setEndX(hand.getStartX());
+		hand.setEndY(hand.getStartY() - (r * HAND_LENGTH));
 
 		arc.setCenterX(w / 2);
 		arc.setCenterY(h / 2);

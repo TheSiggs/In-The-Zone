@@ -33,12 +33,12 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public Character getParent() {return parent;}
 
 	public Zone(
-		MapPoint centre,
-		Collection<MapPoint> range,
-		Optional<Integer> turns,  // empty for a zone that isn't turn limited
-		boolean hasMana,
-		Ability ability,
-		Character agent
+		final MapPoint centre,
+		final Collection<MapPoint> range,
+		final Optional<Integer> turns,  // empty for a zone that isn't turn limited
+		final boolean hasMana,
+		final Ability ability,
+		final Character agent
 	) {
 		this.centre = centre;
 		this.range.addAll(range);
@@ -57,18 +57,18 @@ public class Zone extends Targetable implements HasParentAgent {
 	}
 
 	public Zone(
-		MapPoint centre,
-		Collection<MapPoint> range,
-		Optional<Integer> turns,
-		Ability ability,
-		Character parent,
-		Optional<SpriteInfo> sprite,
-		boolean hasMana,
-		double chanceBuff,
-		double attackBuff,
-		double defenceBuff,
-		Stats stats,
-		boolean purged
+		final MapPoint centre,
+		final Collection<MapPoint> range,
+		final Optional<Integer> turns,
+		final Ability ability,
+		final Character parent,
+		final Optional<SpriteInfo> sprite,
+		final boolean hasMana,
+		final double chanceBuff,
+		final double attackBuff,
+		final double defenceBuff,
+		final Stats stats,
+		final boolean purged
 	) {
 		this.centre = centre;
 		this.range.addAll(range);
@@ -98,14 +98,15 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public MapPoint getPos() {return centre;}
 	@Override public double getAttackBuff() {return attackBuff;}
 	@Override public double getDefenceBuff() {return defenceBuff;}
-	@Override public void dealDamage(int damage) {return;}
+	@Override public void dealDamage(final int damage) {return;}
 	@Override public void defuse() {return;}
 	@Override public void cleanse() {return;}
 	@Override public void purge() {purged = true;}
 	@Override public void revive() {return;}
-	@Override public void applyStatus(Battle battle, StatusEffect status) {return;}
+	@Override public void applyStatus(
+		final Battle battle, final StatusEffect status) {}
 	@Override public boolean isPushable() {return false;}
-	@Override public boolean isEnemyOf(Character character) {return true;}
+	@Override public boolean isEnemyOf(final Character character) {return true;}
 	@Override public boolean isDead() {
 		return purged || turnsRemaining.map(t -> t <= 0).orElse(false);
 	}

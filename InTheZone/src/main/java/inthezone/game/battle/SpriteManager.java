@@ -5,6 +5,7 @@ import isogame.engine.MoveSpriteAnimation;
 import isogame.engine.Sprite;
 import isogame.engine.Stage;
 import isogame.engine.TeleportAnimation;
+import isogame.engine.Tile;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -219,6 +220,9 @@ public class SpriteManager {
 					for (final MapPoint p : z.range) {
 						final Sprite s = zones.remove(p);
 						if (s != null) stage.removeSprite(s);
+						final Tile tile = stage.terrain.getTile(p);
+						final Object tt = tile.userData;
+						if (tt != null) Tooltip.uninstall(tile.subGraph, (Tooltip) tt);
 					}
 
 				} else if (!zones.containsKey(z.centre)) {
@@ -227,6 +231,21 @@ public class SpriteManager {
 						s.setPos(p);
 						zones.put(p, s);
 						stage.addSprite(s);
+
+						final Tile tile = stage.terrain.getTile(p);
+						final Object tt = tile.userData;
+						if (tt != null) Tooltip.uninstall(tile.subGraph, (Tooltip) tt);
+						final boolean isMine = view.player == Player.PLAYER_OBSERVER ||
+							z.parent.player.equals(view.player);
+						final Tooltip tt1 = new Tooltip(
+							new AbilityDescription(z.ability.info)
+								.getCreatedObjectDescription(isMine));
+
+						tt1.setWrapText(true);
+						tt1.setPrefWidth(300);
+
+						Tooltip.install(tile.subGraph, tt1);
+						tile.userData = tt1;
 					}
 				}
 

@@ -4,9 +4,10 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -24,13 +25,13 @@ import inthezone.protocol.ProtocolException;
 public class Revive extends InstantEffect {
 	public final List<MapPoint> targets = new ArrayList<>();
 
-	protected Revive(final MapPoint agent, final Collection<MapPoint> targets) {
+	protected Revive(final MapPoint agent, final Set<MapPoint> targets) {
 		super(agent);
 		this.targets.addAll(targets);
 	}
 
 	public static Revive getEffect(
-		final Collection<MapPoint> targets, final MapPoint agent
+		final Set<MapPoint> targets, final MapPoint agent
 	) {
 		return new Revive(agent, targets);
 	}
@@ -58,7 +59,7 @@ public class Revive extends InstantEffect {
 			if (kind != InstantEffectType.REVIVE)
 				throw new ProtocolException("Expected revive effect");
 
-			final List<MapPoint> targets = new ArrayList<>();
+			final Set<MapPoint> targets = new HashSet<>();
 			for (int i = 0; i < rawTargets.length(); i++) {
 				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
 			}
@@ -86,7 +87,7 @@ public class Revive extends InstantEffect {
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
 		return new Revive(agent, targets.stream()
-			.map(t -> retarget.getOrDefault(t, t)).collect(Collectors.toList()));
+			.map(t -> retarget.getOrDefault(t, t)).collect(Collectors.toSet()));
 	}
 }
 

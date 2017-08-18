@@ -4,9 +4,10 @@ import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -21,16 +22,16 @@ import inthezone.battle.data.InstantEffectType;
 import inthezone.protocol.ProtocolException;
 
 public class SimpleInstantEffect extends InstantEffect {
-	private final Collection<MapPoint> targets;
+	private final List<MapPoint> targets = new ArrayList<>();
 	private final InstantEffectType type;
 
 	private SimpleInstantEffect(
-		final Collection<MapPoint> targets,
+		final Set<MapPoint> targets,
 		final MapPoint agent,
 		final InstantEffectType type
 	) {
 		super(agent);
-		this.targets = targets;
+		this.targets.addAll(targets);
 		this.type = type;
 	}
 
@@ -58,7 +59,7 @@ public class SimpleInstantEffect extends InstantEffect {
 				kind == InstantEffectType.PURGE)
 			) throw new ProtocolException("Expected cleanse, defuse or purge effect");
 
-			final List<MapPoint> targets = new ArrayList<>();
+			final Set<MapPoint> targets = new HashSet<>();
 			for (int i = 0; i < rawTargets.length(); i++) {
 				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
 			}
@@ -71,7 +72,7 @@ public class SimpleInstantEffect extends InstantEffect {
 	}
 
 	public static SimpleInstantEffect getEffect(
-		final Collection<MapPoint> targets,
+		final Set<MapPoint> targets,
 		final MapPoint agent, final InstantEffectType type
 	) {
 		return new SimpleInstantEffect(targets, agent, type);
@@ -93,7 +94,7 @@ public class SimpleInstantEffect extends InstantEffect {
 		return new SimpleInstantEffect(
 			targets.stream()
 				.map(x -> retarget.getOrDefault(x, x))
-				.collect(Collectors.toList()),
+				.collect(Collectors.toSet()),
 			retarget.getOrDefault(agent, agent), type);
 	}
 }

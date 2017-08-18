@@ -28,8 +28,8 @@ public class UseAbilityCommand extends Command {
 	public final AbilityAgentType agentType;
 	public final String ability;
 	public final String friendlyAbilityName;
-	private final Collection<MapPoint> targetSquares;
-	private Collection<DamageToTarget> targets;
+	private final Collection<MapPoint> targetSquares = new ArrayList<>();
+	private final Collection<DamageToTarget> targets = new ArrayList<>();
 	public final int subsequentLevel;
 
 	private final List<MapPoint> constructed = new ArrayList<>();
@@ -66,8 +66,8 @@ public class UseAbilityCommand extends Command {
 		this.agentType = agentType;
 		this.friendlyAbilityName = friendlyAbilityName;
 		this.ability = ability;
-		this.targetSquares = targetSquares;
-		this.targets = targets;
+		this.targetSquares.addAll(targetSquares);
+		this.targets.addAll(targets);
 		this.constructed.addAll(constructed);
 		this.subsequentLevel = subsequentLevel;
 		canCancel = subsequentLevel == 0;
@@ -95,7 +95,7 @@ public class UseAbilityCommand extends Command {
 		r.put("targets", ta);
 
 		final JSONArray tsa = new JSONArray();
-		for (MapPoint p : targetSquares) tsa.put(p.getJSON());
+		for (final MapPoint p : targetSquares) tsa.put(p.getJSON());
 		r.put("targetSquares", tsa);
 
 		final JSONArray cs = new JSONArray();
@@ -223,11 +223,13 @@ public class UseAbilityCommand extends Command {
 	 * */
 	public void retarget(final Map<MapPoint, MapPoint> retarget) {
 		this.agent = retarget.getOrDefault(agent, agent);
-		this.targets = targets.stream()
+		final List<DamageToTarget> targets1 = targets.stream()
 			.map(t -> t.retarget(new Casting(
 				retarget.getOrDefault(t.target.castFrom, t.target.castFrom),
 				retarget.getOrDefault(t.target.target, t.target.target))))
 			.collect(Collectors.toList());
+		targets.clear();
+		targets.addAll(targets1);
 	}
 
 	/**

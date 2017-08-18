@@ -1,8 +1,7 @@
 package inthezone.battle.instant;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
@@ -24,8 +23,8 @@ public class InstantEffectFactory {
 		final BattleState battleState,
 		final InstantEffectInfo info,
 		final MapPoint castFrom,
-		final Collection<MapPoint> attackArea,
-		final List<MapPoint> targets
+		final Set<MapPoint> attackArea,
+		final Set<MapPoint> targets
 	) {
 		switch (info.type) {
 			case CLEANSE: /* fallthrough */

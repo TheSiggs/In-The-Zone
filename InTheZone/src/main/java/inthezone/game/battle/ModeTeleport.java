@@ -33,6 +33,7 @@ public class ModeTeleport extends Mode {
 		this.teleportQueue.addAll(teleportQueue);
 		this.teleportRange = teleportRange;
 		this.canCancel = canCancel;
+		System.err.println("Teleport queue: " + teleportQueue);
 	}
 
 	@Override public Mode updateSelectedCharacter(

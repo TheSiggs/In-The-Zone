@@ -114,7 +114,7 @@ public class PullPush extends InstantEffect {
 		final BattleState battle,
 		final InstantEffectInfo info,
 		final MapPoint castFrom,
-		final Collection<MapPoint> targets,
+		final Set<MapPoint> targets,
 		final boolean isFear
 	) {
 		final List<List<MapPoint>> paths = new ArrayList<>();
@@ -283,9 +283,9 @@ public class PullPush extends InstantEffect {
 	@Override public InstantEffect retarget(
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		final Collection<MapPoint> targets =
+		final Set<MapPoint> targets =
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 
 		return getEffect(battle, type,
 			retarget.getOrDefault(castFrom, castFrom), targets, false);

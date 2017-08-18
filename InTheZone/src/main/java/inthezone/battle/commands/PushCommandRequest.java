@@ -1,18 +1,19 @@
 package inthezone.battle.commands;
 
-import inthezone.battle.BattleState;
-import inthezone.battle.Character;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.Stats;
-import inthezone.battle.instant.PullPush;
-import inthezone.battle.Targetable;
-import inthezone.battle.Trap;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import inthezone.battle.BattleState;
+import inthezone.battle.Targetable;
+import inthezone.battle.Trap;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.instant.PullPush;
 
 public class PushCommandRequest extends CommandRequest {
 	private final MapPoint agent;
@@ -39,7 +40,7 @@ public class PushCommandRequest extends CommandRequest {
 			.filter(x -> !(x instanceof Trap)).findFirst()
 			.orElseThrow(() -> new CommandException("1: Invalid push command"));
 
-		final Collection<MapPoint> targets = new ArrayList<>();
+		final Set<MapPoint> targets = new HashSet<>();
 		targets.add(target);
 
 		Command r = battleState.getCharacterAt(agent).flatMap(a -> {

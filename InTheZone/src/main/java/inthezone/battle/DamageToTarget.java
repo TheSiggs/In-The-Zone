@@ -18,13 +18,13 @@ public class DamageToTarget implements HasJSONRepresentation {
 	public final boolean post;
 
 	public DamageToTarget(
-		Casting target,
-		boolean isTargetATrap,
-		boolean isTargetAZone,
-		int damage,
-		Optional<StatusEffect> statusEffect,
-		boolean pre,
-		boolean post
+		final Casting target,
+		final boolean isTargetATrap,
+		final boolean isTargetAZone,
+		final int damage,
+		final Optional<StatusEffect> statusEffect,
+		final boolean pre,
+		final boolean post
 	) {
 		this.target = target;
 		this.isTargetATrap = isTargetATrap;
@@ -46,7 +46,9 @@ public class DamageToTarget implements HasJSONRepresentation {
 		return r;
 	}
 
-	public static DamageToTarget fromJSON(JSONObject json) throws ProtocolException {
+	public static DamageToTarget fromJSON(final JSONObject json)
+		throws ProtocolException
+	{
 		try {
 			final Casting target = Casting.fromJSON(json.getJSONObject("target"));
 			final boolean trap = json.getBoolean("trap");
@@ -70,11 +72,12 @@ public class DamageToTarget implements HasJSONRepresentation {
 	/**
 	 * The target has moved since the damage was calculated
 	 * */
-	public DamageToTarget retarget(Casting to) {
+	public DamageToTarget retarget(final Casting to) {
 		if (isTargetATrap || isTargetAZone) {
 			return this;
 		} else {
-			return new DamageToTarget(to, false, false, damage, statusEffect, pre, post);
+			return new DamageToTarget(
+				to, false, false, damage, statusEffect, pre, post);
 		}
 	}
 

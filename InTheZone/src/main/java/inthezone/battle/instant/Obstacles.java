@@ -5,9 +5,11 @@ import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,7 +31,7 @@ public class Obstacles extends InstantEffect {
 	private final String abilityName;
 
 	private Obstacles(
-		final Collection<MapPoint> placements,
+		final Set<MapPoint> placements,
 		final String abilityName, final MapPoint agent
 	) {
 		super(agent);
@@ -61,7 +63,7 @@ public class Obstacles extends InstantEffect {
 			if (kind != InstantEffectType.OBSTACLES)
 				throw new ProtocolException("Expected obstacles effect");
 
-			final Collection<MapPoint> placements = new ArrayList<>();
+			final Set<MapPoint> placements = new HashSet<>();
 			for (int i = 0; i < rawPlacements.length(); i++) {
 				placements.add(MapPoint.fromJSON(rawPlacements.getJSONObject(i)));
 			}
@@ -76,7 +78,7 @@ public class Obstacles extends InstantEffect {
 	public static Obstacles getEffect(
 		final MapPoint agent,
 		final String abilityName,
-		final Collection<MapPoint> targets
+		final Set<MapPoint> targets
 	) {
 		return new Obstacles(targets, abilityName, agent);
 	}
@@ -112,7 +114,7 @@ public class Obstacles extends InstantEffect {
 	@Override public InstantEffect retarget(
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		return new Obstacles(placements, abilityName,
+		return new Obstacles(new HashSet<>(placements), abilityName,
 			retarget.getOrDefault(agent, agent));
 	}
 }

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,7 +44,7 @@ public class Move extends InstantEffect {
 	private boolean isComplete;
 
 	private Move(
-		final Optional<List<Character>> affectedCharacters,
+		final Optional<Set<Character>> affectedCharacters,
 		final int range,
 		final Optional<List<List<MapPoint>>> paths,
 		final MapPoint agent,
@@ -108,13 +109,13 @@ public class Move extends InstantEffect {
 	public static Move getEffect(
 		final BattleState battle,
 		final InstantEffectInfo info,
-		final Collection<MapPoint> targets,
+		final Set<MapPoint> targets,
 		final MapPoint agent
 	) {
-		final List<Character> affected = targets.stream()
+		final Set<Character> affected = targets.stream()
 			.flatMap(x -> battle.getCharacterAt(x)
 				.map(v -> Stream.of(v)).orElse(Stream.empty()))
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 
 		return new Move(
 			Optional.of(affected), info.param, Optional.empty(), agent, false);
@@ -192,9 +193,9 @@ public class Move extends InstantEffect {
 	@Override public InstantEffect retarget(
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		final Collection<MapPoint> targets =
+		final Set<MapPoint> targets =
 			paths.stream().map(p -> retarget.getOrDefault(p.get(0), p.get(0)))
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 
 		return getEffect(battle,
 			new InstantEffectInfo(InstantEffectType.MOVE, range),

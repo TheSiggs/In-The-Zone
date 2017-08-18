@@ -1,5 +1,17 @@
 package inthezone.battle.status;
 
+import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
@@ -10,14 +22,6 @@ import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.instant.PullPush;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class FearedStatusEffect extends StatusEffect {
 	private final MapPoint agentPos;
@@ -81,7 +85,7 @@ public class FearedStatusEffect extends StatusEffect {
 	public List<Command> doBeforeTurn(final Battle battle, final Character c) {
 		if (c.isDead()) return new ArrayList<>();
 
-		final Collection<MapPoint> targets = new ArrayList<>();
+		final Set<MapPoint> targets = new HashSet<>();
 		targets.add(c.getPos());
 
 		final PullPush p = PullPush.getEffect(

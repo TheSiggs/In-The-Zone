@@ -521,7 +521,7 @@ public class BattleView
 				try {
 					setMode(new ModeTeleport(this, (ModeAnimating) this.mode,
 						teleport.getAffectedCharacters(), teleport.range, canCancel));
-				} catch (ClassCastException ee) {
+				} catch (final ClassCastException ee) {
 					throw new RuntimeException(
 						"Invalid UI state.  Attempted to teleport from a non-animating mode.");
 				}
@@ -533,7 +533,7 @@ public class BattleView
 				try {
 					setMode(new ModeMoveEffect(this, (ModeAnimating) this.mode,
 						move.getAffectedCharacters(), move.range, canCancel));
-				} catch (ClassCastException ee) {
+				} catch (final ClassCastException ee) {
 					throw new RuntimeException(
 						"Invalid UI state.  Attempted to do move effect from a non-animating mode.");
 				}

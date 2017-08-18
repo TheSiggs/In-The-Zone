@@ -109,7 +109,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					if (i.isField()) {
 						preTargets.addAll(castings);
 					} else {
-						for (DamageToTarget t : allTargets) if (t.pre) preTargets.add(t.target);
+						for (final DamageToTarget t : allTargets)
+							if (t.pre) preTargets.add(t.target);
 					}
 				});
 
@@ -117,7 +118,8 @@ public class UseAbilityCommandRequest extends CommandRequest {
 					if (i.isField()) {
 						postTargets.addAll(castings);
 					} else {
-						for (DamageToTarget t : allTargets) if (t.post) postTargets.add(t.target);
+						for (final DamageToTarget t : allTargets)
+							if (t.post) postTargets.add(t.target);
 					}
 				});
 			}
@@ -172,13 +174,13 @@ public class UseAbilityCommandRequest extends CommandRequest {
 		final Optional<UseAbilityCommand> postCommand,
 		final Optional<InstantEffectCommand> postEffect
 	) throws CommandException {
-		Collection<MapPoint> targetArea = castings.stream()
+		final Set<MapPoint> targetArea = castings.stream()
 			.flatMap(casting -> battleState.getAffectedArea(
 				agent, agentType, ability, casting).stream())
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 
-		final List<MapPoint> targets =
-			effectTargets.stream().map(c -> c.target).collect(Collectors.toList());
+		final Set<MapPoint> targets =
+			effectTargets.stream().map(c -> c.target).collect(Collectors.toSet());
 		return new InstantEffectCommand(InstantEffectFactory.getEffect(
 			ability.rootName, battleState, effect, agent,
 			targetArea, targets), postCommand, postEffect);

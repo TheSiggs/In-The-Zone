@@ -5,9 +5,11 @@ import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,10 +43,10 @@ public class Teleport extends InstantEffect {
 	private List<MapPoint> destinations = new ArrayList<>();
 
 	private Teleport(
-		final Optional<List<Character>> affectedCharacters,
+		final Optional<Set<Character>> affectedCharacters,
 		final int range,
-		final Optional<List<MapPoint>> targets,
-		final Optional<List<MapPoint>> destinations,
+		final Optional<Set<MapPoint>> targets,
+		final Optional<Set<MapPoint>> destinations,
 		final MapPoint agent
 	) {
 		super(agent);
@@ -77,8 +79,8 @@ public class Teleport extends InstantEffect {
 
 		final JSONArray ts = new JSONArray();
 		final JSONArray ds = new JSONArray();
-		for (MapPoint t : targets) ts.put(t.getJSON());
-		for (MapPoint d : destinations) ds.put(d.getJSON());
+		for (final MapPoint t : targets) ts.put(t.getJSON());
+		for (final MapPoint d : destinations) ds.put(d.getJSON());
 
 		o.put("targets", ts);
 		o.put("destinations", ds);
@@ -96,8 +98,8 @@ public class Teleport extends InstantEffect {
 			if (kind != InstantEffectType.TELEPORT)
 				throw new ProtocolException("Expected teleport effect");
 
-			final List<MapPoint> targets = new ArrayList<>();
-			final List<MapPoint> destinations = new ArrayList<>();
+			final Set<MapPoint> targets = new HashSet<>();
+			final Set<MapPoint> destinations = new HashSet<>();
 
 			for (int i = 0; i < rawTargets.length(); i++) {
 				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
@@ -116,12 +118,12 @@ public class Teleport extends InstantEffect {
 
 	public static Teleport getEffect(
 		final BattleState battle, final InstantEffectInfo info,
-		final List<MapPoint> targets, final MapPoint agent
+		final Set<MapPoint> targets, final MapPoint agent
 	) {
-		final List<Character> affected = targets.stream()
+		final Set<Character> affected = targets.stream()
 			.flatMap(x -> battle.getCharacterAt(x)
 				.map(v -> Stream.of(v)).orElse(Stream.empty()))
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 		return new Teleport(Optional.of(affected), info.param,
 			Optional.empty(), Optional.empty(), agent);
 	}
@@ -148,9 +150,11 @@ public class Teleport extends InstantEffect {
 
 		r.add(new ExecutedCommand(cmd.apply(this), apply(battle)));
 
-		for (MapPoint p : destinations) {
-			List<Command> triggers = battle.battleState.trigger.getAllTriggers(p);
-			for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(battle));
+		for (final MapPoint p : destinations) {
+			final List<Command> triggers =
+				battle.battleState.trigger.getAllTriggers(p);
+			for (final Command c : triggers)
+				r.addAll(c.doCmdComputingTriggers(battle));
 		}
 
 		return r;
@@ -168,9 +172,9 @@ public class Teleport extends InstantEffect {
 	@Override public InstantEffect retarget(
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		final List<MapPoint> newTargets =
+		final Set<MapPoint> newTargets =
 			targets.stream().map(t -> retarget.getOrDefault(t, t))
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 
 		return getEffect(battle,
 			new InstantEffectInfo(InstantEffectType.TELEPORT, range),

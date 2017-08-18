@@ -2,7 +2,7 @@ package inthezone.game.battle;
 
 import java.util.Optional;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.Player;
 import isogame.engine.SelectionInfo;
 
@@ -19,11 +19,12 @@ public class ModeOtherTurn extends Mode {
 	@Override public boolean isInteractive() {return false;}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final Optional<Character> oc = selection.spritePriority()
+		final Optional<CharacterFrozen> oc = selection.spritePriority()
 			.flatMap(p -> view.sprites.getCharacterAt(p));
 
 		if (oc.isPresent() &&
-			(view.player == Player.PLAYER_OBSERVER || oc.get().player == view.player)
+			(view.player == Player.PLAYER_OBSERVER ||
+				oc.get().getPlayer() == view.player)
 		) {
 			view.outOfTurnSelect(Optional.of(oc.get()));
 		} else {

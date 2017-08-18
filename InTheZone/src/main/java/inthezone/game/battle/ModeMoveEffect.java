@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.InfoPath;
 import isogame.engine.MapPoint;
@@ -16,17 +16,17 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 
 public class ModeMoveEffect extends ModeMove {
 	private final ModeAnimating lastMode;
-	private final Queue<Character> moveQueue = new LinkedList<>();
+	private final Queue<CharacterFrozen> moveQueue = new LinkedList<>();
 	private final List<MapPoint> moveDestinations = new ArrayList<>();
 	private final int moveRange;
 	private boolean canCancel;
 
-	private Character moving = null;
+	private CharacterFrozen moving = null;
 
 	public ModeMoveEffect(
 		final BattleView view,
 		final ModeAnimating lastMode,
-		final Collection<Character> moveQueue,
+		final Collection<CharacterFrozen> moveQueue,
 		final int moveRange,
 		final boolean canCancel
 	) {
@@ -38,7 +38,7 @@ public class ModeMoveEffect extends ModeMove {
 	}
 
 	@Override public Mode updateSelectedCharacter(
-		final Character selectedCharacter
+		final CharacterFrozen selectedCharacter
 	) {
 		return new ModeMoveEffect(view,
 			lastMode.updateSelectedCharacter(selectedCharacter),

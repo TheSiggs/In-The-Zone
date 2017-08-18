@@ -39,7 +39,7 @@ public class StartBattleCommand implements HasJSONRepresentation {
 
 	private final Collection<Character> characters;
 
-	public List<MapPoint> getStartTiles(Player player) {
+	public List<MapPoint> getStartTiles(final Player player) {
 		if (player == Player.PLAYER_A) {
 			return new ArrayList<>(p1start);
 		} else {

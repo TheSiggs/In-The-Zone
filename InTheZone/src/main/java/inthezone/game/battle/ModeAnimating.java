@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import isogame.engine.MapPoint;
 import java.util.Map;
 
@@ -20,7 +20,7 @@ public class ModeAnimating extends Mode {
 	@Override public boolean canCancel() {return false;}
 
 	@Override public ModeAnimating updateSelectedCharacter(
-		final Character selected
+		final CharacterFrozen selected
 	) {
 		return new ModeAnimating(view, previous.updateSelectedCharacter(selected));
 	}

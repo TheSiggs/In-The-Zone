@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.commands.MoveCommandRequest;
 import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.InfoPath;
@@ -15,17 +15,17 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
  * The selected character is to be moved.
  * */
 public class ModeMove extends Mode {
-	protected final Character selectedCharacter;
+	protected final CharacterFrozen selectedCharacter;
 
 	public ModeMove(
-		final BattleView view, final Character selectedCharacter
+		final BattleView view, final CharacterFrozen selectedCharacter
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
 	@Override public Mode updateSelectedCharacter(
-		final Character selectedCharacter
+		final CharacterFrozen selectedCharacter
 	) {
 		return new ModeMove(view, selectedCharacter);
 	}
@@ -45,7 +45,7 @@ public class ModeMove extends Mode {
 	}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final Optional<Character> oc = selection.spritePriority()
+		final Optional<CharacterFrozen> oc = selection.spritePriority()
 			.flatMap(p -> view.sprites.getCharacterAt(p));
 
 		final Optional<MapPoint> p = selection.pointPriority();
@@ -53,9 +53,9 @@ public class ModeMove extends Mode {
 		if (p.isPresent() && view.isSelectable(p.get())) {
 			view.battle.requestCommand(
 				new MoveCommandRequest(
-					selectedCharacter.getPos(), p.get(), selectedCharacter.player));
+					selectedCharacter.getPos(), p.get(), selectedCharacter.getPlayer()));
 			view.setMode(new ModeAnimating(view));
-		} else if (oc.isPresent() && oc.get().player == view.player) {
+		} else if (oc.isPresent() && oc.get().getPlayer() == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));
 		} else {
 			view.selectCharacter(Optional.empty());

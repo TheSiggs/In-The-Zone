@@ -12,7 +12,7 @@ import javafx.scene.layout.FlowPane;
 
 import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
@@ -64,8 +64,8 @@ public abstract class HUD extends AnchorPane {
 		messageLine.writeMessage(message);
 	}
 
-	public final void selectCharacter(final Optional<Character> oc) {
-		final int id = oc.map(c -> c.id).orElse(-1);
+	public final void selectCharacter(final Optional<CharacterFrozen> oc) {
+		final int id = oc.map(c -> c.getId()).orElse(-1);
 		oc.ifPresent(c -> updateAbilities(c, c.hasMana()));
 
 		for (final CharacterInfoBox box : characters.values())
@@ -82,9 +82,9 @@ public abstract class HUD extends AnchorPane {
 	public abstract void doReconnectMode(final boolean thisClientReconnecting);
 	public abstract void endReconnectMode();
 
-	public final void updateAbilities(final Character c, final boolean mana) {
+	public final void updateAbilities(final CharacterFrozen c, final boolean mana) {
 		final Ability basicAbility =
-			mana ? c.basicAbility.getMana() : c.basicAbility;
+			mana ? c.getBasicAbility().getMana() : c.getBasicAbility();
 
 		final CommandButton attackItem = new CommandButton(sprites.attackIcon,
 			(new AbilityDescription(basicAbility.info)).toString());
@@ -103,7 +103,7 @@ public abstract class HUD extends AnchorPane {
 		pushItem.cannotUseThis.set(c.isDead() || c.isStunned() ||
 			c.getAP() < 1 || notMyTurn);
 
-		for (final Ability a : c.abilities) {
+		for (final Ability a : c.getAbilities()) {
 			final Ability ability = mana ? a.getMana() : a;
 
 			final CommandButton i = new CommandButton(ability.info.media.icon,
@@ -119,16 +119,16 @@ public abstract class HUD extends AnchorPane {
 		}
 	}
 
-	public void init(final Collection<Character> characters) {
-		for (final Character c : characters) {
-			if (c.player != view.player && view.player != Player.PLAYER_OBSERVER)
+	public void init(final Collection<CharacterFrozen> characters) {
+		for (final CharacterFrozen c : characters) {
+			if (c.getPlayer() != view.player && view.player != Player.PLAYER_OBSERVER)
 				continue;
 
 			final CharacterInfoBox box = new CharacterInfoBox(c, sprites);
 			box.setOnMouseClicked(event -> {
-				if (!disableUI.get()) view.selectCharacterById(c.id);
+				if (!disableUI.get()) view.selectCharacterById(c.getId());
 			});
-			this.characters.put(c.id, box);
+			this.characters.put(c.getId(), box);
 		}
 	}
 }

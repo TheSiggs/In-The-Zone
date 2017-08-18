@@ -1,21 +1,26 @@
 package inthezone.comptroller;
 
+import isogame.engine.MapPoint;
+
+import java.util.Collection;
+
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Casting;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.commands.AbilityAgentType;
-import isogame.engine.MapPoint;
-import java.util.Collection;
 
 public class InfoAttackArea extends InfoRequest<Collection<MapPoint>> {
-	private final Character subject;
+	private final CharacterFrozen subject;
 	private final MapPoint castFrom;
 	private final Ability ability;
 	private final MapPoint target;
 
 	public InfoAttackArea(
-		Character subject, Ability ability, MapPoint castFrom, MapPoint target
+		final CharacterFrozen subject,
+		final Ability ability,
+		final MapPoint castFrom,
+		final MapPoint target
 	) {
 		this.subject = subject;
 		this.ability = ability;
@@ -23,7 +28,7 @@ public class InfoAttackArea extends InfoRequest<Collection<MapPoint>> {
 		this.target = target;
 	}
 
-	@Override public void completeAction(Battle battle) {
+	@Override public void completeAction(final Battle battle) {
 		complete.complete(battle.battleState.getAffectedArea(
 			subject.getPos(), AbilityAgentType.CHARACTER,
 			ability, new Casting(castFrom, target)));

@@ -1,13 +1,13 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import isogame.engine.MapPoint;
 import java.util.Map;
 
 public class ModeWaitForReconnect extends Mode {
 	private Mode previous;
 
-	public ModeWaitForReconnect(BattleView view, Mode previous) {
+	public ModeWaitForReconnect(final BattleView view, final Mode previous) {
 		super(view);
 		this.previous = previous;
 	}
@@ -17,11 +17,14 @@ public class ModeWaitForReconnect extends Mode {
 	@Override public boolean isInteractive() {return false;}
 	@Override public boolean canCancel() {return false;}
 
-	@Override public ModeWaitForReconnect updateSelectedCharacter(Character selected) {
-		return new ModeWaitForReconnect(view, previous.updateSelectedCharacter(selected));
+	@Override public ModeWaitForReconnect updateSelectedCharacter(
+		final CharacterFrozen selected
+	) {
+		return new ModeWaitForReconnect(view,
+			previous.updateSelectedCharacter(selected));
 	}
 
-	@Override public Mode retarget(Map<MapPoint, MapPoint> retargeting) {
+	@Override public Mode retarget(final Map<MapPoint, MapPoint> retargeting) {
 		return new ModeWaitForReconnect(view, previous.retarget(retargeting));
 	}
 

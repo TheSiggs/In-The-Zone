@@ -27,7 +27,7 @@ public enum CommandKind {
 		}
 	}
 
-	public static CommandKind fromString(String s) throws ProtocolException {
+	public static CommandKind fromString(final String s) throws ProtocolException {
 		switch (s) {
 			case "End": return CommandKind.ENDTURN;
 			case "Start": return CommandKind.STARTTURN;

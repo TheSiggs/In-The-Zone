@@ -132,7 +132,7 @@ public class BattleInProgress implements Runnable {
 
 			Platform.runLater(() -> {
 				final List<Targetable> affected = new ArrayList<>();
-				affected.addAll(battle.battleState.cloneCharacters());
+				affected.addAll(battle.battleState.characters);
 				affected.addAll(zones);
 				try {
 					final ExecutedCommand st =
@@ -246,7 +246,7 @@ public class BattleInProgress implements Runnable {
 				allCmds.add(last.markLastInSequence());
 			}
 
-			for (ExecutedCommand ec : allCmds) {
+			for (final ExecutedCommand ec : allCmds) {
 				Platform.runLater(() -> listener.command(ec));
 
 				// don't send the command to the network until it's been completed
@@ -271,7 +271,7 @@ public class BattleInProgress implements Runnable {
 		battle.getTurnStart(thisPlayer.otherPlayer()); // Do this for the side-effects only
 		Platform.runLater(() -> {
 			final List<Targetable> affected = new ArrayList<>();
-			affected.addAll(battle.battleState.cloneCharacters());
+			affected.addAll(battle.battleState.characters);
 			affected.addAll(zones);
 			try {
 				listener.command((new StartTurnCommand(

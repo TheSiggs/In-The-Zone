@@ -3,7 +3,7 @@ package inthezone.game.battle;
 
 import java.util.Optional;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import isogame.engine.SelectionInfo;
 
 public class ModeSelect extends Mode {
@@ -13,7 +13,7 @@ public class ModeSelect extends Mode {
 
 	@Override public Mode setupMode() {
 		view.getStage().clearAllHighlighting();
-		final Optional<Character> s = view.getSelectedCharacter();
+		final Optional<CharacterFrozen> s = view.getSelectedCharacter();
 		if (s.isPresent() && !s.get().isDead()) {
 			return (new ModeMove(view, s.get())).setupMode();
 		} else {
@@ -22,10 +22,10 @@ public class ModeSelect extends Mode {
 	}
 
 	@Override public void handleSelection(final SelectionInfo selection) {
-		final Optional<Character> oc = selection.spritePriority()
+		final Optional<CharacterFrozen> oc = selection.spritePriority()
 			.flatMap(p -> view.sprites.getCharacterAt(p));
 
-		if (oc.isPresent() && oc.get().player == view.player) {
+		if (oc.isPresent() && oc.get().getPlayer() == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));
 		} else {
 			view.selectCharacter(Optional.empty());

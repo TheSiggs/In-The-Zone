@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.commands.PushCommandRequest;
 import inthezone.comptroller.InfoPush;
 import isogame.engine.MapPoint;
@@ -11,17 +11,17 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_MOVE;
 
 public class ModePush extends Mode {
-	private final Character selectedCharacter;
+	private final CharacterFrozen selectedCharacter;
 
 	public ModePush(
-		final BattleView view, final Character selectedCharacter
+		final BattleView view, final CharacterFrozen selectedCharacter
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
 	@Override public Mode updateSelectedCharacter(
-		final Character selectedCharacter
+		final CharacterFrozen selectedCharacter
 	) {
 		return new ModePush(view, selectedCharacter);
 	}

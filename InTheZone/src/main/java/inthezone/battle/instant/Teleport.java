@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.Targetable;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
@@ -29,7 +30,12 @@ import inthezone.protocol.ProtocolException;
 
 public class Teleport extends InstantEffect {
 	public final int range;
-	public final List<Character> affectedCharacters = new ArrayList<>();
+	private final List<Character> affectedCharacters = new ArrayList<>();
+
+	public final List<CharacterFrozen> getAffectedCharacters() {
+		return affectedCharacters.stream()
+			.map(c -> c.freeze()).collect(Collectors.toList());
+	}
 
 	private final List<MapPoint> targets = new ArrayList<>();
 	private List<MapPoint> destinations = new ArrayList<>();

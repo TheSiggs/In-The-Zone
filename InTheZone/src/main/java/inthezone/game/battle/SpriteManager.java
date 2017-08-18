@@ -16,11 +16,11 @@ import java.util.Optional;
 
 import javafx.scene.control.Tooltip;
 
-import inthezone.battle.Character;
-import inthezone.battle.RoadBlock;
-import inthezone.battle.Targetable;
-import inthezone.battle.Trap;
-import inthezone.battle.Zone;
+import inthezone.battle.CharacterFrozen;
+import inthezone.battle.RoadBlockFrozen;
+import inthezone.battle.TargetableFrozen;
+import inthezone.battle.TrapFrozen;
+import inthezone.battle.ZoneFrozen;
 import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
@@ -31,7 +31,7 @@ import inthezone.battle.data.StandardSprites;
 public class SpriteManager {
 	private final BattleView view;
 
-	public final Map<Integer, Character> characters = new HashMap<>();
+	public final Map<Integer, CharacterFrozen> characters = new HashMap<>();
 
 	private final Map<MapPoint, Sprite> traps = new HashMap<>();
 
@@ -66,7 +66,7 @@ public class SpriteManager {
 			view.getStage().addSprite(s);
 
 			s.doOnExternalAnimationFinished(() -> {
-				final Character c = characters.get((Integer) s.userData);
+				final CharacterFrozen c = characters.get((Integer) s.userData);
 				s.setAnimation(c.isDead()? "dead" : "idle");
 
 				spritesInMotion -= 1;
@@ -84,12 +84,14 @@ public class SpriteManager {
 	/**
 	 * Get a character by its id.
 	 * */
-	public Character getCharacterById(final int id) {return characters.get(id);}
+	public CharacterFrozen getCharacterById(final int id) {
+		return characters.get(id);
+	}
 
 	/**
 	 * Get a character by its position.
 	 * */
-	public Optional<Character> getCharacterAt(final MapPoint p) {
+	public Optional<CharacterFrozen> getCharacterAt(final MapPoint p) {
 		return characters.values().stream()
 			.filter(c -> c.getPos().equals(p)).findFirst();
 	}
@@ -97,8 +99,8 @@ public class SpriteManager {
 	/**
 	 * Schedule a teleport operation.
 	 * */
-	public void scheduleTeleport(final Character a, final MapPoint t) {
-		final int id = a.id;
+	public void scheduleTeleport(final CharacterFrozen a, final MapPoint t) {
+		final int id = a.getId();
 		final Sprite s = view.getStage().allSprites.stream()
 			.filter(x -> x.userData != null && x.userData.equals(id))
 			.findFirst().get();
@@ -114,13 +116,13 @@ public class SpriteManager {
 		final String animation,
 		final double speed,
 		final List<MapPoint> path,
-		final Character affected
+		final CharacterFrozen affected
 	) {
 		final Stage stage = view.getStage();
 		MapPoint start = path.get(0);
 		MapPoint end = path.get(1);
 
-		final int id = affected.id;
+		final int id = affected.getId();
 		final Sprite s = stage.allSprites.stream()
 			.filter(x -> x.userData != null && x.userData.equals(id))
 			.findFirst().get();
@@ -139,7 +141,7 @@ public class SpriteManager {
 
 	public void updateSelectionStatus() {
 		final int selectedId =
-			view.getSelectedCharacter().map(c -> c.id).orElse(-1);
+			view.getSelectedCharacter().map(c -> c.getId()).orElse(-1);
 		for (final Integer i : decals.keySet()) {
 			decals.get(i).updateSelectionStatus(i == selectedId);
 		}
@@ -148,22 +150,24 @@ public class SpriteManager {
 	/**
 	 * Update the character models.
 	 * */
-	public void updateCharacters(final List<? extends Targetable> characters) {
+	public void updateCharacters(
+		final List<? extends TargetableFrozen> characters
+	) {
 		if (this.characters.isEmpty()) {
-			for (final Targetable t : characters) {
-				if (t instanceof Character) {
-					final Character c = (Character) t;
+			for (final TargetableFrozen t : characters) {
+				if (t instanceof CharacterFrozen) {
+					final CharacterFrozen c = (CharacterFrozen) t;
 					final boolean isSelected = view.getSelectedCharacter()
-						.map(s -> s.id == c.id).orElse(false);
+						.map(s -> s.getId() == c.getId()).orElse(false);
 
-					this.characters.put(c.id, c);
+					this.characters.put(c.getId(), c);
 					final DecalPanel panel = new DecalPanel(standardSprites);
-					decals.put(c.id, panel);
+					decals.put(c.getId(), panel);
 					panel.updateCharacter(c, isSelected);
 
 					final Sprite characterSprite = view.getStage().allSprites.stream()
 						.filter(x -> x.userData != null &&
-							x.userData.equals(c.id)).findFirst().get();
+							x.userData.equals(c.getId())).findFirst().get();
 
 					characterSprite.sceneGraph.getChildren().add(panel);
 				}
@@ -171,23 +175,23 @@ public class SpriteManager {
 			view.hud.init(this.characters.values());
 
 		} else {
-			for (final Targetable t : characters) {
-				if (t instanceof Character) {
-					final Character c = (Character) t;
-					final Character old = this.characters.get(c.id);
+			for (final TargetableFrozen t : characters) {
+				if (t instanceof CharacterFrozen) {
+					final CharacterFrozen c = (CharacterFrozen) t;
+					final CharacterFrozen old = this.characters.get(c.getId());
 					view.updateSelectedCharacter(c);
 
 					if (old != null) {
-						final CharacterInfoBox box = view.hud.characters.get(c.id);
+						final CharacterInfoBox box = view.hud.characters.get(c.getId());
 						if (box != null) box.updateCharacter(c);
 
 						final boolean isSelected = view.getSelectedCharacter()
-							.map(s -> s.id == c.id).orElse(false);
-						decals.get(c.id).updateCharacter(c, isSelected);
+							.map(s -> s.getId() == c.getId()).orElse(false);
+						decals.get(c.getId()).updateCharacter(c, isSelected);
 
 						final Sprite characterSprite = view.getStage().allSprites.stream()
 							.filter(x -> x.userData != null &&
-								x.userData.equals(c.id)).findFirst().get();
+								x.userData.equals(c.getId())).findFirst().get();
 
 						if (c.isDead()) {
 							characterSprite.setAnimation("dead");
@@ -197,7 +201,7 @@ public class SpriteManager {
 					}
 
 
-					this.characters.put(c.id, c);
+					this.characters.put(c.getId(), c);
 				}
 			}
 		}
@@ -206,18 +210,18 @@ public class SpriteManager {
 	}
 
 	private void handleTemporaryImmobileObjects(
-		final Collection<? extends Targetable> tios
+		final Collection<? extends TargetableFrozen> tios
 	) {
-		for (final Targetable t : tios) {
-			if (t instanceof Character) {
+		for (final TargetableFrozen t : tios) {
+			if (t instanceof CharacterFrozen) {
 				continue;
 
-			} else if (t instanceof Zone) {
-				final Zone z = (Zone) t;
+			} else if (t instanceof ZoneFrozen) {
+				final ZoneFrozen z = (ZoneFrozen) t;
 				final Stage stage = view.getStage();
 
 				if (z.reap()) {
-					for (final MapPoint p : z.range) {
+					for (final MapPoint p : z.getRange()) {
 						final Sprite s = zones.remove(p);
 						if (s != null) stage.removeSprite(s);
 						final Tile tile = stage.terrain.getTile(p);
@@ -225,8 +229,8 @@ public class SpriteManager {
 						if (tt != null) Tooltip.uninstall(tile.subGraph, (Tooltip) tt);
 					}
 
-				} else if (!zones.containsKey(z.centre)) {
-					for (final MapPoint p : z.range) {
+				} else if (!zones.containsKey(z.getCentre())) {
+					for (final MapPoint p : z.getRange()) {
 						final Sprite s = new Sprite(z.getSprite());
 						s.setPos(p);
 						zones.put(p, s);
@@ -236,9 +240,9 @@ public class SpriteManager {
 						final Object tt = tile.userData;
 						if (tt != null) Tooltip.uninstall(tile.subGraph, (Tooltip) tt);
 						final boolean isMine = view.player == Player.PLAYER_OBSERVER ||
-							z.parent.player.equals(view.player);
+							z.getParent().getPlayer().equals(view.player);
 						final Tooltip tt1 = new Tooltip(
-							new AbilityDescription(z.ability.info)
+							new AbilityDescription(z.getAbility().info)
 								.getCreatedObjectDescription(isMine));
 
 						tt1.setWrapText(true);
@@ -249,7 +253,7 @@ public class SpriteManager {
 					}
 				}
 
-			} else if (t instanceof RoadBlock) {
+			} else if (t instanceof RoadBlockFrozen) {
 				if (t.reap()) {
 					final Sprite s = roadblocks.remove(t.getPos());
 					if (s != null) view.getStage().removeSprite(s);
@@ -263,7 +267,7 @@ public class SpriteManager {
 
 				} else {
 					final Sprite s = roadblocks.get(t.getPos());
-					if (s != null && ((RoadBlock) t).hasBeenHit()) {
+					if (s != null && ((RoadBlockFrozen) t).hasBeenHit()) {
 						s.setAnimation("hit");
 						Tooltip.install(s.sceneGraphNode, destructibleObjectTooltip2);
 					} else {
@@ -271,7 +275,7 @@ public class SpriteManager {
 					}
 				}
 
-			} else if (t instanceof Trap) {
+			} else if (t instanceof TrapFrozen) {
 				if (t.reap()) {
 					final Sprite s = traps.remove(t.getPos());
 					if (s != null) view.getStage().removeSprite(s);
@@ -280,10 +284,10 @@ public class SpriteManager {
 					final Sprite s;
 					final Tooltip tooltip;
 					if (view.player == Player.PLAYER_OBSERVER ||
-						((Trap) t).parent.player.equals(view.player)
+						((TrapFrozen) t).getParent().getPlayer().equals(view.player)
 					) {
 						tooltip = new Tooltip(
-							(new AbilityDescription(((Trap) t).ability.info))
+							(new AbilityDescription(((TrapFrozen) t).getAbility().info))
 								.getCreatedObjectDescription(true));
 						tooltip.setWrapText(true);
 						tooltip.setPrefWidth(300);

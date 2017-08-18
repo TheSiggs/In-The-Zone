@@ -19,7 +19,9 @@ public class PushCommand extends Command {
 	public final PullPush effect;
 	private final boolean effective; // determines if the push is effective
 
-	public PushCommand(MapPoint agent, PullPush effect, boolean effective) {
+	public PushCommand(
+		final MapPoint agent, final PullPush effect, final boolean effective
+	) {
 		this.agent = agent;
 		this.effect = effect;
 		this.effective = effective;
@@ -35,7 +37,7 @@ public class PushCommand extends Command {
 		return r;
 	}
 
-	public static PushCommand fromJSON(JSONObject json)
+	public static PushCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -55,10 +57,9 @@ public class PushCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
+	public List<Targetable> doCmd(final Battle battle) throws CommandException {
 		List<Targetable> r = new ArrayList<>();
 		if (effective) {
-			System.err.println("Do push command effective");
 			Character user = battle.battleState.getCharacterAt(agent)
 				.orElseThrow(() -> new CommandException("40: Cannot find push agent"));
 

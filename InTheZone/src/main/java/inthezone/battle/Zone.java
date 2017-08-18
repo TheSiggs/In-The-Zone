@@ -1,14 +1,16 @@
 package inthezone.battle;
 
-import inthezone.battle.data.Player;
-import inthezone.battle.data.Stats;
-import inthezone.battle.status.StatusEffect;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import inthezone.battle.data.Player;
+import inthezone.battle.data.Stats;
+import inthezone.battle.status.StatusEffect;
 
 public class Zone extends Targetable implements HasParentAgent {
 	public final MapPoint centre;
@@ -116,11 +118,8 @@ public class Zone extends Targetable implements HasParentAgent {
 	@Override public boolean hasMana() {return hasMana;}
 	@Override public double getChanceBuff() {return chanceBuff;}
 
-	@Override public Zone clone() {
-		return new Zone(
-			centre, range, turnsRemaining, ability, parent,
-			sprite, hasMana, chanceBuff, attackBuff, defenceBuff,
-			stats, purged);
+	@Override public ZoneFrozen freeze() {
+		return new ZoneFrozen(this);
 	}
 }
 

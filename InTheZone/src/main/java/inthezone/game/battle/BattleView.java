@@ -32,7 +32,7 @@ import javafx.scene.input.MouseButton;
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
 import inthezone.battle.BattleOutcome;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommandRequest;
 import inthezone.battle.commands.ExecutedCommand;
@@ -63,7 +63,7 @@ public class BattleView
 
 	public final CommandProcessor commands;
 	public final SpriteManager sprites;
-	private Optional<Character> selectedCharacter = Optional.empty();
+	private Optional<CharacterFrozen> selectedCharacter = Optional.empty();
 
 	// UI components
 	public final MapView canvas;
@@ -266,7 +266,9 @@ public class BattleView
 	/**
 	 * Get the currently selected character.
 	 * */
-	public Optional<Character> getSelectedCharacter() {return selectedCharacter;}
+	public Optional<CharacterFrozen> getSelectedCharacter() {
+		return selectedCharacter;
+	}
 
 	/**
 	 * Select a particular character.
@@ -281,7 +283,7 @@ public class BattleView
 	 * Select or deselect a character.
 	 * @param c If empty, then deselect all characters.
 	 * */
-	public void selectCharacter(final Optional<Character> c) {
+	public void selectCharacter(final Optional<CharacterFrozen> c) {
 		if (mode.canCancel()) {
 			outOfTurnSelect(c);
 			if (mode.isInteractive()) {
@@ -297,7 +299,7 @@ public class BattleView
 	 * Select or deselect a character when it's not your turn.
 	 * @param c If empty, the deselect all characters.
 	 * */
-	public void outOfTurnSelect(final Optional<Character> c) {
+	public void outOfTurnSelect(final Optional<CharacterFrozen> c) {
 		battle.cancel();
 		canvas.resetMouseHandlers();
 		selectedCharacter = c;
@@ -317,9 +319,9 @@ public class BattleView
 	/**
 	 * Update information about the selected character.
 	 * */
-	public void updateSelectedCharacter(final Character c) {
+	public void updateSelectedCharacter(final CharacterFrozen c) {
 		selectedCharacter.ifPresent(sc -> {
-			if (sc.id == c.id) {
+			if (sc.getId() == c.getId()) {
 				selectedCharacter = Optional.of(c);
 				hud.selectCharacter(selectedCharacter);
 				setMode(mode.updateSelectedCharacter(c));
@@ -449,11 +451,11 @@ public class BattleView
 
 	public boolean anyValidMoves() {
 		return sprites.characters.values().stream()
-			.filter(c -> c.player == player)
+			.filter(c -> c.getPlayer() == player)
 			.anyMatch(c -> anyValidMovesFor(c));
 	}
 
-	public boolean anyValidMovesFor(final Character c) {
+	public boolean anyValidMovesFor(final CharacterFrozen c) {
 		final boolean canMove =
 			mode.getFutureWithRetry(battle.requestInfo(new InfoMoveRange(c)))
 				.map(r -> !r.isEmpty()).orElse(false);
@@ -518,7 +520,7 @@ public class BattleView
 
 				try {
 					setMode(new ModeTeleport(this, (ModeAnimating) this.mode,
-						teleport.affectedCharacters, teleport.range, canCancel));
+						teleport.getAffectedCharacters(), teleport.range, canCancel));
 				} catch (ClassCastException ee) {
 					throw new RuntimeException(
 						"Invalid UI state.  Attempted to teleport from a non-animating mode.");
@@ -530,7 +532,7 @@ public class BattleView
 
 				try {
 					setMode(new ModeMoveEffect(this, (ModeAnimating) this.mode,
-						move.affectedCharacters, move.range, canCancel));
+						move.getAffectedCharacters(), move.range, canCancel));
 				} catch (ClassCastException ee) {
 					throw new RuntimeException(
 						"Invalid UI state.  Attempted to do move effect from a non-animating mode.");

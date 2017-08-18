@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import isogame.engine.MapPoint;
 import isogame.engine.SelectionInfo;
 import java.util.Map;
@@ -31,7 +31,7 @@ public abstract class Mode {
 	/**
 	 * Some properties of the selected character have changed.
 	 * */
-	public Mode updateSelectedCharacter(final Character selected) {
+	public Mode updateSelectedCharacter(final CharacterFrozen selected) {
 		return this;
 	}
 

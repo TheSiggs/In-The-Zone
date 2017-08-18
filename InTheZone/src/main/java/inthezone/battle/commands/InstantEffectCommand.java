@@ -132,7 +132,7 @@ public class InstantEffectCommand extends Command {
 			.flatMap(p -> trigger.getAllTriggers(p).stream())
 			.collect(Collectors.toList()));
 
-		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
+		for (final Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
 		return r;
 	}
 }

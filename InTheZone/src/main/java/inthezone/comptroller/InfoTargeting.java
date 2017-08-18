@@ -3,7 +3,7 @@ package inthezone.comptroller;
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Casting;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.data.AbilityZoneType;
 import isogame.engine.MapPoint;
@@ -16,16 +16,16 @@ import java.util.stream.Collectors;
  * Get all the locations that can be targeted.
  * */
 public class InfoTargeting extends InfoRequest<Collection<MapPoint>> {
-	private final Character subject;
+	private final CharacterFrozen subject;
 	private final MapPoint castFrom;
 	private final Ability ability;
 	private final Set<MapPoint> retargetedFrom;
 
 	public InfoTargeting(
-		Character subject,
-		MapPoint castFrom,
-		Set<MapPoint> retargetedFrom,
-		Ability ability
+		final CharacterFrozen subject,
+		final MapPoint castFrom,
+		final Set<MapPoint> retargetedFrom,
+		final Ability ability
 	) {
 		this.subject = subject;
 		this.castFrom = castFrom;
@@ -34,7 +34,7 @@ public class InfoTargeting extends InfoRequest<Collection<MapPoint>> {
 	}
 
 
-	@Override public void completeAction(Battle battle) {
+	@Override public void completeAction(final Battle battle) {
 		final Collection<MapPoint> area =
 			battle.battleState.getTargetableArea(
 				subject.getPos(), castFrom, ability).stream()

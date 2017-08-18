@@ -5,7 +5,7 @@ import isogame.engine.CorruptDataException;
 public enum AbilityAgentType {
 	CHARACTER, TRAP, ZONE;
 
-	public static AbilityAgentType fromString(String s)
+	public static AbilityAgentType fromString(final String s)
 		throws CorruptDataException
 	{
 		switch (s) {

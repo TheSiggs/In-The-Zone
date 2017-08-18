@@ -12,7 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import inthezone.battle.BattleOutcome;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 
@@ -111,14 +111,14 @@ public class ReplayHUD extends HUD {
 			ci1, ci2, actionButtons, roundCounterAndClock, assistanceLine);
 	}
 
-	@Override public void init(final Collection<Character> characters) {
+	@Override public void init(final Collection<CharacterFrozen> characters) {
 		super.init(characters);
 
-		for (final Character c : characters) {
-			if (c.player == Player.PLAYER_A) {
-				characterInfoBoxes1.getChildren().add(this.characters.get(c.id));
-			} else if (c.player == Player.PLAYER_B) {
-				characterInfoBoxes2.getChildren().add(this.characters.get(c.id));
+		for (final CharacterFrozen c : characters) {
+			if (c.getPlayer() == Player.PLAYER_A) {
+				characterInfoBoxes1.getChildren().add(this.characters.get(c.getId()));
+			} else if (c.getPlayer() == Player.PLAYER_B) {
+				characterInfoBoxes2.getChildren().add(this.characters.get(c.getId()));
 			}
 		}
 	}

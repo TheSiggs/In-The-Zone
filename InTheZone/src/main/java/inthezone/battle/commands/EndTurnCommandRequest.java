@@ -8,13 +8,13 @@ import java.util.List;
 public class EndTurnCommandRequest extends CommandRequest {
 	private final Player player;
 
-	public EndTurnCommandRequest(Player player) {
+	public EndTurnCommandRequest(final Player player) {
 		this.player = player;
 	}
 
 	@Override
-	public List<Command> makeCommand(BattleState turn) {
-		List<Command> r = new ArrayList<>();
+	public List<Command> makeCommand(final BattleState turn) {
+		final List<Command> r = new ArrayList<>();
 		r.add(new EndTurnCommand(player));
 		return r;
 	}

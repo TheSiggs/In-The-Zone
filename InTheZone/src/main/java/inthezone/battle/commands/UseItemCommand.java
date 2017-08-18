@@ -16,7 +16,7 @@ public class UseItemCommand extends Command {
 	private final MapPoint agent;
 	private final MapPoint target;
 
-	public UseItemCommand(MapPoint agent, MapPoint target) {
+	public UseItemCommand(final MapPoint agent, final MapPoint target) {
 		this.agent = agent;
 		this.target = target;
 	}
@@ -30,7 +30,7 @@ public class UseItemCommand extends Command {
 		return r;
 	}
 
-	public static UseItemCommand fromJSON(JSONObject json)
+	public static UseItemCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -49,7 +49,7 @@ public class UseItemCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
+	public List<Targetable> doCmd(final Battle battle) throws CommandException {
 		// there is only one item for now, so just create a health potion
 		battle.doUseItem(agent, target, new HealthPotion());
 

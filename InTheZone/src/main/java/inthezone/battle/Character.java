@@ -86,29 +86,8 @@ public class Character extends Targetable {
 		this.revengeBonus = revengeBonus;
 	}
 
-	/**
-	 * Create a copy of this character.
-	 * */
-	@Override public Character clone() {
-		return new Character(
-			id,
-			name,
-			player,
-			sprite,
-			portrait,
-			abilities,
-			basicAbility,
-			baseStats,
-			statusBuff,
-			statusDebuff,
-			hasMana,
-			hasCover,
-			pos,
-			ap,
-			mp,
-			hp,
-			revengeBonus
-		);
+	@Override public CharacterFrozen freeze() {
+		return new CharacterFrozen(this);
 	}
 
 	public Character(

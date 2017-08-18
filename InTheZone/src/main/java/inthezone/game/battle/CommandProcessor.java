@@ -8,7 +8,8 @@ import java.util.Optional;
 import java.util.Queue;
 
 import inthezone.battle.Character;
-import inthezone.battle.Targetable;
+import inthezone.battle.CharacterFrozen;
+import inthezone.battle.TargetableFrozen;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.FatigueCommand;
@@ -66,8 +67,8 @@ public class CommandProcessor {
 			switch (((UseAbilityCommand) ec.cmd).agentType) {
 				case CHARACTER:
 					final UseAbilityCommand ua = (UseAbilityCommand) ec.cmd;
-					final Targetable agent = ec.affected.get(0);
-					final String name = ((Character) agent).name;
+					final TargetableFrozen agent = ec.affected.get(0);
+					final String name = ((CharacterFrozen) agent).getName();
 
 					if (ua.placedTraps) view.hud.writeMessage(name + " sets a trap!");
 					else if (ua.placedZones) view.hud.writeMessage(name + " places a zone!");
@@ -87,7 +88,7 @@ public class CommandProcessor {
 			final List<MapPoint> path = ((MoveCommand) ec.cmd).path;
 			if (path.size() < 2) throw new RuntimeException("Invalid move path");
 
-			final Character agent = (Character) ec.affected.get(0);
+			final CharacterFrozen agent = (CharacterFrozen) ec.affected.get(0);
 			view.sprites.scheduleMovement("walk", walkSpeed, path, agent);
 			registeredAnimations = true;
 
@@ -158,7 +159,8 @@ public class CommandProcessor {
 	 * @return true if a new animation was started.
 	 * */
 	private boolean instantEffect(
-		final InstantEffect effect, final List<Targetable> affectedCharacters
+		final InstantEffect effect,
+		final List<TargetableFrozen> affectedCharacters
 	) {
 		view.retargetMode(effect.getRetargeting());
 		if (effect instanceof PullPush) {
@@ -171,7 +173,7 @@ public class CommandProcessor {
 			}
 
 			for (int i = 0; i < pullpush.paths.size(); i++) {
-				final Character c = (Character) affectedCharacters.get(i);
+				final CharacterFrozen c = (CharacterFrozen) affectedCharacters.get(i);
 				view.sprites.scheduleMovement(c.isDead()? "dead" : "idle",
 					pushSpeed, pullpush.paths.get(i), c);
 			}
@@ -188,7 +190,7 @@ public class CommandProcessor {
 			}
 
 			for (int i = 0; i < destinations.size(); i++) {
-				final int id = ((Character) affectedCharacters.get(i)).id;
+				final int id = ((CharacterFrozen) affectedCharacters.get(i)).getId();
 				view.sprites.scheduleTeleport(
 					view.sprites.getCharacterById(id), destinations.get(i));
 			}
@@ -203,7 +205,7 @@ public class CommandProcessor {
 
 			for (int i = 0; i < move.paths.size(); i++) {
 				view.sprites.scheduleMovement("walk", walkSpeed,
-					move.paths.get(i), (Character) affectedCharacters.get(i));
+					move.paths.get(i), (CharacterFrozen) affectedCharacters.get(i));
 			}
 			return !move.paths.isEmpty();
 

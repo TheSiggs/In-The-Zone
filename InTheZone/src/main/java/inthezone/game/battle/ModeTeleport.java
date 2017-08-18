@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.comptroller.InfoTeleportRange;
 import isogame.engine.MapPoint;
 import isogame.engine.SelectionInfo;
@@ -16,7 +16,7 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTeleport extends Mode {
 	private final ModeAnimating lastMode;
-	private final Queue<Character> teleportQueue = new LinkedList<>();
+	private final Queue<CharacterFrozen> teleportQueue = new LinkedList<>();
 	private final List<MapPoint> teleportDestinations = new ArrayList<>();
 	private final int teleportRange;
 	private final boolean canCancel;
@@ -24,7 +24,7 @@ public class ModeTeleport extends Mode {
 	public ModeTeleport(
 		final BattleView view,
 		final ModeAnimating lastMode,
-		final Collection<Character> teleportQueue,
+		final Collection<CharacterFrozen> teleportQueue,
 		final int teleportRange,
 		final boolean canCancel
 	) {
@@ -36,7 +36,7 @@ public class ModeTeleport extends Mode {
 	}
 
 	@Override public Mode updateSelectedCharacter(
-		final Character selectedCharacter
+		final CharacterFrozen selectedCharacter
 	) {
 		return new ModeTeleport(view,
 			lastMode.updateSelectedCharacter(selectedCharacter),
@@ -44,7 +44,7 @@ public class ModeTeleport extends Mode {
 	}
 
 	@Override public Mode setupMode() {
-		final Character teleporting = teleportQueue.peek();
+		final CharacterFrozen teleporting = teleportQueue.peek();
 		if (teleporting == null) {
 			view.battle.completeEffect(teleportDestinations);
 			return lastMode;

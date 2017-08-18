@@ -1,11 +1,12 @@
 package inthezone.battle;
 
+import isogame.engine.MapPoint;
+import isogame.engine.SpriteInfo;
+
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffect;
-import isogame.engine.MapPoint;
-import isogame.engine.SpriteInfo;
 
 public class Trap extends Targetable implements HasParentAgent {
 	public final MapPoint pos;
@@ -89,11 +90,8 @@ public class Trap extends Targetable implements HasParentAgent {
 	@Override public boolean hasMana() {return hasMana;}
 	@Override public double getChanceBuff() {return chanceBuff;}
 
-	@Override public Trap clone() {
-		return new Trap(
-			pos, ability, parent.clone(), hasMana,
-			chanceBuff, attackBuff, defenceBuff,
-			stats, sprite, defused);
+	@Override public TrapFrozen freeze() {
+		return new TrapFrozen(this);
 	}
 }
 

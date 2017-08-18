@@ -5,11 +5,11 @@ public class CommandException extends Exception {
 		super();
 	}
 
-	public CommandException(String msg) {
+	public CommandException(final String msg) {
 		super(msg);
 	}
 
-	public CommandException(String msg, Exception e) {
+	public CommandException(final String msg, final Exception e) {
 		super(msg, e);
 	}
 }

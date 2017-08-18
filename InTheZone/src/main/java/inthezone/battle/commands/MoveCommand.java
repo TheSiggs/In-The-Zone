@@ -25,7 +25,7 @@ public class MoveCommand extends Command {
 	 * @param isPanic Set to true if this move command was created by the panic
 	 * status effect, and the traps and zones have not been triggered yet.
 	 * */
-	public MoveCommand(List<MapPoint> path, boolean isPanic)
+	public MoveCommand(final List<MapPoint> path, final boolean isPanic)
 		throws CommandException
 	{
 		if (path.size() < 2) throw new CommandException("20: Bad path in move command");
@@ -43,7 +43,7 @@ public class MoveCommand extends Command {
 		return r;
 	}
 
-	public static MoveCommand fromJSON(JSONObject json)
+	public static MoveCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -68,7 +68,7 @@ public class MoveCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
+	public List<Targetable> doCmd(final Battle battle) throws CommandException {
 		final Optional<Character> oc = battle.battleState.getCharacterAt(path.get(0));
 
 		if (isPanic && oc.map(c -> !c.isPanicked()).orElse(true)) {
@@ -87,7 +87,7 @@ public class MoveCommand extends Command {
 	}
 
 	@Override
-	public List<ExecutedCommand> doCmdComputingTriggers(Battle turn)
+	public List<ExecutedCommand> doCmdComputingTriggers(final Battle turn)
 		throws CommandException
 	{
 		final List<ExecutedCommand> r = new ArrayList<>();

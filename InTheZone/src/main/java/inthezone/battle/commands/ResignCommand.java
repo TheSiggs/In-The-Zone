@@ -14,12 +14,12 @@ public class ResignCommand extends Command {
 	public final Player player;
 	public final boolean logoff;
 
-	public ResignCommand(Player player) {
+	public ResignCommand(final Player player) {
 		this.player = player;
 		this.logoff = false;
 	}
 
-	public ResignCommand(Player player, boolean logoff) {
+	public ResignCommand(final Player player, final boolean logoff) {
 		this.player = player;
 		this.logoff = logoff;
 	}
@@ -33,7 +33,7 @@ public class ResignCommand extends Command {
 		return r;
 	}
 
-	public static ResignCommand fromJSON(JSONObject json)
+	public static ResignCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -52,7 +52,7 @@ public class ResignCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle turn) {
+	public List<Targetable> doCmd(final Battle turn) {
 		turn.doResign(player, logoff);
 		return new ArrayList<>();
 	}

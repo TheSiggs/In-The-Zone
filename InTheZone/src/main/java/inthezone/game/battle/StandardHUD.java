@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import inthezone.battle.BattleOutcome;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.StandardSprites;
 import inthezone.game.battle.TurnClock;
 
@@ -140,7 +140,7 @@ public class StandardHUD extends HUD {
 		assistanceLine.getChildren().clear();
 	}
 
-	@Override public void init(final Collection<Character> characters) {
+	@Override public void init(final Collection<CharacterFrozen> characters) {
 		super.init(characters);
 		characterInfoBoxes.getChildren().addAll(this.characters.values());
 	}

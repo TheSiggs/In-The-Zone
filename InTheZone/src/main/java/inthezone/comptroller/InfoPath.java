@@ -7,24 +7,24 @@ import java.util.List;
 import java.util.Optional;
 
 import inthezone.battle.Battle;
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 
 /**
  * Get the path the character will follow to a specific point.
  * */
 public class InfoPath extends InfoRequest<List<MapPoint>> {
-	private final Character subject;
+	private final CharacterFrozen subject;
 	private final MapPoint target;
 	private final int range;
 
-	public InfoPath(final Character subject, final MapPoint target) {
+	public InfoPath(final CharacterFrozen subject, final MapPoint target) {
 		this.subject = subject;
 		this.target = target;
 		this.range = subject.getMP();
 	}
 
 	public InfoPath(
-		final Character subject, final MapPoint target, final int range
+		final CharacterFrozen subject, final MapPoint target, final int range
 	) {
 		this.subject = subject;
 		this.target = target;
@@ -36,7 +36,7 @@ public class InfoPath extends InfoRequest<List<MapPoint>> {
 			complete.complete(new LinkedList<>());
 		} else {
 			complete.complete(battle.battleState.findValidPath(
-				subject.getPos(), target, subject.player, range));
+				subject.getPos(), target, subject.getPlayer(), range));
 		}
 	}
 }

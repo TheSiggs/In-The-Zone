@@ -284,14 +284,6 @@ public class BattleState {
 	}
 
 	/**
-	 * Get a copy of the characters list.  Prevents unintentional and potentially
-	 * unsafe mutation of the original character data.
-	 * */
-	public List<Character> cloneCharacters() {
-		return characters.stream().map(c -> c.clone()).collect(Collectors.toList());
-	}
-
-	/**
 	 * Find a path that is guaranteed to be valid
 	 * @return The empty list if there is no valid path
 	 * */

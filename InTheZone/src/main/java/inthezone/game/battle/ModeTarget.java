@@ -2,8 +2,8 @@ package inthezone.game.battle;
 
 import inthezone.battle.Ability;
 import inthezone.battle.Casting;
-import inthezone.battle.Character;
-import inthezone.battle.Targetable;
+import inthezone.battle.CharacterFrozen;
+import inthezone.battle.TargetableFrozen;
 import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.UseAbilityCommandRequest;
 import inthezone.battle.data.InstantEffectInfo;
@@ -27,7 +27,7 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTarget extends Mode {
-	private final Character selectedCharacter;
+	private final CharacterFrozen selectedCharacter;
 	private final Queue<MapPoint> recastFrom;
 	private Ability targetingAbility;
 	private MapPoint castFrom;
@@ -53,7 +53,7 @@ public class ModeTarget extends Mode {
 
 	public ModeTarget(
 		final BattleView view,
-		final Character selectedCharacter,
+		final CharacterFrozen selectedCharacter,
 		final Ability ability
 	) {
 		super(view);
@@ -67,7 +67,7 @@ public class ModeTarget extends Mode {
 
 	private ModeTarget(
 		final BattleView view,
-		final Character selectedCharacter,
+		final CharacterFrozen selectedCharacter,
 		final Queue<MapPoint> recastFrom,
 		final Ability targetingAbility,
 		final MapPoint castFrom,
@@ -93,7 +93,7 @@ public class ModeTarget extends Mode {
 	}
 
 	@Override public Mode updateSelectedCharacter(
-		final Character selectedCharacter
+		final CharacterFrozen selectedCharacter
 	) {
 		final ModeTarget r = new ModeTarget(
 			view, selectedCharacter, recastFrom,
@@ -313,10 +313,10 @@ public class ModeTarget extends Mode {
 	}
 
 	private void queueRecastPoints(
-		final Collection<Targetable> affected
+		final Collection<TargetableFrozen> affected
 	) {
 		final Collection<MapPoint> affected1 = affected.stream()
-			.filter(t -> t instanceof Character &&
+			.filter(t -> t instanceof CharacterFrozen &&
 				!retargetedFrom.contains(t.getPos()))
 			.map(t -> t.getPos())
 			.collect(Collectors.toList());

@@ -20,11 +20,11 @@ public class SimpleAI implements CommandGenerator {
 
 	@Override
 	public void generateCommands(
-		Battle battle, BattleListener listener, Player forPlayer
+		final Battle battle, final BattleListener listener, final Player forPlayer
 	) {
-		for (Command cmd : battle.getTurnStart(forPlayer)) {
+		for (final Command cmd : battle.getTurnStart(forPlayer)) {
 			try {
-				ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+				final ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
 				Platform.runLater(() -> listener.command(ec)); 
 				if (battle.battleState.getBattleOutcome(forPlayer).isPresent()) {
 					return;
@@ -37,8 +37,8 @@ public class SimpleAI implements CommandGenerator {
 		}
 
 		try {
-			Command cmd = new EndTurnCommand(forPlayer);
-			ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
+			final Command cmd = new EndTurnCommand(forPlayer);
+			final ExecutedCommand ec = new ExecutedCommand(cmd, cmd.doCmd(battle));
 			Platform.runLater(() -> listener.command(ec));
 		} catch (CommandException e) {
 			Platform.runLater(() -> listener.badCommand(e));

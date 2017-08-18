@@ -13,7 +13,7 @@ import org.json.JSONObject;
 public class EndTurnCommand extends Command {
 	public final Player player;
 
-	public EndTurnCommand(Player player) {
+	public EndTurnCommand(final Player player) {
 		this.player = player;
 	}
 
@@ -26,7 +26,7 @@ public class EndTurnCommand extends Command {
 		return r;
 	}
 
-	public static EndTurnCommand fromJSON(JSONObject json)
+	public static EndTurnCommand fromJSON(final JSONObject json)
 		throws ProtocolException
 	{
 		try {
@@ -43,8 +43,8 @@ public class EndTurnCommand extends Command {
 	}
 
 	@Override
-	public List<? extends Targetable> doCmd(Battle turn) {
-		return turn.battleState.cloneCharacters();
+	public List<? extends Targetable> doCmd(final Battle turn) {
+		return new ArrayList<>(turn.battleState.characters);
 	}
 }
 

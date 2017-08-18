@@ -20,7 +20,7 @@ public class PushCommandRequest extends CommandRequest {
 
 	private final InstantEffectInfo pushEffect;
 
-	public PushCommandRequest(MapPoint agent, MapPoint target) {
+	public PushCommandRequest(final MapPoint agent, final MapPoint target) {
 		this.agent = agent;
 		this.target = target;
 
@@ -32,7 +32,9 @@ public class PushCommandRequest extends CommandRequest {
 	}
 
 	@Override
-	public List<Command> makeCommand(BattleState battleState) throws CommandException {
+	public List<Command> makeCommand(final BattleState battleState)
+		throws CommandException
+	{
 		final Targetable t = battleState.getTargetableAt(target).stream()
 			.filter(x -> !(x instanceof Trap)).findFirst()
 			.orElseThrow(() -> new CommandException("1: Invalid push command"));

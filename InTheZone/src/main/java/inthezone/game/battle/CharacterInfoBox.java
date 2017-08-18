@@ -12,7 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.StatusEffectDescription;
@@ -41,24 +41,24 @@ public class CharacterInfoBox extends AnchorPane {
 	private final ColorAdjust deadEffect = new ColorAdjust();
 
 	public CharacterInfoBox(
-		final Character character,
+		final CharacterFrozen character,
 		final StandardSprites sprites
 	) {
 		this.sprites = sprites;
-		this.id = character.id;
+		this.id = character.getId();
 
 		Tooltip.install(ap, new Tooltip("Action points: you spend action points when you attack, push, use a potion, or do an ability"));
 		Tooltip.install(mp, new Tooltip("Movement points: every time you move one square, it costs you one movement point"));
 		Tooltip.install(hp, new Tooltip("Health points: when they get to zero your character faints"));
 
-		portrait = new ImageView(character.portrait);
+		portrait = new ImageView(character.getPortrait());
 
 		selectedImage.setId("selectedCharacterImage");
 		selectedImage.setVisible(false);
 
 		this.getStyleClass().add("character-info-box");
 		this.getStyleClass().add("character-info-box" +
-			(character.player == Player.PLAYER_A? "A" : "B"));
+			(character.getPlayer() == Player.PLAYER_A? "A" : "B"));
 		this.getChildren().addAll(portrait, grid, selectedImage);
 		this.setPrefWidth(162);
 		this.setPrefHeight(274);
@@ -93,7 +93,7 @@ public class CharacterInfoBox extends AnchorPane {
 	}
 
 	private void updateStatus(
-		final Character c,
+		final CharacterFrozen c,
 		final Optional<StatusEffect> buff,
 		final Optional<StatusEffect> debuff
 	) {
@@ -124,10 +124,10 @@ public class CharacterInfoBox extends AnchorPane {
 		return r;
 	}
 
-	private ImageView revengeImage(final Character c) {
+	private ImageView revengeImage(final CharacterFrozen c) {
 		final ImageView r = new ImageView(sprites.revengeIcon);
-		final Tooltip t = new Tooltip(c.name + " is angry!\n" +
-			c.name + " gets a revenge bonus of " +
+		final Tooltip t = new Tooltip(c.getName() + " is angry!\n" +
+			c.getName() + " gets a revenge bonus of " +
 			Math.round(c.getRevengeBonus() * 100) + "%");
 		t.setWrapText(true);
 		t.setPrefWidth(300);
@@ -135,7 +135,7 @@ public class CharacterInfoBox extends AnchorPane {
 		return r;
 	}
 
-	public void updateCharacter(final Character c) {
+	public void updateCharacter(final CharacterFrozen c) {
 		ap.update(c.hasMana()? "ap_mana" : "ap", c.getAP(), c.getStats().ap, false);
 		mp.update("mp", c.getMP(), c.getStats().mp, false);
 		hp.update(c.hasCover()? "hp_cover" : "hp",

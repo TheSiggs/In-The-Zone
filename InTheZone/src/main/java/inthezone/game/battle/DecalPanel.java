@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.StatusEffectDescription;
 import javafx.collections.ObservableList;
@@ -85,7 +85,9 @@ public class DecalPanel extends Group {
 	/**
 	 * Update this decal panel
 	 * */
-	public void updateCharacter(final Character c, final boolean isSelected) {
+	public void updateCharacter(
+		final CharacterFrozen c, final boolean isSelected
+	) {
 		final ObservableList<Node> graph = this.getChildren();
 		graph.clear();
 

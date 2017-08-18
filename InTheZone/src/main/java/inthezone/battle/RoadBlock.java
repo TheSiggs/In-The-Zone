@@ -1,16 +1,15 @@
 package inthezone.battle;
 
-import inthezone.battle.commands.Command;
+import isogame.engine.MapPoint;
+import isogame.engine.SpriteInfo;
+
+import java.util.Optional;
+
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffect;
-import isogame.engine.MapPoint;
-import isogame.engine.SpriteInfo;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class RoadBlock extends Targetable {
 	private final static int HITS_TO_DESTROY = 2;
@@ -77,6 +76,8 @@ public class RoadBlock extends Targetable {
 
 	@Override public SpriteInfo getSprite() {return sprite;}
 
-	@Override public RoadBlock clone() {return new RoadBlock(pos, boundZone, hits, sprite);}
+	@Override public RoadBlockFrozen freeze() {
+		return new RoadBlockFrozen(this);
+	}
 }
 

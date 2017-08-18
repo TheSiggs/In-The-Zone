@@ -1,6 +1,6 @@
 package inthezone.game.battle;
 
-import inthezone.battle.Character;
+import inthezone.battle.CharacterFrozen;
 import inthezone.battle.commands.UseItemCommandRequest;
 import inthezone.comptroller.InfoTargetingItem;
 import isogame.engine.MapPoint;
@@ -11,17 +11,17 @@ import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
 public class ModeTargetItem extends Mode {
-	private final Character selectedCharacter;
+	private final CharacterFrozen selectedCharacter;
 
 	public ModeTargetItem(
-		final BattleView view, final Character selectedCharacter
+		final BattleView view, final CharacterFrozen selectedCharacter
 	) {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
 
 	@Override public Mode updateSelectedCharacter(
-		final Character selectedCharacter
+		final CharacterFrozen selectedCharacter
 	) {
 		return new ModeTargetItem(view, selectedCharacter);
 	}

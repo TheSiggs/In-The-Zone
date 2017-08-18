@@ -29,9 +29,17 @@ public class Game extends Application {
 	private static final double MIN_WIDTH = 1280.0;
 	private static final double MIN_HEIGHT = 720.0;
 
+	private boolean inGlobalExceptionHandler = false;
+
 	@Override
 	public void start(final Stage primaryStage) {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, e) -> {
+			if (inGlobalExceptionHandler) {
+				/* Double fault, hard terminate */
+				System.exit(100);
+			}
+
+			inGlobalExceptionHandler = true;
 			try {
 				e.printStackTrace();
 				final Alert a = new Alert(Alert.AlertType.ERROR,
@@ -39,7 +47,10 @@ public class Game extends Application {
 				a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 				a.setHeaderText("Unexpected error");
 				a.showAndWait();
+			} catch (final Exception e2) {
+				/* do nothing because there's nothing we can do at this point */
 			} finally {
+				inGlobalExceptionHandler = false;
 				Platform.exit();
 			}
 		});

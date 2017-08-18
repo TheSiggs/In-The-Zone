@@ -145,12 +145,25 @@ public class Character extends Targetable {
 	}
 
 	public boolean isAbilityBlocked(final Ability a) {
-		if (isDead() || isStunned()) {
+		return Character.isAbilityBlocked(
+			this.isDead(), this.isStunned(),
+			this.statusBuff, this.statusDebuff, a);
+	}
+
+	/**
+	 * Determine if an ability can be used
+	 * */
+	public static boolean isAbilityBlocked(
+		final boolean isDead, final boolean isStunned,
+		final Optional<StatusEffect> buff, final Optional<StatusEffect> debuff,
+		final Ability a
+	) {
+		if (isDead || isStunned) {
 			return true;
 		} else if (a.info.type == AbilityType.SKILL) {
-			return statusDebuff.map(s -> s instanceof Debilitated).orElse(false);
+			return buff.map(s -> s instanceof Debilitated).orElse(false);
 		} else if (a.info.type == AbilityType.SPELL) {
-			return statusDebuff.map(s -> s instanceof Silenced).orElse(false);
+			return debuff.map(s -> s instanceof Silenced).orElse(false);
 		} else {
 			return false;
 		}

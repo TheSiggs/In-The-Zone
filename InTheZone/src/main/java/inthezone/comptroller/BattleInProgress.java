@@ -130,19 +130,18 @@ public class BattleInProgress implements Runnable {
 			final boolean commandsComming =
 				!commandQueue.isEmpty() && !thisPlayerGenerator.isPresent();
 
-			Platform.runLater(() -> {
-				final List<Targetable> affected = new ArrayList<>();
-				affected.addAll(battle.battleState.characters);
-				affected.addAll(zones);
-				try {
-					final ExecutedCommand st =
-						new StartTurnCommand(thisPlayer, affected)
-							.doCmdComputingTriggers(battle).get(0);
-					listener.command(commandsComming? st : st.markLastInSequence());
-				} catch (CommandException e) {
-					listener.badCommand(e);
-				}
-			});
+			final List<Targetable> affected = new ArrayList<>();
+			affected.addAll(battle.battleState.characters);
+			affected.addAll(zones);
+			try {
+				final ExecutedCommand st =
+					new StartTurnCommand(thisPlayer, affected)
+						.doCmdComputingTriggers(battle).get(0);
+				Platform.runLater(() ->
+					listener.command(commandsComming? st : st.markLastInSequence()));
+			} catch (CommandException e) {
+				Platform.runLater(() -> listener.badCommand(e));
+			}
 
 			if (thisPlayerGenerator.isPresent()) {
 				commandQueue.clear();
@@ -268,19 +267,18 @@ public class BattleInProgress implements Runnable {
 
 	private void otherTurn() {
 		final List<Zone> zones = battle.doTurnStart(thisPlayer.otherPlayer());
-		battle.getTurnStart(thisPlayer.otherPlayer()); // Do this for the side-effects only
-		Platform.runLater(() -> {
-			final List<Targetable> affected = new ArrayList<>();
-			affected.addAll(battle.battleState.characters);
-			affected.addAll(zones);
-			try {
-				listener.command((new StartTurnCommand(
-					thisPlayer.otherPlayer(), affected))
-						.doCmdComputingTriggers(battle).get(0).markLastInSequence());
-			} catch (CommandException e) {
-				listener.badCommand(e);
-			}
-		});
+
+		final List<Targetable> affected = new ArrayList<>();
+		affected.addAll(battle.battleState.characters);
+		affected.addAll(zones);
+		try {
+			final ExecutedCommand ec = (new StartTurnCommand(
+				thisPlayer.otherPlayer(), affected))
+					.doCmdComputingTriggers(battle).get(0).markLastInSequence();
+			Platform.runLater(() -> listener.command(ec));
+		} catch (final CommandException e) {
+			Platform.runLater(() -> listener.badCommand(e));
+		}
 
 		otherPlayerGenerator.generateCommands(
 			battle, listener, thisPlayer.otherPlayer());

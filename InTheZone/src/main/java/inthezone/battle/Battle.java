@@ -51,7 +51,7 @@ public class Battle {
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
-		for (Character c : battleState.characters) c.cleanupStatus(this);
+		for (final Character c : battleState.characters) c.cleanupStatus(this);
 
 		return battleState.removeExpiredZones();
 	}
@@ -142,7 +142,7 @@ public class Battle {
 			battleState.getCharacterAt(agent).ifPresent(c -> c.useAbility(ability));
 		}
 
-		for (DamageToTarget d : targets) {
+		for (final DamageToTarget d : targets) {
 			final Targetable t;
 			if (d.isTargetATrap) {
 				Optional<Trap> mt = battleState.getTrapAt(d.target.target);
@@ -186,7 +186,7 @@ public class Battle {
 	) {
 		agent.useAbility(ability);
 		final List<Trap> r = new ArrayList<>();
-		for (MapPoint p : ps) {
+		for (final MapPoint p : ps) {
 			if (battleState.isSpaceFree(p) && !battleState.getTrapAt(p).isPresent())
 				r.add(battleState.placeTrap(p, ability, agent, sprites));
 		}
@@ -206,7 +206,7 @@ public class Battle {
 		final Collection<MapPoint> ps
 	) {
 		final Set<MapPoint> range = new HashSet<>();
-		for (MapPoint p : ps) range.addAll(battleState.getAffectedArea(
+		for (final MapPoint p : ps) range.addAll(battleState.getAffectedArea(
 			p, AbilityAgentType.CHARACTER, ability, new Casting(p, p)));
 
 		final Optional<Integer> turns = ability.info.zone == AbilityZoneType.BOUND_ZONE?
@@ -223,7 +223,7 @@ public class Battle {
 	 * Handle fatigue damage.
 	 * */
 	public void doFatigue(final Collection<DamageToTarget> targets) {
-		for (DamageToTarget d : targets) {
+		for (final DamageToTarget d : targets) {
 			final Character t = battleState.getCharacterAt(d.target.target)
 				.orElseThrow(() -> new RuntimeException(
 					"Attempted to attack non-target, command verification code failed"));
@@ -338,7 +338,7 @@ public class Battle {
 		final Optional<AbilityInfo> a, final Collection<MapPoint> obstacles
 	) {
 		final List<Targetable> r = new ArrayList<>();
-		for (MapPoint p : obstacles) {
+		for (final MapPoint p : obstacles) {
 			r.add(battleState.placeObstacle(p, a, sprites));
 		}
 		battleState.updateRevengeBonus();
@@ -351,7 +351,7 @@ public class Battle {
 	public List<Targetable> doRevive(final Collection<MapPoint> targets) {
 		final List<Targetable> r = new ArrayList<>();
 
-		for (MapPoint t : targets) {
+		for (final MapPoint t : targets) {
 			battleState.getCharacterAt(t).ifPresent(c -> {
 				if (c.isDead()) {
 					c.revive();

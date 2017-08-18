@@ -20,6 +20,20 @@ public class CharacterFrozen extends TargetableFrozen {
 	public CharacterFrozen(final Character c) {
 		super(c);
 		this.root = c;
+
+		getRevengeBonus = root.getRevengeBonus();
+		getAP = root.getAP();
+		getMP = root.getMP();
+		getHP = root.getHP();
+		getMaxHP = root.getMaxHP();
+		hasCover = root.hasCover();
+		isVampiric = root.isVampiric();
+		isStunned = root.isStunned();
+		isImprisoned = root.isImprisoned();
+		isPanicked = root.isPanicked();
+		isFeared = root.isFeared();
+		getStatusBuff = root.getStatusBuff();
+		getStatusDebuff = root.getStatusDebuff();
 	}
 
 	public int getId() { return root.id; }
@@ -33,26 +47,38 @@ public class CharacterFrozen extends TargetableFrozen {
 	}
 
 	public Ability getBasicAbility() { return root.basicAbility; }
-	public double getRevengeBonus() { return root.getRevengeBonus(); }
 
-	public int getAP() { return root.getAP(); }
-	public int getMP() { return root.getMP(); }
-	public int getHP() { return root.getHP(); }
-	public int getMaxHP() { return root.getMaxHP(); }
-	public boolean hasCover() { return root.hasCover(); }
-	public boolean isVampiric() { return root.isVampiric(); }
-	public boolean isStunned() { return root.isStunned(); }
-	public boolean isImprisoned() { return root.isImprisoned(); }
-	public boolean isPanicked() { return root.isPanicked(); }
-	public boolean isFeared() { return root.isFeared(); }
+	final double getRevengeBonus;
+	final int getAP;
+	final int getMP;
+	final int getHP;
+	final int getMaxHP;
+	final boolean hasCover;
+	final boolean isVampiric;
+	final boolean isStunned;
+	final boolean isImprisoned;
+	final boolean isPanicked;
+	final boolean isFeared;
+	final Optional<StatusEffect> getStatusBuff;
+	final Optional<StatusEffect> getStatusDebuff;
+
+	public double getRevengeBonus() { return getRevengeBonus; }
+	public int getAP() { return getAP; }
+	public int getMP() { return getMP; }
+	public int getHP() { return getHP; }
+	public int getMaxHP() { return getMaxHP; }
+	public boolean hasCover() { return hasCover; }
+	public boolean isVampiric() { return isVampiric; }
+	public boolean isStunned() { return isStunned; }
+	public boolean isImprisoned() { return isImprisoned; }
+	public boolean isPanicked() { return isPanicked; }
+	public boolean isFeared() { return isFeared; }
+	public Optional<StatusEffect> getStatusBuff() { return getStatusBuff; }
+	public Optional<StatusEffect> getStatusDebuff() { return getStatusDebuff; }
 
 	public boolean isAbilityBlocked(final Ability a) {
-		return root.isAbilityBlocked(a);
-	}
-
-	public Optional<StatusEffect> getStatusBuff() { return root.getStatusBuff(); }
-	public Optional<StatusEffect> getStatusDebuff() {
-		return root.getStatusDebuff();
+		return Character.isAbilityBlocked(
+			isDead, isStunned, getStatusBuff, getStatusDebuff, a);
 	}
 }
 

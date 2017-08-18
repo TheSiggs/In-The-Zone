@@ -5,12 +5,14 @@ package inthezone.battle;
  * */
 public class RoadBlockFrozen extends TargetableFrozen {
 	private final RoadBlock root;
+	private final boolean hasBeenHit;
 
 	public RoadBlockFrozen(final RoadBlock root) {
 		super(root);
 		this.root = root;
+		hasBeenHit = root.hasBeenHit();
 	}
 	
-	public boolean hasBeenHit() { return root.hasBeenHit(); }
+	public boolean hasBeenHit() { return hasBeenHit; }
 }
 

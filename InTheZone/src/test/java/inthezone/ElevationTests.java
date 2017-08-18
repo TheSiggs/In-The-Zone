@@ -51,9 +51,16 @@ public class ElevationTests {
 			battle.findValidPath(slope1, slope3, Player.PLAYER_A, 2);
 		assertEquals(3, path.size());
 
-		final List<MapPoint> path2 =
-			battle.findValidPath(slope1, slope1.add(new MapPoint(-2, 0)), Player.PLAYER_A, 2);
-		assertTrue(path2.isEmpty());
+		final MapPoint back = slope1.add(new MapPoint(-2, 0));
+
+		final List<MapPoint> path2 = 
+			battle.findValidPath(slope1, back, Player.PLAYER_A, 2);
+		assertEquals(3, path2.size());
+
+		zan.teleport(back, false);
+		final List<MapPoint> path3 =
+			battle.findValidPath(back, slope1, Player.PLAYER_A, 2);
+		assertTrue(path3.isEmpty());
 	}
 
 	@Test public void downCliffs() {

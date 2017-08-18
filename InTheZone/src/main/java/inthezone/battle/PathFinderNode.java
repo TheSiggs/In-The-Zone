@@ -15,11 +15,11 @@ public class PathFinderNode extends Node<MapPoint> {
 	private final int height;
 
 	public PathFinderNode(
-		Node<MapPoint> parent,
-		StageInfo terrain,
-		Set<MapPoint> obstacles,
-		MapPoint start,
-		MapPoint goal
+		final Node<MapPoint> parent,
+		final StageInfo terrain,
+		final Set<MapPoint> obstacles,
+		final MapPoint start,
+		final MapPoint goal
 	) {
 		super(parent, start, goal);
 		this.terrain = terrain;
@@ -30,7 +30,7 @@ public class PathFinderNode extends Node<MapPoint> {
 
 	@Override
 	public Node<MapPoint> getGoalNode() {
-		MapPoint goal = this.getGoal();
+		final MapPoint goal = this.getGoal();
 
 		return new PathFinderNode(
 			this.getParent(),
@@ -42,16 +42,16 @@ public class PathFinderNode extends Node<MapPoint> {
 
 	@Override
 	public Set<Node<MapPoint>> getAdjacentNodes() {
-		Set<Node<MapPoint>> nodes = new TreeSet<>();
+		final Set<Node<MapPoint>> nodes = new TreeSet<>();
 
-		MapPoint pos = this.getPosition();
-		MapPoint goal = this.getGoal();
-		MapPoint n = new MapPoint(pos.x, pos.y - 1);
-		MapPoint s = new MapPoint(pos.x, pos.y + 1);
-		MapPoint e = new MapPoint(pos.x + 1, pos.y);
-		MapPoint w = new MapPoint(pos.x - 1, pos.y);
+		final MapPoint pos = this.getPosition();
+		final MapPoint goal = this.getGoal();
+		final MapPoint n = new MapPoint(pos.x, pos.y - 1);
+		final MapPoint s = new MapPoint(pos.x, pos.y + 1);
+		final MapPoint e = new MapPoint(pos.x + 1, pos.y);
+		final MapPoint w = new MapPoint(pos.x - 1, pos.y);
 
-		Node<MapPoint> parent = this.getParent();
+		final Node<MapPoint> parent = this.getParent();
 		if (!(parent != null && parent.getPosition().equals(pos))) {
 			if (n.y >= 0 && !obstacles.contains(n) && canTraverseBoundary(pos, n, SlopeType.N)) {
 				nodes.add(nextNode(n));
@@ -70,16 +70,16 @@ public class PathFinderNode extends Node<MapPoint> {
 		return nodes;
 	}
 
-	private PathFinderNode nextNode(MapPoint x) {
+	private PathFinderNode nextNode(final MapPoint x) {
 		return new PathFinderNode(this, terrain, obstacles, x, getGoal());
 	}
 
-	private boolean canTraverseBoundary(MapPoint from, MapPoint to, SlopeType slope) {
+	private boolean canTraverseBoundary(final MapPoint from, final MapPoint to, final SlopeType slope) {
 		return canTraverseBoundary(from, to, slope, terrain);
 	}
 
 	public static boolean canTraverseBoundary(
-		MapPoint from, MapPoint to, StageInfo terrain
+		final MapPoint from, final MapPoint to, final StageInfo terrain
 	) {
 		final MapPoint dp = to.subtract(from).normalise();
 		final SlopeType slope;
@@ -95,30 +95,23 @@ public class PathFinderNode extends Node<MapPoint> {
 	 * Determine if the elevation rules allow us to pass from one point to another.
 	 * */
 	private static boolean canTraverseBoundary(
-		MapPoint from, MapPoint to, SlopeType slope, StageInfo terrain
+		final MapPoint from,
+		final MapPoint to,
+		final SlopeType slope,
+		final StageInfo terrain
 	) {
 		final Tile tfrom = terrain.getTile(from);
 		final Tile tto = terrain.getTile(to);
 
-		if (tfrom.slope == tto.slope && tfrom.elevation == tto.elevation) {
-			return true;
-		} else if (tfrom.slope != SlopeType.NONE) {
-			return
-				(slope == tfrom.slope && tto.elevation - tfrom.elevation == 1) ||
-				(slope == tfrom.slope.opposite() && tto.elevation == tfrom.elevation) ||
-				(slope == tfrom.slope &&
-					tto.slope == SlopeType.NONE && tto.elevation <= tfrom.elevation);
-		} else if (tfrom.elevation == tto.elevation) {
-			return tto.slope == SlopeType.NONE || tto.slope == slope;
-		} else if (tfrom.elevation - tto.elevation >= 1) {
-			return tto.slope == slope.opposite() || tto.slope == SlopeType.NONE;
-		} else if (tfrom.elevation - tto.elevation == -1) {
-			return tto.slope == slope;
-		} else return false;
+		return
+			(tfrom.elevation > tto.elevation) ||
+			(tfrom.elevation == tto.elevation &&
+				(tto.slope == SlopeType.NONE || tto.slope == slope || tto.slope == tfrom.slope)) ||
+			((tto.elevation - tfrom.elevation) == 1 && tfrom.slope == slope);
 	}
 
 	@Override
-	public int compareTo(Node<MapPoint> other) {
+	public int compareTo(final Node<MapPoint> other) {
 		if (this.getCost() != other.getCost()) {
 			return super.compareTo(other);
 
@@ -127,8 +120,8 @@ public class PathFinderNode extends Node<MapPoint> {
 				return 0;
 
 			} else {
-				MapPoint n1 = this.getPosition();
-				MapPoint n2 = other.getPosition();
+				final MapPoint n1 = this.getPosition();
+				final MapPoint n2 = other.getPosition();
 				return (n1.x == n2.x) ? (n1.y - n2.y) : (n1.x - n2.x);
 			}
 		}
@@ -136,21 +129,21 @@ public class PathFinderNode extends Node<MapPoint> {
 
 	@Override
 	public double g() {
-		Node<MapPoint> parent = getParent();
+		final Node<MapPoint> parent = getParent();
 		if (parent == null) return 1.0; else return parent.g() + 1.0;
 	}
 
 	@Override
-	public double h(MapPoint goal) {
-		MapPoint here = this.getPosition();
-		double xDiff = goal.x - here.x;
-		double yDiff = goal.y - here.y;
+	public double h(final MapPoint goal) {
+		final MapPoint here = this.getPosition();
+		final double xDiff = goal.x - here.x;
+		final double yDiff = goal.y - here.y;
 		return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 	}
 
 	@Override
 	public String toString() {
-		MapPoint here = this.getPosition();
+		final MapPoint here = this.getPosition();
 		return "(" + here.x + ", " + here.y + ")";
 	}
 }

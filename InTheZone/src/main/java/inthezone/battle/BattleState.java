@@ -283,6 +283,10 @@ public class BattleState {
 		return characters.stream().filter(c -> c.getPos().equals(x)).findFirst();
 	}
 
+	public Optional<Character> getCharacterById(int id) {
+		return characters.stream().filter(c -> c.id == id).findFirst();
+	}
+
 	/**
 	 * Find a path that is guaranteed to be valid
 	 * @return The empty list if there is no valid path
@@ -304,10 +308,10 @@ public class BattleState {
 	public List<List<MapPoint>> findAllValidPaths(
 		final MapPoint start,
 		final MapPoint target,
-		final Player player,
+		final Character subject,
 		final int maxCost
 	) {
-		return pathGenerator.generateAll(start, target, player, maxCost);
+		return pathGenerator.generateAll(start, target, subject, maxCost);
 	}
 
 	private PathGenerator pathGenerator = new PathGenerator(this);

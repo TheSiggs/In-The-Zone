@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import inthezone.battle.Battle;
+import inthezone.battle.Character;
 import inthezone.battle.CharacterFrozen;
 
 /**
@@ -35,8 +36,15 @@ public class InfoPath extends InfoRequest<List<List<MapPoint>>> {
 		if (subject.isImprisoned()) {
 			complete.complete(new LinkedList<>());
 		} else {
-			complete.complete(battle.battleState.findAllValidPaths(
-				subject.getPos(), target, subject.getPlayer(), range));
+			final Optional<Character> character =
+				battle.battleState.getCharacterById(subject.getId());
+
+			if (character.isPresent()) {
+				complete.complete(battle.battleState.findAllValidPaths(
+					subject.getPos(), target, character.get(), range));
+			} else {
+				complete.complete(new LinkedList<>());
+			}
 		}
 	}
 }

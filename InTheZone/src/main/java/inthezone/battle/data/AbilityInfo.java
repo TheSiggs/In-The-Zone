@@ -109,6 +109,12 @@ public class AbilityInfo implements HasJSONRepresentation {
 		return r;
 	}
 
+	public boolean isDangerous() {
+		return
+			(eff > 0d && !heal) ||
+			statusEffect.map(e -> e.kind == StatusEffectKind.DEBUFF).orElse(false);
+	}
+
 	public static AbilityInfo fromJSON(
 		JSONObject json, ResourceLocator loc, Library lib
 	) throws CorruptDataException {

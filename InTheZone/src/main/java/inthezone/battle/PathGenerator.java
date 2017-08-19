@@ -11,8 +11,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import inthezone.battle.data.Player;
-
 /**
  * Generate and rank paths
  * */
@@ -32,7 +30,7 @@ public class PathGenerator {
 	public List<List<MapPoint>> generateAll(
 		final MapPoint source,
 		final MapPoint target,
-		final Player player,
+		final Character player,
 		int maxCost
 	) {
 		final List<MapPoint> init = new ArrayList<>();
@@ -100,7 +98,7 @@ public class PathGenerator {
 	private static final double trapCost = 10d;
 	private static final double zoneCost = 10d;
 
-	private ToDoubleFunction<List<MapPoint>> rankPath(final Player player) {
+	private ToDoubleFunction<List<MapPoint>> rankPath(final Character player) {
 		return p -> {
 			final MapPoint first = p.get(0);
 			final MapPoint last = p.get(p.size() - 1);
@@ -121,10 +119,10 @@ public class PathGenerator {
 					Math.pow((dy * t) + ((double) first.y) - ((double) pt.y), 2));
 
 				double trapHazard = battle.getTrapAt(pt).map(trap ->
-					trap.affects(player)? trapCost : 0d).orElse(0d);
+					trap.hurtsPlayer(player)? trapCost : 0d).orElse(0d);
 
 				double zoneHazard = battle.getZoneAt(pt).map(zone ->
-					zone.affects(player)? zoneCost : 0d).orElse(0d);
+					zone.hurtsPlayer(player)? zoneCost : 0d).orElse(0d);
 
 				totalCost += directness + trapHazard + zoneHazard;
 			}

@@ -67,9 +67,10 @@ public class Trap extends Targetable implements HasParentAgent {
 		this.defused = defused;
 	}
 
-	public boolean affects(final Player player) {
-		// TODO: implement this
-		return true;
+	public boolean hurtsPlayer(final Character subject) {
+		return
+			ability.canTarget(parent, subject) &&
+			ability.info.isDangerous();
 	}
 
 	@Override public boolean blocksSpace() {return false;}

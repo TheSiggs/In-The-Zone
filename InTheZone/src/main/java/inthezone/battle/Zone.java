@@ -93,9 +93,10 @@ public class Zone extends Targetable implements HasParentAgent {
 		turnsRemaining = turnsRemaining.map(t -> t - 1);
 	}
 
-	public boolean affects(final Player player) {
-		// TODO: implement this
-		return true;
+	public boolean hurtsPlayer(final Character subject) {
+		return
+			ability.canTarget(parent, subject) &&
+			ability.info.isDangerous();
 	}
 
 	@Override public boolean blocksSpace() {return false;}

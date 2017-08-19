@@ -21,6 +21,9 @@ public class ModeMoveEffect extends ModeMove {
 	private final int moveRange;
 	private boolean canCancel;
 
+	private final List<List<MapPoint>> currentPaths = new ArrayList<>();
+	private int currentPathIndex = 0;
+
 	private CharacterFrozen moving = null;
 
 	public ModeMoveEffect(
@@ -83,8 +86,19 @@ public class ModeMoveEffect extends ModeMove {
 		stage.clearHighlighting(HIGHLIGHT_PATH);
 
 		getFutureWithRetry(view.battle.requestInfo(new InfoPath(moving, p, moveRange)))
-			.ifPresent(path -> path.stream()
-				.forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH)));
+				.ifPresent(paths -> {
+					currentPaths.addAll(paths);
+					currentPathIndex = 0;
+				});
+	}
+
+	private void updatePathHighlight() {
+		final Stage stage = view.getStage();
+		stage.clearHighlighting(HIGHLIGHT_PATH);
+		if (!currentPaths.isEmpty()) {
+			for (final MapPoint pp : currentPaths.get(currentPathIndex))
+				stage.setHighlight(pp, HIGHLIGHT_PATH);
+		}
 	}
 }
 

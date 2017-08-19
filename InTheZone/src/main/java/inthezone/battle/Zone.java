@@ -93,6 +93,11 @@ public class Zone extends Targetable implements HasParentAgent {
 		turnsRemaining = turnsRemaining.map(t -> t - 1);
 	}
 
+	public boolean affects(final Player player) {
+		// TODO: implement this
+		return true;
+	}
+
 	@Override public boolean blocksSpace() {return false;}
 	@Override public boolean blocksPath(Player player) {return false;}
 

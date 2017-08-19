@@ -298,6 +298,21 @@ public class BattleState {
 	}
 
 	/**
+	 * Find all the possible paths from the source to the target, ordering them
+	 * by desirability.
+	 * */
+	public List<List<MapPoint>> findAllValidPaths(
+		final MapPoint start,
+		final MapPoint target,
+		final Player player,
+		final int maxCost
+	) {
+		return pathGenerator.generateAll(start, target, player, maxCost);
+	}
+
+	private PathGenerator pathGenerator = new PathGenerator(this);
+
+	/**
 	 * Get a valid prefix of a potentially invalid path.
 	 * */
 	public List<MapPoint> reduceToValidPath(final List<MapPoint> path) {

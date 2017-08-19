@@ -12,7 +12,7 @@ import inthezone.battle.CharacterFrozen;
 /**
  * Get the path the character will follow to a specific point.
  * */
-public class InfoPath extends InfoRequest<List<MapPoint>> {
+public class InfoPath extends InfoRequest<List<List<MapPoint>>> {
 	private final CharacterFrozen subject;
 	private final MapPoint target;
 	private final int range;
@@ -35,7 +35,7 @@ public class InfoPath extends InfoRequest<List<MapPoint>> {
 		if (subject.isImprisoned()) {
 			complete.complete(new LinkedList<>());
 		} else {
-			complete.complete(battle.battleState.findValidPath(
+			complete.complete(battle.battleState.findAllValidPaths(
 				subject.getPos(), target, subject.getPlayer(), range));
 		}
 	}

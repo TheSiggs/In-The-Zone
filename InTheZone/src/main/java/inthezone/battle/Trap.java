@@ -67,8 +67,13 @@ public class Trap extends Targetable implements HasParentAgent {
 		this.defused = defused;
 	}
 
+	public boolean affects(final Player player) {
+		// TODO: implement this
+		return true;
+	}
+
 	@Override public boolean blocksSpace() {return false;}
-	@Override public boolean blocksPath(Player player) {return false;}
+	@Override public boolean blocksPath(final Player player) {return false;}
 
 	@Override public Stats getStats() {return stats;}
 	@Override public MapPoint getPos() {return pos;}

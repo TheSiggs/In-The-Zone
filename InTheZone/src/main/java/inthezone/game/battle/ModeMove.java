@@ -7,6 +7,8 @@ import inthezone.comptroller.InfoPath;
 import isogame.engine.MapPoint;
 import isogame.engine.SelectionInfo;
 import isogame.engine.Stage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_MOVE;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
@@ -23,6 +25,9 @@ public class ModeMove extends Mode {
 		super(view);
 		this.selectedCharacter = selectedCharacter;
 	}
+
+	private final List<List<MapPoint>> currentPaths = new ArrayList<>();
+	private int currentPathIndex = 0;
 
 	@Override public Mode updateSelectedCharacter(
 		final CharacterFrozen selectedCharacter
@@ -63,13 +68,24 @@ public class ModeMove extends Mode {
 	}
 
 	@Override public void handleMouseOver(final MapPoint p) {
-		final Stage stage = view.getStage();
-		stage.clearHighlighting(HIGHLIGHT_PATH);
-
+		currentPaths.clear();
 		getFutureWithRetry(view.battle.requestInfo(
 			new InfoPath(selectedCharacter, p)))
-				.ifPresent(path -> path.stream()
-					.forEach(pp -> stage.setHighlight(pp, HIGHLIGHT_PATH)));
+				.ifPresent(paths -> {
+					currentPaths.addAll(paths);
+					currentPathIndex = 0;
+				});
+
+		updatePathHighlight();
+	}
+
+	private void updatePathHighlight() {
+		final Stage stage = view.getStage();
+		stage.clearHighlighting(HIGHLIGHT_PATH);
+		if (!currentPaths.isEmpty()) {
+			for (final MapPoint pp : currentPaths.get(currentPathIndex))
+				stage.setHighlight(pp, HIGHLIGHT_PATH);
+		}
 	}
 
 	@Override public void handleMouseOut() {

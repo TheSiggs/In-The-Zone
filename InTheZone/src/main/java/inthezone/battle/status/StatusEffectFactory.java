@@ -58,7 +58,8 @@ public class StatusEffectFactory {
 					return getEffect(info, startTurn, 0, null);
 			}
 		} catch (CorruptDataException|JSONException e) {
-			throw new ProtocolException("Error parsing status effect");
+			throw new ProtocolException("Error parsing status effect " +
+				json.toString());
 		}
 	}
 }

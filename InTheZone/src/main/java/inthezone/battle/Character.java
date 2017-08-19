@@ -289,18 +289,7 @@ public class Character extends Targetable {
 		final List<Command> r = new ArrayList<>();
 		if (this.player != player) return r;
 
-		final Stats stats = getStats();
-		ap = stats.ap;
-		mp = stats.mp;
-
-		// reset the point buff/debuff checks
-		buffedAP = false;
-		buffedMP = false;
-		debuffedAP = false;
-		debuffedMP = false;
-
 		// handle status effects (but not feared or panicked)
-		hasCover = false;
 		statusBuff.ifPresent(s -> {
 			r.addAll(s.doBeforeTurn(battle, this));
 		});
@@ -341,7 +330,7 @@ public class Character extends Targetable {
 	/**
 	 * Update the status effects on this character
 	 * */
-	public void cleanupStatus(final Battle battle) {
+	public void cleanupStatus(final Battle battle, final Player player) {
 		statusBuff.ifPresent(s -> {
 			if (s.canRemoveNow(battle.battleState.getTurnNumber()))
 				statusBuff = Optional.empty();
@@ -350,7 +339,25 @@ public class Character extends Targetable {
 			if (s.canRemoveNow(battle.battleState.getTurnNumber()))
 				statusDebuff = Optional.empty();
 		});
-		clampPoints();
+
+		if (this.player == player) {
+			// reset the points
+			final Stats stats = getStats();
+			ap = stats.ap;
+			mp = stats.mp;
+
+			// reset the point buff/debuff checks
+			buffedAP = false;
+			buffedMP = false;
+			debuffedAP = false;
+			debuffedMP = false;
+
+			// do the side status buff/debuff side-effects
+			hasCover = false;
+			statusBuff.ifPresent(s -> s.doBeforeTurn(battle, this));
+			statusDebuff.ifPresent(s -> s.doBeforeTurn(battle, this));
+			clampPoints();
+		}
 	}
 
 	@Override public Stats getStats() {

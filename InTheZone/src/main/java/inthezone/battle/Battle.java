@@ -51,7 +51,8 @@ public class Battle {
 		if (flipRound) round += 1;
 		flipRound = !flipRound;
 
-		for (final Character c : battleState.characters) c.cleanupStatus(this);
+		for (final Character c : battleState.characters)
+			c.cleanupStatus(this, player);
 
 		return battleState.removeExpiredZones();
 	}

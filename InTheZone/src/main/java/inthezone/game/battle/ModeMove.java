@@ -49,16 +49,26 @@ public class ModeMove extends Mode {
 		return this;
 	}
 
+	@Override public void nextPath() {
+		if (!currentPaths.isEmpty()) {
+			currentPathIndex = (currentPathIndex + 1) % currentPaths.size();
+			updatePathHighlight();
+		}
+	}
+
 	@Override public void handleSelection(final SelectionInfo selection) {
 		final Optional<CharacterFrozen> oc = selection.spritePriority()
 			.flatMap(p -> view.sprites.getCharacterAt(p));
 
 		final Optional<MapPoint> p = selection.pointPriority();
 
-		if (p.isPresent() && view.isSelectable(p.get())) {
+		if (p.isPresent() &&
+			view.isSelectable(p.get()) &&
+			currentPathIndex < currentPaths.size()
+		) {
 			view.battle.requestCommand(
 				new MoveCommandRequest(
-					selectedCharacter.getPos(), p.get(), selectedCharacter.getPlayer()));
+					currentPaths.get(currentPathIndex), selectedCharacter.getPlayer()));
 			view.setMode(new ModeAnimating(view));
 		} else if (oc.isPresent() && oc.get().getPlayer() == view.player) {
 			view.selectCharacter(Optional.of(oc.get()));

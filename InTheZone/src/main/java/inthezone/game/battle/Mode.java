@@ -51,6 +51,8 @@ public abstract class Mode {
 			"GUI entered an invalid state.  Animation completed but we weren't waiting on any animation");
 	}
 
+	public void nextPath() { return; }
+
 	public boolean isInteractive() {return true;}
 	public void handleSelection(final SelectionInfo selection) {}
 	public void handleMouseOver(final MapPoint p) {}

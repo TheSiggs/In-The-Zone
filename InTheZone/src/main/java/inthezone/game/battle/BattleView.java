@@ -167,6 +167,7 @@ public class BattleView
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
 		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ENTER), InTheZoneKeyBinding.enter);
+		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.TAB), InTheZoneKeyBinding.altpath);
 
 		canvas.doOnKeyReleased(action -> {
 			if (action == InTheZoneKeyBinding.cancel) {
@@ -179,6 +180,8 @@ public class BattleView
 				if (modalDialog.isShowing()) {
 					modalDialog.doDefault();
 				}
+			} else if (action == InTheZoneKeyBinding.altpath) {
+				if (mode != null) mode.nextPath();
 			}
 		});
 

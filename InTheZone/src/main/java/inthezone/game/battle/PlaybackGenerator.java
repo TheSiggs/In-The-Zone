@@ -19,6 +19,7 @@ import java.io.IOException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -134,17 +135,20 @@ public class PlaybackGenerator implements CommandGenerator {
 				if (cmd instanceof EndTurnCommand) return;
 
 			} catch (IOException|JSONException|ProtocolException e) {
-					Platform.runLater(() -> {
-						final Alert a = new Alert(AlertType.ERROR,
-							e.getMessage(), ButtonType.OK);
-						a.setHeaderText("Error parsing playback file");
-						a.showAndWait();
-					});
+				Platform.runLater(() -> {
+					final Alert a = new Alert(AlertType.ERROR,
+						e.getMessage(), ButtonType.OK);
+					a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+					a.setHeaderText("Error parsing playback file");
+					a.showAndWait();
+				});
 
-					this.close();
+				this.close();
+				return;
 
 			} catch (CommandException e) {
 				Platform.runLater(() -> listener.badCommand(e));
+				return;
 
 			} catch (InterruptedException e) {
 				/* ignore */

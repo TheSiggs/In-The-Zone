@@ -492,8 +492,19 @@ public class BattleView
 		hud.endReconnectMode();
 	}
 
+	private boolean handlingError = false;
+
 	@Override
 	public void badCommand(final CommandException e) {
+		System.err.println("Game error: ");
+		e.printStackTrace();
+
+		if (handlingError) {
+			System.err.println("Double fault!");
+			System.exit(100);
+		}
+		handlingError = true;
+
 		final Alert a = new Alert(Alert.AlertType.ERROR,
 			e.getMessage(), ButtonType.CLOSE);
 		a.setHeaderText("Game error!");
@@ -509,6 +520,8 @@ public class BattleView
 		if (!(mode instanceof ModeAnimating) && !(mode instanceof ModeOtherTurn))
 			setMode(new ModeAnimating(this, mode));
 		if (!inAnimation && commands.isComplete()) setMode(mode.animationDone());
+
+		handlingError = false;
 	}
 
 	@Override

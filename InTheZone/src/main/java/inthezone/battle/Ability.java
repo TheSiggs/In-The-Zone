@@ -94,6 +94,16 @@ public class Ability {
 		}
 	}
 
+	/**
+	 * Determine if the ability has any affect on a particular target
+	 * */
+	public boolean canAffect(final Targetable target) {
+		if (target instanceof Trap) return info.affectsTraps();
+		else if (target instanceof Zone) return info.affectsZones();
+		else if (target instanceof RoadBlock) return info.dealsDamage();
+		else return true;
+	}
+
 	private static final double const_a = 20;
 	private static final double const_b = 5;
 	private static final double const_h = 12;

@@ -111,8 +111,24 @@ public class AbilityInfo implements HasJSONRepresentation {
 
 	public boolean isDangerous() {
 		return
-			(eff > 0d && !heal) ||
+			dealsDamage() ||
 			statusEffect.map(e -> e.kind == StatusEffectKind.DEBUFF).orElse(false);
+	}
+
+	public boolean affectsTraps() {
+		return
+			instantBefore.map(i -> i.type == InstantEffectType.DEFUSE).orElse(false) ||
+			instantAfter.map(i -> i.type == InstantEffectType.DEFUSE).orElse(false);
+	}
+
+	public boolean affectsZones() {
+		return
+			instantBefore.map(i -> i.type == InstantEffectType.PURGE).orElse(false) ||
+			instantAfter.map(i -> i.type == InstantEffectType.PURGE).orElse(false);
+	}
+
+	public boolean dealsDamage() {
+		return eff > 0d && !heal;
 	}
 
 	public static AbilityInfo fromJSON(

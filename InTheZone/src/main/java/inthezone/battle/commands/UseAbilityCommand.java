@@ -112,7 +112,7 @@ public class UseAbilityCommand extends Command {
 			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
 			final AbilityAgentType agentType = AbilityAgentType.fromString(json.getString("agentType"));
 			final String ability = json.getString("ability");
-			final String friendlyAbilityName = json.getString("fability");
+			final String friendlyAbilityName = json.optString("fability", ability);
 			final JSONArray rawTargets = json.getJSONArray("targets");
 			final JSONArray rawTargetSquares = json.getJSONArray("targetSquares");
 			final JSONArray rawConstructed = json.getJSONArray("constructed");

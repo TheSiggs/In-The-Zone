@@ -65,7 +65,7 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	public JSONObject getJSON() {
 		final JSONObject o = new JSONObject();
 		o.put("info", info.toString());
-		r.put("startTurn", startTurn);
+		o.put("startTurn", startTurn);
 		return o;
 	}
 }

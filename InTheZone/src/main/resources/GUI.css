@@ -95,6 +95,7 @@
 	-fx-border-width:2px;
 	-fx-border-style:solid;
 	-fx-text-fill:white;
+	-fx-prompt-text-fill:white;
 	-fx-font-size:16px;
 	-fx-padding:10px;
 	-fx-focus-color: transparent;
@@ -186,8 +187,9 @@
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-padding:0px;
-	-fx-focus-color: transparent;
-	-fx-faint-focus-color: transparent;
+	-fx-focus-color:transparent;
+	-fx-faint-focus-color:transparent;
+	-fx-shadow-highlight-color:transparent;
 }
 
 .gui-list .list-cell {
@@ -197,10 +199,14 @@
 	-fx-border-style:solid;
 	-fx-border-color:black;
 	-fx-border-width:0px 0px 2px 0px;
+	-fx-focus-color:transparent;
+	-fx-faint-focus-color:transparent;
+	-fx-shadow-highlight-color:transparent;
 }
 
 .gui-list .list-cell:selected {
-	-fx-font-weight:bold;
+	-fx-background-image:url(/gui_assets/mp.png);
+	-fx-background-repeat:repeat;
 }
 
 .gui-list .list-cell:empty {
@@ -427,7 +433,7 @@
 .main-menu {
 	-fx-background-image:url(/gui_assets/lobby_bg.png);
 	-fx-border-style:solid;
-	-fx-border-width:0px 0px 4px 0px;
+	-fx-border-width:0px 0px 2px 0px;
 	-fx-border-color:black;
 }
 
@@ -442,12 +448,12 @@
 	-fx-faint-focus-color: transparent;
 	-fx-shadow-highlight-color:transparent;
 	-fx-border-style:solid;
-	-fx-border-width:0px 4px 0px 0px;
+	-fx-border-width:0px 2px 0px 0px;
 	-fx-border-color:black;
 }
 
 #menu-button-first {
-	-fx-border-width:0px 4px 0px 4px;
+	-fx-border-width:0px 2px 0px 2px;
 }
 
 .menu-bar > .container {
@@ -455,10 +461,10 @@
 }
 
 .menu-bar > .container > .menu-button Label {
-	-fx-padding:20px 60px 20px 60px;
+	-fx-padding:10px 50px 10px 50px;
 	-fx-text-fill:white;
 	-fx-font-family:'Impact';
-	-fx-font-size:32px;
+	-fx-font-size:20px;
 	-fx-font-weight:bold;
 }
 
@@ -484,7 +490,7 @@
 .menu-item .label {
 	-fx-text-fill:white;
 	-fx-font-family:'Impact';
-	-fx-font-size:32px;
+	-fx-font-size:20px;
 	-fx-font-weight:bold;
 	-fx-alignment:center;
 }

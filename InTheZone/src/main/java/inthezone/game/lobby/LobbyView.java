@@ -87,7 +87,7 @@ public class LobbyView extends BorderPane {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
 
-		this.getStylesheets().add("/GUI.css");
+		this.getStylesheets().addAll("/GUI.css", "/lobby.css");
 		this.getStyleClass().add("gui-pane");
 
 		mainMenu.setUseSystemMenuBar(false);

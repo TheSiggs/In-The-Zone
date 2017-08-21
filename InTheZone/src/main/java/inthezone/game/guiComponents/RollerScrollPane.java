@@ -5,13 +5,12 @@ import javafx.animation.Transition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -25,7 +24,7 @@ public class RollerScrollPane extends AnchorPane {
 
 	private final static double SCROLL_BUTTON_SIZE = 10;
 
-	private Region content;
+	private Node content;
 
 	private double scrollMin = 0;
 	private double scrollMax = 0;
@@ -33,7 +32,7 @@ public class RollerScrollPane extends AnchorPane {
 
 	private boolean enableScrollWheel = true;
 
-	public RollerScrollPane(Region content, boolean horizontal) {
+	public RollerScrollPane(final Node content, final boolean horizontal) {
 		super();
 		this.horizontal = horizontal;
 		this.content = content;
@@ -127,7 +126,7 @@ public class RollerScrollPane extends AnchorPane {
 		});
 	}
 
-	public void setScrollWheelEnable(boolean enableScrollWheel) {
+	public void setScrollWheelEnable(final boolean enableScrollWheel) {
 		this.enableScrollWheel = enableScrollWheel;
 	}
 
@@ -135,7 +134,7 @@ public class RollerScrollPane extends AnchorPane {
 
 	public double getScrollMax() { return scrollMax; }
 
-	public void setScrollPos(double pos) {
+	public void setScrollPos(final double pos) {
 		scroll = Math.min(scrollMax, Math.max(pos, scrollMin));
 		if (horizontal) innerPane.setTranslateX(-scroll);
 			else innerPane.setTranslateY(-scroll);
@@ -149,7 +148,7 @@ public class RollerScrollPane extends AnchorPane {
 
 		final boolean v;
 		if (horizontal) v = cn.getWidth() > vp.getWidth();
-		else v = cn.getHeight() > vp.getHeight();
+		else v = cn.getHeight() > vp.getHeight() + 3d;
 
 		back.setVisible(v);
 		forward.setVisible(v);
@@ -173,7 +172,7 @@ public class RollerScrollPane extends AnchorPane {
 
 	private ScrollAnimation animation = null;
 
-	private void mouseDown(boolean back) {
+	private void mouseDown(final boolean back) {
 		if (animation == null) {
 			// start the scrolling animation
 			animation = new ScrollAnimation(back);
@@ -195,7 +194,7 @@ public class RollerScrollPane extends AnchorPane {
 		final double start;
 		final boolean back;
 
-		public ScrollAnimation(boolean back) {
+		public ScrollAnimation(final boolean back) {
 			this.back = back;
 			this.setInterpolator(Interpolator.LINEAR);
 			if (back) {
@@ -204,10 +203,11 @@ public class RollerScrollPane extends AnchorPane {
 				max = scrollMax;
 			}
 			start = scroll;
-			setCycleDuration(new Duration((Math.abs(max - start) / SCROLL_SPEED) * 1000));
+			setCycleDuration(new Duration(
+				(Math.abs(max - start) / SCROLL_SPEED) * 1000));
 		}
 
-		public void interpolate(double frac) {
+		public void interpolate(final double frac) {
 			final double pos;
 			if (back) pos = ((start - max) * (1 - frac)) + max;
 			else pos = ((max - start) * frac) + start;

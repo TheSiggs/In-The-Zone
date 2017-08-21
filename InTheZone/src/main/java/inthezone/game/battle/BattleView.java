@@ -84,7 +84,7 @@ public class BattleView
 	// Instant effect completions must be delayed until the command queue is empty.
 	private Optional<Runnable> instantEffectCompletion = Optional.empty();
 
-	public final ModalDialog modalDialog = new ModalDialog(this);
+	public final ModalDialog modalDialog = new ModalDialog();
 
 	/**
 	 * Start a standard battle
@@ -140,6 +140,8 @@ public class BattleView
 			Highlighters.highlights);
 
 		this.hud = hud.apply(this);
+		modalDialog.setOnShow(this.hud::modalStart);
+		modalDialog.setOnClose(this.hud::modalEnd);
 
 		System.err.println("Playing as " + player);
 

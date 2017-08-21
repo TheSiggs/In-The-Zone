@@ -12,19 +12,20 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
-import inthezone.game.battle.BattleView;
-
 public class ModalDialog extends Group {
-	private final BattleView view;
-
 	private Optional<DialogPane> currentDialog = Optional.empty();
 	public Optional<DialogPane> getCurrentDialog() { return currentDialog; }
 
 	private boolean isShowing = false;
 	public boolean isShowing() { return isShowing; }
 
-	public ModalDialog(final BattleView view) {
-		this.view = view;
+	private Runnable onShow = () -> {};
+	private Runnable onClose = () -> {};
+
+	public void setOnShow(final Runnable r) { this.onShow = r; }
+	public void setOnClose(final Runnable r) { this.onClose = r; }
+
+	public ModalDialog() {
 		this.setVisible(false);
 	}
 
@@ -42,11 +43,11 @@ public class ModalDialog extends Group {
 			});
 		}
 
-		view.hud.modalStart();
 		currentDialog = Optional.of(pane);
 		this.getChildren().add(pane);
 		this.setVisible(true);
 		isShowing = true;
+		onShow.run();
 	}
 
 	public void doDefault() {
@@ -88,9 +89,9 @@ public class ModalDialog extends Group {
 	public void closeModalDialog() {
 		currentDialog = Optional.empty();
 		this.getChildren().clear();
-		view.hud.modalEnd();
 		isShowing = false;
 		this.setVisible(false);
+		onClose.run();
 	}
 }
 

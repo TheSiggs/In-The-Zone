@@ -5,6 +5,7 @@ import isogame.engine.CorruptDataException;
 import java.util.Collection;
 import java.util.Optional;
 
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -12,7 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 import inthezone.battle.commands.StartBattleCommand;
@@ -28,11 +32,12 @@ public class LobbyView extends BorderPane {
 	private final GameDataFactory gameData;
 	private final ClientConfig config;
 
+	private final HBox mainMenuBack = new HBox();
 	private final MenuBar mainMenu = new MenuBar();
 	private final Menu homeMenu = new Menu(null);
-	private final Menu playMenu = new Menu("Play");
+	private final Menu playMenu = new Menu(null);
 	private final Menu loadoutsMenu = new Menu(null);
-	private final Menu optionsMenu = new Menu("Options");
+	private final Menu optionsMenu = new Menu(null);
 	private final Menu logoutMenu = new Menu(null);
 
 	private final MenuItem practiceGame = new MenuItem("Practice");
@@ -67,8 +72,11 @@ public class LobbyView extends BorderPane {
 		final Node loadoutsLabel = new Label("Loadouts");
 		final Node logoutLabel = new Label("Logout");
 
+		homeMenu.setId("menu-button-first");
 		homeMenu.setGraphic(homeLabel);
+		playMenu.setGraphic(new Label("Play"));
 		loadoutsMenu.setGraphic(loadoutsLabel);
+		optionsMenu.setGraphic(new Label("Options"));
 		logoutMenu.setGraphic(logoutLabel);
 
 		logoutLabel.setOnMouseClicked(event -> {
@@ -79,7 +87,22 @@ public class LobbyView extends BorderPane {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
 
-		setTop(mainMenu);
+		this.getStylesheets().add("/GUI.css");
+		this.getStyleClass().add("gui-pane");
+
+		mainMenu.setUseSystemMenuBar(false);
+
+		final Separator leftSpace = new Separator(Orientation.HORIZONTAL);
+		final Separator rightSpace = new Separator(Orientation.HORIZONTAL);
+		HBox.setHgrow(leftSpace, Priority.ALWAYS);
+		HBox.setHgrow(rightSpace, Priority.ALWAYS);
+		leftSpace.setMaxWidth(Double.MAX_VALUE);
+		rightSpace.setMaxWidth(Double.MAX_VALUE);
+		mainMenuBack.getChildren().addAll(leftSpace, mainMenu, rightSpace);
+
+		mainMenuBack.getStyleClass().add("main-menu");
+
+		setTop(mainMenuBack);
 		setLeft(players);
 		setCenter(newsPanel);
 	}

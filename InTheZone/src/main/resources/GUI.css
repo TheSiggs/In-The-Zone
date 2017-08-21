@@ -424,3 +424,81 @@
 	-fx-stroke-width:2px;
 }
 
+.main-menu {
+	-fx-background-image:url(/gui_assets/lobby_bg.png);
+	-fx-border-style:solid;
+	-fx-border-width:0px 0px 4px 0px;
+	-fx-border-color:black;
+}
+
+.menu-bar {
+	-fx-padding:0px;
+	-fx-background-color:transparent;
+}
+
+.menu-bar > .container > .menu-button {
+	-fx-padding:0px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+	-fx-border-style:solid;
+	-fx-border-width:0px 4px 0px 0px;
+	-fx-border-color:black;
+}
+
+#menu-button-first {
+	-fx-border-width:0px 4px 0px 4px;
+}
+
+.menu-bar > .container {
+	-fx-spacing:0px;
+}
+
+.menu-bar > .container > .menu-button Label {
+	-fx-padding:20px 60px 20px 60px;
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:32px;
+	-fx-font-weight:bold;
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+	-fx-background-image:url(/gui_assets/ap.png);
+	-fx-background-repeat:repeat;
+}
+
+.menu-item {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px 2px 0px 2px;
+	-fx-border-style:solid;
+	-fx-padding:10px 40px 10px 40px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.menu-item .label {
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:32px;
+	-fx-font-weight:bold;
+	-fx-alignment:center;
+}
+
+.menu-item:focused, .menu-item:hovered {
+	-fx-background-image:url(/gui_assets/ap.png);
+	-fx-background-repeat:repeat;
+}
+
+.main-menu .context-menu {
+	-fx-background-color:transparent;
+	-fx-padding:0px;
+	-fx-border-style:solid;
+	-fx-border-color:black;
+	-fx-border-width:0px 0px 2px 0px;
+}
+

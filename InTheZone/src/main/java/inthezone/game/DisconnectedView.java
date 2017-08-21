@@ -133,7 +133,7 @@ public class DisconnectedView extends FlowPane {
 				parent.showScreen(
 					new ChallengePane(gameData, config, Optional.empty(),
 						Player.PLAYER_A, "You", "AI"), getStartSandpitCont());
-			} catch (CorruptDataException e) {
+			} catch (final CorruptDataException e) {
 				final Alert a = new Alert(Alert.AlertType.ERROR,
 					e.getMessage(), ButtonType.CLOSE);
 				a.setHeaderText("Game data corrupt");
@@ -160,13 +160,13 @@ public class DisconnectedView extends FlowPane {
 					parent.showScreen(new BattleView(playback, in, gameData),
 						winCond -> System.err.println("Replay complete: " + winCond));
 
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					final Alert a = new Alert(Alert.AlertType.ERROR,
 						e.getMessage(), ButtonType.CLOSE);
 					a.setHeaderText("Cannot read saved game file");
 					a.showAndWait();
 
-				} catch (ProtocolException|CorruptDataException e) {
+				} catch (final ProtocolException|CorruptDataException e) {
 					final Alert a = new Alert(Alert.AlertType.ERROR,
 						e.getMessage(), ButtonType.CLOSE);
 					a.setHeaderText("Saved game corrupted");
@@ -201,7 +201,7 @@ public class DisconnectedView extends FlowPane {
 					parent.showScreen(new BattleView(
 						ready, Player.PLAYER_A, new SimpleAI(), Optional.empty(), gameData),
 						winCond -> System.err.println("Battle over: " + winCond));
-				} catch (CorruptDataException e) {
+				} catch (final CorruptDataException e) {
 					final Alert a = new Alert(Alert.AlertType.ERROR,
 						e.getMessage(), ButtonType.OK);
 					a.setHeaderText("Error starting game");

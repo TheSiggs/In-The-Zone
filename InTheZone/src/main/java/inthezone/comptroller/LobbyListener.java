@@ -11,33 +11,35 @@ import java.util.Optional;
  * These methods are invoked in the network thread.
  * */
 public interface LobbyListener {
-	public void connectedToServer(String playerName, Collection<String> players);
-	public void errorConnectingToServer(Exception e);
-	public void serverError(Exception e);
+	public void connectedToServer(
+		final String playerName, final Collection<String> players);
+	public void errorConnectingToServer(final Exception e);
+	public void serverError(final Exception e);
 
 	/**
 	 * A message from the server that should be reported to the player.
 	 * */
-	public void serverNotification(String e);
+	public void serverNotification(final String e);
 
 	public void connectionDropped();
 	public void loggedOff();
-	public void playerHasLoggedIn(String player);
-	public void playerHasLoggedOff(String player);
-	public void playerHasEnteredBattle(String player);
-	public void playerRefusesChallenge(String player);
-	public void challengeFrom(String player, StartBattleCommandRequest cmd);
+	public void playerHasLoggedIn(final String player);
+	public void playerHasLoggedOff(final String player);
+	public void playerHasEnteredBattle(final String player);
+	public void playerRefusesChallenge(final String player);
+	public void challengeFrom(
+		final String player, final StartBattleCommandRequest cmd);
 
 	/**
 	 * Our challenge has been issued to the named player.
 	 * */
-	public void challengeIssued(String player);
+	public void challengeIssued(final String player);
 
 	/**
 	 * The other client logged off.
 	 * @param logoff The other client is not coming back
 	 * */
-	public void otherClientDisconnects(boolean logoff);
+	public void otherClientDisconnects(final boolean logoff);
 
 	/**
 	 * The other client reconnected
@@ -49,6 +51,9 @@ public interface LobbyListener {
 	 * @param player The player we are playing
 	 * @param otherPlayer The name of the other player
 	 * */
-	public void startBattle(StartBattleCommand battle, Player player, String otherPlayer);
+	public void startBattle(
+		final StartBattleCommand battle,
+		final Player player,
+		final String otherPlayer);
 }
 

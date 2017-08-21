@@ -28,6 +28,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Region;
 
 import inthezone.ai.CommandGenerator;
 import inthezone.battle.Ability;
@@ -508,6 +509,7 @@ public class BattleView
 		final Alert a = new Alert(Alert.AlertType.ERROR,
 			e.getMessage(), ButtonType.CLOSE);
 		a.setHeaderText("Game error!");
+		a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 		a.showAndWait();
 		battle.requestCommand(new ResignCommandRequest(player));
 	}

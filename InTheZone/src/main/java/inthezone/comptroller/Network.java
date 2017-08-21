@@ -67,7 +67,7 @@ public class Network implements Runnable {
 				while (!connect.get()) {
 					try {
 						connect.wait();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						/* ignore */
 					}
 				}
@@ -78,11 +78,11 @@ public class Network implements Runnable {
 					(new Thread(new NetworkReader(
 						fromServer, lobbyListener, readCommandQueue, gameData,
 							Thread.currentThread()))).start();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					cleanUpConnection();
 					lobbyListener.errorConnectingToServer(e);
 					continue;
-				} catch (ProtocolException e) {
+				} catch (final ProtocolException e) {
 					cleanUpConnection();
 					lobbyListener.serverError(e);
 					continue;
@@ -102,13 +102,13 @@ public class Network implements Runnable {
 						lobbyListener.loggedOff();
 						break;
 					}
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					if (socket.isClosed()) {
 						cleanUpConnection();
 						lobbyListener.connectionDropped();
 						break;
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					cleanUpConnection();
 					lobbyListener.connectionDropped();
 					break;
@@ -121,7 +121,7 @@ public class Network implements Runnable {
 		sendQueue.clear();
 		if (socket != null) try {
 			socket.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			/* Doesn't matter */
 		}
 		connect.set(false);
@@ -156,7 +156,7 @@ public class Network implements Runnable {
 		if (r.kind == MessageKind.GAME_DATA) {
 			try {
 				gameData.update(r.payload);
-			} catch (CorruptDataException e) {
+			} catch (final CorruptDataException e) {
 				throw new ProtocolException("Server error: bad game data", e);
 			}
 		} else if (r.kind != MessageKind.OK) {
@@ -208,7 +208,7 @@ public class Network implements Runnable {
 	) {
 		try {
 			sendQueue.put(Message.CHALLENGE_PLAYER(player, cmd.getJSON()));
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}
@@ -225,15 +225,19 @@ public class Network implements Runnable {
 		try {
 			sendQueue.put(Message.ACCEPT_CHALLENGE(
 				otherPlayer, player, cmd.getJSON()));
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}
 
-	public void refuseChallenge(final String player) {
+	/**
+	 * @param player the player to reject
+	 * @param thisPlayer this player
+	 * */
+	public void refuseChallenge(final String player, final String thisPlayer) {
 		try {
-			sendQueue.put(Message.REJECT_CHALLENGE(player));
-		} catch (InterruptedException e) {
+			sendQueue.put(Message.REJECT_CHALLENGE(player, thisPlayer));
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}
@@ -241,7 +245,7 @@ public class Network implements Runnable {
 	public void sendCommand(final Command cmd) {
 		try {
 			sendQueue.put(Message.COMMAND(cmd.getJSON()));
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}
@@ -249,7 +253,7 @@ public class Network implements Runnable {
 	public void gameOver() {
 		try {
 			sendQueue.put(Message.GAME_OVER());
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}
@@ -257,7 +261,7 @@ public class Network implements Runnable {
 	public void logout() {
 		try {
 			sendQueue.put(Message.LOGOFF());
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
 	}

@@ -1,20 +1,7 @@
 package inthezone.game;
 
-import isogame.engine.CorruptDataException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Stack;
-import java.util.function.Consumer;
-
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-
 import inthezone.battle.BattleOutcome;
+import inthezone.battle.commands.ResignCommand;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
@@ -24,6 +11,19 @@ import inthezone.comptroller.Network;
 import inthezone.comptroller.NetworkCommandGenerator;
 import inthezone.game.battle.BattleView;
 import inthezone.game.lobby.LobbyView;
+import isogame.engine.CorruptDataException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.function.Consumer;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 public class ContentPane extends StackPane implements LobbyListener {
 	private final DisconnectedView disconnected;
@@ -134,6 +134,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Error connecting to server");
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 			a.showAndWait();
 			disconnected.endConnecting();
 			if (screens.isEmpty()) switchPane(disconnected);
@@ -148,6 +149,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Server error");
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 			a.showAndWait();
 			currentBattle.ifPresent(b -> b.handleEndBattle(Optional.empty()));
 			if (screens.isEmpty()) switchPane(disconnected);
@@ -160,6 +162,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 		Platform.runLater(() -> {
 			final Alert a = new Alert(Alert.AlertType.ERROR, e, ButtonType.CLOSE);
 			a.setHeaderText("Message from the server");
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 			a.showAndWait();
 		});
 	}
@@ -210,10 +213,16 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	@Override
 	public void playerRefusesChallenge(final String player) {
+		Platform.runLater(() -> {
+			lobbyView.challengeRejected(player);
+		});
 	}
 
 	@Override
 	public void challengeIssued(final String player) {
+		Platform.runLater(() -> {
+			lobbyView.issuedChallenge(player);
+		});
 	}
 
 	@Override
@@ -252,26 +261,46 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+	private final Map<String, Integer> cancelledChallenges = new HashMap<>();
+
+	/**
+	 * Cancel an outstanding challenge.
+	 * */
+	public void cancelChallenge(final String player) {
+		cancelledChallenges.put(player,
+			1 + cancelledChallenges.getOrDefault(player, 0));
+	}
+
 	@Override
 	public void startBattle(
 		final StartBattleCommand ready,
 		final Player player,
-		final String playerName
+		final String otherPlayer
 	) {
 		Platform.runLater(() -> {
 			try {
+				if (cancelledChallenges.getOrDefault(otherPlayer, 0) > 0) {
+					cancelledChallenges.put(
+						otherPlayer, cancelledChallenges.get(otherPlayer) - 1);
+					network.sendCommand(new ResignCommand(player));
+					return;
+				}
 				final BattleView newBattle = new BattleView(ready, player,
 					new NetworkCommandGenerator(network.readCommandQueue),
 					Optional.of(network), gameData);
 				currentBattle = Optional.of(newBattle);
+				lobbyView.challengeAccepted(otherPlayer);
 				showScreen(newBattle, oWinCond -> {
 					currentBattle = Optional.empty();
 				});
 
-			} catch (CorruptDataException e) {
+			} catch (final CorruptDataException e) {
+				lobbyView.challengeError(otherPlayer);
+				network.sendCommand(new ResignCommand(player, true));
 				final Alert a = new Alert(Alert.AlertType.ERROR,
 					e.getMessage(), ButtonType.CLOSE);
 				a.setHeaderText("Error starting battle");
+				a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 				a.showAndWait();
 			}
 		});

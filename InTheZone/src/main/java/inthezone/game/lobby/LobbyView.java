@@ -1,39 +1,47 @@
 package inthezone.game.lobby;
 
+import isogame.engine.CorruptDataException;
+
+import java.util.Collection;
+import java.util.Optional;
+
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
+
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
-import inthezone.comptroller.Network;
 import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
 import inthezone.game.loadoutEditor.LoadoutOverview;
-import isogame.engine.CorruptDataException;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
-public class LobbyView extends VBox {
-	private final ObservableList<ServerPlayer> players =
-		FXCollections.observableArrayList();
-	final ListView<ServerPlayer> playerList = new ListView<>(players);
-	
-	private final Map<String, ServerPlayer>	playerNames = new HashMap<>();
-
+public class LobbyView extends BorderPane {
 	private final ContentPane parent;
 	private final GameDataFactory gameData;
 	private final ClientConfig config;
+
+	private final MenuBar mainMenu = new MenuBar();
+	private final Menu homeMenu = new Menu(null);
+	private final Menu playMenu = new Menu("Play");
+	private final Menu loadoutsMenu = new Menu(null);
+	private final Menu optionsMenu = new Menu("Options");
+	private final Menu logoutMenu = new Menu(null);
+
+	private final MenuItem practiceGame = new MenuItem("Practice");
+	private final MenuItem queueGame = new MenuItem("Queue");
+	private final MenuItem keybindings = new MenuItem("Keyboard");
+
+	private	final PlayersList players;
+	private final NewsPanel newsPanel = new NewsPanel();
+	private final StatusPanel status;
 
 	public LobbyView(
 		final ContentPane parent,
@@ -44,106 +52,129 @@ public class LobbyView extends VBox {
 		this.gameData = gameData;
 		this.config = config;
 
-		final FlowPane toolbar = new FlowPane();
-		final Button logout = new Button("Logout");
-		final Button loadouts = new Button("Edit loadouts");
-		final Button challenge = new Button("Challenge");
-		toolbar.getChildren().addAll(challenge, loadouts, logout);
+		playMenu.getItems().addAll(practiceGame, queueGame);
+		optionsMenu.getItems().addAll(keybindings);
+		mainMenu.getMenus().addAll(
+			homeMenu, playMenu, loadoutsMenu, optionsMenu, logoutMenu);
 
-		final VBox mainPane = new VBox();
+		players = new PlayersList(this::issueChallenge);
+		status = new StatusPanel(() -> {
+			cancelChallenge();
+			this.setLeft(players);
+		});
 
-		mainPane.getChildren().addAll(new Label("Players on server"), playerList);
+		final Node homeLabel = new Label("Home");
+		final Node loadoutsLabel = new Label("Loadouts");
+		final Node logoutLabel = new Label("Logout");
 
-		challenge.disableProperty().bind(
-			playerList.getSelectionModel().selectedItemProperty().isNull());
+		homeMenu.setGraphic(homeLabel);
+		loadoutsMenu.setGraphic(loadoutsLabel);
+		logoutMenu.setGraphic(logoutLabel);
 
-		this.getChildren().addAll(toolbar, mainPane);
-
-		logout.setOnAction(event -> {
+		logoutLabel.setOnMouseClicked(event -> {
 			parent.network.logout();
 		});
 
-		loadouts.setOnAction(event -> {
+		loadoutsLabel.setOnMouseClicked(event -> {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
 
-		challenge.setOnAction(event -> {
-			if (config.loadouts.isEmpty()) {
-				final Alert a = new Alert(
-					Alert.AlertType.INFORMATION, null, ButtonType.OK);
-				a.setHeaderText(
-					"You must create at least one loadout before issuing a challenge");
-				a.showAndWait();
-				return;
-			}
-
-			final ServerPlayer s =
-				playerList.getSelectionModel().getSelectedItem();
-
-			if (s != null && s.isInGame()) {
-				final Alert a = new Alert(
-					Alert.AlertType.INFORMATION, null, ButtonType.OK);
-				a.setHeaderText(s.name + " is in a game");
-				a.showAndWait();
-				
-			} else if (s != null) {
-				try {
-					parent.showScreen(
-						new ChallengePane(gameData, config, Optional.empty(),
-							Player.randomPlayer(), playerName, s.name), oCmdReq ->
-								oCmdReq.ifPresent(cmdReq -> {
-									parent.network.challengePlayer(cmdReq, s.name);
-								}));
-				} catch (CorruptDataException e) {
-					final Alert a = new Alert(Alert.AlertType.ERROR,
-						e.getMessage(), ButtonType.CLOSE);
-					a.setHeaderText("Error initialising challenge panel");
-					a.showAndWait();
-				}
-			}
-		});
+		setTop(mainMenu);
+		setLeft(players);
+		setCenter(newsPanel);
 	}
 
-	private String playerName = null;
+	private String thisPlayer = null;
 
 	public void joinLobby(
-		final String playerName, final Collection<String> players
+		final String thisPlayer, final Collection<String> players
 	) {
-		this.playerName = playerName;
-		this.players.clear();
-
-		players.stream()
-			.filter(x -> !x.equals(playerName))
-			.map(x -> new ServerPlayer(x, false))
-			.forEach(x -> {
-				this.players.add(x);
-				this.playerNames.put(x.name, x);
-			});
-	}
-
-	public void playerJoins(final String player) {
-		if (player == playerName) return;
-
-		final ServerPlayer oldPlayer = playerNames.get(player);
-		if (oldPlayer != null) {
-			oldPlayer.reset();
-			playerList.refresh();
-		} else {
-			final ServerPlayer p = new ServerPlayer(player, false);
-			playerNames.put(player, p);
-			players.add(p);
+		this.thisPlayer = thisPlayer;
+		for (final String p : players) {
+			if (!p.equals(thisPlayer)) this.players.addPlayer(p);
 		}
 	}
 
+	public void playerJoins(final String player) {
+		players.addPlayer(player);
+	}
+
 	public void playerLeaves(final String player) {
-		final ServerPlayer p = playerNames.remove(player);
-		if (p != null) players.remove(p);
+		players.removePlayer(player);
 	}
 
 	public void playerEntersGame(final String player) {
-		final ServerPlayer p = playerNames.get(player);
-		if (p != null) p.setInGame();
-		playerList.refresh();
+		players.removePlayer(player);
+	}
+
+	public void connectionLost() {
+	}
+
+	public void reconnected() {
+	}
+
+	private Optional<String> currentChallenge;
+
+	public void cancelChallenge() {
+		currentChallenge.ifPresent(parent::cancelChallenge);
+	}
+
+	public void issueChallenge(final String player) {
+		if (config.loadouts.isEmpty()) {
+			final Alert a = new Alert(
+				Alert.AlertType.INFORMATION, null, ButtonType.OK);
+			a.setHeaderText(
+				"You must create at least one loadout before issuing a challenge");
+			a.showAndWait();
+			return;
+		}
+
+		if (thisPlayer == null) {
+			final Alert a = new Alert(
+				Alert.AlertType.ERROR, null, ButtonType.CLOSE);
+			a.setHeaderText(
+				"Cannot issue challenge due to an internal error (player name is unknown)");
+			a.showAndWait();
+			return;
+		}
+
+		try {
+			parent.showScreen(
+				new ChallengePane(gameData, config, Optional.empty(),
+					Player.randomPlayer(), thisPlayer, player), oCmdReq ->
+						oCmdReq.ifPresent(cmdReq -> {
+							parent.network.challengePlayer(cmdReq, player);
+							this.setLeft(status);
+						}));
+		} catch (final CorruptDataException e) {
+			final Alert a = new Alert(Alert.AlertType.ERROR,
+				e.getMessage(), ButtonType.CLOSE);
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+			a.setHeaderText("Error initialising challenge panel");
+			a.showAndWait();
+		}
+	}
+
+	public void issuedChallenge(final String player) {
+		currentChallenge = Optional.of(player);
+		status.setStatus(
+			"Waiting for " + player + " to accept your challenge");
+	}
+
+	public void challengeAccepted(final String player) {
+		setLeft(players);
+	}
+
+	public void challengeRejected(final String player) {
+		setLeft(players);
+		final Alert a = new Alert(
+			Alert.AlertType.INFORMATION, null, ButtonType.OK);
+		a.setHeaderText(player + " rejected your challenge!");
+		a.showAndWait();
+	}
+
+	public void challengeError(final String player) {
+		setLeft(players);
 	}
 
 	public void challengeFrom(
@@ -151,7 +182,7 @@ public class LobbyView extends VBox {
 	) {
 		if (config.loadouts.isEmpty()) {
 			// Automatically refuse the challenge
-			parent.network.refuseChallenge(player);
+			parent.network.refuseChallenge(player, thisPlayer);
 		}
 
 		final Alert a = new Alert(
@@ -163,10 +194,10 @@ public class LobbyView extends VBox {
 				try {
 					parent.showScreen(
 						new ChallengePane(gameData, config, Optional.of(otherCmd.stage),
-							otherCmd.player.otherPlayer(), playerName, player),
+							otherCmd.player.otherPlayer(), thisPlayer, player),
 							oCmdReq -> {
 								if (!oCmdReq.isPresent()) {
-									parent.network.refuseChallenge(player);
+									parent.network.refuseChallenge(player, thisPlayer);
 								} else {
 									try {
 										final StartBattleCommandRequest cmdReq = oCmdReq.get();
@@ -174,8 +205,8 @@ public class LobbyView extends VBox {
 											cmdReq.makeCommand(otherCmd, gameData);
 										parent.network.acceptChallenge(
 											ready, otherCmd.player.otherPlayer(), player);
-									} catch (CorruptDataException e) {
-										parent.network.refuseChallenge(player);
+									} catch (final CorruptDataException e) {
+										parent.network.refuseChallenge(player, thisPlayer);
 										final Alert ae = new Alert(
 											Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
 										ae.setHeaderText("Error initialising battle");
@@ -183,41 +214,18 @@ public class LobbyView extends VBox {
 									}
 								}
 							});
-				} catch (CorruptDataException e) {
-					parent.network.refuseChallenge(player);
+				} catch (final CorruptDataException e) {
+					parent.network.refuseChallenge(player, thisPlayer);
 					final Alert ae = new Alert(
 						Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
+					ae.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 					ae.setHeaderText("Error initialising challenge panel");
 					ae.showAndWait();
 				}
 			} else {
-				parent.network.refuseChallenge(player);
+				parent.network.refuseChallenge(player, thisPlayer);
 			}
 		});
-	}
-}
-
-class ServerPlayer {
-	public final String name;
-
-	private boolean inGame;
-
-	public ServerPlayer(final String name, final boolean inGame) {
-		this.name = name;
-		this.inGame = inGame;
-	}
-
-	public void setInGame() { inGame = true; }
-
-	public boolean isInGame() { return inGame; }
-
-	public void reset() {
-		inGame = false;
-	}
-
-	@Override
-	public String toString() {
-		return name + (inGame? " (unavailable)" : "");
 	}
 }
 

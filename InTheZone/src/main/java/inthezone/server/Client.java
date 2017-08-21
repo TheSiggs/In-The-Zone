@@ -578,7 +578,7 @@ public class Client {
 			// reject any other challenges
 			while (!challenges.isEmpty()) {
 				final Client c = challenges.iterator().next();
-				doRejectChallenge(Message.REJECT_CHALLENGE(c.getClientName()), c);
+				doRejectChallenge(Message.REJECT_CHALLENGE(c.getClientName(), getClientName()), c);
 			}
 
 			final Game game = new Game(this, client);

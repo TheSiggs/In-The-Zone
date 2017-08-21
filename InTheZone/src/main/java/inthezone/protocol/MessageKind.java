@@ -10,7 +10,7 @@ public enum MessageKind {
 	// should not be reported.  Or perhaps the reporting could be delayed until
 	// the player returns to the lobby.
 
-	public static MessageKind fromString(String in) throws ProtocolException {
+	public static MessageKind fromString(final String in) throws ProtocolException {
 		switch (in) {
 			case "SV": return S_VERSION;
 			case "CV": return C_VERSION;

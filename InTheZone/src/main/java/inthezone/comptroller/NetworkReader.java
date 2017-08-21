@@ -24,11 +24,11 @@ public class NetworkReader implements Runnable {
 	private int lastSequenceNumber = 0;
 
 	public NetworkReader(
-		BufferedReader in,
-		LobbyListener lobbyListener,
-		BlockingQueue<Command> recQueue,
-		GameDataFactory gameData,
-		Thread parent
+		final BufferedReader in,
+		final LobbyListener lobbyListener,
+		final BlockingQueue<Command> recQueue,
+		final GameDataFactory gameData,
+		final Thread parent
 	) {
 		this.in = in;
 		this.lobbyListener = lobbyListener;
@@ -52,9 +52,12 @@ public class NetworkReader implements Runnable {
 
 				switch (msg.kind) {
 					case PLAYERS_JOIN:
-						for (String p : msg.parseJoinedLobby()) lobbyListener.playerHasLoggedIn(p);
-						for (String p : msg.parseLeftLobby()) lobbyListener.playerHasLoggedOff(p);
-						for (String p : msg.parseJoinedGame()) lobbyListener.playerHasEnteredBattle(p);
+						for (final String p : msg.parseJoinedLobby())
+							lobbyListener.playerHasLoggedIn(p);
+						for (final String p : msg.parseLeftLobby())
+							lobbyListener.playerHasLoggedOff(p);
+						for (final String p : msg.parseJoinedGame())
+							lobbyListener.playerHasEnteredBattle(p);
 						break;
 
 					case CHALLENGE_PLAYER:
@@ -62,13 +65,14 @@ public class NetworkReader implements Runnable {
 							lobbyListener.challengeFrom(msg.parseName(),
 								StartBattleCommandRequest.fromJSON(
 									msg.payload.getJSONObject("cmd"), gameData));
-						} catch (JSONException e) {
-							throw new ProtocolException("NetworkReader 10: Malformed command", e);
+						} catch (final JSONException e) {
+							throw new ProtocolException(
+								"NetworkReader 10: Malformed command", e);
 						}
 						break;
 
 					case REJECT_CHALLENGE:
-						lobbyListener.playerRefusesChallenge(msg.parseName());
+						lobbyListener.playerRefusesChallenge(msg.parseOtherPlayer());
 						break;
 
 					case START_BATTLE:
@@ -76,7 +80,7 @@ public class NetworkReader implements Runnable {
 							lobbyListener.startBattle(
 								StartBattleCommand.fromJSON(msg.parseCommand(), gameData),
 								msg.parsePlayer(), msg.payload.getString("otherPlayer"));
-						} catch (JSONException e) {
+						} catch (final JSONException e) {
 							throw new ProtocolException(
 								"NetworkReader 20: Invalid start battle command", e);
 						}
@@ -86,7 +90,7 @@ public class NetworkReader implements Runnable {
 						try {
 							recQueue.put(Command.fromJSON(msg.parseCommand()));
 							lastSequenceNumber = sequenceNumber;
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 							/* ignore */
 						}
 						break;
@@ -126,9 +130,9 @@ public class NetworkReader implements Runnable {
 				/* Doesn't matter */
 			}
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO: try to recover the situation
-		} catch (ProtocolException e) {
+		} catch (final ProtocolException e) {
 			try {
 				in.close();
 				parent.interrupt();

@@ -73,10 +73,7 @@ public class LobbyView extends BorderPane {
 			homeMenu, playMenu, loadoutsMenu, optionsMenu, logoutMenu);
 
 		players = new PlayersList(this::issueChallenge);
-		status = new StatusPanel(() -> {
-			cancelChallenge();
-			this.setLeft(players);
-		});
+		status = new StatusPanel(this::cancelChallenge);
 
 		final Node homeLabel = new Label("Home");
 		final Node loadoutsLabel = new Label("Loadouts");
@@ -179,7 +176,7 @@ public class LobbyView extends BorderPane {
 			return;
 		}
 
-		if (wait == StatusPanel.WaitingStatus.NONE) {
+		if (status.getWaitingStatus() == StatusPanel.WaitingStatus.NONE) {
 			try {
 				parent.showScreen(
 					new ChallengePane(gameData, config, Optional.empty(),
@@ -199,6 +196,7 @@ public class LobbyView extends BorderPane {
 	public void cancelChallenge() {
 		currentChallenge.ifPresent(parent::cancelChallenge);
 		status.waitingDone();
+		setLeft(players);
 	}
 
 	public void issueChallenge(final String player) {
@@ -250,12 +248,16 @@ public class LobbyView extends BorderPane {
 	}
 
 	public void challengeRejected(final String player) {
+		final Optional<String> waitingFor = status.getWaitingForPlayer();
+
 		status.waitingDone();
 		setLeft(players);
-		final Alert a = new Alert(
-			Alert.AlertType.INFORMATION, null, ButtonType.OK);
-		a.setHeaderText(player + " rejected your challenge!");
-		a.showAndWait();
+		if (waitingFor.map(p -> p.equals(player)).orElse(false)) {
+			final Alert a = new Alert(
+				Alert.AlertType.INFORMATION, null, ButtonType.OK);
+			a.setHeaderText(player + " rejected your challenge!");
+			a.showAndWait();
+		}
 	}
 
 	public void challengeError(final String player) {

@@ -1,8 +1,8 @@
-#players-list {
+.left-panel {
 	-fx-padding:60px 0px 60px 40px
 }
 
-#players-list-inner {
+.left-panel-inner {
 	-fx-background-image:url(/gui_assets/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-border-width:2px;
@@ -48,6 +48,12 @@
 
 #news-panel-inner {
 	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-border-color:black;
+}
+
+#status-message {
+	-fx-border-width:0px 0px 2px 0px;
 	-fx-border-style:solid;
 	-fx-border-color:black;
 }

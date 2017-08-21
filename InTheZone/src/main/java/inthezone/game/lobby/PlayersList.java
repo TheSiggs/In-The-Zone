@@ -53,8 +53,9 @@ public class PlayersList extends StackPane {
 		players.setPlaceholder(noPlayers);
 		noPlayers.setText(noPlayersOnServer);
 
+		this.getStyleClass().add("left-panel");
+		inner.getStyleClass().add("left-panel-inner");
 		this.setId("players-list");
-		inner.setId("players-list-inner");
 		title.getStyleClass().add("title");
 		noPlayers.setId("no-players");
 		searchBox.getStyleClass().add("gui-textfield");

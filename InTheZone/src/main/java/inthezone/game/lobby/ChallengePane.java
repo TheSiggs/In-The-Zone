@@ -177,14 +177,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			true, false, highlights);
 		startPosChooser.startAnimating();
 
-		startPosChooser.keyBindings.keys.put(
-			new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
-		startPosChooser.keyBindings.keys.put(
-			new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
-		startPosChooser.keyBindings.keys.put(
-			new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
-		startPosChooser.keyBindings.keys.put(
-			new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
+		startPosChooser.keyBindings.loadBindings(config.getKeyBindingTable());
 
 		startPosChooser.setFocusTraversable(true);
 		// make sure other controls can't take focus

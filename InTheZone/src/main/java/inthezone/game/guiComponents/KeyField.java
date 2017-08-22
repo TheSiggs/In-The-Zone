@@ -17,6 +17,8 @@ public class KeyField extends TextField {
 
 	public final ObjectProperty<KeyCodeCombination> keyProperty =
 		new SimpleObjectProperty<>(null);
+	
+	private Optional<KeyCodeCombination> previousValue = Optional.empty();
 
 	public KeyField(final Optional<KeyCodeCombination> key) {
 		invalidKeys.add(KeyCode.ESCAPE);
@@ -66,11 +68,15 @@ public class KeyField extends TextField {
 					KeyCombination.ModifierValue.ANY, shortcut);
 
 			keyProperty.setValue(c);
+			previousValue = Optional.empty();
 		});
 
 		this.focusedProperty().addListener((o, f0, gainingFocus) -> {
 			if (gainingFocus) {
+				previousValue = Optional.ofNullable(keyProperty.getValue());
 				keyProperty.setValue(null);
+			} else {
+				previousValue.ifPresent(keyProperty::setValue);
 			}
 		});
 	}

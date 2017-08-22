@@ -57,26 +57,16 @@ public class KeyboardOptions extends DialogPane {
 	private void initialize(final KeyBindingTable table) {
 		bindings.getChildren().clear();
 
-		final Map<KeyBinding, List<KeyCodeCombination>> reverseTable =
-			new HashMap<>();
-
-		for (final KeyCodeCombination k : table.keys.keySet()) {
-			final KeyBinding b = table.keys.get(k);
-			final List<KeyCodeCombination> l =
-				reverseTable.getOrDefault(b, new ArrayList<>());
-			l.add(k);
-			reverseTable.put(b, l);
-		}
+		final Map<KeyBinding, KeyCodeCombination> kp =
+			table.getPrimaryKeys();
+		final Map<KeyBinding, KeyCodeCombination> ks =
+			table.getSecondaryKeys();
 
 		int rowNum = 0;
 		for (final KeyBinding b : InTheZoneKeyBinding.allBindings()) {
 			final Label action = new Label(b.toString());
-			final List<KeyCodeCombination> l =
-				reverseTable.getOrDefault(b, new ArrayList<>());
-			final KeyField primary = new KeyField(
-				Optional.ofNullable(l.size() > 0 ? l.get(0) : null));
-			final KeyField secondary = new KeyField(
-				Optional.ofNullable(l.size() > 1 ? l.get(1) : null));
+			final KeyField primary = new KeyField(Optional.ofNullable(kp.get(b)));
+			final KeyField secondary = new KeyField(Optional.ofNullable(ks.get(b)));
 
 			primary.setPromptText("click to set key");
 			secondary.setPromptText("click to set key");

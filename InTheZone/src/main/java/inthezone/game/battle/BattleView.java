@@ -1,7 +1,6 @@
 package inthezone.game.battle;
 
 import isogame.engine.CorruptDataException;
-import isogame.engine.KeyBinding;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
@@ -25,8 +24,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 
@@ -48,6 +45,7 @@ import inthezone.comptroller.BattleInProgress;
 import inthezone.comptroller.BattleListener;
 import inthezone.comptroller.InfoMoveRange;
 import inthezone.comptroller.Network;
+import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
 import inthezone.game.InTheZoneKeyBinding;
 import inthezone.protocol.ProtocolException;
@@ -94,10 +92,11 @@ public class BattleView
 		final Player player,
 		final CommandGenerator otherPlayer,
 		final Optional<Network> network,
-		final GameDataFactory gameData
+		final GameDataFactory gameData,
+		final ClientConfig config
 	) throws CorruptDataException {
 		this(startBattle, player,
-			Optional.empty(), otherPlayer, network, gameData,
+			Optional.empty(), otherPlayer, network, gameData, config,
 			view -> new StandardHUD(view, gameData.getStandardSprites()));
 	}
 
@@ -107,13 +106,14 @@ public class BattleView
 	public BattleView(
 		final PlaybackGenerator pb,
 		final InputStream in,
-		final GameDataFactory gameData
+		final GameDataFactory gameData,
+		final ClientConfig config
 	) throws IOException, ProtocolException, CorruptDataException {
 		this(
 			pb.start(new BufferedReader(new InputStreamReader(in, "UTF-8")), gameData),
 			Player.PLAYER_OBSERVER,
 			Optional.of(pb), pb,
-			Optional.empty(), gameData,
+			Optional.empty(), gameData, config,
 			view -> new ReplayHUD(view, gameData.getStandardSprites(), pb));
 	}
 
@@ -124,6 +124,7 @@ public class BattleView
 		final CommandGenerator otherPlayer,
 		final Optional<Network> network,
 		final GameDataFactory gameData,
+		final ClientConfig config,
 		final Function<BattleView, HUD> hud
 	) throws CorruptDataException {
 		this.setMinSize(0, 0);
@@ -164,13 +165,7 @@ public class BattleView
 		canvas.doOnMouseOver(p -> mode.handleMouseOver(p));
 		canvas.doOnMouseOut(() -> mode.handleMouseOut());
 
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.ENTER), InTheZoneKeyBinding.enter);
-		canvas.keyBindings.keys.put(new KeyCodeCombination(KeyCode.TAB), InTheZoneKeyBinding.altpath);
+		canvas.keyBindings.loadBindings(config.getKeyBindingTable());
 
 		canvas.doOnKeyReleased(action -> {
 			if (action == InTheZoneKeyBinding.cancel) {

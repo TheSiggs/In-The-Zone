@@ -132,7 +132,7 @@ public class DisconnectedView extends FlowPane {
 			try {
 				parent.showScreen(
 					new ChallengePane(gameData, config, Optional.empty(),
-						Player.PLAYER_A, "You", "AI"), getStartSandpitCont());
+						Player.PLAYER_A, "You", "AI"), getStartSandpitCont(config));
 			} catch (final CorruptDataException e) {
 				final Alert a = new Alert(Alert.AlertType.ERROR,
 					e.getMessage(), ButtonType.CLOSE);
@@ -157,7 +157,7 @@ public class DisconnectedView extends FlowPane {
 					final PlaybackGenerator playback = new PlaybackGenerator();
 					final InputStream in = new FileInputStream(file);
 
-					parent.showScreen(new BattleView(playback, in, gameData),
+					parent.showScreen(new BattleView(playback, in, gameData, config),
 						winCond -> System.err.println("Replay complete: " + winCond));
 
 				} catch (final IOException e) {
@@ -179,7 +179,9 @@ public class DisconnectedView extends FlowPane {
 		this.getChildren().addAll(login, setServer, loadout, sandpit, replay);
 	}
 
-	private Consumer<Optional<StartBattleCommandRequest>> getStartSandpitCont() {
+	private Consumer<Optional<StartBattleCommandRequest>> getStartSandpitCont(
+		final ClientConfig config
+	) {
 		return ostart -> {
 			ostart.ifPresent(start -> {
 				try {
@@ -199,7 +201,8 @@ public class DisconnectedView extends FlowPane {
 
 					// start the battle
 					parent.showScreen(new BattleView(
-						ready, Player.PLAYER_A, new SimpleAI(), Optional.empty(), gameData),
+						ready, Player.PLAYER_A, new SimpleAI(),
+						Optional.empty(), gameData, config),
 						winCond -> System.err.println("Battle over: " + winCond));
 				} catch (final CorruptDataException e) {
 					final Alert a = new Alert(Alert.AlertType.ERROR,

@@ -328,7 +328,8 @@ public class LobbyView extends StackPane {
 
 					// start the battle
 					parent.showScreen(new BattleView(
-						ready, Player.PLAYER_A, new SimpleAI(), Optional.empty(), gameData),
+						ready, Player.PLAYER_A, new SimpleAI(),
+						Optional.empty(), gameData, config),
 						winCond -> System.err.println("Battle over: " + winCond));
 				} catch (final CorruptDataException e) {
 					modalDialog.showError(e, "Error starting game", () -> System.exit(1));

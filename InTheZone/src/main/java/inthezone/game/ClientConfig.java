@@ -42,32 +42,19 @@ public class ClientConfig implements HasJSONRepresentation {
 		new KeyBindingTable();
 
 	public ClientConfig(final GameDataFactory gameData) {
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.UP), KeyBinding.scrollUp);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.DOWN), KeyBinding.scrollDown);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.LEFT), KeyBinding.scrollLeft);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.RIGHT), KeyBinding.scrollRight);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.Q), KeyBinding.rotateLeft);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.E), KeyBinding.rotateRight);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.ENTER), InTheZoneKeyBinding.enter);
-		defaultKeybindingTable.keys.put(
-			new KeyCodeCombination(KeyCode.TAB), InTheZoneKeyBinding.altpath);
+		defaultKeybindingTable.setSecondaryKey(KeyBinding.scrollUp        , new KeyCodeCombination(KeyCode.UP)    );
+		defaultKeybindingTable.setSecondaryKey(KeyBinding.scrollDown      , new KeyCodeCombination(KeyCode.DOWN)  );
+		defaultKeybindingTable.setSecondaryKey(KeyBinding.scrollLeft      , new KeyCodeCombination(KeyCode.LEFT)  );
+		defaultKeybindingTable.setSecondaryKey(KeyBinding.scrollRight     , new KeyCodeCombination(KeyCode.RIGHT) );
+		defaultKeybindingTable.setPrimaryKey(  KeyBinding.rotateLeft      , new KeyCodeCombination(KeyCode.Q)     );
+		defaultKeybindingTable.setPrimaryKey(  KeyBinding.rotateRight     , new KeyCodeCombination(KeyCode.E)     );
+		defaultKeybindingTable.setPrimaryKey(  KeyBinding.scrollUp        , new KeyCodeCombination(KeyCode.W)     );
+		defaultKeybindingTable.setPrimaryKey(  KeyBinding.scrollLeft      , new KeyCodeCombination(KeyCode.A)     );
+		defaultKeybindingTable.setPrimaryKey(  KeyBinding.scrollDown      , new KeyCodeCombination(KeyCode.S)     );
+		defaultKeybindingTable.setPrimaryKey(  KeyBinding.scrollRight     , new KeyCodeCombination(KeyCode.D)     );
+		defaultKeybindingTable.setPrimaryKey(  InTheZoneKeyBinding.cancel , new KeyCodeCombination(KeyCode.ESCAPE));
+		defaultKeybindingTable.setPrimaryKey(  InTheZoneKeyBinding.enter  , new KeyCodeCombination(KeyCode.ENTER) );
+		defaultKeybindingTable.setPrimaryKey(  InTheZoneKeyBinding.altpath, new KeyCodeCombination(KeyCode.TAB)   );
 
 		try (
 			BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -148,10 +135,7 @@ public class ClientConfig implements HasJSONRepresentation {
 	}
 
 	private void copyDefaultKeysTable() {
-		keyBindings.keys.clear();
-		for (final KeyCodeCombination k : defaultKeybindingTable.keys.keySet()) {
-			keyBindings.keys.put(k, defaultKeybindingTable.keys.get(k));
-		}
+		keyBindings.loadBindings(defaultKeybindingTable);
 	}
 
 	private void resetConfigFile() {

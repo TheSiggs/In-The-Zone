@@ -1,6 +1,7 @@
 package inthezone.game.guiComponents;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.ObjectProperty;
@@ -9,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 
 public class KeyField extends TextField {
 	private final Set<KeyCode> invalidKeys = new HashSet<>();
@@ -16,7 +18,7 @@ public class KeyField extends TextField {
 	public final ObjectProperty<KeyCodeCombination> keyProperty =
 		new SimpleObjectProperty<>(null);
 
-	public KeyField() {
+	public KeyField(final Optional<KeyCodeCombination> key) {
 		invalidKeys.add(KeyCode.ESCAPE);
 		invalidKeys.add(KeyCode.ENTER);
 		invalidKeys.add(KeyCode.CONTROL);
@@ -25,7 +27,14 @@ public class KeyField extends TextField {
 		invalidKeys.add(KeyCode.META);
 		invalidKeys.add(KeyCode.SHORTCUT);
 
-		this.textProperty().bind(keyProperty.asString());
+		addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+			if (event.getCode() == KeyCode.TAB) event.consume();
+		});
+
+		keyProperty.addListener((o, k0, k1) ->
+			textProperty().set(k1 == null? "" : k1.getDisplayText()));
+
+		key.ifPresent(keyProperty::setValue);
 
 		this.setOnKeyReleased(event -> {
 			final KeyCode code = event.getCode();
@@ -57,14 +66,11 @@ public class KeyField extends TextField {
 					KeyCombination.ModifierValue.ANY, shortcut);
 
 			keyProperty.setValue(c);
-			this.textProperty().bind(keyProperty.asString());
 		});
 
 		this.focusedProperty().addListener((o, f0, gainingFocus) -> {
 			if (gainingFocus) {
-				this.textProperty().unbind();
-				this.setText("");
-			} else {
+				keyProperty.setValue(null);
 			}
 		});
 	}

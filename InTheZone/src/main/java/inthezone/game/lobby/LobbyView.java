@@ -35,6 +35,7 @@ import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
 import inthezone.game.battle.BattleView;
 import inthezone.game.battle.ModalDialog;
+import inthezone.game.guiComponents.KeyboardOptions;
 import inthezone.game.loadoutEditor.LoadoutOverview;
 
 public class LobbyView extends StackPane {
@@ -93,6 +94,11 @@ public class LobbyView extends StackPane {
 
 		loadoutsLabel.setOnMouseClicked(event -> {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
+		});
+
+		keybindings.setOnAction(event -> {
+			final KeyboardOptions dialog = new KeyboardOptions(config);
+			modalDialog.showDialog(dialog, r -> {});
 		});
 
 		logoutLabel.setOnMouseClicked(event -> {

@@ -43,6 +43,18 @@ public class ClientConfig implements HasJSONRepresentation {
 
 	public ClientConfig(final GameDataFactory gameData) {
 		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.UP), KeyBinding.scrollUp);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.DOWN), KeyBinding.scrollDown);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.LEFT), KeyBinding.scrollLeft);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.RIGHT), KeyBinding.scrollRight);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.Q), KeyBinding.rotateLeft);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.E), KeyBinding.rotateRight);
+		defaultKeybindingTable.keys.put(
 			new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
 		defaultKeybindingTable.keys.put(
 			new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);

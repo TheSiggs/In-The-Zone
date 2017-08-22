@@ -98,7 +98,12 @@ public class LobbyView extends StackPane {
 
 		keybindings.setOnAction(event -> {
 			final KeyboardOptions dialog = new KeyboardOptions(config);
-			modalDialog.showDialog(dialog, r -> {});
+			modalDialog.showDialog(dialog, r -> {
+				if (r == KeyboardOptions.doneButton) {
+					config.getKeyBindingTable().loadBindings(dialog.resultTable);
+					config.writeConfig();
+				}
+			});
 		});
 
 		logoutLabel.setOnMouseClicked(event -> {

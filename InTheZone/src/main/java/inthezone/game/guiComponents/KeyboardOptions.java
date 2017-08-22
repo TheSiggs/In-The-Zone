@@ -24,7 +24,7 @@ import inthezone.game.ClientConfig;
 import inthezone.game.InTheZoneKeyBinding;
 
 public class KeyboardOptions extends DialogPane {
-	private final ButtonType doneButton =
+	public static final ButtonType doneButton =
 		new ButtonType("Done", ButtonBar.ButtonData.OK_DONE);
 	
 	private final Button resetButton = new Button("Reset to defaults");
@@ -34,6 +34,8 @@ public class KeyboardOptions extends DialogPane {
 	private final ScrollPane bindingsWrapper;
 
 	private static final double KeysHeight = 300d;
+
+	public final KeyBindingTable resultTable = new KeyBindingTable();
 
 	public KeyboardOptions(final ClientConfig config) {
 		bindingsWrapper = new ScrollPane(bindings);
@@ -47,6 +49,9 @@ public class KeyboardOptions extends DialogPane {
 		bindingsWrapper.setMinHeight(KeysHeight);
 		bindingsWrapper.setMaxHeight(KeysHeight);
 
+		resetButton.setOnAction(event ->
+			initialize(config.defaultKeyBindingTable));
+
 		this.setHeaderText("Keyboard bindings");
 		this.setContent(content);
 		this.getButtonTypes().addAll(ButtonType.CANCEL, doneButton);
@@ -55,12 +60,13 @@ public class KeyboardOptions extends DialogPane {
 	}
 
 	private void initialize(final KeyBindingTable table) {
+		resultTable.loadBindings(table);
 		bindings.getChildren().clear();
 
 		final Map<KeyBinding, KeyCodeCombination> kp =
-			table.getPrimaryKeys();
+			resultTable.getPrimaryKeys();
 		final Map<KeyBinding, KeyCodeCombination> ks =
-			table.getSecondaryKeys();
+			resultTable.getSecondaryKeys();
 
 		int rowNum = 0;
 		for (final KeyBinding b : InTheZoneKeyBinding.allBindings()) {
@@ -72,10 +78,10 @@ public class KeyboardOptions extends DialogPane {
 			secondary.setPromptText("click to set key");
 
 			primary.keyProperty.addListener((o, k0, k1) -> {
-				if (k1 != null) table.setPrimaryKey(b, k1);
+				if (k1 != null) resultTable.setPrimaryKey(b, k1);
 			});
 			secondary.keyProperty.addListener((o, k0, k1) -> {
-				if (k1 != null) table.setSecondaryKey(b, k1);
+				if (k1 != null) resultTable.setSecondaryKey(b, k1);
 			});
 
 			bindings.addRow(rowNum, action, primary, secondary);

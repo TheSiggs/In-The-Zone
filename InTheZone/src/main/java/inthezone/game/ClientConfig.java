@@ -5,21 +5,24 @@ import inthezone.battle.data.Loadout;
 import inthezone.server.Server;
 import isogame.engine.CorruptDataException;
 import isogame.engine.HasJSONRepresentation;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import isogame.engine.KeyBinding;
+import isogame.engine.KeyBindingTable;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +37,26 @@ public class ClientConfig implements HasJSONRepresentation {
 	private final File configFile =
 		new File(GameDataFactory.gameDataCacheDir, "client.json");
 
+	private KeyBindingTable keyBindings = new KeyBindingTable();
+	public static final KeyBindingTable defaultKeybindingTable =
+		new KeyBindingTable();
+
 	public ClientConfig(final GameDataFactory gameData) {
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.W), KeyBinding.scrollUp);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.A), KeyBinding.scrollLeft);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.S), KeyBinding.scrollDown);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.D), KeyBinding.scrollRight);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.ESCAPE), InTheZoneKeyBinding.cancel);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.ENTER), InTheZoneKeyBinding.enter);
+		defaultKeybindingTable.keys.put(
+			new KeyCodeCombination(KeyCode.TAB), InTheZoneKeyBinding.altpath);
+
 		try (
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 				new FileInputStream(configFile), "UTF-8"))
@@ -48,7 +70,7 @@ public class ClientConfig implements HasJSONRepresentation {
 
 			loadConfig(new JSONObject(raw.toString()), gameData);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			System.err.println("Error reading config file: " + e.getMessage());
 			resetConfigFile();
 		}
@@ -75,6 +97,10 @@ public class ClientConfig implements HasJSONRepresentation {
 		return !loadouts.stream().anyMatch(l -> l.name.equals(n));
 	}
 
+	public KeyBindingTable getKeyBindingTable() {
+		return keyBindings;
+	}
+
 	public void loadConfig(
 		final JSONObject json, final GameDataFactory gameData
 	) throws CorruptDataException {
@@ -85,6 +111,7 @@ public class ClientConfig implements HasJSONRepresentation {
 		try {
 			final String name = json.optString("name", null);
 			final JSONArray loadouts = json.optJSONArray("loadouts");
+			final JSONObject keys = json.optJSONObject("keys");
 			this.server = json.optString("server", DEFAULT_SERVER);
 			this.port = json.optInt("port", DEFAULT_PORT);
 
@@ -92,17 +119,33 @@ public class ClientConfig implements HasJSONRepresentation {
 			if (loadouts != null) {
 				final List<JSONObject> ls =
 					jsonArrayToList(loadouts, JSONObject.class);
-				for (JSONObject l : ls) this.loadouts.add(Loadout.fromJSON(l, gameData));
+				for (final JSONObject l : ls)
+					this.loadouts.add(Loadout.fromJSON(l, gameData));
 			}
 
-		} catch (JSONException|ClassCastException e) {
+			if (keys != null) {
+				keyBindings = KeyBindingTable.fromJSON(
+					keys, InTheZoneKeyBinding::new);
+			} else {
+				copyDefaultKeysTable();
+			}
+
+		} catch (final JSONException|ClassCastException e) {
 			throw new CorruptDataException("Type error in config file");
+		}
+	}
+
+	private void copyDefaultKeysTable() {
+		keyBindings.keys.clear();
+		for (final KeyCodeCombination k : defaultKeybindingTable.keys.keySet()) {
+			keyBindings.keys.put(k, defaultKeybindingTable.keys.get(k));
 		}
 	}
 
 	private void resetConfigFile() {
 		defaultPlayerName = Optional.empty();
 		loadouts.clear();
+		copyDefaultKeysTable();
 		writeConfig();
 	}
 
@@ -113,8 +156,10 @@ public class ClientConfig implements HasJSONRepresentation {
 		o.put("server", server);
 		o.put("port", port);
 		final JSONArray a = new JSONArray();
-		for (Loadout l : loadouts) a.put(l.getJSON());
+		for (final Loadout l : loadouts) a.put(l.getJSON());
 		o.put("loadouts", a);
+		o.put("keys", keyBindings.getJSON());
+
 		return o;
 	}
 
@@ -128,7 +173,7 @@ public class ClientConfig implements HasJSONRepresentation {
 				new FileOutputStream(configFile), "UTF-8"))
 		) {
 			out.print(getJSON().toString());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Cannot create configuration file \"" +

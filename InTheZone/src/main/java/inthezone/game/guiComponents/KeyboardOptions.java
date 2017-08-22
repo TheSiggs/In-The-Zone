@@ -71,6 +71,13 @@ public class KeyboardOptions extends DialogPane {
 			primary.setPromptText("click to set key");
 			secondary.setPromptText("click to set key");
 
+			primary.keyProperty.addListener((o, k0, k1) -> {
+				if (k1 != null) table.setPrimaryKey(b, k1);
+			});
+			secondary.keyProperty.addListener((o, k0, k1) -> {
+				if (k1 != null) table.setSecondaryKey(b, k1);
+			});
+
 			bindings.addRow(rowNum, action, primary, secondary);
 			rowNum += 1;
 		}

@@ -153,7 +153,7 @@ public class CharacterIndicatorPane extends AnchorPane {
 
 		abilities.clear();
 		abilitiesList.getChildren().clear();
-		for (AbilityInfo a : profile.allAbilities()) {
+		for (final AbilityInfo a : profile.allAbilities()) {
 			final ImageView i = new ImageView(a.media.icon);
 			final Tooltip t = new Tooltip((new AbilityDescription(a)).toString());
 			t.setWrapText(true);

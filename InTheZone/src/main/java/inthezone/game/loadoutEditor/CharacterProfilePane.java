@@ -174,7 +174,7 @@ public class CharacterProfilePane extends HBox {
 		final ObservableList<AbilityInfo> basicsList =
 			FXCollections.<AbilityInfo>observableArrayList();
 
-		for (AbilityInfo a : info.abilities) {
+		for (final AbilityInfo a : info.abilities) {
 			if (a.type == AbilityType.BASIC) {
 				basicsList.add(a);
 			} else if (a.type != AbilityType.SPECIAL) {
@@ -204,7 +204,7 @@ public class CharacterProfilePane extends HBox {
 		model.attackPP.bind(attack.valueProperty());
 
 		bottomSection.getChildren().clear();
-		for (AbilityInfo a : profile.abilities) {
+		for (final AbilityInfo a : profile.abilities) {
 			final boolean removable =
 				a.type != AbilityType.BASIC &&
 				a.type != AbilityType.SPECIAL;

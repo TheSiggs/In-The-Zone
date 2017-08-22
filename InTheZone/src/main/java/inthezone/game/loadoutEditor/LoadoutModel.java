@@ -24,12 +24,12 @@ public class LoadoutModel {
 	public final List<CharacterProfileModel> usedProfiles = new ArrayList<>();
 	public final Deque<CharacterProfileModel> otherProfiles = new LinkedList<>();
 
-	public LoadoutModel(GameDataFactory gameData)
+	public LoadoutModel(final GameDataFactory gameData)
 		throws CorruptDataException
 	{
 		name.set("New loadout");
 
-		for (CharacterInfo c : gameData.getCharacters()) {
+		for (final CharacterInfo c : gameData.getCharacters()) {
 			if (c.playable) {
 				otherProfiles.add(new CharacterProfileModel(new CharacterProfile(c)));
 			}
@@ -53,9 +53,9 @@ public class LoadoutModel {
 	/**
 	 * Substitute with the previous character in the queue.
 	 * */
-	public CharacterProfileModel substituteLeft(CharacterProfileModel old) {
-		int i = usedProfiles.indexOf(old);
-		CharacterProfileModel r = otherProfiles.pollLast();
+	public CharacterProfileModel substituteLeft(final CharacterProfileModel old) {
+		final int i = usedProfiles.indexOf(old);
+		final CharacterProfileModel r = otherProfiles.pollLast();
 		otherProfiles.offerFirst(usedProfiles.set(i, r));
 		rebindTotalCost();
 		return r;
@@ -64,15 +64,15 @@ public class LoadoutModel {
 	/**
 	 * Substitute with the next character in the queue.
 	 * */
-	public CharacterProfileModel substituteRight(CharacterProfileModel old) {
-		int i = usedProfiles.indexOf(old);
-		CharacterProfileModel r = otherProfiles.pollFirst();
+	public CharacterProfileModel substituteRight(final CharacterProfileModel old) {
+		final int i = usedProfiles.indexOf(old);
+		final CharacterProfileModel r = otherProfiles.pollFirst();
 		otherProfiles.offerLast(usedProfiles.set(i, r));
 		rebindTotalCost();
 		return r;
 	}
 	
-	public LoadoutModel(GameDataFactory gameData, Loadout loadout)
+	public LoadoutModel(final GameDataFactory gameData, final Loadout loadout)
 		throws CorruptDataException
 	{
 		name.set(loadout.name);
@@ -93,7 +93,7 @@ public class LoadoutModel {
 			})
 			.collect(Collectors.toList()));
 
-		for (CharacterInfo c : gameData.getCharacters()) {
+		for (final CharacterInfo c : gameData.getCharacters()) {
 			if (c.playable && !seenCharacters.contains(c.name)) {
 				otherProfiles.add(new CharacterProfileModel(new CharacterProfile(c)));
 			}

@@ -57,7 +57,7 @@ public class CharacterProfileModel {
 		rootCharacter = c.rootCharacter;
 		basicAbility.setValue(c.basicAbility);
 		abilities.clear();
-		for (AbilityInfo a : c.abilities) abilities.add(a);
+		for (final AbilityInfo a : c.abilities) abilities.add(a);
 		hpPP.setValue(c.hpPP);
 		attackPP.setValue(c.attackPP);
 
@@ -87,7 +87,7 @@ public class CharacterProfileModel {
 				rootCharacter, new ArrayList<>(abilities),
 				basicAbility.getValue(), 
 				attackPP.getValue(), hpPP.getValue());
-		} catch (CorruptDataException e) {
+		} catch (final CorruptDataException e) {
 			throw new RuntimeException("Invalid character profile", e);
 		}
 	}

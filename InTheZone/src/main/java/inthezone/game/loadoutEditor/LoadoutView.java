@@ -1,21 +1,15 @@
 package inthezone.game.loadoutEditor;
 
-import inthezone.battle.data.CharacterProfile;
-import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Loadout;
-import inthezone.game.ClientConfig;
-import inthezone.game.DialogScreen;
-import inthezone.game.guiComponents.RollerScrollPane;
-import isogame.engine.CorruptDataException;
-import javafx.beans.property.BooleanProperty;
+
+import java.util.Optional;
+
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
@@ -27,10 +21,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.StageStyle;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+
+import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Loadout;
+import inthezone.game.ClientConfig;
+import inthezone.game.DialogScreen;
+import inthezone.game.battle.ModalDialog;
+import inthezone.game.guiComponents.RollerScrollPane;
 
 public class LoadoutView extends DialogScreen<Loadout> {
 	private LoadoutModel model;
@@ -53,11 +50,13 @@ public class LoadoutView extends DialogScreen<Loadout> {
 
 	private final int loadoutID;
 
+	private final ModalDialog modalDialog = new ModalDialog();
+
 	public LoadoutView(
-		ClientConfig config,
-		GameDataFactory gameData,
-		LoadoutModel model,
-		int loadoutID
+		final ClientConfig config,
+		final GameDataFactory gameData,
+		final LoadoutModel model,
+		final int loadoutID
 	) {
 		this.config = config;
 		this.model = model;
@@ -99,7 +98,14 @@ public class LoadoutView extends DialogScreen<Loadout> {
 
 		root.getChildren().addAll(characterName, mainPane, pp);
 
-		this.getChildren().add(root);
+		modalDialog.setOnShow(() -> {
+			root.setMouseTransparent(true);
+			modalDialog.requestFocus();
+		});
+
+		modalDialog.setOnClose(() -> root.setMouseTransparent(false));
+
+		this.getChildren().addAll(root, modalDialog);
 
 		selectedCharacter.addListener((v, o, n) -> {
 			if (n != null) {
@@ -122,13 +128,6 @@ public class LoadoutView extends DialogScreen<Loadout> {
 
 	public void saveAndExit() {
 		if (this.model.totalCost.get() > Loadout.maxPP) {
-			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-				null, ButtonType.YES, ButtonType.CANCEL);
-			a.setHeaderText(null);
-			a.setGraphic(null);
-			a.initStyle(StageStyle.UNDECORATED);
-			a.getDialogPane().getStylesheets().add("dialogs.css");
-
 			final Text text = new Text(
 				"This loadout uses too many power points.\n" +
 				"You cannot use this loadout for network games.\n" +
@@ -137,19 +136,32 @@ public class LoadoutView extends DialogScreen<Loadout> {
 			textWrapper.getStyleClass().add("text-container");
 			text.setWrappingWidth(400);
 			text.getStyleClass().add("text");
-			a.getDialogPane().setContent(textWrapper);
 
-			final Optional<ButtonType> r = a.showAndWait();
-			if (!r.isPresent() || r.get() == ButtonType.CANCEL) return;
+			final DialogPane dialog = new DialogPane();
+			dialog.getButtonTypes().addAll(ButtonType.YES, ButtonType.CANCEL);
+			dialog.getStylesheets().add("dialogs.css");
+			dialog.setHeaderText(null);
+			dialog.setGraphic(null);
+			dialog.setContentText(null);
+			dialog.setContent(textWrapper);
+
+			modalDialog.showDialog(dialog, r -> {
+				if (r == ButtonType.YES) {
+					final Loadout out = this.model.encodeLoadout();
+					config.loadouts.set(loadoutID, out);
+					config.writeConfig();
+					onDone.accept(Optional.of(out));
+				}
+			});
+		} else {
+			final Loadout out = this.model.encodeLoadout();
+			config.loadouts.set(loadoutID, out);
+			config.writeConfig();
+			onDone.accept(Optional.of(out));
 		}
-
-		final Loadout out = this.model.encodeLoadout();
-		config.loadouts.set(loadoutID, out);
-		config.writeConfig();
-		onDone.accept(Optional.of(out));
 	}
 
-	public void setLoadoutModel(LoadoutModel model) {
+	public void setLoadoutModel(final LoadoutModel model) {
 		this.model = model;
 
 		loadoutName.setText(model.name.get());

@@ -1,5 +1,13 @@
 package inthezone.game.lobby;
 
+import isogame.engine.CorruptDataException;
+import isogame.engine.FacingDirection;
+import isogame.engine.KeyBinding;
+import isogame.engine.MapPoint;
+import isogame.engine.MapView;
+import isogame.engine.Sprite;
+import isogame.engine.Stage;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -9,9 +17,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -31,14 +37,8 @@ import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.game.ClientConfig;
 import inthezone.game.DialogScreen;
+import inthezone.game.battle.ModalDialog;
 import inthezone.game.guiComponents.RollingChoiceBox;
-import isogame.engine.CorruptDataException;
-import isogame.engine.FacingDirection;
-import isogame.engine.KeyBinding;
-import isogame.engine.MapPoint;
-import isogame.engine.MapView;
-import isogame.engine.Sprite;
-import isogame.engine.Stage;
 
 /**
  * Gather all the information required to issue / respond to a challenge.
@@ -74,6 +74,8 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		new HashMap<>();
 	
 	private final GameDataFactory gameData;
+
+	private ModalDialog modalDialog = new ModalDialog();
 
 	/**
 	 * @param gameData The game data
@@ -193,7 +195,18 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			if (loadout.isFocused()) startPosChooser.requestFocus();
 		});
 
-		this.getChildren().addAll(startPosChooser, guiRoot);
+		modalDialog.setOnShow(() -> {
+			guiRoot.setMouseTransparent(true);
+			startPosChooser.setMouseTransparent(true);
+			modalDialog.requestFocus();
+		});
+
+		modalDialog.setOnClose(() -> {
+			guiRoot.setMouseTransparent(false);
+			startPosChooser.setMouseTransparent(false);
+		});
+
+		this.getChildren().addAll(startPosChooser, guiRoot, modalDialog);
 
 		stage.getSelectionModel().selectedItemProperty()
 			.addListener((o, s0, s) -> setStage(s));
@@ -227,9 +240,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			if (s == null || l == null ||
 				characterPositions.size() != l.characters.size())
 			{
-				final Alert a = new Alert(Alert.AlertType.ERROR,
-					"Stage, loadout, or placement not complete", ButtonType.OK);
-				a.showAndWait();
+				modalDialog.showMessage("Stage, loadout, or placement not complete");
 			} else {
 				final List<MapPoint> startTiles = l.characters.stream()
 					.map(c -> characterPositions.get(c.rootCharacter.name))

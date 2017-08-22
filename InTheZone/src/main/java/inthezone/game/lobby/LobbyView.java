@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -23,7 +22,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 import inthezone.ai.SimpleAI;
 import inthezone.battle.commands.StartBattleCommand;
@@ -35,13 +34,15 @@ import inthezone.battle.data.Player;
 import inthezone.game.ClientConfig;
 import inthezone.game.ContentPane;
 import inthezone.game.battle.BattleView;
+import inthezone.game.battle.ModalDialog;
 import inthezone.game.loadoutEditor.LoadoutOverview;
 
-public class LobbyView extends BorderPane {
+public class LobbyView extends StackPane {
 	private final ContentPane parent;
 	private final GameDataFactory gameData;
 	private final ClientConfig config;
 
+	private final BorderPane gui = new BorderPane();
 	private final HBox mainMenuBack = new HBox();
 	private final MenuBar mainMenu = new MenuBar();
 	private final Menu homeMenu = new Menu(null);
@@ -57,6 +58,8 @@ public class LobbyView extends BorderPane {
 	private	final PlayersList players;
 	private final NewsPanel newsPanel = new NewsPanel();
 	private final StatusPanel status;
+
+	private final ModalDialog modalDialog = new ModalDialog();
 
 	public LobbyView(
 		final ContentPane parent,
@@ -111,9 +114,17 @@ public class LobbyView extends BorderPane {
 
 		mainMenuBack.getStyleClass().add("main-menu");
 
-		setTop(mainMenuBack);
-		setLeft(players);
-		setCenter(newsPanel);
+		gui.setTop(mainMenuBack);
+		gui.setLeft(players);
+		gui.setCenter(newsPanel);
+
+		modalDialog.setOnShow(() -> {
+			modalDialog.requestFocus();
+			gui.setMouseTransparent(true);
+		});
+		modalDialog.setOnClose(() -> gui.setMouseTransparent(false));
+
+		this.getChildren().addAll(gui, modalDialog);
 	}
 
 	private String thisPlayer = null;
@@ -158,21 +169,22 @@ public class LobbyView extends BorderPane {
 				prompt = "Stop waiting?";
 			}
 
-			final Alert a = new Alert(
-				Alert.AlertType.CONFIRMATION, prompt,
-				ButtonType.YES, ButtonType.NO);
-			a.setHeaderText(status.getWaitingMessage());
-			a.showAndWait().ifPresent(r -> {
-				if (r == ButtonType.YES) cancelChallenge();
+			modalDialog.showConfirmation(prompt, status.getWaitingMessage(), r -> {
+				if (r == ButtonType.YES) {
+					cancelChallenge();
+					actuallyStartPracticeGame();
+				}
 			});
-		}
 
+		} else {
+			actuallyStartPracticeGame();
+		}
+	}
+
+	private void actuallyStartPracticeGame() {
 		if (config.loadouts.size() < 1) {
-			final Alert a = new Alert(
-				Alert.AlertType.INFORMATION, null, ButtonType.OK);
-			a.setHeaderText(
+			modalDialog.showMessage(
 				"You must create at least one loadout before starting a game");
-			a.showAndWait();
 			return;
 		}
 
@@ -182,11 +194,7 @@ public class LobbyView extends BorderPane {
 					new ChallengePane(gameData, config, Optional.empty(),
 						Player.PLAYER_A, "You", "AI"), getStartSandpitCont());
 			} catch (final CorruptDataException e) {
-				final Alert a = new Alert(Alert.AlertType.ERROR,
-					e.getMessage(), ButtonType.CLOSE);
-				a.setHeaderText("Game data corrupt");
-				a.showAndWait();
-				System.exit(1);
+				modalDialog.showError(e, "Game data corrupt", () -> System.exit(1));
 			}
 		}
 	}
@@ -196,25 +204,19 @@ public class LobbyView extends BorderPane {
 	public void cancelChallenge() {
 		currentChallenge.ifPresent(parent::cancelChallenge);
 		status.waitingDone();
-		setLeft(players);
+		gui.setLeft(players);
 	}
 
 	public void issueChallenge(final String player) {
 		if (config.loadouts.isEmpty()) {
-			final Alert a = new Alert(
-				Alert.AlertType.INFORMATION, null, ButtonType.OK);
-			a.setHeaderText(
+			modalDialog.showMessage(
 				"You must create at least one loadout before issuing a challenge");
-			a.showAndWait();
 			return;
 		}
 
 		if (thisPlayer == null) {
-			final Alert a = new Alert(
-				Alert.AlertType.ERROR, null, ButtonType.CLOSE);
-			a.setHeaderText(
+			modalDialog.showError(null,
 				"Cannot issue challenge due to an internal error (player name is unknown)");
-			a.showAndWait();
 			return;
 		}
 
@@ -225,44 +227,37 @@ public class LobbyView extends BorderPane {
 						oCmdReq.ifPresent(cmdReq -> {
 							parent.network.challengePlayer(cmdReq, player);
 							status.waitForChallenge(player);
-							this.setLeft(status);
+							gui.setLeft(status);
 						}));
 		} catch (final CorruptDataException e) {
-			final Alert a = new Alert(Alert.AlertType.ERROR,
-				e.getMessage(), ButtonType.CLOSE);
-			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-			a.setHeaderText("Error initialising challenge panel");
-			a.showAndWait();
+			modalDialog.showError(e, "Error initialising challenge panel");
 		}
 	}
 
 	public void issuedChallenge(final String player) {
 		currentChallenge = Optional.of(player);
 		status.waitForChallenge(player);
-		setLeft(status);
+		gui.setLeft(status);
 	}
 
 	public void challengeAccepted(final String player) {
 		status.waitingDone();
-		setLeft(players);
+		gui.setLeft(players);
 	}
 
 	public void challengeRejected(final String player) {
 		final Optional<String> waitingFor = status.getWaitingForPlayer();
 
 		status.waitingDone();
-		setLeft(players);
+		gui.setLeft(players);
 		if (waitingFor.map(p -> p.equals(player)).orElse(false)) {
-			final Alert a = new Alert(
-				Alert.AlertType.INFORMATION, null, ButtonType.OK);
-			a.setHeaderText(player + " rejected your challenge!");
-			a.showAndWait();
+			modalDialog.showMessage(player + " rejected your challenge!");
 		}
 	}
 
 	public void challengeError(final String player) {
 		status.waitingDone();
-		setLeft(players);
+		gui.setLeft(players);
 	}
 
 	public void challengeFrom(
@@ -273,11 +268,9 @@ public class LobbyView extends BorderPane {
 			parent.network.refuseChallenge(player, thisPlayer);
 		}
 
-		final Alert a = new Alert(
-			Alert.AlertType.CONFIRMATION, "Accept this challenge?",
-			ButtonType.YES, ButtonType.NO);
-		a.setHeaderText(player + " challenges you to battle!");
-		a.showAndWait().ifPresent(r -> {
+		final String message = player + " challenges you to battle!";
+		final String prompt = "Accept this challenge?";
+		modalDialog.showConfirmation(prompt, message, r -> {
 			if (r == ButtonType.YES) {
 				try {
 					parent.showScreen(
@@ -295,20 +288,13 @@ public class LobbyView extends BorderPane {
 											ready, otherCmd.player.otherPlayer(), player);
 									} catch (final CorruptDataException e) {
 										parent.network.refuseChallenge(player, thisPlayer);
-										final Alert ae = new Alert(
-											Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-										ae.setHeaderText("Error initialising battle");
-										ae.showAndWait();
+										modalDialog.showError(e, "Error initialising battle");
 									}
 								}
 							});
 				} catch (final CorruptDataException e) {
 					parent.network.refuseChallenge(player, thisPlayer);
-					final Alert ae = new Alert(
-						Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-					ae.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-					ae.setHeaderText("Error initialising challenge panel");
-					ae.showAndWait();
+					modalDialog.showError(e, "Error initialising challenge panel");
 				}
 			} else {
 				parent.network.refuseChallenge(player, thisPlayer);
@@ -339,10 +325,7 @@ public class LobbyView extends BorderPane {
 						ready, Player.PLAYER_A, new SimpleAI(), Optional.empty(), gameData),
 						winCond -> System.err.println("Battle over: " + winCond));
 				} catch (final CorruptDataException e) {
-					final Alert a = new Alert(Alert.AlertType.ERROR,
-						e.getMessage(), ButtonType.OK);
-					a.setHeaderText("Error starting game");
-					a.showAndWait();
+					modalDialog.showError(e, "Error starting game", () -> System.exit(1));
 				}
 			});
 		};

@@ -93,5 +93,43 @@ public class ModalDialog extends Group {
 		this.setVisible(false);
 		onClose.run();
 	}
+
+	public void showError(final Exception e, final String header) {
+		showError(e, header, () -> {});
+	}
+
+	public void showError(
+		final Exception e, final String header, final Runnable k
+	) {
+		final DialogPane dialog = new DialogPane();
+		dialog.getButtonTypes().addAll(ButtonType.CLOSE);
+		dialog.getStylesheets().add("dialogs.css");
+		dialog.setHeaderText(header);
+		dialog.setGraphic(null);
+		dialog.setContentText(e == null? null : e.getMessage());
+		showDialog(dialog, r -> k.run());
+	}
+
+	public void showMessage(final String message) {
+		final DialogPane dialog = new DialogPane();
+		dialog.getButtonTypes().addAll(ButtonType.OK);
+		dialog.getStylesheets().add("dialogs.css");
+		dialog.setHeaderText(message);
+		dialog.setGraphic(null);
+		dialog.setContentText(null);
+		showDialog(dialog, r -> {});
+	}
+
+	public void showConfirmation(
+		final String prompt, final String message, final Consumer<ButtonType> k
+	) {
+		final DialogPane dialog = new DialogPane();
+		dialog.getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
+		dialog.getStylesheets().add("dialogs.css");
+		dialog.setHeaderText(message);
+		dialog.setGraphic(null);
+		dialog.setContentText(prompt);
+		showDialog(dialog, k);
+	}
 }
 

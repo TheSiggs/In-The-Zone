@@ -15,6 +15,10 @@
 	-fx-padding:10px 0px 0px 10px;
 }
 
+.dialog-pane .header-panel {
+	-fx-padding:10px 10px 0px 10px;
+}
+
 .dialog-pane .text {
 	-fx-fill:white;
 	-fx-font-size:16px;

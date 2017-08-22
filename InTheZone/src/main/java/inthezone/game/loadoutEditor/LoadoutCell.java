@@ -12,7 +12,7 @@ public class LoadoutCell extends ListCell<LoadoutModel> {
 	}
 
 	@Override
-	public void updateItem(LoadoutModel item, boolean isEmpty) {
+	public void updateItem(final LoadoutModel item, final boolean isEmpty) {
 		super.updateItem(item, isEmpty);
 		
 		if (!isEmpty) textProperty().bind(item.name);

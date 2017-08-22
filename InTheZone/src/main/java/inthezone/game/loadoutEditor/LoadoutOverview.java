@@ -7,7 +7,6 @@ import java.util.Optional;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -24,12 +23,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.StageStyle;
 
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Loadout;
 import inthezone.game.ContentPane;
 import inthezone.game.DialogScreen;
+import inthezone.game.battle.ModalDialog;
 
 public class LoadoutOverview extends DialogScreen<Void> {
 	private final AnchorPane root = new AnchorPane();
@@ -42,6 +41,8 @@ public class LoadoutOverview extends DialogScreen<Void> {
 	private final VBox centerWrapper = new VBox();
 
 	private final ContentPane parent;
+
+	private final ModalDialog modalDialog = new ModalDialog();
 	
 	public LoadoutOverview(final ContentPane parent) {
 		this.parent = parent;
@@ -101,12 +102,21 @@ public class LoadoutOverview extends DialogScreen<Void> {
 		loadouts.boundsInLocalProperty().addListener(v -> adjustScrollbar());
 
 		for (Loadout l : parent.config.loadouts) {
-			loadouts.getChildren().add(new LoadoutFrame(parent, this, Optional.of(l)));
+			loadouts.getChildren().add(new LoadoutFrame(
+				parent, this, Optional.of(l), modalDialog));
 		}
-		loadouts.getChildren().add(new LoadoutFrame(parent, this, Optional.empty()));
+		loadouts.getChildren().add(new LoadoutFrame(
+			parent, this, Optional.empty(), modalDialog));
+
+		modalDialog.setOnShow(() -> {
+			root.setMouseTransparent(true);
+			modalDialog.requestFocus();
+		});
+
+		modalDialog.setOnClose(() -> root.setMouseTransparent(false));
 
 		root.getChildren().addAll(centerWrapper, title, newLoadout, back);
-		this.getChildren().add(root);
+		this.getChildren().addAll(root, modalDialog);
 
 		this.setOnKeyReleased(event -> {
 			if (event.getCode() == KeyCode.ESCAPE) onDone.accept(null);
@@ -135,18 +145,16 @@ public class LoadoutOverview extends DialogScreen<Void> {
 			final LoadoutModel m = new LoadoutModel(parent.gameData);
 			m.name.setValue(parent.config.newLoadoutName());
 			final LoadoutFrame cell =
-				new LoadoutFrame(parent, this, Optional.of(m.encodeLoadout()));
+				new LoadoutFrame(parent, this,
+					Optional.of(m.encodeLoadout()), modalDialog);
 			loadouts.getChildren().add(0, cell);
 			parent.config.loadouts.add(0, m.encodeLoadout());
 			parent.showScreen(
 				new LoadoutView(parent.config, parent.gameData, m, 0),
 				v -> cell.updateView(v));
 
-		} catch (CorruptDataException e) {
-			final Alert a = new Alert(
-				Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE);
-			a.setHeaderText("Game data corrupt");
-			a.showAndWait();
+		} catch (final CorruptDataException e) {
+			modalDialog.showError(e, "Game data corrupt");
 			System.exit(1);
 		}
 	}
@@ -180,11 +188,15 @@ class LoadoutFrame extends VBox {
 
 	private static final double badLoadoutH = 320;
 
+	private final ModalDialog modalDialog;
+
 	public LoadoutFrame(
 		final ContentPane parent,
 		final LoadoutOverview overview,
-		final Optional<Loadout> mloadout
+		final Optional<Loadout> mloadout,
+		final ModalDialog modalDialog
 	) {
+		this.modalDialog = modalDialog;
 		this.mloadout = mloadout;
 
 		this.getStyleClass().add("loadout-cell");
@@ -206,24 +218,16 @@ class LoadoutFrame extends VBox {
 				} else {
 					overview.newLoadout();
 				}
-			} catch (CorruptDataException e) {
-				final Alert a = new Alert(Alert.AlertType.ERROR,
-					e.getMessage(), ButtonType.CLOSE);
-				a.setHeaderText("Game data corrupt");
-				a.showAndWait();
+			} catch (final CorruptDataException e) {
+				modalDialog.showError(e, "Game data corrupt");
 				System.exit(1);
 			}
 		});
 
 		delete.setOnMouseClicked(event -> {
-			final Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-				"Really remove loadout " + this.mloadout.get().name,
-				ButtonType.NO, ButtonType.YES);
-			a.setGraphic(null);
-			a.initStyle(StageStyle.UNDECORATED);
-			a.getDialogPane().getStylesheets().add("dialogs.css");
-			a.setHeaderText(null);
-			a.showAndWait().ifPresent(bt -> {
+			final String prompt =
+				"Really remove loadout " + this.mloadout.get().name + "?";
+			modalDialog.showConfirmation(prompt, null, bt -> {
 				if (bt == ButtonType.YES) {
 					parent.config.loadouts.remove(this.mloadout.get());
 					parent.config.writeConfig();

@@ -48,7 +48,7 @@ public class AbilityDescriptionPanel extends VBox {
 		VBox.setVgrow(manaDescription, Priority.ALWAYS);
 	}
 
-	public void setAbility(AbilityInfo a) {
+	public void setAbility(final AbilityInfo a) {
 		if (a == null) {
 			abilityName.setText("No ability selected");
 			abilityName.setGraphic(null);

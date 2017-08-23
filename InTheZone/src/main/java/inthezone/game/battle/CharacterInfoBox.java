@@ -49,9 +49,17 @@ public class CharacterInfoBox extends AnchorPane {
 		this.sprites = sprites;
 		this.id = character.getId();
 
-		Tooltip.install(ap, new Tooltip("Action points: you spend action points when you attack, push, use a potion, or do an ability"));
-		Tooltip.install(mp, new Tooltip("Movement points: every time you move one square, it costs you one movement point"));
-		Tooltip.install(hp, new Tooltip("Health points: when they get to zero your character faints"));
+		final Tooltip ttap = new Tooltip("Action points: you spend action points when you attack, push, use a potion, or do an ability");
+		final Tooltip ttmp = new Tooltip("Movement points: every time you move one square, it costs you one movement point");
+		final Tooltip tthp = new Tooltip("Health points: when they get to zero your character faints");
+
+		ttap.setWrapText(true); ttap.setMaxWidth(300);
+		ttmp.setWrapText(true); ttmp.setMaxWidth(300);
+		tthp.setWrapText(true); tthp.setMaxWidth(300);
+
+		Tooltip.install(ap, ttap);
+		Tooltip.install(mp, ttmp);
+		Tooltip.install(hp, tthp);
 
 		portrait = new ImageView(character.getPortrait());
 
@@ -121,7 +129,7 @@ public class CharacterInfoBox extends AnchorPane {
 		final Tooltip t = new Tooltip((new StatusEffectDescription(
 			s.getInfo())).toString());
 		t.setWrapText(true);
-		t.setPrefWidth(300);
+		t.setMaxWidth(300);
 		Tooltip.install(r, t);
 		return r;
 	}
@@ -132,7 +140,7 @@ public class CharacterInfoBox extends AnchorPane {
 			c.getName() + " gets a revenge bonus of " +
 			Math.round(c.getRevengeBonus() * 100) + "%");
 		t.setWrapText(true);
-		t.setPrefWidth(300);
+		t.setMaxWidth(300);
 		Tooltip.install(r, t);
 		return r;
 	}

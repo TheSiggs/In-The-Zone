@@ -24,6 +24,7 @@ import inthezone.battle.ZoneFrozen;
 import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.StatusEffectDescription;
 
 /**
  * A class to keep track of all the sprites.
@@ -147,6 +148,30 @@ public class SpriteManager {
 		}
 	}
 
+	private Tooltip characterTooltip(final CharacterFrozen c) {
+		final StringBuilder out = new StringBuilder();
+		out.append(c.getName());
+		if (c.getPlayer() != view.player) out.append(" (enemy)");
+
+		if (c.getStatusBuff().isPresent() || c.getStatusDebuff().isPresent()) {
+			out.append("\n\n");
+		}
+
+		c.getStatusBuff().ifPresent(s ->
+			out.append(new StatusEffectDescription(s.getInfo()).toString()));
+		if (c.getStatusBuff().isPresent() && c.getStatusDebuff().isPresent()) {
+			out.append("\n\n");
+		}
+		c.getStatusDebuff().ifPresent(s ->
+			out.append(new StatusEffectDescription(s.getInfo()).toString()));
+
+		final Tooltip r = new Tooltip(out.toString());
+		r.setWrapText(true);
+		r.setMaxWidth(300);
+
+		return r;
+	}
+
 	/**
 	 * Update the character models.
 	 * */
@@ -169,6 +194,8 @@ public class SpriteManager {
 						.filter(x -> x.userData != null &&
 							x.userData.equals(c.getId())).findFirst().get();
 
+					Tooltip.install(
+						characterSprite.sceneGraphNode, characterTooltip(c));
 					characterSprite.sceneGraph.getChildren().add(panel);
 				}
 			}
@@ -198,8 +225,10 @@ public class SpriteManager {
 						} else if (!c.isDead() && old.isDead()) {
 							characterSprite.setAnimation("idle");
 						}
-					}
 
+						Tooltip.install(
+							characterSprite.sceneGraphNode, characterTooltip(c));
+					}
 
 					this.characters.put(c.getId(), c);
 				}
@@ -213,7 +242,7 @@ public class SpriteManager {
 		final Tooltip tt = new Tooltip("Mana zone." +
 			"  Put your characters on mana zones for an extra power boost");
 		tt.setWrapText(true);
-		tt.setPrefWidth(300);
+		tt.setMaxWidth(300);
 		return tt;
 	}
 
@@ -260,7 +289,7 @@ public class SpriteManager {
 								.getCreatedObjectDescription(isMine));
 
 						tt1.setWrapText(true);
-						tt1.setPrefWidth(300);
+						tt1.setMaxWidth(300);
 
 						Tooltip.install(tile.subGraph, tt1);
 						tile.userData = tt1;
@@ -304,7 +333,7 @@ public class SpriteManager {
 							(new AbilityDescription(((TrapFrozen) t).getAbility().info))
 								.getCreatedObjectDescription(true));
 						tooltip.setWrapText(true);
-						tooltip.setPrefWidth(300);
+						tooltip.setMaxWidth(300);
 						s = new Sprite(t.getSprite());
 					} else {
 						tooltip = new Tooltip("It's a trap!");

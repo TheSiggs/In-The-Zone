@@ -67,11 +67,11 @@ public class DecalPanel extends Group {
 
 		buff.setMouseTransparent(false);
 		buffTooltip.setWrapText(true);
-		buffTooltip.setPrefWidth(300);
+		buffTooltip.setMaxWidth(300);
 
 		debuff.setMouseTransparent(false);
 		debuffTooltip.setWrapText(true);
-		debuffTooltip.setPrefWidth(300);
+		debuffTooltip.setMaxWidth(300);
 
 		this.setTranslateY(DECAL_Y);
 	}

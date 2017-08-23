@@ -209,6 +209,14 @@ public class SpriteManager {
 		handleTemporaryImmobileObjects(characters);
 	}
 
+	public static Tooltip getManaZoneTooltip() {
+		final Tooltip tt = new Tooltip("Mana zone." +
+			"  Put your characters on mana zones for an extra power boost");
+		tt.setWrapText(true);
+		tt.setPrefWidth(300);
+		return tt;
+	}
+
 	private void handleTemporaryImmobileObjects(
 		final Collection<? extends TargetableFrozen> tios
 	) {
@@ -226,7 +234,13 @@ public class SpriteManager {
 						if (s != null) stage.removeSprite(s);
 						final Tile tile = stage.terrain.getTile(p);
 						final Object tt = tile.userData;
-						if (tt != null) Tooltip.uninstall(tile.subGraph, (Tooltip) tt);
+						if (tt != null) {
+							if (tile.isManaZone) {
+								Tooltip.install(tile.subGraph, getManaZoneTooltip());
+							} else {
+								Tooltip.uninstall(tile.subGraph, (Tooltip) tt);
+							}
+						}
 					}
 
 				} else if (!zones.containsKey(z.getCentre())) {

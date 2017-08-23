@@ -1,16 +1,19 @@
 package inthezone.game.battle;
 
+import isogame.engine.CameraAngle;
 import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import isogame.engine.MapView;
 import isogame.engine.Sprite;
 import isogame.engine.Stage;
+import isogame.engine.Tile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,6 +27,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 
@@ -228,6 +232,16 @@ public class BattleView
 
 		final List<MapPoint> startTiles = startBattle.getStartTiles(player);
 		if (startTiles.size() > 0) canvas.centreOnTile(startTiles.get(0));
+
+		// add basic tooltips
+		final Iterator<Tile> tiles =
+			getStage().terrain.iterateTiles(CameraAngle.UL);
+		while (tiles.hasNext()) {
+			final Tile tile = tiles.next();
+			if (tile.isManaZone) {
+				Tooltip.install(tile.subGraph, sprites.getManaZoneTooltip());
+			}
+		}
 
 		setMode(new ModeOtherTurn(this));
 		this.getChildren().addAll(this.hud, modalDialog);

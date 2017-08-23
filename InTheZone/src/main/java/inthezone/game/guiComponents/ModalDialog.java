@@ -7,6 +7,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.input.MouseButton;
@@ -35,12 +36,14 @@ public class ModalDialog extends Group {
 		closeModalDialog();
 
 		for (final ButtonType bt : pane.getButtonTypes()) {
-			pane.lookupButton(bt).setOnMouseClicked(event -> {
-				if (event.getButton() == MouseButton.PRIMARY) {
-					closeModalDialog();
-					continuation.accept(bt);
-				}
-			});
+			if (bt.getButtonData() != ButtonBar.ButtonData.OTHER) {
+				pane.lookupButton(bt).setOnMouseClicked(event -> {
+					if (event.getButton() == MouseButton.PRIMARY) {
+						closeModalDialog();
+						continuation.accept(bt);
+					}
+				});
+			}
 		}
 
 		currentDialog = Optional.of(pane);

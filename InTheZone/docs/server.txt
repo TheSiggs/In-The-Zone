@@ -1,0 +1,28 @@
+How to run the server
+
+ * The server creates a directory called games in the working directory.  The server creates a file in this directory for every game played.  The server must have permission to create this directory and to create files in this directory.
+
+ * The server server reads commands from a named pipe.  Each command must end with a newline character.  The default name for the pipe is server_command.pipe (in the working directory of the server).  The name of the pipe to read from can be customized with the --command-pipe=<filename> command line option.  The server cannot create the pipe itself, and it will not start if the pipe is not present.
+
+ * The following commands are recognised when written to the command pipe:
+   TERMINATE - terminate the server process immediately
+
+ * The server logs to stderr.
+
+ * The following command line options are applicable:
+
+ --port=<int>
+     Sets the port to listen on for clients
+ --command-pipe=<filename>
+     The named pipe to listen on for commands
+ --name=<string>
+     Sets the server name which may be presented to clients
+ --maxClients=<int>
+     Sets the maximum number of clients that are allowed on the server
+ --backlog=<int>
+     Sets the server socket backlog value
+ --basedir=<path>
+		 Sets the directory in which to find the game data, if different from the
+		 compiled in game data.
+
+

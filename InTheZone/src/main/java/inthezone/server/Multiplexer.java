@@ -39,8 +39,11 @@ public class Multiplexer implements Runnable {
 	private final int maxClients;
 
 	public Multiplexer(
-		String name, int port, int backlog,
-		int maxClients, GameDataFactory dataFactory
+		final String name,
+		final int port,
+		final int backlog,
+		final int maxClients,
+		final GameDataFactory dataFactory
 	) throws IOException {
 		this.name = name;
 		this.maxClients = maxClients;
@@ -61,7 +64,7 @@ public class Multiplexer implements Runnable {
 		while (!killThread) {
 			try {
 				doSelect();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Log.error("IO error in multiplexer", e);
 				if (!selector.isOpen()) restoreSelector();
 			}
@@ -71,23 +74,23 @@ public class Multiplexer implements Runnable {
 	private void restoreSelector() {
 		try {
 			selector = Selector.open();
-			for (Client c : pendingClients) {
+			for (final Client c : pendingClients) {
 				c.closeConnection(false);
 			}
-			Collection<Client> cannotReset = new LinkedList<>();
-			for (Client c : namedClients.values()) {
+			final Collection<Client> cannotReset = new LinkedList<>();
+			for (final Client c : namedClients.values()) {
 				try {
 					c.resetSelector(selector);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					cannotReset.add(c);
 				}
 			}
-			for (Client c : cannotReset) {
+			for (final Client c : cannotReset) {
 				if (!c.isDisconnected()) {
 					c.closeConnection(false);
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Log.fatal("Cannot get selector, quitting", e);
 			killThread = true;
 		}
@@ -129,12 +132,12 @@ public class Multiplexer implements Runnable {
 		}
 
 		// cancel keys for closed connections.
-		for (SelectionKey k : selector.keys()) if (!k.isValid()) k.cancel();
+		for (final SelectionKey k : selector.keys()) if (!k.isValid()) k.cancel();
 
 		// clean up any clients which have quietly dropped their connections.
 		expiredClients.clear();
 		disconnectedClients.clear();
-		for (Client c : sessions.values()) {
+		for (final Client c : sessions.values()) {
 			if (c.isDisconnected()) {
 				if (c.isDisconnectedTimeout()) expiredClients.add(c);
 			} else if (!c.isConnected()) {
@@ -144,17 +147,17 @@ public class Multiplexer implements Runnable {
 			}
 		}
 
-		for (Client c : expiredClients) removeClient(c);
-		for (Client c : disconnectedClients) c.closeConnection(false);
+		for (final Client c : expiredClients) removeClient(c);
+		for (final Client c : disconnectedClients) c.closeConnection(false);
 	}
 
-	private void removeClient(Client c) {
+	private void removeClient(final Client c) {
 		Log.info("Removing client " +
 			c.name.orElse("<UNNAMED CLIENT>"), null);
 		c.closeConnection(true);
 	}
 
-	private void newClient(SocketChannel connection) {
+	private void newClient(final SocketChannel connection) {
 		try {
 			if (sessions.size() >= maxClients) {
 				// if this happens, assume we're under attack and just close the
@@ -171,11 +174,11 @@ public class Multiplexer implements Runnable {
 					name, connection, selector, namedClients,
 					pendingClients, sessions, dataFactory));
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			try {
 				Log.error("IO error receiving connection from " +
 					connection.getRemoteAddress().toString(), e);
-			} catch (IOException e2) {
+			} catch (final IOException e2) {
 				Log.error("IO error receiving connection from unknown address (" +
 					e2.getMessage() + ") ", e);
 			}

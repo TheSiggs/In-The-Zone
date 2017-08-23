@@ -23,6 +23,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +56,27 @@ public class ClientConfig implements HasJSONRepresentation {
 		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.cancel , new KeyCodeCombination(KeyCode.ESCAPE));
 		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.enter  , new KeyCodeCombination(KeyCode.ENTER) );
 		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.altpath, new KeyCodeCombination(KeyCode.TAB)   );
+
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.next   ,
+			new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN) );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.prev   ,
+			new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN)  );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.character1, new KeyCodeCombination(KeyCode.Z)  );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.character2, new KeyCodeCombination(KeyCode.X)  );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.character3, new KeyCodeCombination(KeyCode.C)  );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.character4, new KeyCodeCombination(KeyCode.V)  );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.clearSelected, new KeyCodeCombination(KeyCode.BACK_SPACE));
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.attack , new KeyCodeCombination(KeyCode.DIGIT1)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.push   , new KeyCodeCombination(KeyCode.DIGIT2)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.potion , new KeyCodeCombination(KeyCode.DIGIT3)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.special, new KeyCodeCombination(KeyCode.DIGIT4)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a1     , new KeyCodeCombination(KeyCode.DIGIT5)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a2     , new KeyCodeCombination(KeyCode.DIGIT6)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a3     , new KeyCodeCombination(KeyCode.DIGIT7)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a4     , new KeyCodeCombination(KeyCode.DIGIT8)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a5     , new KeyCodeCombination(KeyCode.DIGIT9)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a6     , new KeyCodeCombination(KeyCode.DIGIT0)   );
+		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.endTurn, new KeyCodeCombination(KeyCode.END)   );
 
 		try (
 			BufferedReader in = new BufferedReader(new InputStreamReader(

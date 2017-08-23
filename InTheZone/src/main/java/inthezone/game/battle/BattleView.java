@@ -180,6 +180,8 @@ public class BattleView
 				}
 			} else if (action == InTheZoneKeyBinding.altpath) {
 				if (mode != null) mode.nextPath();
+			} else {
+				this.hud.handleKey(action);
 			}
 		});
 

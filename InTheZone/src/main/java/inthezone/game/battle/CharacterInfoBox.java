@@ -36,6 +36,8 @@ public class CharacterInfoBox extends AnchorPane {
 
 	private boolean isSelected = false;
 
+	public boolean isSelected() { return isSelected; }
+
 	private final StandardSprites sprites;
 
 	private final ColorAdjust deadEffect = new ColorAdjust();

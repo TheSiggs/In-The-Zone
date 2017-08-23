@@ -1,9 +1,14 @@
 package inthezone.game.battle;
 
+import isogame.engine.KeyBinding;
+
 import java.util.Collection;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
@@ -14,6 +19,7 @@ import javafx.util.Duration;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.StandardSprites;
+import inthezone.game.InTheZoneKeyBinding;
 import inthezone.game.battle.TurnClock;
 
 public class StandardHUD extends HUD {
@@ -98,6 +104,60 @@ public class StandardHUD extends HUD {
 			assistanceLine, characterInfoBoxes, actionButtons,
 			endTurnButton, resignButton, roundCounterAndClock
 		);
+	}
+
+	@Override public void handleKey(final KeyBinding binding) {
+		final ObservableList<Node> boxes = characterInfoBoxes.getChildren();
+		final ObservableList<Node> actions = actionButtons.getChildren();
+		if (binding == InTheZoneKeyBinding.next) {
+			view.selectCharacterById(
+				((CharacterInfoBox) boxes.get((
+					getSelectedCharacterIndex() + 1) % 4)).id);
+		} else if (binding == InTheZoneKeyBinding.prev) {
+			view.selectCharacterById(
+				((CharacterInfoBox) boxes.get((
+					getSelectedCharacterIndex() + 4 - 1) % 4)).id);
+		} else if (binding == InTheZoneKeyBinding.character1) {
+			view.selectCharacterById(((CharacterInfoBox) boxes.get(0)).id);
+		} else if (binding == InTheZoneKeyBinding.character2) {
+			view.selectCharacterById(((CharacterInfoBox) boxes.get(1)).id);
+		} else if (binding == InTheZoneKeyBinding.character3) {
+			view.selectCharacterById(((CharacterInfoBox) boxes.get(2)).id);
+		} else if (binding == InTheZoneKeyBinding.character4) {
+			view.selectCharacterById(((CharacterInfoBox) boxes.get(3)).id);
+		} else if (binding == InTheZoneKeyBinding.clearSelected) {
+			view.selectCharacter(Optional.empty());
+		} else if (binding == InTheZoneKeyBinding.attack) {
+			if (actions.size() > 0) ((CommandButton) actions.get(0)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.push) {
+			if (actions.size() > 1) ((CommandButton) actions.get(1)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.potion) {
+			if (actions.size() > 2) ((CommandButton) actions.get(2)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.special) {
+			if (actions.size() > 3) ((CommandButton) actions.get(3)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.a1) {
+			if (actions.size() > 4) ((CommandButton) actions.get(4)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.a2) {
+			if (actions.size() > 5) ((CommandButton) actions.get(5)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.a3) {
+			if (actions.size() > 6) ((CommandButton) actions.get(6)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.a4) {
+			if (actions.size() > 7) ((CommandButton) actions.get(7)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.a5) {
+			if (actions.size() > 8) ((CommandButton) actions.get(8)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.a6) {
+			if (actions.size() > 9) ((CommandButton) actions.get(9)).doCommand();
+		} else if (binding == InTheZoneKeyBinding.endTurn) {
+			view.sendEndTurn();
+		}
+	}
+
+	private int getSelectedCharacterIndex() {
+		final ObservableList<Node> boxes = characterInfoBoxes.getChildren();
+		for (int i = 0; i < boxes.size(); i++) {
+			if (((CharacterInfoBox) boxes.get(i)).isSelected()) return i;
+		}
+		return -1;
 	}
 
 	@Override protected void notifyTurn() {

@@ -17,7 +17,7 @@ public class CommandButton extends Button {
 
 	public final BooleanProperty cannotUseThis = new SimpleBooleanProperty(false);
 
-	public CommandButton(Image icon, String description) {
+	public CommandButton(final Image icon, final String description) {
 		super(null, new ImageView(icon));
 
 		descriptionWindow.getScene().getStylesheets().add("HUD.css");
@@ -50,13 +50,17 @@ public class CommandButton extends Button {
 		this.setOnMouseExited(event -> {
 			descriptionWindow.hide();
 		});
+
+		setOnAction(event -> doCommand());
 	}
 
-	public void setButtonAction(EventHandler<ActionEvent> handler) {
-		setOnAction(event -> {
-			if (!cannotUseThis.get()) handler.handle(event);
-		});
+	private Runnable action = () -> {};
+	public void setButtonAction(final Runnable action) {
+		this.action = action;
 	}
 
+	public void doCommand() {
+		if (!cannotUseThis.get()) action.run();
+	}
 }
 

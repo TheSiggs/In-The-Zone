@@ -1,5 +1,7 @@
 package inthezone.game.battle;
 
+import isogame.engine.KeyBinding;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -109,6 +111,10 @@ public class ReplayHUD extends HUD {
 
 		this.getChildren().addAll(view.canvas,
 			ci1, ci2, actionButtons, roundCounterAndClock, assistanceLine);
+	}
+
+	@Override public void handleKey(final KeyBinding binding) {
+		// Do nothing
 	}
 
 	@Override public void init(final Collection<CharacterFrozen> characters) {

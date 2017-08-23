@@ -1,5 +1,7 @@
 package inthezone.game.battle;
 
+import isogame.engine.KeyBinding;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +40,10 @@ public abstract class HUD extends AnchorPane {
 
 		pushItem = new CommandButton(sprites.pushIcon,
 			"Push a character (1 AP)");
-		pushItem.setButtonAction(event -> view.usePush());
+		pushItem.setButtonAction(() -> view.usePush());
 		potionItem = new CommandButton(sprites.potionIcon,
 			"Use a healing potion (1 AP)");
-		potionItem.setButtonAction(event -> view.useItem());
+		potionItem.setButtonAction(() -> view.useItem());
 	}
 
 	public final void notifyRound() {
@@ -72,8 +74,10 @@ public abstract class HUD extends AnchorPane {
 			box.setSelected(box.id == id);
 	}
 
-	public final void modalStart() { disableUI.set(true); }
-	public final void modalEnd() { disableUI.set(false); }
+	public abstract void handleKey(final KeyBinding binding);
+
+	public void modalStart() { disableUI.set(true); }
+	public void modalEnd() { disableUI.set(false); }
 
 	/**
 	 * Switch to battle end mode.
@@ -88,7 +92,7 @@ public abstract class HUD extends AnchorPane {
 
 		final CommandButton attackItem = new CommandButton(sprites.attackIcon,
 			(new AbilityDescription(basicAbility.info)).toString());
-		attackItem.setButtonAction(event -> view.useAbility(basicAbility));
+		attackItem.setButtonAction(() -> view.useAbility(basicAbility));
 
 		actionButtons.getChildren().clear();
 		actionButtons.getChildren().addAll(attackItem, pushItem, potionItem);
@@ -113,7 +117,7 @@ public abstract class HUD extends AnchorPane {
 				ability.info.ap > c.getAP() ||
 				ability.info.mp > c.getMP() ||
 				c.isAbilityBlocked(a));
-			i.setButtonAction(event -> view.useAbility(ability));
+			i.setButtonAction(() -> view.useAbility(ability));
 
 			actionButtons.getChildren().add(i);
 		}

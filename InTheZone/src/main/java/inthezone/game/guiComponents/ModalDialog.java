@@ -1,6 +1,8 @@
 package inthezone.game.battle;
 
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.function.Consumer;
 
 import javafx.geometry.Bounds;
@@ -14,11 +16,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 public class ModalDialog extends Group {
+	private Queue<DialogPane> nextDialog = new LinkedList<>();
 	private Optional<DialogPane> currentDialog = Optional.empty();
 	public Optional<DialogPane> getCurrentDialog() { return currentDialog; }
 
-	private boolean isShowing = false;
-	public boolean isShowing() { return isShowing; }
+	public boolean isShowing() { return currentDialog.isPresent(); }
 
 	private Runnable onShow = () -> {};
 	private Runnable onClose = () -> {};
@@ -33,8 +35,6 @@ public class ModalDialog extends Group {
 	public void showDialog(
 		final DialogPane pane, final Consumer<ButtonType> continuation
 	) {
-		closeModalDialog();
-
 		for (final ButtonType bt : pane.getButtonTypes()) {
 			if (bt.getButtonData() != ButtonBar.ButtonData.OTHER) {
 				pane.lookupButton(bt).setOnMouseClicked(event -> {
@@ -46,11 +46,19 @@ public class ModalDialog extends Group {
 			}
 		}
 
-		currentDialog = Optional.of(pane);
-		this.getChildren().add(pane);
-		this.setVisible(true);
-		isShowing = true;
-		onShow.run();
+		nextDialog.add(pane);
+		nextDialog();
+	}
+
+	private void nextDialog() {
+		if (!isShowing()) {
+			currentDialog = Optional.ofNullable(nextDialog.poll());
+			currentDialog.ifPresent(pane -> {
+				this.getChildren().add(pane);
+				this.setVisible(true);
+				onShow.run();
+			});
+		}
 	}
 
 	public void doDefault() {
@@ -92,9 +100,9 @@ public class ModalDialog extends Group {
 	public void closeModalDialog() {
 		currentDialog = Optional.empty();
 		this.getChildren().clear();
-		isShowing = false;
 		this.setVisible(false);
 		onClose.run();
+		nextDialog();
 	}
 
 	public void showError(final Exception e, final String header) {

@@ -8,11 +8,12 @@ import java.util.Optional;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -23,7 +24,7 @@ import inthezone.game.InTheZoneKeyBinding;
 import inthezone.game.battle.TurnClock;
 
 public class StandardHUD extends HUD {
-	private final FlowPane characterInfoBoxes = new FlowPane();
+	private final HBox characterInfoBoxes = new HBox();
 	private final Button endTurnButton = new Button("End turn");
 	private final Button resignButton = new Button("Resign");
 
@@ -60,8 +61,6 @@ public class StandardHUD extends HUD {
 		actionButtons.visibleProperty().bind(view.isCharacterSelected
 			.and(view.cannotCancel.not()).and(disableUI.not()));
 
-		characterInfoBoxes.setPrefWrapLength(1000);
-
 		assistanceLine.setAlignment(Pos.CENTER);
 		assistanceLine.setFillWidth(false);
 		assistanceLine.getChildren().addAll(messageLine, multiTargetAssistant);
@@ -74,8 +73,11 @@ public class StandardHUD extends HUD {
 		clock.setPrefHeight(100d);
 		roundCounterAndClock.getChildren().addAll(roundCounter, clock);
 
-		AnchorPane.setTopAnchor(characterInfoBoxes, 0d);
-		AnchorPane.setLeftAnchor(characterInfoBoxes, 0d);
+		final Group characterInfoBoxesWrapper =
+			new Group(characterInfoBoxes);
+
+		AnchorPane.setTopAnchor(characterInfoBoxesWrapper, 0d);
+		AnchorPane.setLeftAnchor(characterInfoBoxesWrapper, 0d);
 
 		AnchorPane.setBottomAnchor(endTurnButton, 0d);
 		AnchorPane.setLeftAnchor(endTurnButton, 0d);
@@ -101,7 +103,7 @@ public class StandardHUD extends HUD {
 
 		this.getChildren().addAll(
 			view.canvas,
-			assistanceLine, characterInfoBoxes, actionButtons,
+			assistanceLine, characterInfoBoxesWrapper, actionButtons,
 			endTurnButton, resignButton, roundCounterAndClock
 		);
 	}

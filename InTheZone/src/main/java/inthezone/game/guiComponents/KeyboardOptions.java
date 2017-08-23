@@ -3,6 +3,7 @@ package inthezone.game.guiComponents;
 import isogame.engine.KeyBinding;
 import isogame.engine.KeyBindingTable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -94,9 +95,15 @@ public class KeyboardOptions extends DialogPane {
 			initialize(config.defaultKeyBindingTable));
 	}
 
+	private final Map<KeyBinding, KeyField> primaries = new HashMap<>();
+	private final Map<KeyBinding, KeyField> secondaries = new HashMap<>();
+
 	private void initialize(final KeyBindingTable table) {
 		resultTable.loadBindings(table);
 		bindings.getChildren().clear();
+
+		primaries.clear();
+		secondaries.clear();
 
 		final Map<KeyBinding, KeyCodeCombination> kp =
 			resultTable.getPrimaryKeys();
@@ -122,11 +129,26 @@ public class KeyboardOptions extends DialogPane {
 			primary.getStyleClass().add("table-row");
 			secondary.getStyleClass().add("table-row");
 
+			primaries.put(b, primary);
+			secondaries.put(b, secondary);
+
 			primary.keyProperty.addListener((o, k0, k1) -> {
-				if (k1 != null) resultTable.setPrimaryKey(b, k1);
+				if (k1 != null) {
+					final KeyBinding last = resultTable.setPrimaryKey(b, k1);
+					if (last != null && last != b) {
+						primaries.get(last).keyProperty.setValue(null);
+						secondaries.get(last).keyProperty.setValue(null);
+					}
+				}
 			});
 			secondary.keyProperty.addListener((o, k0, k1) -> {
-				if (k1 != null) resultTable.setSecondaryKey(b, k1);
+				if (k1 != null) {
+					final KeyBinding last = resultTable.setSecondaryKey(b, k1);
+					if (last != null && last != b) {
+						primaries.get(last).keyProperty.setValue(null);
+						secondaries.get(last).keyProperty.setValue(null);
+					}
+				}
 			});
 
 			bindings.addRow(rowNum, action, primary, secondary);

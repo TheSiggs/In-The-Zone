@@ -57,15 +57,18 @@ public class KeyField extends TextField {
 					KeyCombination.ModifierValue.DOWN :
 					KeyCombination.ModifierValue.UP;
 
+			final KeyCombination.ModifierValue meta =
+				event.isMetaDown()?
+					KeyCombination.ModifierValue.DOWN :
+					KeyCombination.ModifierValue.UP;
+
 			final KeyCombination.ModifierValue shortcut =
 				event.isShortcutDown()?
 					KeyCombination.ModifierValue.DOWN :
 					KeyCombination.ModifierValue.UP;
 
 			final KeyCodeCombination c =
-				new KeyCodeCombination(code,
-					shift, control, alt,
-					KeyCombination.ModifierValue.ANY, shortcut);
+				new KeyCodeCombination(code, shift, control, alt, meta, shortcut);
 
 			keyProperty.setValue(c);
 			previousValue = Optional.empty();

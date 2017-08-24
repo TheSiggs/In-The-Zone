@@ -36,6 +36,12 @@ public interface LobbyListener {
 	public void challengeIssued(final String player);
 
 	/**
+	 * An incoming challenge was cancelled.
+	 * @param player The player that cancelled the challenge
+	 * */
+	public void challengeCancelled(final String player);
+
+	/**
 	 * The other client logged off.
 	 * @param logoff The other client is not coming back
 	 * */

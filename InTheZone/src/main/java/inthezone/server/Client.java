@@ -39,8 +39,8 @@ public class Client {
 
 	public Optional<String> name = Optional.empty();
 
-	private Set<Client> challenges = new HashSet<>();
-	private Set<Client> challenged = new HashSet<>();
+	private final Set<Client> challenges = new HashSet<>();
+	private final Set<Client> challenged = new HashSet<>();
 	private Optional<Game> currentGame = Optional.empty();
 
 	private final List<Message> messages = new ArrayList<>();
@@ -238,6 +238,15 @@ public class Client {
 		Log.info("A challenge made by " + getClientName() +
 			" has been rejected by " + client.getClientName(), null);
 		challenged.remove(client);
+	}
+
+	/**
+	 * A challenge made to this client is cancelled.
+	 * */
+	public void challengeCancelled(final Client client) {
+		Log.info("A challenge made by " +
+			client.getClientName() + " has been cancelled", null);
+		challenges.remove(client);
 	}
 
 	/**
@@ -474,6 +483,8 @@ public class Client {
 						doRejectChallenge(msg, client);
 					} else if (msg.kind == MessageKind.ACCEPT_CHALLENGE) {
 						doAcceptChallenge(msg, client);
+					} else if (msg.kind == MessageKind.CANCEL_CHALLENGE) {
+						doCancelChallenges(msg);
 					} else {
 						throw new ProtocolException("Wrong message for lobby mode");
 					}
@@ -542,6 +553,18 @@ public class Client {
 	}
 
 	/**
+	 * Cancel all current challenges
+	 * */
+	private void doCancelChallenges(final Message msg) throws ProtocolException {
+		Log.info(getClientName() + " cancels all challenges", null);
+		for (final Client c : challenged) {
+			c.challengeCancelled(this);
+			c.forwardMessage(msg);
+		}
+		challenged.clear();
+	}
+
+	/**
 	 * Reject a challenge from another client
 	 * @param client The client who's challenge we are rejecting
 	 * */
@@ -587,7 +610,7 @@ public class Client {
 			startGameWith(client, game);
 			client.startGameWith(this, game);
 
-			for (Client c : namedClients.values()) {
+			for (final Client c : namedClients.values()) {
 				if (c != this && c != client) {
 					c.enteredGame(this);
 					c.enteredGame(client);

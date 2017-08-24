@@ -6,8 +6,10 @@ import isogame.engine.Stage;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -271,6 +273,26 @@ public class LobbyView extends StackPane {
 		gui.setLeft(players);
 	}
 
+	private Optional<ChallengePane> cancellableChallenge = Optional.empty();
+	private final Set<String> incomingChallenges = new HashSet<>();
+
+	public void cancellationFrom(final String player) {
+		incomingChallenges.remove(player);
+		cancellableChallenge.ifPresent(p -> p.forceCancel());
+	}
+
+	private boolean checkCancelled(
+		final String player, final boolean notify
+	) {
+		if (!incomingChallenges.contains(player)) {
+			if (notify) modalDialog.showMessage(
+				player + " cancelled their challenge");
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public void challengeFrom(
 		final String player, final StartBattleCommandRequest otherCmd
 	) {
@@ -279,15 +301,24 @@ public class LobbyView extends StackPane {
 			parent.network.refuseChallenge(player, thisPlayer);
 		}
 
+		incomingChallenges.add(player);
+
 		final String message = player + " challenges you to battle!";
 		final String prompt = "Accept this challenge?";
 		modalDialog.showConfirmation(prompt, message, r -> {
 			if (r == ButtonType.YES) {
+				if (checkCancelled(player, true)) return;
 				try {
+					cancellableChallenge = Optional.of(new ChallengePane(
+						gameData, config, Optional.of(otherCmd.stage),
+						otherCmd.player.otherPlayer(), thisPlayer, player));
+
 					parent.showScreen(
-						new ChallengePane(gameData, config, Optional.of(otherCmd.stage),
-							otherCmd.player.otherPlayer(), thisPlayer, player),
+						cancellableChallenge.get(),
 							oCmdReq -> {
+								cancellableChallenge = Optional.empty();
+								if (checkCancelled(player, true)) return;
+
 								if (!oCmdReq.isPresent()) {
 									parent.network.refuseChallenge(player, thisPlayer);
 								} else {
@@ -297,6 +328,7 @@ public class LobbyView extends StackPane {
 											cmdReq.makeCommand(otherCmd, gameData);
 										parent.network.acceptChallenge(
 											ready, otherCmd.player.otherPlayer(), player);
+										incomingChallenges.remove(player);
 									} catch (final CorruptDataException e) {
 										parent.network.refuseChallenge(player, thisPlayer);
 										modalDialog.showError(e, "Error initialising battle");
@@ -308,6 +340,7 @@ public class LobbyView extends StackPane {
 					modalDialog.showError(e, "Error initialising challenge panel");
 				}
 			} else {
+				if (checkCancelled(player, false)) return;
 				parent.network.refuseChallenge(player, thisPlayer);
 			}
 		});

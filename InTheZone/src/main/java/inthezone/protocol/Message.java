@@ -205,9 +205,23 @@ public class Message {
 		return new Message(MessageKind.RECONNECT, o);
 	}
 
+	/**
+	 * Cancel a challenge
+	 * @param fromPlayer the player that is cancelling the challenge that they
+	 * issued
+	 * */
+	public static Message CANCEL_CHALLENGE(
+		final String fromPlayer
+	) {
+		final JSONObject o = new JSONObject();
+		o.put("name", fromPlayer);
+		return new Message(MessageKind.CANCEL_CHALLENGE, o);
+	}
+
 	public String parseName() throws ProtocolException {
 		if (kind != MessageKind.REQUEST_NAME &&
 			kind != MessageKind.CHALLENGE_PLAYER &&
+			kind != MessageKind.CANCEL_CHALLENGE &&
 			kind != MessageKind.ACCEPT_CHALLENGE &&
 			kind != MessageKind.REJECT_CHALLENGE &&
 			kind != MessageKind.ISSUE_CHALLENGE)

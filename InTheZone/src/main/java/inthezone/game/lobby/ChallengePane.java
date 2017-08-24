@@ -245,6 +245,10 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		});
 	}
 
+	public void forceCancel() {
+		onDone.accept(Optional.empty());
+	}
+
 	private void setDoneButtonState() {
 		final String s = stage.getSelectionModel().getSelectedItem();
 		final Loadout l = loadout.getSelectionModel().getSelectedItem();

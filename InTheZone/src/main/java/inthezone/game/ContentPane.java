@@ -13,9 +13,9 @@ import inthezone.game.battle.BattleView;
 import inthezone.game.lobby.LobbyView;
 import isogame.engine.CorruptDataException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
 import javafx.application.Platform;
@@ -261,14 +261,20 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	private final Map<String, Integer> cancelledChallenges = new HashMap<>();
+	private final Set<String> cancelledChallenges = new HashSet<>();
+
+	@Override public void challengeCancelled(final String player) {
+		Platform.runLater(() -> {
+			lobbyView.cancellationFrom(player);
+		});
+	}
 
 	/**
 	 * Cancel an outstanding challenge.
 	 * */
 	public void cancelChallenge(final String player) {
-		cancelledChallenges.put(player,
-			1 + cancelledChallenges.getOrDefault(player, 0));
+		cancelledChallenges.add(player);
+		network.cancelChallenge();
 	}
 
 	@Override
@@ -279,10 +285,8 @@ public class ContentPane extends StackPane implements LobbyListener {
 	) {
 		Platform.runLater(() -> {
 			try {
-				if (cancelledChallenges.getOrDefault(otherPlayer, 0) > 0) {
-					cancelledChallenges.put(
-						otherPlayer, cancelledChallenges.get(otherPlayer) - 1);
-					network.sendCommand(new ResignCommand(player));
+				if (cancelledChallenges.contains(otherPlayer)) {
+					cancelledChallenges.remove(otherPlayer);
 					return;
 				}
 				final BattleView newBattle = new BattleView(ready, player,

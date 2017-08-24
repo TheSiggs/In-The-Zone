@@ -242,6 +242,14 @@ public class Network implements Runnable {
 		}
 	}
 
+	public void cancelChallenge() {
+		try {
+			sendQueue.put(Message.CANCEL_CHALLENGE(playerName));
+		} catch (final InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		}
+	}
+
 	public void sendCommand(final Command cmd) {
 		try {
 			sendQueue.put(Message.COMMAND(cmd.getJSON()));

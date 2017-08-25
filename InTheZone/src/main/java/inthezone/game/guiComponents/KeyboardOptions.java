@@ -18,11 +18,16 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import inthezone.game.ClientConfig;
 import inthezone.game.InTheZoneKeyBinding;
+import inthezone.game.battle.ModalDialog;
 
+/**
+ * The keyboard options dialog.
+ * */
 public class KeyboardOptions extends DialogPane {
 	public static final ButtonType doneButton =
 		new ButtonType("Done", ButtonBar.ButtonData.OK_DONE);
@@ -30,10 +35,13 @@ public class KeyboardOptions extends DialogPane {
 	public static final ButtonType resetButton =
 		new ButtonType("Reset to defaults", ButtonBar.ButtonData.OTHER);
 	
+	private final StackPane contentWrapper = new StackPane();
 	private final VBox content = new VBox();
 	private final GridPane headers = new GridPane();
 	private final GridPane bindings = new GridPane();
 	private final ScrollPane bindingsWrapper;
+
+	private final ModalDialog modalDialog = new ModalDialog();
 
 	private final Label header0 = new Label();
 	private final Label header1 = new Label("Primary key");
@@ -88,11 +96,32 @@ public class KeyboardOptions extends DialogPane {
 		this.getStylesheets().add("dialogs.css");
 
 		this.setHeaderText("Keyboard bindings");
-		this.setContent(content);
+		contentWrapper.getChildren().addAll(content, modalDialog);
+		this.setContent(contentWrapper);
 		this.getButtonTypes().addAll(resetButton, ButtonType.CANCEL, doneButton);
 
-		lookupButton(resetButton).setOnMouseClicked(event ->
-			initialize(config.defaultKeyBindingTable));
+		modalDialog.setOnShow(() -> {
+			content.setMouseTransparent(true);
+			lookupButton(resetButton).setMouseTransparent(true);
+			lookupButton(ButtonType.CANCEL).setMouseTransparent(true);
+			lookupButton(doneButton).setMouseTransparent(true);
+		});
+
+		modalDialog.setOnClose(() -> {
+			content.setMouseTransparent(false);
+			lookupButton(resetButton).setMouseTransparent(false);
+			lookupButton(ButtonType.CANCEL).setMouseTransparent(false);
+			lookupButton(doneButton).setMouseTransparent(false);
+		});
+
+		lookupButton(resetButton).setOnMouseClicked(event -> {
+			final String message =
+				"Resetting to defaults will erase your current key bindings" +
+				" and replace them with default values.";
+			modalDialog.showConfirmation("Proceed?", message, bt -> {
+				if (bt == ButtonType.YES) initialize(config.defaultKeyBindingTable);
+			});
+		});
 	}
 
 	private final Map<KeyBinding, KeyField> primaries = new HashMap<>();
@@ -132,27 +161,69 @@ public class KeyboardOptions extends DialogPane {
 			primaries.put(b, primary);
 			secondaries.put(b, secondary);
 
-			primary.keyProperty.addListener((o, k0, k1) -> {
-				if (k1 != null) {
-					final KeyBinding last = resultTable.setPrimaryKey(b, k1);
-					if (last != null && last != b) {
-						primaries.get(last).keyProperty.setValue(null);
-						secondaries.get(last).keyProperty.setValue(null);
-					}
-				}
-			});
-			secondary.keyProperty.addListener((o, k0, k1) -> {
-				if (k1 != null) {
-					final KeyBinding last = resultTable.setSecondaryKey(b, k1);
-					if (last != null && last != b) {
-						primaries.get(last).keyProperty.setValue(null);
-						secondaries.get(last).keyProperty.setValue(null);
-					}
-				}
-			});
+			primary.keyProperty.addListener((o, k0, k1) ->
+				rebindKey(k1, b, primary, true));
+			secondary.keyProperty.addListener((o, k0, k1) ->
+				rebindKey(k1, b, secondary, false));
 
 			bindings.addRow(rowNum, action, primary, secondary);
 			rowNum += 1;
+		}
+	}
+
+	private void rebindKey(
+		final KeyCodeCombination key,
+		final KeyBinding action,
+		final KeyField field,
+		final boolean isPrimary
+	) {
+		if (key == null) {
+			actuallyRebindKey(key, action, isPrimary);
+			return;
+		}
+
+		final KeyBinding oldAction = resultTable.getKeyAction(key);
+		if (oldAction == action) return;
+
+		if (oldAction != null) {
+			final String message = "The key combination '" + key.getDisplayText() +
+				"' is currently mapped to " + oldAction.toString();
+			final String prompt = "Remove current mapping?";
+			modalDialog.showConfirmation(prompt, message, bt -> {
+				if (bt == ButtonType.YES) {
+					actuallyRebindKey(key, action, isPrimary);
+				} else {
+					final Map<KeyBinding, KeyCodeCombination> keys = isPrimary?
+						resultTable.getPrimaryKeys() : resultTable.getSecondaryKeys();
+					field.keyProperty.setValue(keys.get(action));
+				}
+			});
+
+		} else {
+			actuallyRebindKey(key, action, isPrimary);
+		}
+	}
+
+	private void actuallyRebindKey(
+		final KeyCodeCombination key,
+		final KeyBinding action,
+		final boolean isPrimary
+	) {
+		if (key == null) {
+			if (isPrimary) resultTable.setPrimaryKey(action, null);
+			else resultTable.setSecondaryKey(action, null);
+			return;
+
+		} else {
+			final KeyBinding last;
+
+			if (isPrimary) last = resultTable.setPrimaryKey(action, key);
+			else last = resultTable.setSecondaryKey(action, key);
+
+			if (last != null && last != action) {
+				primaries.get(last).keyProperty.setValue(null);
+				secondaries.get(last).keyProperty.setValue(null);
+			}
 		}
 	}
 }

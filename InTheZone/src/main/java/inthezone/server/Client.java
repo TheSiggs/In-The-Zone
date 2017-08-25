@@ -288,6 +288,7 @@ public class Client {
 
 	/**
 	 * Return true if matchmaking is allowed, false otherwise
+	 * @param rq the start battle request from the other player
 	 * */
 	public boolean makeMatch(
 		final Client other, final StartBattleCommandRequest rq
@@ -306,8 +307,11 @@ public class Client {
 			return false;
 
 		} else {
+			Log.info(getClientName() +
+				" is matching with " + other.getClientName() +
+				" and playing as " + rq.player.otherPlayer(), null);
 			makingMatchWith = Optional.of(other);
-			toPlayAs = Optional.of(rq.player);
+			toPlayAs = Optional.of(rq.player.otherPlayer());
 			channel.requestSend(Message.CHALLENGE_PLAYER(
 				other.getClientName(), rq.getJSON(), true));
 
@@ -332,9 +336,14 @@ public class Client {
 			return Optional.empty();
 		} else {
 			if (makingMatchWith.get().queuedGame.isPresent()) {
+				Log.info(getClientName() + " completing match with " +
+					makingMatchWith.get().getClientName(), null);
 				return Optional.of(rq.makeCommand(
 					makingMatchWith.get().queuedGame.get(), dataFactory));
 			} else {
+				Log.info(getClientName() +
+					" finished setting up game, now waiting for" +
+					makingMatchWith.get().getClientName(), null);
 				queuedGame = Optional.of(rq);
 				return Optional.empty();
 			}
@@ -764,17 +773,28 @@ public class Client {
 				gameQueue.get(i).match(q);
 
 			if (sb.isPresent()) {
+				// we have to cross the StartBattleCommandRequests since usually player
+				// A sends his SBCRQ to player B and vice versa.
 				final boolean thisok = makeMatch(
-					gameQueue.get(i).client, sb.get().thisone);
+					gameQueue.get(i).client, sb.get().thatone);
 				final boolean thatok = gameQueue.get(i).client.makeMatch(
-					this, sb.get().thatone);
+					this, sb.get().thisone);
 
 				if (thisok && thatok) {
+					Log.info("Matched " + getClientName() +
+						" with " + gameQueue.get(i).client.getClientName(), null);
+					Log.info(
+						gameQueue.get(i).client.getClientName() +
+						" leaves the queue", null);
 					gameQueue.remove(i);
 					return;
 				} else {
 					// we're in an invalid state, so cancel everything and return to the
 					// lobby
+					Log.warn(getClientName() + " and " +
+						gameQueue.get(i).client.getClientName() +
+						" are potentially in an invalid state" +
+						", throw them both off the queue", null);
 					cancelQueue();
 					gameQueue.get(i).client.cancelQueue();
 				}
@@ -782,6 +802,7 @@ public class Client {
 		}
 
 		// failing that, wait in the queue
+		Log.info(getClientName() + " enters queue", null);
 		gameQueue.add(q);
 	}
 
@@ -789,11 +810,13 @@ public class Client {
 	 * Remove this client from the game queue.
 	 * */
 	public void cancelQueue() {
+		Log.info(getClientName() + " is leaving the queue", null);
 		if (state != ClientState.QUEUE) return;
 
 		state = ClientState.LOBBY;
 		for (int i = 0; i < gameQueue.size(); i++) {
 			if (gameQueue.get(i).client == this) {
+				Log.info("Removing " + getClientName() + " from the queue", null);
 				gameQueue.remove(i); i -= 1;
 			}
 		}

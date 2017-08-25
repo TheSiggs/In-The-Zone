@@ -105,7 +105,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 				challenge.ifPresent(cmd -> {
 					challengePlayer = Optional.empty();
 					challenge = Optional.empty();
-					lobbyView.challengeFrom(player, cmd);
+					lobbyView.challengeFrom(player, this.fromQueue, cmd);
 				}));
 		}
 	}
@@ -226,16 +226,21 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+	private boolean fromQueue = false;
+
 	@Override
 	public void challengeFrom(
-		final String player, final StartBattleCommandRequest cmd
+		final String player,
+		final boolean fromQueue,
+		final StartBattleCommandRequest cmd
 	) {
 		Platform.runLater(() -> {
 			if (screens.isEmpty()) {
-				lobbyView.challengeFrom(player, cmd);
+				lobbyView.challengeFrom(player, fromQueue, cmd);
 			} else {
 				challengePlayer = Optional.of(player);
 				challenge = Optional.of(cmd);
+				this.fromQueue = fromQueue;
 			}
 		});
 	}

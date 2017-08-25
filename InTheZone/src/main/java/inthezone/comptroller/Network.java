@@ -239,6 +239,23 @@ public class Network implements Runnable {
 	}
 
 	/**
+	 * @param plaer the player accepting the game
+	 * @param otherPlayer the player who's game we're accepting
+	 * */
+	public void acceptQueuedGame(
+		final StartBattleCommandRequest cmdRq,
+		final Player player,
+		final String otherPlayer
+	) {
+		try {
+			sendQueue.put(Message.ACCEPT_CHALLENGE(
+				otherPlayer, player, cmdRq.getJSON(), true));
+		} catch (final InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		} 
+	}
+
+	/**
 	 * @param player the player to reject
 	 * @param thisPlayer this player
 	 * */

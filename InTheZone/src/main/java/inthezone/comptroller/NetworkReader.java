@@ -63,6 +63,7 @@ public class NetworkReader implements Runnable {
 					case CHALLENGE_PLAYER:
 						try {
 							lobbyListener.challengeFrom(msg.parseName(),
+								msg.payload.getBoolean("isQueue"),
 								StartBattleCommandRequest.fromJSON(
 									msg.payload.getJSONObject("cmd"), gameData));
 						} catch (final JSONException e) {

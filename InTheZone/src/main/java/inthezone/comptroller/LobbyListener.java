@@ -28,7 +28,9 @@ public interface LobbyListener {
 	public void playerHasEnteredBattle(final String player);
 	public void playerRefusesChallenge(final String player);
 	public void challengeFrom(
-		final String player, final StartBattleCommandRequest cmd);
+		final String player,
+		final boolean fromQueue,
+		final StartBattleCommandRequest cmd);
 
 	/**
 	 * Our challenge has been issued to the named player.

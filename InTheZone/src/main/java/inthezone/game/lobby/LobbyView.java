@@ -333,8 +333,18 @@ public class LobbyView extends StackPane {
 		}
 	}
 
+	/**
+	 * Process a challenge (or queued game) from another player.
+	 * @param player The player to accept the game from
+	 * @param fromQueue true if this game came off the queue (otherwise it was a
+	 * challenge)
+	 * @param otherCmd the StartBattleCommandRequest to initialise the
+	 * ChallengePane from
+	 * */
 	public void challengeFrom(
-		final String player, final StartBattleCommandRequest otherCmd
+		final String player,
+		final boolean fromQueue,
+		final StartBattleCommandRequest otherCmd
 	) {
 		if (config.loadouts.isEmpty()) {
 			// Automatically refuse the challenge
@@ -343,14 +353,26 @@ public class LobbyView extends StackPane {
 
 		incomingChallenges.add(player);
 
-		final String message = player + " challenges you to battle!";
-		final String prompt = "Accept this challenge?";
+		final String message;
+		final String prompt;
+
+		if (fromQueue) {
+			message = player + " wants to battle!";
+			prompt = "Accept this game?";
+		} else {
+			message = player + " challenges you to battle!";
+			prompt = "Accept this challenge?";
+		}
+
 		modalDialog.showConfirmation(prompt, message, r -> {
 			if (r == ButtonType.YES) {
 				if (checkCancelled(player, true)) return;
 
 				final StatusPanel.WaitingStatus wait = status.getWaitingStatus();
-				if (wait != StatusPanel.WaitingStatus.NONE) cancelChallenge();
+				if (
+					(!fromQueue && wait != StatusPanel.WaitingStatus.NONE) ||
+					(fromQueue && wait != StatusPanel.WaitingStatus.QUEUE)
+				) cancelChallenge();
 
 				try {
 					cancellableChallenge = Optional.of(new ChallengePane(
@@ -365,6 +387,11 @@ public class LobbyView extends StackPane {
 
 								if (!oCmdReq.isPresent()) {
 									parent.network.refuseChallenge(player, thisPlayer);
+								} else if (fromQueue) {
+									final StartBattleCommandRequest cmdReq = oCmdReq.get();
+									parent.network.acceptQueuedGame(
+										cmdReq, cmdReq.player, player);
+									incomingChallenges.remove(player);
 								} else {
 									try {
 										final StartBattleCommandRequest cmdReq = oCmdReq.get();

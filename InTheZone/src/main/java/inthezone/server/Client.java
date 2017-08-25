@@ -342,7 +342,7 @@ public class Client {
 					makingMatchWith.get().queuedGame.get(), dataFactory));
 			} else {
 				Log.info(getClientName() +
-					" finished setting up game, now waiting for" +
+					" finished setting up game, now waiting for " +
 					makingMatchWith.get().getClientName(), null);
 				queuedGame = Optional.of(rq);
 				return Optional.empty();

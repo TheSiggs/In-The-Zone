@@ -174,7 +174,7 @@ public class LobbyView extends StackPane {
 	public void enterQueue() {
 		final StatusPanel.WaitingStatus wait = status.getWaitingStatus();
 		if (wait == StatusPanel.WaitingStatus.QUEUE) {
-			return;
+			modalDialog.showMessage("You are already in the queue");
 		} else if (wait == StatusPanel.WaitingStatus.CHALLENGE) {
 			final String prompt = "Cancel challenge?";
 			modalDialog.showConfirmation(prompt, status.getWaitingMessage(), r -> {
@@ -315,6 +315,9 @@ public class LobbyView extends StackPane {
 	 * Handle a cancellation of our queued status
 	 * */
 	public void queueCancellation() {
+		status.getWaitingForPlayer().ifPresent(op ->
+			modalDialog.showMessage(op + " cancelled the game"));
+
 		incomingChallenges.clear();
 		cancellableChallenge.ifPresent(p -> p.forceCancel());
 		status.waitingDone();
@@ -324,9 +327,12 @@ public class LobbyView extends StackPane {
 	private boolean checkCancelled(
 		final String player, final boolean notify
 	) {
-		if (!incomingChallenges.contains(player)) {
+		if (
+			!incomingChallenges.contains(player) ||
+			status.getWaitingStatus() == StatusPanel.WaitingStatus.QUEUED_SETUP
+		) {
 			if (notify) modalDialog.showMessage(
-				player + " cancelled their challenge");
+				player + " cancelled the game");
 			return true;
 		} else {
 			return false;
@@ -392,6 +398,7 @@ public class LobbyView extends StackPane {
 									parent.network.acceptQueuedGame(
 										cmdReq, cmdReq.player, player);
 									incomingChallenges.remove(player);
+									status.waitForOtherPlayer(player);
 								} else {
 									try {
 										final StartBattleCommandRequest cmdReq = oCmdReq.get();

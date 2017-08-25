@@ -231,15 +231,18 @@ public class Message {
 
 	/**
 	 * Enter the game queue
-	 * @params vetoMaps the maps to veto
+	 * @param name the name of the player entering the queue
+	 * @param vetoMaps the maps to veto
 	 * */
 	public static Message ENTER_QUEUE(
+		final String name,
 		final List<String> vetoMaps
 	) {
 		final JSONObject o = new JSONObject();
 		final JSONArray a = new JSONArray();
 		for (final String m : vetoMaps) a.put(m);
 		o.put("veto", a);
+		o.put("name", name);
 		return new Message(MessageKind.ENTER_QUEUE, o);
 	}
 
@@ -253,6 +256,7 @@ public class Message {
 			kind != MessageKind.CANCEL_CHALLENGE &&
 			kind != MessageKind.ACCEPT_CHALLENGE &&
 			kind != MessageKind.REJECT_CHALLENGE &&
+			kind != MessageKind.ENTER_QUEUE &&
 			kind != MessageKind.ISSUE_CHALLENGE)
 				throw new ProtocolException("Expected name");
 		try {

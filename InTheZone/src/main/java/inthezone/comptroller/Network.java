@@ -215,7 +215,7 @@ public class Network implements Runnable {
 
 	public void enterQueue(final List<String> vetoMaps) {
 		try {
-			sendQueue.put(Message.ENTER_QUEUE(vetoMaps));
+			sendQueue.put(Message.ENTER_QUEUE(playerName, vetoMaps));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}

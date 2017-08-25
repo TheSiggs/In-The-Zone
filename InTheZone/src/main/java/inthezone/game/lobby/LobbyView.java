@@ -238,7 +238,7 @@ public class LobbyView extends StackPane {
 		}
 	}
 
-	private Optional<String> currentChallenge;
+	private Optional<String> currentChallenge = Optional.empty();
 
 	/**
 	 * Cancel all current challenges and exit the queue
@@ -309,6 +309,16 @@ public class LobbyView extends StackPane {
 	public void cancellationFrom(final String player) {
 		incomingChallenges.remove(player);
 		cancellableChallenge.ifPresent(p -> p.forceCancel());
+	}
+
+	/**
+	 * Handle a cancellation of our queued status
+	 * */
+	public void queueCancellation() {
+		incomingChallenges.clear();
+		cancellableChallenge.ifPresent(p -> p.forceCancel());
+		status.waitingDone();
+		gui.setLeft(players);
 	}
 
 	private boolean checkCancelled(

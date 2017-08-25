@@ -42,6 +42,11 @@ public interface LobbyListener {
 	public void challengeCancelled(final String player);
 
 	/**
+	 * We got thrown off the queue.
+	 * */
+	public void queueCancelled();
+
+	/**
 	 * The other client logged off.
 	 * @param logoff The other client is not coming back
 	 * */

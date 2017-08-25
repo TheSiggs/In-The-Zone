@@ -271,6 +271,12 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+	@Override public void queueCancelled() {
+		Platform.runLater(() -> {
+			lobbyView.queueCancellation();
+		});
+	}
+
 	public void enterQueue(final List<String> vetoMaps) {
 		network.enterQueue(vetoMaps);
 		cancelQueue = false;

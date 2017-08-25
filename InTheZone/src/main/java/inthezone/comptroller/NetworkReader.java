@@ -116,6 +116,10 @@ public class NetworkReader implements Runnable {
 						lobbyListener.challengeCancelled(msg.parseName());
 						break;
 
+					case CANCEL_QUEUE:
+						lobbyListener.queueCancelled();
+						break;
+
 					case NOK:
 						lobbyListener.serverNotification(msg.parseMessage());
 						break;

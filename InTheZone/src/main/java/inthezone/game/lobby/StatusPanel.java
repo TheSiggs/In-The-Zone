@@ -61,6 +61,7 @@ public class StatusPanel extends StackPane {
 
 	public void waitInQueue() {
 		waitingStatus = WaitingStatus.QUEUE;
+		waitingForPlayer = Optional.empty();
 		message.setText("Waiting in queue");
 	}
 

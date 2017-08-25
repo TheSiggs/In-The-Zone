@@ -41,14 +41,16 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 	private JSONObject json = null;
 
-	public GameDataFactory(Optional<File> baseDir, boolean useInternal)
+	public GameDataFactory(final Optional<File> baseDir, boolean useInternal)
 		throws IOException, CorruptDataException
 	{
 		this(baseDir, useInternal, false);
 	}
 
 	public GameDataFactory(
-		Optional<File> baseDir, boolean useInternal, boolean nofx
+		final Optional<File> baseDir,
+		final boolean useInternal,
+		final boolean nofx
 	)
 		throws IOException, CorruptDataException
 	{
@@ -67,7 +69,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 		this.standardSprites = new StandardSprites(globalLibrary, loc);
 
 		// load the game data
-		try (BufferedReader in =
+		try (final BufferedReader in =
 			new BufferedReader(new InputStreamReader(loc.gameData(), "UTF-8"))
 		) {
 			if (in == null) throw new FileNotFoundException(
@@ -80,7 +82,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 			loadGameData(new JSONObject(raw.toString()));
 
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			throw new CorruptDataException("game data is corrupted", e);
 		}
 	}
@@ -88,24 +90,24 @@ public class GameDataFactory implements HasJSONRepresentation {
 	@Override
 	public JSONObject getJSON() {return json;}
 
-	public void update(JSONObject json) throws CorruptDataException {
+	public void update(final JSONObject json) throws CorruptDataException {
 		stages.clear();
 		characters.clear();
 		loadGameData(json);
 
 		if (updateCache) {
-			try (PrintWriter out =
+			try (final PrintWriter out =
 				new PrintWriter(new OutputStreamWriter(new FileOutputStream(
 					loc.gameDataFilename()), "UTF-8"));
 			) {
 				out.print(json);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new CorruptDataException("IO error writing back to cache", e);
 			}
 		}
 	}
 
-	private void loadGameData(JSONObject json) throws CorruptDataException {
+	private void loadGameData(final JSONObject json) throws CorruptDataException {
 		try {
 			this.json = json;
 			this.version = UUID.fromString(json.getString("version"));
@@ -113,22 +115,22 @@ public class GameDataFactory implements HasJSONRepresentation {
 			final JSONArray aStages = json.getJSONArray("stages");
 			final JSONArray aCharacters = json.getJSONArray("characters");
 
-			for (Object x : aStages) {
-				Stage i = Stage.fromJSON(
+			for (final Object x : aStages) {
+				final Stage i = Stage.fromJSON(
 					(JSONObject) x, loc, globalLibrary);
 				stages.put(i.name, i);
 			}
 
-			for (Object x : aCharacters) {
-				CharacterInfo i =
+			for (final Object x : aCharacters) {
+				final CharacterInfo i =
 					CharacterInfo.fromJSON((JSONObject) x, loc, globalLibrary);
 				characters.put(i.name, i);
 			}
 
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			throw new CorruptDataException("Error in game data: " + e.getMessage(), e);
 
-		} catch (ClassCastException|IllegalArgumentException e) {
+		} catch (final ClassCastException|IllegalArgumentException e) {
 			throw new CorruptDataException("Type error in game data: " + e.getMessage(), e);
 		}
 	}
@@ -149,8 +151,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 	/**
 	 * May return null.
 	 * */
-	public Stage getStage(String name) {
-		Stage r = stages.get(name);
+	public Stage getStage(final String name) {
+		final Stage r = stages.get(name);
 		return r == null? null : r.clone();
 	}
 
@@ -179,7 +181,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 	/**
 	 * May return null
 	 * */
-	public CharacterInfo getCharacter(String name) {
+	public CharacterInfo getCharacter(final String name) {
 		return characters.get(name);
 	}
 
@@ -191,11 +193,11 @@ public class GameDataFactory implements HasJSONRepresentation {
 	 * Write game data out to a file
 	 * */
 	public void writeToStream(
-		OutputStream outStream,
-		Collection<File> stages,
-		Collection<CharacterInfo> characters
+		final OutputStream outStream,
+		final Collection<File> stages,
+		final Collection<CharacterInfo> characters
 	) throws IOException {
-		try (PrintWriter out =
+		try (final PrintWriter out =
 			new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
 		) {
 			final JSONObject o = new JSONObject();
@@ -203,8 +205,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 			final JSONArray c = new JSONArray();
 			final JSONArray w = new JSONArray();
 
-			for (File stage : stages) s.put(parseStage(stage));
-			for (CharacterInfo character : characters) c.put(character.getJSON());
+			for (final File stage : stages)
+				s.put(parseStage(stage));
+			for (final CharacterInfo character : characters)
+				c.put(character.getJSON());
 
 			o.put("version", UUID.randomUUID().toString());
 			o.put("versionNumber", ++versionNumber);
@@ -215,8 +219,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 		}
 	}
 
-	private JSONObject parseStage(File stage) throws IOException {
-		try (BufferedReader in =
+	private JSONObject parseStage(final File stage) throws IOException {
+		try (final BufferedReader in =
 			new BufferedReader(new InputStreamReader(new FileInputStream(stage), "UTF-8"))
 		) {
 			if (in == null) throw new FileNotFoundException(
@@ -228,7 +232,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 
 			return new JSONObject(raw.toString());
 
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			throw new IOException("stage file \"" + stage + "\" is corrupted");
 		}
 	}

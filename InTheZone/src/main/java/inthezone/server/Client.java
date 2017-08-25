@@ -1,5 +1,7 @@
 package inthezone.server;
 
+import isogame.engine.CorruptDataException;
+
 import java.io.IOException;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -11,11 +13,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
 import inthezone.Log;
+import inthezone.battle.commands.StartBattleCommand;
+import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
+import inthezone.battle.data.Player;
 import inthezone.protocol.ClientState;
 import inthezone.protocol.Message;
 import inthezone.protocol.MessageChannel;
@@ -45,6 +51,11 @@ public class Client {
 
 	private final List<Message> messages = new ArrayList<>();
 
+	// the global game queue
+	private final List<GameQueueElement> gameQueue;
+
+	private final Collection<String> allMaps = new ArrayList<>();
+
 	// If we are in the disconnected state, then this tells us when the
 	// disconnection happened
 	private long disconnectedAt = 0;
@@ -66,9 +77,10 @@ public class Client {
 		final Map<String, Client> namedClients,
 		final Collection<Client> pendingClients,
 		final Map<UUID, Client> sessions,
+		final List<GameQueueElement> gameQueue,
 		final GameDataFactory dataFactory
 	) throws IOException {
-
+		this.gameQueue = gameQueue;
 		this.namedClients = namedClients;
 		this.pendingClients = pendingClients;
 		this.sessions = sessions;
@@ -77,6 +89,9 @@ public class Client {
 		this.channel = new MessageChannel(connection, sel, this);
 
 		sessions.put(sessionKey, this);
+
+		allMaps.addAll(dataFactory.getStages().stream()
+			.map(s -> s.name).collect(Collectors.toList()));
 
 		// Send the server version to get the ball rolling
 		channel.requestSend(Message.SV(
@@ -226,6 +241,10 @@ public class Client {
 		state = ClientState.GAME;
 		challenges.remove(client);
 
+		queuedGame = Optional.empty();
+		toPlayAs = Optional.empty();
+		makingMatchWith = Optional.empty();
+
 		currentGame.ifPresent(g -> g.close());
 		currentGame = Optional.of(game);
 	}
@@ -257,6 +276,69 @@ public class Client {
 		Log.info(getClientName() +
 			" has been challenged by " + client.getClientName(), null);
 		challenges.add(client);
+	}
+
+	// The client we're currently matching a queued game with
+	Optional<Client> makingMatchWith = Optional.empty();
+	// the player to play as in the queued game that is currently under
+	// construction
+	Optional<Player> toPlayAs = Optional.empty(); 
+	// The queued game while we wait for the other player
+	Optional<StartBattleCommandRequest> queuedGame = Optional.empty();
+
+	/**
+	 * Return true if matchmaking is allowed, false otherwise
+	 * */
+	public boolean makeMatch(
+		final Client other, final StartBattleCommandRequest rq
+	) {
+		if (makingMatchWith.isPresent()) {
+			Log.warn(other.getClientName() + " attempted to make match with " +
+				getClientName() + ", but " + getClientName() +
+				" was already matching with " +
+				makingMatchWith.get().getClientName(), null);
+			return false;
+
+		} else if (state != ClientState.QUEUE) {
+			Log.warn(other.getClientName() + " attempted to make match with " +
+				getClientName() + ", but " + getClientName() +
+				" was not in the QUEUE state", null);
+			return false;
+
+		} else {
+			makingMatchWith = Optional.of(other);
+			toPlayAs = Optional.of(rq.player);
+			channel.requestSend(Message.CHALLENGE_PLAYER(
+				other.getClientName(), rq.getJSON(), true));
+
+			return true;
+		}
+	}
+
+	public Optional<StartBattleCommand> completeMatch(
+		final StartBattleCommandRequest rq
+	) throws CorruptDataException {
+		if (!makingMatchWith.isPresent()) {
+			Log.warn(getClientName() + " attempted to complete a match" +
+				", but there was no match to complete", null);
+			return Optional.empty();
+		} else if (queuedGame.isPresent()) {
+			Log.warn(getClientName() +
+				" attempted to complete the same match twice", null);
+			return Optional.empty();
+		} else if (toPlayAs.map(p -> rq.player != p).orElse(true)) {
+			Log.warn(getClientName() +
+				" attempted to cheat by playing as the wrong character", null);
+			return Optional.empty();
+		} else {
+			if (makingMatchWith.get().queuedGame.isPresent()) {
+				return Optional.of(rq.makeCommand(
+					makingMatchWith.get().queuedGame.get(), dataFactory));
+			} else {
+				queuedGame = Optional.of(rq);
+				return Optional.empty();
+			}
+		}
 	}
 
 	private int seq = 0;
@@ -484,10 +566,27 @@ public class Client {
 					} else if (msg.kind == MessageKind.ACCEPT_CHALLENGE) {
 						doAcceptChallenge(msg, client);
 					} else if (msg.kind == MessageKind.CANCEL_CHALLENGE) {
-						doCancelChallenges(msg);
+						doCancelChallenges();
+					} else if (msg.kind == MessageKind.ENTER_QUEUE) {
+						doCancelChallenges();
+						doEnterQueue(msg.parseVetos());
 					} else {
 						throw new ProtocolException("Wrong message for lobby mode");
 					}
+				}
+				break;
+			
+			case QUEUE:
+				if (msg.kind == MessageKind.GAME_OVER) break;
+
+				if (msg.kind == MessageKind.CANCEL_CHALLENGE) {
+					cancelQueue();
+				} else if (msg.kind == MessageKind.REJECT_CHALLENGE) {
+					cancelQueue();
+				} else if (msg.kind == MessageKind.ACCEPT_CHALLENGE) {
+					doAcceptQueueGame(msg);
+				} else {
+					throw new ProtocolException("Wrong message for lobby mode");
 				}
 				break;
 
@@ -555,11 +654,11 @@ public class Client {
 	/**
 	 * Cancel all current challenges
 	 * */
-	private void doCancelChallenges(final Message msg) throws ProtocolException {
+	private void doCancelChallenges() throws ProtocolException {
 		Log.info(getClientName() + " cancels all challenges", null);
 		for (final Client c : challenged) {
 			c.challengeCancelled(this);
-			c.forwardMessage(msg);
+			c.forwardMessage(Message.CANCEL_CHALLENGE(getClientName()));
 		}
 		challenged.clear();
 	}
@@ -601,31 +700,13 @@ public class Client {
 			// reject any other challenges
 			while (!challenges.isEmpty()) {
 				final Client c = challenges.iterator().next();
-				doRejectChallenge(Message.REJECT_CHALLENGE(c.getClientName(), getClientName()), c);
+				doRejectChallenge(
+					Message.REJECT_CHALLENGE(c.getClientName(), getClientName()), c);
 			}
 
-			final Game game = new Game(this, client);
-			game.nextCommand(msg.parseCommand(), this);
-
-			startGameWith(client, game);
-			client.startGameWith(this, game);
-
-			for (final Client c : namedClients.values()) {
-				if (c != this && c != client) {
-					c.enteredGame(this);
-					c.enteredGame(client);
-				}
-			}
-
-			client.forwardMessage(Message.START_BATTLE(
-				msg.parseCommand(),
-				msg.parsePlayer().otherPlayer(),
-				this.name.orElse("")));
-
-			channel.requestSend(Message.START_BATTLE(
-				msg.parseCommand(),
-				msg.parsePlayer(),
-				msg.parseName()));
+			doStartBattle(
+				client, msg.parseCommand(), msg.parsePlayer(),
+				msg.parsePlayer().otherPlayer(), false);
 
 		} else {
 			Log.warn(getClientName() +
@@ -635,6 +716,114 @@ public class Client {
 					c.getOther(this).getClientName()).orElse("<NO GAME>"), null);
 			channel.requestSend(Message.NOK(client.name.orElse("") +
 				" is already in battle with someone else"));
+		}
+	}
+
+	/**
+	 * Start a battle with another client.
+	 * */
+	private void doStartBattle(
+		final Client other,
+		final JSONObject cmd,
+		final Player thisPlayer,
+		final Player thatPlayer,
+		final boolean fromQueue
+	) throws ProtocolException {
+		final Game game = new Game(this, other);
+		game.nextCommand(cmd, this);
+
+		startGameWith(other, game);
+		other.startGameWith(this, game);
+
+		for (final Client c : namedClients.values()) {
+			if (c != this && c != other) {
+				c.enteredGame(this);
+				c.enteredGame(other);
+			}
+		}
+
+		other.forwardMessage(Message.START_BATTLE(
+			cmd, thatPlayer, getClientName(), fromQueue));
+
+		channel.requestSend(Message.START_BATTLE(
+			cmd, thisPlayer, other.getClientName(), fromQueue));
+	}
+
+	/**
+	 * Enter the game queue.
+	 * */
+	private void doEnterQueue(final List<String> vetoMaps) {
+		state = ClientState.QUEUE;
+
+		final GameQueueElement q =
+			new GameQueueElement(this, vetoMaps, allMaps);
+
+		// attempt to start a game now
+		for (int i = 0; i < gameQueue.size(); i++) {
+			final Optional<GameQueueElement.StartBattlePair> sb =
+				gameQueue.get(i).match(q);
+
+			if (sb.isPresent()) {
+				final boolean thisok = makeMatch(
+					gameQueue.get(i).client, sb.get().thisone);
+				final boolean thatok = gameQueue.get(i).client.makeMatch(
+					this, sb.get().thatone);
+
+				if (thisok && thatok) {
+					gameQueue.remove(i);
+					return;
+				} else {
+					// we're in an invalid state, so cancel everything and return to the
+					// lobby
+					cancelQueue();
+					gameQueue.get(i).client.cancelQueue();
+				}
+			}
+		}
+
+		// failing that, wait in the queue
+		gameQueue.add(q);
+	}
+
+	/**
+	 * Remove this client from the game queue.
+	 * */
+	public void cancelQueue() {
+		if (state != ClientState.QUEUE) return;
+
+		state = ClientState.LOBBY;
+		for (int i = 0; i < gameQueue.size(); i++) {
+			if (gameQueue.get(i).client == this) {
+				gameQueue.remove(i); i -= 1;
+			}
+		}
+
+		channel.requestSend(Message.CANCEL_QUEUE());
+
+		queuedGame = Optional.empty();
+		toPlayAs = Optional.empty();
+		makingMatchWith.ifPresent(other -> {
+			other.channel.requestSend(Message.CANCEL_CHALLENGE(getClientName()));
+			other.cancelQueue();
+			makingMatchWith = Optional.empty();
+		});
+	}
+
+	/**
+	 * Accept a game from the queue.
+	 * */
+	public void doAcceptQueueGame(final Message msg) throws ProtocolException {
+		try {
+			final Optional<StartBattleCommand> result =
+				completeMatch(StartBattleCommandRequest.fromJSON(
+					msg.parseCommand(), dataFactory));
+
+			if (result.isPresent()) {
+				doStartBattle(makingMatchWith.get(), result.get().getJSON(),
+					toPlayAs.get(), toPlayAs.get().otherPlayer(), true);
+			}
+		} catch (final CorruptDataException e) {
+			throw new ProtocolException("Error accepting queue game", e);
 		}
 	}
 }

@@ -94,6 +94,8 @@ public class LobbyView extends StackPane {
 
 		practiceGame.setOnAction(event -> startPracticeGame());
 
+		queueGame.setOnAction(event -> enterQueue());
+
 		loadoutsLabel.setOnMouseClicked(event -> {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
@@ -169,6 +171,30 @@ public class LobbyView extends StackPane {
 	public void reconnected() {
 	}
 
+	public void enterQueue() {
+		final StatusPanel.WaitingStatus wait = status.getWaitingStatus();
+		if (wait == StatusPanel.WaitingStatus.QUEUE) {
+			return;
+		} else if (wait == StatusPanel.WaitingStatus.CHALLENGE) {
+			final String prompt = "Cancel challenge?";
+			modalDialog.showConfirmation(prompt, status.getWaitingMessage(), r -> {
+				if (r == ButtonType.YES) {
+					cancelChallenge();
+					actuallyEnterQueue();
+				}
+			});
+		} else {
+			actuallyEnterQueue();
+		}
+	}
+
+	private void actuallyEnterQueue() {
+		// TODO: show veto panel
+		parent.enterQueue(new ArrayList<>());
+		status.waitInQueue();
+		gui.setLeft(status);
+	}
+
 	public void startPracticeGame() {
 		final StatusPanel.WaitingStatus wait = status.getWaitingStatus();
 
@@ -214,8 +240,12 @@ public class LobbyView extends StackPane {
 
 	private Optional<String> currentChallenge;
 
+	/**
+	 * Cancel all current challenges and exit the queue
+	 * */
 	public void cancelChallenge() {
 		currentChallenge.ifPresent(parent::cancelChallenge);
+		parent.cancelQueue();
 		status.waitingDone();
 		gui.setLeft(players);
 	}
@@ -308,6 +338,10 @@ public class LobbyView extends StackPane {
 		modalDialog.showConfirmation(prompt, message, r -> {
 			if (r == ButtonType.YES) {
 				if (checkCancelled(player, true)) return;
+
+				final StatusPanel.WaitingStatus wait = status.getWaitingStatus();
+				if (wait != StatusPanel.WaitingStatus.NONE) cancelChallenge();
+
 				try {
 					cancellableChallenge = Optional.of(new ChallengePane(
 						gameData, config, Optional.of(otherCmd.stage),
@@ -360,8 +394,8 @@ public class LobbyView extends StackPane {
 
 					// prepare the battle
 					final StartBattleCommand ready =
-						(new StartBattleCommandRequest(start.stage, op, "AI", l,
-							startTiles.stream().collect(Collectors.toList())))
+						(new StartBattleCommandRequest(start.stage, op, "AI", Optional.of(l),
+							Optional.of(startTiles.stream().collect(Collectors.toList()))))
 							.makeCommand(start, gameData);
 
 					// start the battle

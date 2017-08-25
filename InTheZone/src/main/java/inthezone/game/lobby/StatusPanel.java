@@ -17,7 +17,7 @@ public class StatusPanel extends StackPane {
 	private final Label message = new Label();
 
 	public enum WaitingStatus {
-		NONE, CHALLENGE, QUEUE
+		NONE, CHALLENGE, QUEUE, QUEUED_SETUP
 	}
 
 	private Optional<String> waitingForPlayer = Optional.empty();
@@ -68,6 +68,13 @@ public class StatusPanel extends StackPane {
 		waitingStatus = WaitingStatus.CHALLENGE;
 		waitingForPlayer = Optional.of(toPlayer);
 		message.setText("Waiting for " + toPlayer + " to respond to challenge");
+	}
+
+	public void waitForOtherPlayer(final String otherPlayer) {
+		waitingStatus = WaitingStatus.QUEUED_SETUP;
+		waitingForPlayer = Optional.of(otherPlayer);
+		message.setText("Waiting for " +
+			otherPlayer + " to choose starting positions");
 	}
 }
 

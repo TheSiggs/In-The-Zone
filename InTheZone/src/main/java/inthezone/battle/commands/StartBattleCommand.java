@@ -81,7 +81,7 @@ public class StartBattleCommand implements HasJSONRepresentation {
 
 	public Collection<Sprite> makeSprites() {
 		final Collection<Sprite> sprites = new ArrayList<>();
-		for (Character c : characters) {
+		for (final Character c : characters) {
 			Sprite s = new Sprite(c.sprite);
 			s.userData = c.id;
 			s.setPos(c.getPos());
@@ -98,8 +98,8 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		final JSONArray a1 = new JSONArray();
 		final JSONArray a2 = new JSONArray();
 
-		for (MapPoint p : p1start) a1.put(p.getJSON());
-		for (MapPoint p : p2start) a2.put(p.getJSON());
+		for (final MapPoint p : p1start) a1.put(p.getJSON());
+		for (final MapPoint p : p2start) a2.put(p.getJSON());
 
 		r.put("kind", "Start");
 		r.put("stage", stage);
@@ -144,12 +144,14 @@ public class StartBattleCommand implements HasJSONRepresentation {
 			return new StartBattleCommand(
 				stage, p1First, p1, p2, p1Start, p2Start, p1Name, p2Name);
 
-		} catch (JSONException|CorruptDataException e) {
+		} catch (final JSONException|CorruptDataException e) {
 			throw new ProtocolException("Error parsing start command", e);
 		}
 	}
 
-	public Battle doCmd(final GameDataFactory gameData) throws CorruptDataException {
+	public Battle doCmd(final GameDataFactory gameData)
+		throws CorruptDataException
+	{
 		return new Battle(
 			new BattleState(gameData.getStage(stage), characters),
 			gameData.getStandardSprites());

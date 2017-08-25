@@ -3,7 +3,7 @@ package inthezone.protocol;
 public enum MessageKind {
 	S_VERSION, C_VERSION, OK, NOK, GAME_DATA, REQUEST_NAME, PLAYERS_JOIN,
 	CHALLENGE_PLAYER, ACCEPT_CHALLENGE, REJECT_CHALLENGE, COMMAND,
-	GAME_OVER, LOGOFF, RECONNECT, WAIT_FOR_RECONNECT,
+	GAME_OVER, LOGOFF, RECONNECT, WAIT_FOR_RECONNECT, ENTER_QUEUE, CANCEL_QUEUE,
 	START_BATTLE, ISSUE_CHALLENGE, CANCEL_CHALLENGE;
 
 	// NOTE: REJECT_CHALLENGE can happen during a game, in which case it probably
@@ -30,6 +30,8 @@ public enum MessageKind {
 			case "SB": return START_BATTLE;
 			case "IC": return ISSUE_CHALLENGE;
 			case "CC": return CANCEL_CHALLENGE;
+			case "EQ": return ENTER_QUEUE;
+			case "CQ": return CANCEL_QUEUE;
 			default:
 				throw new ProtocolException("Bad message kind " + in);
 		}
@@ -55,6 +57,8 @@ public enum MessageKind {
 			case START_BATTLE: return "SB";
 			case ISSUE_CHALLENGE: return "IC";
 			case CANCEL_CHALLENGE: return "CC";
+			case ENTER_QUEUE: return "EQ";
+			case CANCEL_QUEUE: return "CQ";
 			default:
 				throw new RuntimeException("This cannot happen");
 		}

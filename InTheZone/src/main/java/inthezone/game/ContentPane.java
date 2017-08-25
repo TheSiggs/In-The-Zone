@@ -14,6 +14,7 @@ import inthezone.game.lobby.LobbyView;
 import isogame.engine.CorruptDataException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
@@ -261,12 +262,23 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+	private boolean cancelQueue = true;
 	private final Set<String> cancelledChallenges = new HashSet<>();
 
 	@Override public void challengeCancelled(final String player) {
 		Platform.runLater(() -> {
 			lobbyView.cancellationFrom(player);
 		});
+	}
+
+	public void enterQueue(final List<String> vetoMaps) {
+		network.enterQueue(vetoMaps);
+		cancelQueue = false;
+	}
+
+	public void cancelQueue() {
+		network.cancelChallenge();
+		cancelQueue = true;
 	}
 
 	/**
@@ -281,14 +293,24 @@ public class ContentPane extends StackPane implements LobbyListener {
 	public void startBattle(
 		final StartBattleCommand ready,
 		final Player player,
-		final String otherPlayer
+		final String otherPlayer,
+		final boolean isFromQueue
 	) {
 		Platform.runLater(() -> {
 			try {
 				if (cancelledChallenges.contains(otherPlayer)) {
 					cancelledChallenges.remove(otherPlayer);
+					// last line of defence in case of race conditions
+					network.sendCommand(new ResignCommand(player));
 					return;
 				}
+
+				if (isFromQueue && cancelQueue) {
+					// last line of defence in case of race conditions
+					network.sendCommand(new ResignCommand(player));
+					return;
+				}
+
 				final BattleView newBattle = new BattleView(ready, player,
 					new NetworkCommandGenerator(network.readCommandQueue),
 					Optional.of(network), gameData, config);

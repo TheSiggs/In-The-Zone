@@ -195,8 +195,8 @@ public class DisconnectedView extends FlowPane {
 
 					// prepare the battle
 					final StartBattleCommand ready =
-						(new StartBattleCommandRequest(start.stage, op, "AI", l,
-							startTiles.stream().collect(Collectors.toList())))
+						(new StartBattleCommandRequest(start.stage, op, "AI", Optional.of(l),
+							Optional.of(startTiles.stream().collect(Collectors.toList()))))
 							.makeCommand(start, gameData);
 
 					// start the battle

@@ -240,7 +240,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 					.collect(Collectors.toList());
 				startPosChooser.stopAnimating();
 				onDone.accept(Optional.of(new StartBattleCommandRequest(
-					s, player, thisPlayerName, l, startTiles)));
+					s, player, thisPlayerName, Optional.of(l), Optional.of(startTiles))));
 			}
 		});
 	}

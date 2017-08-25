@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -207,7 +207,15 @@ public class Network implements Runnable {
 		final StartBattleCommandRequest cmd, final String player
 	) {
 		try {
-			sendQueue.put(Message.CHALLENGE_PLAYER(player, cmd.getJSON()));
+			sendQueue.put(Message.CHALLENGE_PLAYER(player, cmd.getJSON(), false));
+		} catch (final InterruptedException e) {
+			throw new RuntimeException("This cannot happen");
+		}
+	}
+
+	public void enterQueue(final List<String> vetoMaps) {
+		try {
+			sendQueue.put(Message.ENTER_QUEUE(vetoMaps));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}
@@ -224,7 +232,7 @@ public class Network implements Runnable {
 	) {
 		try {
 			sendQueue.put(Message.ACCEPT_CHALLENGE(
-				otherPlayer, player, cmd.getJSON()));
+				otherPlayer, player, cmd.getJSON(), false));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}

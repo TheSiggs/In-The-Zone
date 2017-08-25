@@ -79,7 +79,8 @@ public class NetworkReader implements Runnable {
 						try {
 							lobbyListener.startBattle(
 								StartBattleCommand.fromJSON(msg.parseCommand(), gameData),
-								msg.parsePlayer(), msg.payload.getString("otherPlayer"));
+								msg.parsePlayer(), msg.payload.getString("otherPlayer"),
+								msg.payload.getBoolean("isQueue"));
 						} catch (final JSONException e) {
 							throw new ProtocolException(
 								"NetworkReader 20: Invalid start battle command", e);

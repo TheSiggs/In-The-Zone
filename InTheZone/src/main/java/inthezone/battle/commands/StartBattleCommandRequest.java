@@ -8,6 +8,7 @@ import isogame.engine.Stage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +30,8 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 	public final String stage;
 	public final Player player;
 	public final String playerName;
-	private final Loadout me;
-	private final List<MapPoint> startTiles;
+	private final Optional<Loadout> me;
+	private final Optional<List<MapPoint>> startTiles;
 
 	/**
 	 * @param stage The stage to battle on
@@ -42,8 +43,8 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		final String stage,
 		final Player player,
 		final String playerName,
-		final Loadout me,
-		final List<MapPoint> startTiles
+		final Optional<Loadout> me,
+		final Optional<List<MapPoint>> startTiles
 	) {
 		this.stage = stage;
 		this.player = player;
@@ -56,13 +57,17 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 	public JSONObject getJSON() {
 		final JSONObject r = new JSONObject();
 		final JSONArray a = new JSONArray();
-		startTiles.stream().map(x -> x.getJSON()).forEach(x -> a.put(x));
+
+		startTiles.ifPresent(s -> {
+			s.stream().map(x -> x.getJSON()).forEach(x -> a.put(x));
+			r.put("starts", a);
+		});
+
 		r.put("name", "startBattleReq");
 		r.put("stage", stage);
 		r.put("player", player.toString());
 		r.put("playerName", playerName);
-		r.put("starts", a);
-		r.put("loadout", me.getJSON());
+		me.ifPresent(d -> r.put("loadout", d.getJSON()));
 		return r;
 	}
 
@@ -79,12 +84,25 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 			final String playerName = json.getString("playerName");
 			final String stage = json.getString("stage");
 			final Player player = Player.fromString(json.getString("player"));
-			final JSONArray rawStarts = json.getJSONArray("starts");
-			final Loadout loadout = Loadout.fromJSON(json.getJSONObject("loadout"), gameData);
+			final JSONArray rawStarts = json.optJSONArray("starts");
+			final JSONObject mloadout = json.optJSONObject("loadout");
 
-			final List<MapPoint> starts = new ArrayList<>();
-			for (int i = 0; i < rawStarts.length(); i++) {
-				starts.add(MapPoint.fromJSON(rawStarts.getJSONObject(i)));
+			final Optional<Loadout> loadout;
+			if (mloadout != null) {
+				loadout = Optional.of(Loadout.fromJSON(mloadout, gameData));
+			} else {
+				loadout = Optional.empty();
+			}
+
+			final Optional<List<MapPoint>> starts;
+			if (rawStarts == null) {
+				starts = Optional.empty();
+			} else {
+				final List<MapPoint> ss = new ArrayList<>();
+				for (int i = 0; i < rawStarts.length(); i++) {
+					ss.add(MapPoint.fromJSON(rawStarts.getJSONObject(i)));
+				}
+				starts = Optional.of(ss);
 			}
 
 			if (!name.equals("startBattleReq"))
@@ -93,7 +111,7 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 			return new StartBattleCommandRequest(
 				stage, player, playerName, loadout, starts);
 
-		} catch (JSONException|CorruptDataException e) {
+		} catch (final JSONException|CorruptDataException e) {
 			throw new ProtocolException("Parse error in start battle request", e);
 		}
 	}
@@ -108,34 +126,40 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		if (op.player == this.player)
 			throw new CorruptDataException("Both parties tried to play the same side");
 
+		if (
+			!op.me.isPresent() || !op.startTiles.isPresent() ||
+			!me.isPresent() || !startTiles.isPresent()
+		) throw new CorruptDataException(
+			"Attempted to start a battle with incomplete information");
+
 		final Stage si = factory.getStage(stage);
-		Collection<MapPoint> myps = getStartTiles(si, player);
-		Collection<MapPoint> opps = getStartTiles(si, op.player);
+		final Collection<MapPoint> myps = getStartTiles(si, player);
+		final Collection<MapPoint> opps = getStartTiles(si, op.player);
 
 		if (
-			!startTiles.stream().allMatch(t -> myps.contains(t)) ||
-			!op.startTiles.stream().allMatch(t -> opps.contains(t))
+			!startTiles.get().stream().allMatch(t -> myps.contains(t)) ||
+			!op.startTiles.get().stream().allMatch(t -> opps.contains(t))
 		) {
 			throw new CorruptDataException(
 				"Invalid start positions in start battle request");
 		}
 
 		if (
-			startTiles.size() != me.characters.size() ||
-			op.startTiles.size() != op.me.characters.size()
+			startTiles.get().size() != me.get().characters.size() ||
+			op.startTiles.get().size() != op.me.get().characters.size()
 		) {
 			throw new CorruptDataException(
-				"Wrong number of start positions inn start battle request");
+				"Wrong number of start positions in start battle request");
 		}
 
 		if (player == Player.PLAYER_A) {
 			return new StartBattleCommand(
-				stage, Math.random() < 0.5, me, op.me,
-				startTiles, op.startTiles, playerName, op.playerName);
+				stage, Math.random() < 0.5, me.get(), op.me.get(),
+				startTiles.get(), op.startTiles.get(), playerName, op.playerName);
 		} else {
 			return new StartBattleCommand(
-				stage, Math.random() < 0.5, op.me, me,
-				op.startTiles, startTiles, op.playerName, playerName);
+				stage, Math.random() < 0.5, op.me.get(), me.get(),
+				op.startTiles.get(), startTiles.get(), op.playerName, playerName);
 		}
 	}
 

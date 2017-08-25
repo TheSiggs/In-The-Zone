@@ -19,7 +19,7 @@ public class Message {
 
 	private int sequenceNumber = 0;
 
-	public Message(final MessageKind kind, final JSONObject payload) {
+	private Message(final MessageKind kind, final JSONObject payload) {
 		this.kind = kind;
 		this.payload = payload;
 	}
@@ -136,11 +136,14 @@ public class Message {
 	}
 
 	public static Message CHALLENGE_PLAYER(
-		final String name, final JSONObject cmd
+		final String name,
+		final JSONObject cmd,
+		final boolean inQueue
 	) {
 		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		o.put("cmd", cmd);
+		o.put("isQueue", inQueue);
 		return new Message(MessageKind.CHALLENGE_PLAYER, o);
 	}
 
@@ -149,12 +152,16 @@ public class Message {
 	 * @param player The player accepting the challenge
 	 * */
 	public static Message ACCEPT_CHALLENGE(
-		final String name, final Player player, final JSONObject cmd
+		final String name,
+		final Player player,
+		final JSONObject cmd,
+		final boolean fromQueue
 	) {
 		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		o.put("player", player.toString());
 		o.put("cmd", cmd);
+		o.put("isQueue", fromQueue);
 		return new Message(MessageKind.ACCEPT_CHALLENGE, o);
 	}
 
@@ -175,12 +182,16 @@ public class Message {
 	 * @param player The player that the recipient of this message should play.
 	 * */
 	public static Message START_BATTLE(
-		final JSONObject cmd, final Player player, final String otherPlayer
+		final JSONObject cmd,
+		final Player player,
+		final String otherPlayer,
+		final boolean fromQueue
 	) {
 		final JSONObject o = new JSONObject();
 		o.put("player", player.toString());
 		o.put("otherPlayer", otherPlayer);
 		o.put("cmd", cmd);
+		o.put("isQueue", fromQueue);
 		return new Message(MessageKind.START_BATTLE, o);
 	}
 
@@ -216,6 +227,24 @@ public class Message {
 		final JSONObject o = new JSONObject();
 		o.put("name", fromPlayer);
 		return new Message(MessageKind.CANCEL_CHALLENGE, o);
+	}
+
+	/**
+	 * Enter the game queue
+	 * @params vetoMaps the maps to veto
+	 * */
+	public static Message ENTER_QUEUE(
+		final List<String> vetoMaps
+	) {
+		final JSONObject o = new JSONObject();
+		final JSONArray a = new JSONArray();
+		for (final String m : vetoMaps) a.put(m);
+		o.put("veto", a);
+		return new Message(MessageKind.ENTER_QUEUE, o);
+	}
+
+	public static Message CANCEL_QUEUE() {
+		return new Message(MessageKind.CANCEL_QUEUE, new JSONObject());
 	}
 
 	public String parseName() throws ProtocolException {
@@ -346,6 +375,22 @@ public class Message {
 
 		try {
 			return payload.getString("m");
+		} catch (final JSONException e) {
+			throw new ProtocolException("Malformed message");
+		}
+	}
+
+	public List<String> parseVetos() throws ProtocolException {
+		if (kind != MessageKind.ENTER_QUEUE)
+			throw new ProtocolException("Expected enter queue message");
+
+		try {
+			final List<String> r = new ArrayList<>();
+			final JSONArray a = payload.getJSONArray("veto");
+			for (int i = 0; i < a.length(); i++) {
+				r.add(a.getString(i));
+			}
+			return r;
 		} catch (final JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}

@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,6 +28,8 @@ public class Multiplexer implements Runnable {
 	private final Map<String, Client> namedClients = new HashMap<>();
 	// All clients currently connected to the server
 	private final Map<UUID, Client> sessions = new HashMap<>();
+	// The queue of clients waiting for automatic matchmaking
+	private final List<GameQueueElement> gameQueue = new ArrayList<>();
 
 	private final GameDataFactory dataFactory;
 	private Selector selector;
@@ -172,7 +175,7 @@ public class Multiplexer implements Runnable {
 					connection.getRemoteAddress().toString(), null);
 				pendingClients.add(new Client(
 					name, connection, selector, namedClients,
-					pendingClients, sessions, dataFactory));
+					pendingClients, sessions, gameQueue, dataFactory));
 			}
 		} catch (final IOException e) {
 			try {

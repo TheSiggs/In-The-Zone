@@ -60,6 +60,7 @@ public interface LobbyListener {
 	public void startBattle(
 		final StartBattleCommand battle,
 		final Player player,
-		final String otherPlayer);
+		final String otherPlayer,
+		final boolean isFromQueue);
 }
 

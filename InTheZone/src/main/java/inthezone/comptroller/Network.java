@@ -33,6 +33,7 @@ public class Network implements Runnable {
 	private final LobbyListener lobbyListener;
 
 	private final AtomicBoolean connect = new AtomicBoolean(false);
+	private final AtomicBoolean loggedIn = new AtomicBoolean(false);
 	private String host;
 	private int port;
 	private Socket socket = null;
@@ -41,8 +42,14 @@ public class Network implements Runnable {
 	private String playerName;
 	private UUID session = null;
 
-	private final BlockingQueue<Message> sendQueue = new LinkedBlockingQueue<>();
-	public final BlockingQueue<Command> readCommandQueue = new LinkedBlockingQueue<>();
+	private static final long CONNECTION_DELAY = 5l * 1000l;
+	private static final long MAX_CONNECTION_DELAY = 5l * 60l * 1000l;
+	private long currentConnectionDelay = CONNECTION_DELAY;
+
+	private final BlockingQueue<Message> sendQueue =
+		new LinkedBlockingQueue<>();
+	public final BlockingQueue<Command> readCommandQueue =
+		new LinkedBlockingQueue<>();
 
 	public Network(
 		final GameDataFactory gameData,
@@ -55,6 +62,7 @@ public class Network implements Runnable {
 	private volatile boolean disconnectNow = false;
 
 	public synchronized void shutdown() {
+		connect.set(false);
 		disconnectNow = true;
 		logout();
 	}
@@ -62,7 +70,6 @@ public class Network implements Runnable {
 	@Override
 	public void run() {
 		while (!disconnectNow) {
-
 			synchronized (connect) {
 				while (!connect.get()) {
 					try {
@@ -71,19 +78,36 @@ public class Network implements Runnable {
 						/* ignore */
 					}
 				}
-				connect.set(false);
 
 				try {
 					doConnect();
 					(new Thread(new NetworkReader(
 						fromServer, lobbyListener, readCommandQueue, gameData,
 							Thread.currentThread()))).start();
+					loggedIn.set(true);
+					currentConnectionDelay = CONNECTION_DELAY;
 				} catch (final IOException e) {
 					cleanUpConnection();
-					lobbyListener.errorConnectingToServer(e);
+
+					if (!loggedIn.get()) {
+						connect.set(false);
+						lobbyListener.serverError(e);
+
+					} else {
+						try {
+							Thread.sleep(currentConnectionDelay);
+						} catch (final InterruptedException e2) {
+							if (!connect.get()) lobbyListener.loggedOff();
+						}
+						currentConnectionDelay *= 2;
+						currentConnectionDelay =
+							Math.min(currentConnectionDelay, MAX_CONNECTION_DELAY);
+					}
+
 					continue;
 				} catch (final ProtocolException e) {
 					cleanUpConnection();
+					connect.set(false);
 					lobbyListener.serverError(e);
 					continue;
 				}
@@ -124,7 +148,6 @@ public class Network implements Runnable {
 		} catch (final IOException e) {
 			/* Doesn't matter */
 		}
-		connect.set(false);
 	}
 
 	private void doConnect() throws IOException, ProtocolException {
@@ -175,7 +198,7 @@ public class Network implements Runnable {
 				named = true;
 			} else {
 				final String reason = r.parseMessage();
-				throw new IOException(reason);
+				throw new ProtocolException(reason);
 			}
 		}
 
@@ -293,6 +316,8 @@ public class Network implements Runnable {
 
 	public void logout() {
 		try {
+			connect.set(false);
+			loggedIn.set(false);
 			sendQueue.put(Message.LOGOFF());
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");

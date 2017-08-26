@@ -122,7 +122,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	) {
 		Platform.runLater(() -> {
 			isConnected = true;
-			disconnected.endConnecting();
+			lobbyView.reconnected();
 			lobbyView.joinLobby(playerName, players);
 			if (screens.isEmpty()) switchPane(lobbyView);
 		});
@@ -145,6 +145,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 	@Override
 	public void serverError(final Exception e) {
 		Platform.runLater(() -> {
+			System.err.println("Received server error");
 			e.printStackTrace();
 			isConnected = false;
 			final Alert a = new Alert(Alert.AlertType.ERROR,
@@ -172,13 +173,15 @@ public class ContentPane extends StackPane implements LobbyListener {
 	public void connectionDropped() {
 		Platform.runLater(() -> {
 			isConnected = false;
-			final Alert a = new Alert(Alert.AlertType.ERROR,
-				"Lost connection to the server", ButtonType.CLOSE);
-			a.setHeaderText("Server disconnected");
-			a.showAndWait();
 			currentBattle.ifPresent(b -> b.handleEndBattle(Optional.empty()));
-			if (screens.isEmpty()) switchPane(disconnected);
+			if (screens.isEmpty()) switchPane(lobbyView);
+			lobbyView.connectionLost();
 		});
+	}
+
+	public void doLogout() {
+		network.logout();
+		networkThread.interrupt();
 	}
 
 	@Override

@@ -60,6 +60,7 @@ public class LobbyView extends StackPane {
 
 	private	final PlayersList players;
 	private final NewsPanel newsPanel = new NewsPanel();
+	private final DisconnectedPanel disconnected = new DisconnectedPanel();
 	private final StatusPanel status;
 
 	private final ModalDialog modalDialog = new ModalDialog();
@@ -111,7 +112,7 @@ public class LobbyView extends StackPane {
 		});
 
 		logoutLabel.setOnMouseClicked(event -> {
-			parent.network.logout();
+			parent.doLogout();
 		});
 
 		this.getStylesheets().addAll("/GUI.css", "/lobby.css");
@@ -166,9 +167,14 @@ public class LobbyView extends StackPane {
 	}
 
 	public void connectionLost() {
+		System.err.println("Connection lost!");
+		gui.setLeft(null);
+		gui.setCenter(disconnected);
 	}
 
 	public void reconnected() {
+		gui.setLeft(players);
+		gui.setCenter(newsPanel);
 	}
 
 	public void enterQueue() {

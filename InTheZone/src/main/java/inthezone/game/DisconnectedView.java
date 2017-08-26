@@ -2,32 +2,18 @@ package inthezone.game;
 
 import static javafx.stage.FileChooser.ExtensionFilter;
 
-import inthezone.ai.SimpleAI;
-import inthezone.battle.commands.StartBattleCommand;
-import inthezone.battle.commands.StartBattleCommandRequest;
-import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Loadout;
-import inthezone.battle.data.Player;
 import inthezone.comptroller.Network;
 import inthezone.game.battle.BattleView;
 import inthezone.game.battle.PlaybackGenerator;
 import inthezone.game.loadoutEditor.LoadoutOverview;
-import inthezone.game.lobby.ChallengePane;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-import isogame.engine.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -41,7 +27,6 @@ public class DisconnectedView extends FlowPane {
 	private final Button login = new Button("Connect to server");
 	private final Button setServer = new Button("Set server");
 	private final Button loadout = new Button("Edit loadouts offline");
-	private final Button sandpit = new Button("Sandpit mode");
 	private final Button replay = new Button("Replay recorded game");
 
 	private final GameDataFactory gameData;
@@ -119,29 +104,6 @@ public class DisconnectedView extends FlowPane {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
 
-		sandpit.setOnAction(event -> {
-			if (config.loadouts.size() < 1) {
-				final Alert a = new Alert(
-					Alert.AlertType.INFORMATION, null, ButtonType.OK);
-				a.setHeaderText(
-					"You must create at least one loadout before starting a game");
-				a.showAndWait();
-				return;
-			}
-
-			try {
-				parent.showScreen(
-					new ChallengePane(gameData, config, Optional.empty(),
-						Player.PLAYER_A, "You", "AI"), getStartSandpitCont(config));
-			} catch (final CorruptDataException e) {
-				final Alert a = new Alert(Alert.AlertType.ERROR,
-					e.getMessage(), ButtonType.CLOSE);
-				a.setHeaderText("Game data corrupt");
-				a.showAndWait();
-				System.exit(1);
-			}
-		});
-		
 		replay.setOnAction(event -> {
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Choose replay file");
@@ -176,54 +138,7 @@ public class DisconnectedView extends FlowPane {
 
 		});
 
-		this.getChildren().addAll(login, setServer, loadout, sandpit, replay);
-	}
-
-	private Consumer<Optional<StartBattleCommandRequest>> getStartSandpitCont(
-		final ClientConfig config
-	) {
-		return ostart -> {
-			ostart.ifPresent(start -> {
-				try {
-					// prepare the AI position
-					final Player op = start.getOtherPlayer();
-					final Stage si = gameData.getStage(start.stage);
-					Collection<MapPoint> startTiles = op == Player.PLAYER_A ?
-						si.terrain.getPlayerStartTiles() :
-						si.terrain.getAIStartTiles();
-					final Loadout l = makeSandpitLoadout(start, startTiles, gameData);
-
-					// prepare the battle
-					final StartBattleCommand ready =
-						(new StartBattleCommandRequest(start.stage, op, "AI", Optional.of(l),
-							Optional.of(startTiles.stream().collect(Collectors.toList()))))
-							.makeCommand(start, gameData);
-
-					// start the battle
-					parent.showScreen(new BattleView(
-						ready, Player.PLAYER_A, new SimpleAI(),
-						Optional.empty(), gameData, config),
-						winCond -> System.err.println("Battle over: " + winCond));
-				} catch (final CorruptDataException e) {
-					final Alert a = new Alert(Alert.AlertType.ERROR,
-						e.getMessage(), ButtonType.OK);
-					a.setHeaderText("Error starting game");
-					a.showAndWait();
-				}
-			});
-		};
-	}
-	
-	private static Loadout makeSandpitLoadout(
-		final StartBattleCommandRequest start,
-		final Collection<MapPoint> startTiles,
-		final GameDataFactory gameData
-	) throws CorruptDataException {
-		final List<CharacterProfile> characters = new ArrayList<>();
-		for (int i = 0; i < startTiles.size(); i++)
-			characters.add(new CharacterProfile(gameData.getCharacter("Robot")));
-
-		return new Loadout("Sandpit", characters, new ArrayList<>());
+		this.getChildren().addAll(login, setServer, loadout, replay);
 	}
 
 	public void startConnecting() {

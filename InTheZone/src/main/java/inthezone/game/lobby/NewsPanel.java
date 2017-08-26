@@ -15,7 +15,7 @@ public class NewsPanel extends StackPane {
 	private final static String userAgent = "InTheZone";
 
 	private final static String newsURL =
-		"http://dreamprodigy.co.nz/vm973eoknid2ic3qpl02gg364iikof84/news/index.html";
+		"http://www.dreamprodigy.co.nz/vm973eoknid2ic3qpl02gg364iikof84/news/index.html";
 
 	public NewsPanel() {
 		this.setId("news-panel");

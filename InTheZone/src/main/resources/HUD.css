@@ -133,3 +133,36 @@
 	-fx-opacity:0.6;
 }
 
+.hud-menu-button {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.hud-menu-button > .container > .menu-button {
+	-fx-border-style:solid;
+	-fx-border-width:0px;
+}
+
+.hud-menu-button > .container > .menu-button > .label {
+	-fx-border-style:solid;
+	-fx-border-width:0px;
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:20px;
+	-fx-font-weight:bold;
+	-fx-padding:10px 40px 10px 40px;
+}
+
+.hud-menu-button > .container > .menu-button:hover,
+.hud-menu-button > .container > .menu-button:focused,
+.hud-menu-button > .container > .menu-button:showing {
+	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-repeat:repeat;
+}
+

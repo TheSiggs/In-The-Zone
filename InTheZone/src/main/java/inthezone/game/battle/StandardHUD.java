@@ -11,6 +11,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -20,13 +23,19 @@ import javafx.util.Duration;
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.StandardSprites;
+import inthezone.game.ClientConfig;
 import inthezone.game.InTheZoneKeyBinding;
 import inthezone.game.battle.TurnClock;
+import inthezone.game.guiComponents.KeyboardOptions;
 
 public class StandardHUD extends HUD {
 	private final HBox characterInfoBoxes = new HBox();
 	private final Button endTurnButton = new Button("End turn");
-	private final Button resignButton = new Button("Resign");
+
+	private final MenuBar optionsButton = new MenuBar();
+	private final Menu optionsMenu = new Menu("Menu");
+	private final MenuItem resignButton = new MenuItem("Resign");
+	private final MenuItem keyboardButton = new MenuItem("Keyboard options");
 
 	private final MultiTargetAssistant multiTargetAssistant;
 
@@ -36,7 +45,11 @@ public class StandardHUD extends HUD {
 
 	private final VBox assistanceLine = new VBox();
 
-	public StandardHUD(final BattleView view, final StandardSprites sprites) {
+	public StandardHUD(
+		final BattleView view,
+		final StandardSprites sprites,
+		final ClientConfig config
+	) {
 		super(view, sprites);
 
 		this.setMinSize(0, 0);
@@ -45,17 +58,29 @@ public class StandardHUD extends HUD {
 		this.multiTargetAssistant = new MultiTargetAssistant(view);
 
 		endTurnButton.setTooltip(new Tooltip("End your turn"));
-		resignButton.setTooltip(new Tooltip("Resign from the game"));
 		Tooltip.install(clock, clockTooltip);
 
+		endTurnButton.setMaxWidth(Double.MAX_VALUE);
+
 		endTurnButton.setOnAction(event -> view.sendEndTurn());
+		keyboardButton.setOnAction(event -> {
+			final KeyboardOptions dialog = new KeyboardOptions(config);
+			view.modalDialog.showDialog(dialog, r -> {
+				if (r == KeyboardOptions.doneButton) {
+					view.canvas.keyBindings.loadBindings(dialog.resultTable);
+					config.getKeyBindingTable().loadBindings(dialog.resultTable);
+					config.writeConfig();
+				}
+			});
+		});
 		resignButton.setOnAction(event -> view.sendResign());
 
+		optionsButton.getStyleClass().add("hud-menu-button");
 		endTurnButton.getStyleClass().add("gui-button");
-		resignButton.getStyleClass().add("gui-button");
 
 		endTurnButton.disableProperty().bind(view.isMyTurn.not()
 			.or(view.cannotCancel).or(disableUI));
+		optionsButton.disableProperty().bind(disableUI);
 		resignButton.disableProperty().bind(view.isMyTurn.not().or(disableUI));
 
 		actionButtons.visibleProperty().bind(view.isCharacterSelected
@@ -71,7 +96,11 @@ public class StandardHUD extends HUD {
 
 		clock.setPrefWidth(100d);
 		clock.setPrefHeight(100d);
-		roundCounterAndClock.getChildren().addAll(roundCounter, clock);
+		roundCounterAndClock.getChildren().addAll(
+			roundCounter, clock, endTurnButton);
+
+		optionsButton.getMenus().add(optionsMenu);
+		optionsMenu.getItems().addAll(keyboardButton, resignButton);
 
 		final Group characterInfoBoxesWrapper =
 			new Group(characterInfoBoxes);
@@ -79,11 +108,8 @@ public class StandardHUD extends HUD {
 		AnchorPane.setTopAnchor(characterInfoBoxesWrapper, 0d);
 		AnchorPane.setLeftAnchor(characterInfoBoxesWrapper, 0d);
 
-		AnchorPane.setBottomAnchor(endTurnButton, 0d);
-		AnchorPane.setLeftAnchor(endTurnButton, 0d);
-
-		AnchorPane.setBottomAnchor(resignButton, 0d);
-		AnchorPane.setRightAnchor(resignButton, 0d);
+		AnchorPane.setBottomAnchor(optionsButton, 0d);
+		AnchorPane.setRightAnchor(optionsButton, 0d);
 
 		AnchorPane.setTopAnchor(roundCounterAndClock, 0d);
 		AnchorPane.setRightAnchor(roundCounterAndClock, 0d);
@@ -104,7 +130,7 @@ public class StandardHUD extends HUD {
 		this.getChildren().addAll(
 			view.canvas,
 			assistanceLine, characterInfoBoxesWrapper, actionButtons,
-			endTurnButton, resignButton, roundCounterAndClock
+			optionsButton, roundCounterAndClock
 		);
 	}
 

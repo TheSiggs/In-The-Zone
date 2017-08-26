@@ -101,7 +101,7 @@ public class BattleView
 	) throws CorruptDataException {
 		this(startBattle, player,
 			Optional.empty(), otherPlayer, network, gameData, config,
-			view -> new StandardHUD(view, gameData.getStandardSprites()));
+			view -> new StandardHUD(view, gameData.getStandardSprites(), config));
 	}
 
 	/**

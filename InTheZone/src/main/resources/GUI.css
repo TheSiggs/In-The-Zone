@@ -500,7 +500,7 @@
 	-fx-background-repeat:repeat;
 }
 
-.main-menu .context-menu {
+.context-menu {
 	-fx-background-color:transparent;
 	-fx-padding:0px;
 	-fx-border-style:solid;

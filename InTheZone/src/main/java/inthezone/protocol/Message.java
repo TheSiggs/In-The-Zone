@@ -168,13 +168,18 @@ public class Message {
 	/**
 	 * @param name The name of the player we are rejecting
 	 * @param myName the name of the player doing the rejecting
+	 * @param notReady true if this is an automatic rejection due to the other
+	 * client not being ready to accept challenges
 	 * */
 	public static Message REJECT_CHALLENGE(
-		final String name, final String myName
+		final String name,
+		final String myName,
+		final boolean notReady
 	) {
 		final JSONObject o = new JSONObject();
 		o.put("name", name);
 		o.put("otherPlayer", myName);
+		o.put("notReady", notReady);
 		return new Message(MessageKind.REJECT_CHALLENGE, o);
 	}
 

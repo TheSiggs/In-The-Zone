@@ -288,13 +288,19 @@ public class LobbyView extends StackPane {
 		gui.setLeft(players);
 	}
 
-	public void challengeRejected(final String player) {
+	public void challengeRejected(
+		final String player, final boolean notReady
+	) {
 		final Optional<String> waitingFor = status.getWaitingForPlayer();
 
 		status.waitingDone();
 		gui.setLeft(players);
 		if (waitingFor.map(p -> p.equals(player)).orElse(false)) {
-			modalDialog.showMessage(player + " rejected your challenge!");
+			final String message;
+			if (notReady) message = player + " is not ready to battle";
+			else message = player + " rejected your challenge!";
+
+			modalDialog.showMessage(message);
 		}
 	}
 

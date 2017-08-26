@@ -73,7 +73,8 @@ public class NetworkReader implements Runnable {
 						break;
 
 					case REJECT_CHALLENGE:
-						lobbyListener.playerRefusesChallenge(msg.parseOtherPlayer());
+						lobbyListener.playerRefusesChallenge(
+							msg.parseOtherPlayer(), msg.payload.getBoolean("notReady"));
 						break;
 
 					case START_BATTLE:

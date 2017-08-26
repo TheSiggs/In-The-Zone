@@ -639,9 +639,26 @@ public class Client {
 	private void doChallenge(final Message msg, final Client client)
 		throws ProtocolException
 	{
-		if (challenged.size() < MAX_CHALLENGES && client.name.isPresent()) {
+		if (challenged.size() < MAX_CHALLENGES &&
+			(client.state == ClientState.LOBBY || client.state == ClientState.QUEUE))
+		{
 			Log.info(getClientName() +
 				" challenged " + client.getClientName() + " to battle!", null);
+
+			if (client.state == ClientState.QUEUE) {
+				if (client.makingMatchWith.isPresent()) {
+					Log.info(getClientName() + " challenged " +
+						client.getClientName() + " but " + client.getClientName() +
+						" is still responding to a game with " +
+						client.makingMatchWith.get().getClientName(), null);
+					channel.requestSend(Message.REJECT_CHALLENGE(
+						getClientName(), client.getClientName(), true));
+					return;
+				} else {
+					client.cancelQueue();
+				}
+			}
+
 			challenged.add(client);
 			client.challenge(this);
 			channel.requestSend(Message.ISSUE_CHALLENGE(client.name.get()));
@@ -651,12 +668,12 @@ public class Client {
 		} else {
 			Log.info(getClientName() +
 				" challenged " + client.getClientName() + " to battle, but " +
-				 (!client.name.isPresent() ?
+				 (!(client.state == ClientState.LOBBY || client.state == ClientState.QUEUE) ?
 					client.getClientName() + " is not ready to accept challenges" :
 					getClientName() + " has too many unanswered challenges"), null);
 
-			channel.requestSend(
-				Message.NOK("Cannot challenge " + client.name.orElse("")));
+			channel.requestSend(Message.REJECT_CHALLENGE(
+				getClientName(), client.getClientName(), true));
 		}
 	}
 
@@ -684,7 +701,9 @@ public class Client {
 				" rejects a challenge from " + client.getClientName(), null);
 			challenges.remove(client);
 			client.challengeRejected(this);
-			client.forwardMessage(msg);
+			client.forwardMessage(Message.REJECT_CHALLENGE(
+				client.getClientName(), getClientName(),
+				msg.payload.getBoolean("notReady")));
 		} else {
 			Log.warn(getClientName() +
 				" attempted to reject a challenge from" + client.getClientName() +
@@ -709,8 +728,8 @@ public class Client {
 			// reject any other challenges
 			while (!challenges.isEmpty()) {
 				final Client c = challenges.iterator().next();
-				doRejectChallenge(
-					Message.REJECT_CHALLENGE(c.getClientName(), getClientName()), c);
+				doRejectChallenge(Message.REJECT_CHALLENGE(
+					c.getClientName(), getClientName(), false), c);
 			}
 
 			doStartBattle(

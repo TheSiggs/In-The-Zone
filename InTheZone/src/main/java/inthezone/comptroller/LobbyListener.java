@@ -26,7 +26,10 @@ public interface LobbyListener {
 	public void playerHasLoggedIn(final String player);
 	public void playerHasLoggedOff(final String player);
 	public void playerHasEnteredBattle(final String player);
-	public void playerRefusesChallenge(final String player);
+
+	public void playerRefusesChallenge(
+		final String player, final boolean notReady);
+
 	public void challengeFrom(
 		final String player,
 		final boolean fromQueue,

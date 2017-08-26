@@ -213,9 +213,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 	@Override
-	public void playerRefusesChallenge(final String player) {
+	public void playerRefusesChallenge(
+		final String player, final boolean notReady
+	) {
 		Platform.runLater(() -> {
-			lobbyView.challengeRejected(player);
+			lobbyView.challengeRejected(player, notReady);
 		});
 	}
 

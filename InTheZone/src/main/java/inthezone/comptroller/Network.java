@@ -261,7 +261,7 @@ public class Network implements Runnable {
 	 * */
 	public void refuseChallenge(final String player, final String thisPlayer) {
 		try {
-			sendQueue.put(Message.REJECT_CHALLENGE(player, thisPlayer));
+			sendQueue.put(Message.REJECT_CHALLENGE(player, thisPlayer, false));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("This cannot happen");
 		}

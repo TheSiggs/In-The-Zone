@@ -60,3 +60,57 @@
 	-fx-border-color:black;
 }
 
+#veto-panel {
+	-fx-padding:60px 40px 60px 40px;
+}
+
+#veto-panel-inner {
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-border-color:black;
+	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-repeat:repeat;
+}
+
+#veto-panel-inner .buttons {
+	-fx-padding:10px;
+}
+
+.veto-buttons {
+	-fx-padding:10px;
+}
+
+.veto-button .box , .veto-button .mark {
+	-fx-padding:0px;
+	visibility:hidden;
+}
+
+.veto-button {
+	-fx-background-color:white;
+	-fx-border-color:black;
+	-fx-border-width:2px;
+	-fx-border-style:solid;
+	-fx-padding:8px 8px 0px 0px;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-shadow-highlight-color:transparent;
+}
+
+.veto-button .label {
+	-fx-padding:0px;
+	-fx-text-fill:white;
+	-fx-font-family:'Impact';
+	-fx-font-size:26px;
+	-fx-alignment:bottom-center;
+}
+
+.veto-button .label .text {
+	-fx-stroke:black;
+	-fx-stroke-width:1px;
+}
+
+.veto-button .cross {
+	-fx-stroke:red;
+	-fx-stroke-width:10px;
+}
+

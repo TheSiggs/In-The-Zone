@@ -163,7 +163,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 	 * */
 	public Image getThumbnail(final Stage stage) {
 		try {
-			return new Image(loc.gfx("mapThumbs/" + stage.name + ".map.png"));
+			return new Image(loc.gfx("mapThumbs/" + stage.name + ".png"));
 		} catch (final IOException e) {
 			System.err.println("No thumbnail for " + stage.name);
 			e.printStackTrace();

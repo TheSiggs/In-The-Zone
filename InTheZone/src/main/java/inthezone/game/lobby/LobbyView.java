@@ -60,6 +60,7 @@ public class LobbyView extends StackPane {
 
 	private	final PlayersList players;
 	private final NewsPanel newsPanel = new NewsPanel();
+	private final VetoPanel vetoPanel;
 	private final DisconnectedPanel disconnected = new DisconnectedPanel();
 	private final StatusPanel status;
 
@@ -93,6 +94,8 @@ public class LobbyView extends StackPane {
 		optionsMenu.setGraphic(new Label("Options"));
 		logoutMenu.setGraphic(logoutLabel);
 
+		homeLabel.setOnMouseClicked(event -> homeScreen());
+
 		practiceGame.setOnAction(event -> startPracticeGame());
 
 		queueGame.setOnAction(event -> enterQueue());
@@ -100,6 +103,9 @@ public class LobbyView extends StackPane {
 		loadoutsLabel.setOnMouseClicked(event -> {
 			parent.showScreen(new LoadoutOverview(parent), v -> {});
 		});
+
+		this.vetoPanel = new VetoPanel(
+			gameData, this::homeScreen, this::actuallyEnterQueue);
 
 		keybindings.setOnAction(event -> {
 			final KeyboardOptions dialog = new KeyboardOptions(config);
@@ -166,15 +172,33 @@ public class LobbyView extends StackPane {
 		players.removePlayer(player);
 	}
 
+	private boolean isConnected = true;
+
 	public void connectionLost() {
 		System.err.println("Connection lost!");
 		gui.setLeft(null);
 		gui.setCenter(disconnected);
+		isConnected = false;
 	}
 
 	public void reconnected() {
 		gui.setLeft(players);
 		gui.setCenter(newsPanel);
+		isConnected = true;
+	}
+
+	public void homeScreen() {
+		if (isConnected) {
+			gui.setCenter(newsPanel);
+			if (status.getWaitingStatus() == StatusPanel.WaitingStatus.NONE) {
+				gui.setLeft(players);
+			} else {
+				gui.setLeft(status);
+			}
+		} else {
+			gui.setLeft(null);
+			gui.setCenter(disconnected);
+		}
 	}
 
 	public void enterQueue() {
@@ -186,22 +210,28 @@ public class LobbyView extends StackPane {
 			modalDialog.showConfirmation(prompt, status.getWaitingMessage(), r -> {
 				if (r == ButtonType.YES) {
 					cancelChallenge();
-					actuallyEnterQueue();
+					showVetoPanel();
 				}
 			});
 		} else {
-			actuallyEnterQueue();
+			showVetoPanel();
 		}
 	}
 
-	private void actuallyEnterQueue() {
-		// TODO: show veto panel
-		parent.enterQueue(new ArrayList<>());
+	private void showVetoPanel() {
+		gui.setLeft(null);
+		gui.setCenter(vetoPanel);
+	}
+
+	private void actuallyEnterQueue(final List<String> vetoStages) {
+		parent.enterQueue(vetoStages);
 		status.waitInQueue();
+		gui.setCenter(newsPanel);
 		gui.setLeft(status);
 	}
 
 	public void startPracticeGame() {
+		homeScreen();
 		final StatusPanel.WaitingStatus wait = status.getWaitingStatus();
 
 		if (wait != StatusPanel.WaitingStatus.NONE) {

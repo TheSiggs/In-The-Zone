@@ -94,6 +94,7 @@ public class KeyboardOptions extends DialogPane {
 		bindings.setVgap(4d);
 
 		this.getStylesheets().add("dialogs.css");
+		this.getStylesheets().add("scrollpanel.css");
 
 		this.setHeaderText("Keyboard bindings");
 		contentWrapper.getChildren().addAll(content, modalDialog);

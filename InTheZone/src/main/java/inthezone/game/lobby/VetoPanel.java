@@ -62,7 +62,7 @@ public class VetoPanel extends StackPane {
 		cancelButton.setOnAction(event -> onCancel.run());
 		joinButton.setOnAction(event -> 
 			onQueue.accept(vetoButtons.stream()
-				.filter(b -> !b.isSelected()).map(b -> b.stage.name)
+				.filter(b -> b.isSelected()).map(b -> b.stage.name)
 				.collect(Collectors.toList())));
 		resetButton.setOnAction(event -> {
 			for (final VetoButton b : vetoButtons) b.setSelected(false);

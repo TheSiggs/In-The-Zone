@@ -111,11 +111,11 @@ public class Client {
 		if (!connection.isOpen()) return;
 		try {
 			final List<Message> msgs = channel.doRead();
-			for (Message msg : msgs) doNextMessage(msg);
-		} catch (IOException e) {
+			for (final Message msg : msgs) doNextMessage(msg);
+		} catch (final IOException e) {
 			Log.error("IO error reading from " + getClientName(), e);
 			closeConnection(false);
-		} catch (ProtocolException e) {
+		} catch (final ProtocolException e) {
 			Log.error("Protocol error reading from " + getClientName(), e);
 			closeConnection(false);
 		}
@@ -128,7 +128,7 @@ public class Client {
 		if (!connection.isOpen()) return;
 		try {
 			channel.doWrite();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Log.error("IO error writing to " + getClientName(), e);
 			closeConnection(false);
 		}
@@ -159,13 +159,22 @@ public class Client {
 			recursiveCloseConnection = true;
 			currentGame.ifPresent(x -> x.getOther(this).otherGuyLoggedOff());
 			recursiveCloseConnection = false;
+
+			// make absolutely sure this client is not in the queue
+			for (int i = 0; i < gameQueue.size(); i++) {
+				if (gameQueue.get(i).client == this) {
+					Log.info("Removing " + getClientName() + " from the queue", null);
+					gameQueue.remove(i); i -= 1;
+				}
+			}
+
 			sessions.remove(sessionKey);
 			if (name.isPresent()) {
 				namedClients.remove(name.get());
-				for (Client c : namedClients.values()) {
+				for (final Client c : namedClients.values()) {
 					try {
 						c.leftLobby(this);
-					} catch (ProtocolException e) {
+					} catch (final ProtocolException e) {
 						/* If there was an error, then that client can't have had a
 						 * reference to us anyway, so we can ignore the exception */
 					}
@@ -178,7 +187,7 @@ public class Client {
 		}
 		try {
 			connection.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			/* We tried, it failed, too bad. */
 		}
 	}
@@ -368,7 +377,7 @@ public class Client {
 	 * Replay all messages that came after the provided sequence number.
 	 * */
 	public void replayMessagesFrom(final int lastSequenceNumber) {
-		for (Message m : messages) {
+		for (final Message m : messages) {
 			if (m.getSequenceNumber() > lastSequenceNumber) {
 				channel.requestSend(m);
 			}
@@ -460,7 +469,7 @@ public class Client {
 	public String getRemoteAddress() {
 		try {
 			return connection.getRemoteAddress().toString();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			return "Unknown address (" + e.getMessage() + ")";
 		}
 	}
@@ -541,7 +550,7 @@ public class Client {
 
 					} else {
 						this.name = Optional.of(name);
-						for (Client c : namedClients.values()) {
+						for (final Client c : namedClients.values()) {
 							if (c != this) c.enteredLobby(this);
 						}
 						namedClients.put(name, this);
@@ -610,7 +619,7 @@ public class Client {
 				} else if (msg.kind == MessageKind.GAME_OVER) {
 					otherPlayer.gameOver();
 					this.gameOver();
-					for (Client c : namedClients.values()) {
+					for (final Client c : namedClients.values()) {
 						if (c != otherPlayer) c.enteredLobby(otherPlayer);
 						if (c != this) c.enteredLobby(this);
 					}

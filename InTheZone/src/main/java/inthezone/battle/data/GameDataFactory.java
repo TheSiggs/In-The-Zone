@@ -7,14 +7,14 @@ import isogame.engine.SpriteInfo;
 import isogame.engine.Stage;
 import isogame.resource.DevelopmentResourceLocator;
 import isogame.resource.ResourceLocator;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -22,8 +22,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.UUID;
+
+import javafx.scene.image.Image;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -154,6 +156,19 @@ public class GameDataFactory implements HasJSONRepresentation {
 	public Stage getStage(final String name) {
 		final Stage r = stages.get(name);
 		return r == null? null : r.clone();
+	}
+
+	/**
+	 * Get the thumbnail image for a stage.  May return null.
+	 * */
+	public Image getThumbnail(final Stage stage) {
+		try {
+			return new Image(loc.gfx("mapThumbs/" + stage.name + ".map.png"));
+		} catch (final IOException e) {
+			System.err.println("No thumbnail for " + stage.name);
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public Collection<Stage> getStages() {

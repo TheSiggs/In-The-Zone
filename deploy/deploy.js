@@ -20,6 +20,17 @@ process.on('uncaughtException', function(err){
 var server = http.createServer(srv)
 server.listen(4010)
 
+setTimeout(()=>{
+  let proc = spawn('./GitLabHook.sh')
+  proc.stderr.on("data", (x)=>{ERR(x+'')})
+  proc.stdout.on("data", (x)=>{
+    if(x+''=='BUILD SUCCESSFUL\n'){
+      log('new')
+      lastBuild = new Date()
+    }
+  })
+},10000)
+
 function srv(req, res){
 
   log(req.url)
@@ -71,7 +82,9 @@ function clientsHTML(){
     <body>
 
       <ul><li>
-        <a href="./client/client-latest.jar">Latest</a>
+        <a href="./client/client-latest.jar">Client - Latest</a>
+      </li><li>
+        <a href="./client/dataeditor-latest.jar">Data Editor - Latest</a>
       </li></ul>
       <br> Last Build ${lastBuild}
     <body>

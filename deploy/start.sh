@@ -1,4 +1,6 @@
 #!/bin/sh -
 
-cd /home/itz/devrepo/deploy
-/home/itz/node deploy.js >> ../../logs/deploy.log 2>> ../../logs/deploy.log
+HOME="/home/ubuntu"
+
+cd $HOME/devrepo/deploy
+$HOME/node deploy.js >> $HOME/logs/deploy.log 2>> $HOME/logs/deploy.log

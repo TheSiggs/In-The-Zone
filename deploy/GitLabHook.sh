@@ -18,3 +18,5 @@ cp ./dataeditor/build/libs/* ./dataeditor/build/libs/dataeditor-latest.jar
 cp ./dataeditor/build/libs/* ../../
 
 #service IntheZone restart
+#echo "restart" > ../../server_command.pipe
+echo "exit" > ../../server_command.pipe

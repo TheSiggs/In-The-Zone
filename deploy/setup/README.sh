@@ -6,11 +6,16 @@
 HOME="/home/ubuntu"
 
 git checkout master
+git pull
+
+sleep 1
 
 mkdir $HOME/logs
 cd $HOME/devrepo/deploy/setup
 sudo cp ../*.service /etc/system.d/system/
 echo "deployed"
+
+sleep 2
 
 sudo systemctl enable InTheZoneDevDeploy.service
 sudo systemctl enable InTheZone.service

@@ -1,0 +1,9 @@
+[Unit]
+Description = InTheZone Build server
+
+[Service]
+ExecStart=/home/ubuntu/devrepo/deploy/startDevDeploy.sh
+
+[Install]
+WantedBy=multi-user.target
+

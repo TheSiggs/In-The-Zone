@@ -1,0 +1,9 @@
+[Unit]
+Description = InTheZone game server
+
+[Service]
+ExecStart=/home/ubuntu/devrepo/deploy/startServer.sh
+
+[Install]
+WantedBy=multi-user.target
+

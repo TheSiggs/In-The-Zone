@@ -5,15 +5,19 @@
 # set HOME variable
 HOME="/home/ubuntu"
 
-git checkout master
-git pull
+#git checkout master
+#git pull
 
 sleep 1
 
 mkdir $HOME/logs
 cd $HOME/devrepo/deploy/setup
-sudo cp ../*.service /etc/system.d/system/
+sudo cp ./*.service /etc/systemd/system/
 echo "deployed"
+
+sleep 2
+
+sudo systemctl daemon-reload
 
 sleep 2
 
@@ -33,6 +37,6 @@ sleep 3
 echo "building"
 cd ../
 #./GitLabHook.sh
-ping 127.0.0.1:4010/b9b81349ba29f5b8f8c684c822040b1a/
+curl 127.0.0.1:4010/b9b81349ba29f5b8f8c684c822040b1a/
 
 echo "done."

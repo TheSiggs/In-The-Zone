@@ -4,6 +4,7 @@ git pull
 
 cd InTheZone/
 
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
 ./gradlew clean sJ
 
 cp ./client/build/libs/* ./client/build/libs/client-latest.jar

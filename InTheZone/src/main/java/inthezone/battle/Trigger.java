@@ -16,7 +16,7 @@ import java.util.Optional;
 public class Trigger {
 	private final BattleState battle;
 
-	public Trigger(BattleState battle) {
+	public Trigger(final BattleState battle) {
 		this.battle = battle;
 	}
 
@@ -27,7 +27,9 @@ public class Trigger {
 	 * the start point of the original path was a trigger point.  The return
 	 * value is never length 0.
 	 * */
-	public List<MapPoint> shrinkPath(Targetable agent, List<MapPoint> path) {
+	public List<MapPoint> shrinkPath(
+		final Targetable agent, final List<MapPoint> path
+	) {
 		return splitPath(agent, path).get(0);
 	}
 
@@ -40,14 +42,16 @@ public class Trigger {
 	 * first element in the return list may have length 1, which indicates that
 	 * the original path started on a trigger point.  Never returns an empty list.
 	 * */
-	public List<List<MapPoint>> splitPath(Targetable agent, List<MapPoint> path) {
+	public List<List<MapPoint>> splitPath(
+		final Targetable agent, final List<MapPoint> path
+	) {
 		final List<List<MapPoint>> r = new ArrayList<>();
 
 		boolean pathAdded = false;
 
 		Optional<Zone> currentZone = null;
 		List<MapPoint> currentPath = new ArrayList<>();
-		for (MapPoint p : path) {
+		for (final MapPoint p : path) {
 			currentPath.add(p);
 			pathAdded = false;
 
@@ -79,7 +83,7 @@ public class Trigger {
 	 * Get the results of triggering all traps and zones at point p
 	 * @param p The location of the trap or zone tor trigger
 	 * */
-	public List<Command> getAllTriggers(MapPoint p) {
+	public List<Command> getAllTriggers(final MapPoint p) {
 		final List<Command> r = new ArrayList<>();
 
 		battle.getZoneAt(p).ifPresent(zone -> {
@@ -90,8 +94,8 @@ public class Trigger {
 
 		battle.getTrapAt(p).ifPresent(trap -> {
 			try {
-				final List<Casting> targets =
-					new ArrayList<>(); targets.add(new Casting(p, p));
+				final List<Casting> targets = new ArrayList<>();
+				targets.add(new Casting(p, p));
 
 				if (battle.getTargetableAt(p).stream()
 					.anyMatch(t -> !(t instanceof Trap) &&
@@ -101,7 +105,7 @@ public class Trigger {
 					r.addAll((new UseAbilityCommandRequest(p, AbilityAgentType.TRAP,
 						trap.ability, targets)).makeCommand(battle));
 				}
-			} catch (CommandException e) {
+			} catch (final CommandException e) {
 				throw new RuntimeException("Internal logic error triggering trap", e);
 			}
 		});

@@ -56,8 +56,9 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 		final Collection<DamageToTarget> r = new ArrayList<>();
 		final Set<MapPoint> targeted = new HashSet<>();
-		for (Casting casting : castings) {
-			final Set<MapPoint> area = battleState.getAffectedArea(agent, agentType, ability, casting);
+		for (final Casting casting : castings) {
+			final Set<MapPoint> area =
+				battleState.getAffectedArea(agent, agentType, ability, casting);
 
 			final Collection<Targetable> targets =
 				battleState.getAbilityTargets(agent, agentType, ability, area)
@@ -69,8 +70,9 @@ public class UseAbilityCommandRequest extends CommandRequest {
 
 			targeted.addAll(targets.stream()
 				.map(t -> t.getPos()).collect(Collectors.toList()));
-			for (Targetable t : targets) r.add(
-				ability.computeDamageToTarget(battleState, a, t, casting.castFrom, revengeBonus));
+			for (final Targetable t : targets) r.add(
+				ability.computeDamageToTarget(
+					battleState, a, t, casting.castFrom, revengeBonus));
 		}
 
 		return r;

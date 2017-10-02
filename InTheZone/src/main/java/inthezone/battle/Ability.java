@@ -80,12 +80,16 @@ public class Ability {
 	 * @return true if agent can target the target, otherwise false.
 	 * */
 	public boolean canTarget(final Targetable agent, final Targetable target) {
-		if (target.getPos().equals(agent.getPos())) {
-			return info.range.targetMode.self;
-		} else if (agent instanceof Character) {
-			return
-				(info.range.targetMode.enemies && target.isEnemyOf((Character) agent)) ||
-				(info.range.targetMode.allies && !target.isEnemyOf((Character) agent));
+		if (agent instanceof Character) {
+			if (target.getPos().equals(agent.getPos())) {
+				return info.range.targetMode.self;
+			} else {
+				return
+					(info.range.targetMode.enemies &&
+						target.isEnemyOf((Character) agent)) ||
+					(info.range.targetMode.allies &&
+						!target.isEnemyOf((Character) agent));
+			}
 		} else if (agent instanceof HasParentAgent) {
 			return canTarget(((HasParentAgent) agent).getParent(), target);
 		} else {

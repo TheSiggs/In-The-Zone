@@ -868,11 +868,11 @@
         {
           "pp": 1,
           "mp": 0,
-          "chance": 0.75,
-          "eff": 1,
+          "chance": 1,
+          "eff": 0,
           "statusEffect": "panicked",
           "range": {
-            "los": true,
+            "los": false,
             "piercing": false,
             "range": 3,
             "targetMode": "E",
@@ -892,11 +892,11 @@
         {
           "pp": 1,
           "mp": 0,
-          "chance": 0.75,
-          "eff": 1,
+          "chance": 1,
+          "eff": 0,
           "statusEffect": "feared 2",
           "range": {
-            "los": true,
+            "los": false,
             "piercing": false,
             "range": 3,
             "targetMode": "E",
@@ -1544,7 +1544,7 @@
         "defence": 12,
         "attack": 16,
         "hp": 105,
-        "power": 20,
+        "power": 18,
         "ap": 2
       },
       "name": "Zan",
@@ -12214,6 +12214,6 @@
       "sprites": []
     }
   ],
-  "version": "3d67750c-1adc-479e-90ad-85c9b98bfc07",
-  "versionNumber": 218
+  "version": "70f7c71a-9a71-4aa2-b0f4-f73e65100ad9",
+  "versionNumber": 222
 }

@@ -195,6 +195,7 @@
         4,
         5
       ],
+      "flavour": "",
       "stats": {
         "mp": 3,
         "defence": 1,
@@ -204,15 +205,16 @@
         "ap": 3
       },
       "name": "Zan",
-      "sprite": "zan",
       "hpCurve": [],
       "portrait": "portrait/zan.png",
       "bigPortrait": "portrait/generic.png",
+      "spriteB": "zan",
       "attackCurve": [
         3,
         4,
         5
       ],
+      "spriteA": "zan",
       "playable": true
     },
     {
@@ -334,9 +336,34 @@
           "banned": false,
           "trap": false,
           "recursion": 0
+        },
+        {
+          "pp": 1,
+          "mp": 0,
+          "chance": 1,
+          "eff": 0,
+          "range": {
+            "los": true,
+            "piercing": false,
+            "range": 3,
+            "targetMode": "SEA",
+            "radius": 0,
+            "nTargets": 1
+          },
+          "media": {"icon": "abilities/default.png"},
+          "type": "special",
+          "ap": 2,
+          "zone": "None",
+          "instantBefore": "PULL 2",
+          "name": "Warrior's challenge",
+          "heal": false,
+          "banned": false,
+          "trap": false,
+          "recursion": 0
         }
       ],
       "defenceCurve": [],
+      "flavour": "",
       "stats": {
         "mp": 3,
         "defence": 1,
@@ -346,11 +373,12 @@
         "ap": 3
       },
       "name": "Kieren",
-      "sprite": "kieren",
       "hpCurve": [],
       "portrait": "portrait/blank.png",
       "bigPortrait": "portrait/generic.png",
+      "spriteB": "kieren",
       "attackCurve": [],
+      "spriteA": "kieren",
       "playable": true
     },
     {
@@ -569,6 +597,7 @@
         }
       ],
       "defenceCurve": [],
+      "flavour": "",
       "stats": {
         "mp": 6,
         "defence": 1,
@@ -578,11 +607,12 @@
         "ap": 3
       },
       "name": "Daniel",
-      "sprite": "daniel",
       "hpCurve": [],
       "portrait": "portrait/blank.png",
       "bigPortrait": "portrait/generic.png",
+      "spriteB": "daniel",
       "attackCurve": [],
+      "spriteA": "daniel",
       "playable": true
     },
     {
@@ -610,6 +640,7 @@
         "recursion": 0
       }],
       "defenceCurve": [],
+      "flavour": "",
       "stats": {
         "mp": 3,
         "defence": 1,
@@ -619,11 +650,12 @@
         "ap": 3
       },
       "name": "Robot",
-      "sprite": "robot",
       "hpCurve": [],
       "portrait": "portrait/robot.png",
       "bigPortrait": "portrait/generic.png",
+      "spriteB": "robot",
       "attackCurve": [],
+      "spriteA": "robot",
       "playable": false
     },
     {
@@ -746,6 +778,7 @@
         }
       ],
       "defenceCurve": [],
+      "flavour": "",
       "stats": {
         "mp": 3,
         "defence": 1,
@@ -755,11 +788,12 @@
         "ap": 3
       },
       "name": "Nettis",
-      "sprite": "nettis",
       "hpCurve": [],
       "portrait": "portrait/nettis.png",
       "bigPortrait": "portrait/generic.png",
+      "spriteB": "nettis",
       "attackCurve": [],
+      "spriteA": "nettis",
       "playable": true
     }
   ],
@@ -6994,6 +7028,6 @@
       "sprites": []
     }
   ],
-  "version": "f7c9c7ed-6519-4638-acdc-96cb36b20c7d",
-  "versionNumber": 79
+  "version": "913bfde5-519e-4db9-ba28-4be9eda3367d",
+  "versionNumber": 80
 }

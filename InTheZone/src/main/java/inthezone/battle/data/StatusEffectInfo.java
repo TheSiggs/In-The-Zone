@@ -3,13 +3,13 @@ package inthezone.battle.data;
 import isogame.engine.CorruptDataException;
 
 public class StatusEffectInfo {
-	public StatusEffectType type;
-	public StatusEffectKind kind;
+	public final StatusEffectType type;
+	public final StatusEffectKind kind;
 	public final int param;
 
 	private static final int DEFAULT_PARAMETER = 0;
 
-	public StatusEffectInfo(String effect)
+	public StatusEffectInfo(final String effect)
 		throws CorruptDataException
 	{
 		String parts[] = effect.split("\\s");
@@ -21,7 +21,7 @@ public class StatusEffectInfo {
 		if (parts.length >= 2) {
 			try {
 				paramv = Integer.parseInt(parts[1]);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				// ignore
 			}
 		}
@@ -29,7 +29,7 @@ public class StatusEffectInfo {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (obj instanceof StatusEffectInfo) {

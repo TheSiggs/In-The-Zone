@@ -11,12 +11,12 @@ public class InstantEffectInfo {
 
 	private static final int DEFAULT_PARAMETER = 0;
 
-	public InstantEffectInfo(InstantEffectType type, int param) {
+	public InstantEffectInfo(final InstantEffectType type, final int param) {
 		this.type = type;
 		this.param = param;
 	}
 
-	public InstantEffectInfo(String effect)
+	public InstantEffectInfo(final String effect)
 		throws CorruptDataException
 	{
 		String parts[] = effect.split("\\s");
@@ -27,7 +27,7 @@ public class InstantEffectInfo {
 		if (parts.length >= 2) {
 			try {
 				paramv = Integer.parseInt(parts[1]);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				// ignore
 			}
 		}
@@ -38,7 +38,7 @@ public class InstantEffectInfo {
 		return type.hashCode() * param;
 	}
 
-	@Override public boolean equals(Object b) {
+	@Override public boolean equals(final Object b) {
 		if (b == null) return false;
 		else if (b instanceof InstantEffectInfo) {
 			final InstantEffectInfo i = (InstantEffectInfo) b;

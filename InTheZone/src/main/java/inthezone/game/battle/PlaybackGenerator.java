@@ -9,6 +9,7 @@ import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.EndTurnCommand;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.commands.ResignCommand;
+import inthezone.battle.commands.ResignReason;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
@@ -23,6 +24,10 @@ import javafx.scene.layout.Region;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * A command generator that reads commands from a recorded game (to facilitate
+ * replaying recorded games.
+ * */
 public class PlaybackGenerator implements CommandGenerator {
 	private BufferedReader inReader = null;
 
@@ -36,11 +41,14 @@ public class PlaybackGenerator implements CommandGenerator {
 			final RecordedLine inLine = new RecordedLine(inReader.readLine());
 			System.err.println("Recorded game was started by " + inLine.playerName);
 			return StartBattleCommand.fromJSON(inLine.cmd, gameData);
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			throw new ProtocolException("Error parsing JSON", e);
 		}
 	}
 
+	/**
+	 * A line from a recorded game file.
+	 * */
 	class RecordedLine {
 		public final String playerName;
 		public final JSONObject cmd;
@@ -81,16 +89,17 @@ public class PlaybackGenerator implements CommandGenerator {
 				inReader.close();
 
 				if (forPlayer != null && battle != null && listener != null) {
-					final Command cmd = new ResignCommand(forPlayer, true);
+					final Command cmd = new ResignCommand(
+						forPlayer, ResignReason.LOGGED_OFF);
 					final ExecutedCommand ec =
 						new ExecutedCommand(cmd, cmd.doCmd(battle));
 					Platform.runLater(() -> listener.command(ec.markLastInSequence())); 
 				}
 
-			} catch (CommandException e) {
+			} catch (final CommandException e) {
 				Platform.runLater(() -> listener.badCommand(e));
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				/* ignore */
 			}
 		}
@@ -134,7 +143,7 @@ public class PlaybackGenerator implements CommandGenerator {
 
 				if (cmd instanceof EndTurnCommand) return;
 
-			} catch (IOException|JSONException|ProtocolException e) {
+			} catch (final IOException|JSONException|ProtocolException e) {
 				Platform.runLater(() -> {
 					final Alert a = new Alert(AlertType.ERROR,
 						e.getMessage(), ButtonType.OK);
@@ -146,11 +155,11 @@ public class PlaybackGenerator implements CommandGenerator {
 				this.close();
 				return;
 
-			} catch (CommandException e) {
+			} catch (final CommandException e) {
 				Platform.runLater(() -> listener.badCommand(e));
 				return;
 
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				/* ignore */
 			}
 		}

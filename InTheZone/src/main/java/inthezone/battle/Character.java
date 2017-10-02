@@ -1,8 +1,21 @@
 package inthezone.battle;
 
+import isogame.engine.MapPoint;
+import isogame.engine.SpriteInfo;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javafx.scene.image.Image;
+
 import inthezone.battle.commands.Command;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterProfile;
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
@@ -16,14 +29,6 @@ import inthezone.battle.status.Silenced;
 import inthezone.battle.status.StatusEffect;
 import inthezone.battle.status.Stunned;
 import inthezone.battle.status.Vampirism;
-import isogame.engine.MapPoint;
-import isogame.engine.SpriteInfo;
-import javafx.scene.image.Image;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Character extends Targetable {
 	public final int id; // a unique identifier that can be used to track this character
@@ -447,6 +452,21 @@ public class Character extends Targetable {
 
 	@Override public boolean blocksPath(final Player player) {
 		return !(isDead() || this.player == player);
+	}
+
+	@Override public boolean isAffectedBy(final StatusEffectInfo status) {
+		return true;
+	}
+
+	@Override public boolean isAffectedBy(final InstantEffectInfo instant) {
+		final InstantEffectType t = instant.type;
+		return
+			t == InstantEffectType.PUSH && !isImprisoned() ||
+			t == InstantEffectType.PULL && !isImprisoned() ||
+			t == InstantEffectType.TELEPORT && !isImprisoned() ||
+			t == InstantEffectType.MOVE && !isImprisoned() ||
+			t == InstantEffectType.REVIVE ||
+			t == InstantEffectType.CLEANSE;
 	}
 }
 

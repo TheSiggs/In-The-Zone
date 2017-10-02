@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import nz.dcoder.ai.astar.AStarSearch;
 
 import inthezone.battle.commands.AbilityAgentType;
+import inthezone.battle.commands.ResignReason;
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
@@ -177,14 +178,14 @@ public class BattleState {
 	}
 
 	private Optional<Player> resignedPlayer = Optional.empty();
-	private boolean logoff = false; // set to true when the other player disconnected
+	private ResignReason reason = null;
 
 	/**
 	 * Register a resignation.
 	 * */
-	public void resign(final Player player, final boolean logoff) {
+	public void resign(final Player player, final ResignReason reason) {
 		this.resignedPlayer = Optional.of(player);
-		this.logoff = logoff;
+		this.reason = reason;
 	}
 
 	/**
@@ -195,12 +196,23 @@ public class BattleState {
 			return getBattleOutcome(Player.PLAYER_A);
 
 		if (resignedPlayer.isPresent()) {
-			if (resignedPlayer.get() == player) {
-				return Optional.of(BattleOutcome.RESIGN);
-			} else if (logoff) {
-				return Optional.of(BattleOutcome.OTHER_LOGGED_OUT);
-			} else {
-				return Optional.of(BattleOutcome.OTHER_RESIGNED);
+			switch (reason) {
+				case RESIGNED:
+					if (resignedPlayer.get() == player) {
+						return Optional.of(BattleOutcome.RESIGN);
+					} else {
+						return Optional.of(BattleOutcome.OTHER_RESIGNED);
+					}
+				case LOGGED_OFF:
+					return Optional.of(BattleOutcome.OTHER_LOGGED_OUT);
+				case ERROR:
+					if (resignedPlayer.get() == player) {
+						return Optional.of(BattleOutcome.ERROR);
+					} else {
+						return Optional.of(BattleOutcome.OTHER_ERROR);
+					}
+				default:
+					throw new RuntimeException("Unknown resign type: " + reason);
 			}
 		}
 

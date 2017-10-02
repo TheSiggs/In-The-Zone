@@ -12,7 +12,9 @@ import inthezone.battle.commands.AbilityAgentType;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.UseAbilityCommandRequest;
+import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.Stats;
+import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.status.StatusEffect;
 
 public abstract class Targetable implements Obstacle {
@@ -43,6 +45,12 @@ public abstract class Targetable implements Obstacle {
 	public abstract boolean reap();
 
 	public Optional<Zone> currentZone = Optional.empty();
+
+	public boolean isAffectedBy(final StatusEffectInfo status) {
+		return false;
+	}
+
+	public abstract boolean isAffectedBy(final InstantEffectInfo instant);
 
 	/**
 	 * Generate a zone effect, if the triggering conditions are met.

@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffect;
@@ -126,6 +128,10 @@ public class Zone extends Targetable implements HasParentAgent {
 
 	@Override public ZoneFrozen freeze() {
 		return new ZoneFrozen(this);
+	}
+
+	@Override public boolean isAffectedBy(final InstantEffectInfo instant) {
+		return instant.type == InstantEffectType.PURGE;
 	}
 }
 

@@ -2,7 +2,6 @@ package inthezone.battle;
 
 import inthezone.battle.data.AbilityInfo;
 import inthezone.battle.data.AbilityType;
-import inthezone.battle.data.Range;
 import inthezone.battle.data.Stats;
 import inthezone.battle.status.StatusEffectFactory;
 import isogame.engine.MapPoint;
@@ -27,7 +26,7 @@ public class Ability {
 			", mana:" + isMana + ", subsequentLevel:" + subsequentLevel + ")";
 	}
 
-	public Ability(AbilityInfo info) {
+	public Ability(final AbilityInfo info) {
 		this.info = info;
 		this.rootName = info.name;
 		this.manaRootName = info.name;
@@ -96,11 +95,18 @@ public class Ability {
 
 	/**
 	 * Determine if the ability has any affect on a particular target
+	 * @param target The target to check.
 	 * */
 	public boolean canAffect(final Targetable target) {
 		if (target instanceof Trap) return info.affectsTraps();
 		else if (target instanceof Zone) return info.affectsZones();
 		else if (target instanceof RoadBlock) return info.dealsDamage();
+		else if (info.eff == 0) {
+			return
+				info.statusEffect.map(target::isAffectedBy).orElse(false) ||
+				info.instantBefore.map(target::isAffectedBy).orElse(false) ||
+				info.instantAfter.map(target::isAffectedBy).orElse(false);
+		}
 		else return true;
 	}
 
@@ -113,6 +119,13 @@ public class Ability {
 
 	/**
 	 * The damage formula.
+	 * @param q Computed efficiency factor
+	 * @param manaBonus Agent mana bonux
+	 * @param r Agent revenge bonus
+	 * @param attackBuff Agent attack buff
+	 * @param defenceBuff Target defence buff
+	 * @param a Computed agent stats
+	 * @param t Computed target stats
 	 * */
 	public static double damageFormulaStatic(
 		final double q,
@@ -120,7 +133,7 @@ public class Ability {
 		final double r,
 		final double attackBuff,
 		final double defenceBuff,
-		final Stats a, Stats t
+		final Stats a, final Stats t
 	) {
 		return
 			q * (1 + manaBonus + attackBuff - defenceBuff + r) *
@@ -129,12 +142,21 @@ public class Ability {
 			((const_b * ((double) a.power)) / const_a);
 	}
 
+	/**
+	 * The damage formula (high level version).
+	 * @param agentHasMana True if the agent is on a mana zone.
+	 * @param r Agent revenge bonus
+	 * @param attackBuff Agent attack buff
+	 * @param defenceBuff Target defence buff
+	 * @param a Computed agent stats
+	 * @param t Computed target stats
+	 * */
 	private double damageFormula(
 		final boolean agentHasMana,
 		final double r,
 		final double attackBuff,
 		final double defenceBuff,
-		final Stats a, Stats t
+		final Stats a, final Stats t
 	) {
 		double q = info.type == AbilityType.BASIC? 1 : info.eff;
 		double manaBonus = agentHasMana && !isMana? const_m : 0;
@@ -142,6 +164,12 @@ public class Ability {
 	}
 
 
+	/**
+	 * The healing formula.
+	 * @param manaBonus True if the agent is on a mana zone.
+	 * @param q Computed efficiency factor
+	 * @param t Computed target stats
+	 * */
 	private double healingFormula(
 		final boolean manaBonus, final double q, final Stats t
 	) {
@@ -151,8 +179,11 @@ public class Ability {
 	}
 
 	/**
+	 * Compute the damage to deal to a specific target.
+	 * @param battle The battle state.
 	 * @param a Agent
 	 * @param t Target
+	 * @param castFrom The tile where the ability was cast from
 	 * @param r Revenge bonus
 	 * */
 	public DamageToTarget computeDamageToTarget(
@@ -184,6 +215,12 @@ public class Ability {
 			Math.random() < chance, Math.random() < chance);
 	}
 
+	/**
+	 * Compute the additional healing that occurs due to vampirism.
+	 * @param battle The state of the battle
+	 * @param a The agent that has vampirism
+	 * @param targets The characters that were targeted
+	 * */
 	public DamageToTarget computeVampirismEffect(
 		final BattleState battle, final Character a, final Collection<DamageToTarget> targets
 	) {
@@ -198,6 +235,11 @@ public class Ability {
 			false, false, damage, Optional.empty(), false, false);
 	}
 
+	/**
+	 * Impose an effect with the specified chance of success
+	 * @param p The chance of success
+	 * @param effect The effect to apply
+	 * */
 	private <T> Optional<T> imposeEffect(final double p, final T effect) {
 		return Optional.ofNullable(Math.random() < p ? effect : null);
 	}

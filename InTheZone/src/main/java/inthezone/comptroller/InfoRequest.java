@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.Optional;
 
 public abstract class InfoRequest<T> extends Action {
-	final CompletableFuture<T> complete;
+	public final CompletableFuture<T> complete;
 
 	protected InfoRequest() {
 		super(Optional.empty());

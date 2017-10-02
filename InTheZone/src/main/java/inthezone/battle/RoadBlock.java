@@ -6,6 +6,7 @@ import isogame.engine.SpriteInfo;
 import java.util.Optional;
 
 import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
@@ -20,7 +21,9 @@ public class RoadBlock extends Targetable {
 	private Optional<Zone> boundZone;
 
 	public RoadBlock(
-		MapPoint pos, Optional<AbilityInfo> a, StandardSprites sprites
+		final MapPoint pos,
+		final Optional<AbilityInfo> a,
+		final StandardSprites sprites
 	) {
 		this.pos = pos;
 		this.boundZone = Optional.empty();
@@ -29,7 +32,10 @@ public class RoadBlock extends Targetable {
 	}
 
 	private RoadBlock(
-		MapPoint pos, Optional<Zone> boundZone, int hits, SpriteInfo sprite
+		final MapPoint pos,
+		final Optional<Zone> boundZone,
+		final int hits,
+		final SpriteInfo sprite
 	) {
 		this.pos = pos;
 		this.boundZone = boundZone;
@@ -37,7 +43,7 @@ public class RoadBlock extends Targetable {
 		this.sprite = sprite;
 	}
 
-	public void bindZone(Zone zone) {
+	public void bindZone(final Zone zone) {
 		this.boundZone = Optional.of(zone);
 	}
 
@@ -48,7 +54,7 @@ public class RoadBlock extends Targetable {
 	@Override public MapPoint getPos() {return pos;}
 	@Override public double getAttackBuff() {return 0;}
 	@Override public double getDefenceBuff() {return 0;}
-	@Override public void dealDamage(int damage) {
+	@Override public void dealDamage(final int damage) {
 		if (damage <= 0) return;
 
 		hits -= 1;
@@ -65,9 +71,10 @@ public class RoadBlock extends Targetable {
 	@Override public void cleanse() {return;}
 	@Override public void purge() {return;}
 	@Override public void revive() {return;}
-	@Override public void applyStatus(Battle battle, StatusEffect status) {return;}
+	@Override public void applyStatus(
+		final Battle battle, final StatusEffect status) {return;}
 	@Override public boolean isPushable() {return false;}
-	@Override public boolean isEnemyOf(Character character) {return true;}
+	@Override public boolean isEnemyOf(final Character character) {return true;}
 	@Override public boolean isDead() {return hits == 0;}
 	@Override public boolean reap() {return isDead();}
 
@@ -78,6 +85,10 @@ public class RoadBlock extends Targetable {
 
 	@Override public RoadBlockFrozen freeze() {
 		return new RoadBlockFrozen(this);
+	}
+
+	@Override public boolean isAffectedBy(final InstantEffectInfo instant) {
+		return false;
 	}
 }
 

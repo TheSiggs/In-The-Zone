@@ -3,6 +3,8 @@ package inthezone.battle;
 import isogame.engine.MapPoint;
 import isogame.engine.SpriteInfo;
 
+import inthezone.battle.data.InstantEffectInfo;
+import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 import inthezone.battle.data.Stats;
@@ -98,6 +100,10 @@ public class Trap extends Targetable implements HasParentAgent {
 
 	@Override public TrapFrozen freeze() {
 		return new TrapFrozen(this);
+	}
+
+	@Override public boolean isAffectedBy(final InstantEffectInfo instant) {
+		return instant.type == InstantEffectType.DEFUSE;
 	}
 }
 

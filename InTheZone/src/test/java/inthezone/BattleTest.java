@@ -4,21 +4,24 @@ import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
+import inthezone.battle.RoadBlock;
+import inthezone.battle.Trap;
 import inthezone.battle.data.AbilityType;
 import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StatusEffectInfo;
-import inthezone.battle.RoadBlock;
 import inthezone.battle.status.StatusEffect;
 import inthezone.battle.status.StatusEffectFactory;
-import inthezone.battle.Trap;
+import inthezone.comptroller.InfoPush;
+import inthezone.comptroller.InfoTargeting;
 import isogame.engine.MapPoint;
 import isogame.engine.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
@@ -161,6 +164,43 @@ public class BattleTest {
 		dan.applyStatus(b, accelerated);
 		assertEquals(0, dan.getMP());
 		assertEquals(7, dan.getStats().mp);
+	}
+
+	@Test
+	public void cannotPushPullImprisoned() throws Exception {
+		final Battle b = simpleBattle();
+		final Character zan = b.battleState.getCharacterAt(zanPos).get();
+		final Character dan = b.battleState.getCharacterAt(danPos).get();
+		final Character kieren = b.battleState.getCharacterAt(kierenPos).get();
+
+		assertNotNull(zan);
+		assertNotNull(dan);
+		assertNotNull(kieren);
+
+		// imprison dan
+		dan.applyStatus(b,
+			StatusEffectFactory.getEffect(new StatusEffectInfo("imprisoned"),
+			0, 0, Optional.empty()));
+
+		kieren.teleport(dan.getPos().add(new MapPoint(2, 0)), false);
+
+		// check that we cannot push dan
+		final InfoPush pushTargeting = new InfoPush(zan.freeze());
+		pushTargeting.completeAction(b);
+		final Collection<MapPoint> pts2 = pushTargeting.complete.get();
+		assertFalse(pts2.contains(dan.getPos()));
+
+		// check that we cannot pull dan, but we can pull zan
+		final InfoTargeting targeting = new InfoTargeting(
+			kieren.freeze(),
+			kieren.getPos(),
+			new HashSet<>(),
+			kieren.abilities.stream().filter(a ->
+				a.info.name.equals("Warrior's challenge")).findFirst().get());
+		targeting.completeAction(b);
+		final Collection<MapPoint> pts = targeting.complete.get();
+		assertFalse(pts.contains(dan.getPos()));
+		assertTrue(pts.contains(zan.getPos()));
 	}
 }
 

@@ -1,16 +1,7 @@
 package inthezone.battle;
 
-import inthezone.battle.commands.AbilityAgentType;
-import inthezone.battle.commands.Command;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.commands.FatigueCommand;
-import inthezone.battle.data.AbilityInfo;
-import inthezone.battle.data.AbilityZoneType;
-import inthezone.battle.data.Player;
-import inthezone.battle.data.StandardSprites;
-import inthezone.battle.data.Stats;
-import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,6 +10,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import inthezone.battle.commands.AbilityAgentType;
+import inthezone.battle.commands.Command;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.commands.FatigueCommand;
+import inthezone.battle.commands.ResignReason;
+import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.AbilityZoneType;
+import inthezone.battle.data.Player;
+import inthezone.battle.data.StandardSprites;
+import inthezone.battle.data.Stats;
+import inthezone.protocol.ProtocolException;
 
 /**
  * This class processes battle commands.
@@ -368,8 +371,8 @@ public class Battle {
 	/**
 	 * Handle the resign effect
 	 * */
-	public void doResign(final Player player, final boolean logoff) {
-		battleState.resign(player, logoff);
+	public void doResign(final Player player, final ResignReason reason) {
+		battleState.resign(player, reason);
 	}
 }
 

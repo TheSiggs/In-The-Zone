@@ -1,17 +1,22 @@
 package inthezone.game.battle;
 
-import inthezone.battle.BattleOutcome;
+import java.util.Optional;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import java.util.Optional;
 
+import inthezone.battle.BattleOutcome;
+
+/**
+ * A control to tell the player how the game ended.
+ * */
 public class EndManager extends HBox {
 	private final Label message = new Label(" ");
 	private final Button close = new Button("Close");
 
-	public EndManager(BattleView view, BattleOutcome outcome) {
+	public EndManager(final BattleView view, final BattleOutcome outcome) {
 		super();
 
 		this.setAlignment(Pos.CENTER);
@@ -25,6 +30,8 @@ public class EndManager extends HBox {
 			case RESIGN: m = "You resigned."; break;
 			case OTHER_RESIGNED: m = "Other player resigned."; break;
 			case OTHER_LOGGED_OUT: m = "Other player logged out or disconnected."; break;
+			case ERROR: m = "The game has ended due to an error"; break;
+			case OTHER_ERROR: m = "The game has ended due to an error on the other player's computer"; break;
 			default: throw new RuntimeException("This cannot happen");
 		}
 

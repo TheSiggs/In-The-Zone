@@ -2,6 +2,7 @@ package inthezone.game;
 
 import inthezone.battle.BattleOutcome;
 import inthezone.battle.commands.ResignCommand;
+import inthezone.battle.commands.ResignReason;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
@@ -338,7 +339,7 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 			} catch (final CorruptDataException e) {
 				lobbyView.challengeError(otherPlayer);
-				network.sendCommand(new ResignCommand(player, true));
+				network.sendCommand(new ResignCommand(player, ResignReason.ERROR));
 				final Alert a = new Alert(Alert.AlertType.ERROR,
 					e.getMessage(), ButtonType.CLOSE);
 				a.setHeaderText("Error starting battle");

@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
@@ -78,8 +79,16 @@ public class ClientConfig implements HasJSONRepresentation {
 		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.a6     , new KeyCodeCombination(KeyCode.DIGIT0)   );
 		defaultKeyBindingTable.setPrimaryKey(  InTheZoneKeyBinding.endTurn, new KeyCodeCombination(KeyCode.END)   );
 
+		gameData.addUpdateWatcher(() ->
+			Platform.runLater(() -> loadConfigFile(configFile, gameData)));
+		loadConfigFile(configFile, gameData);
+	}
+
+	private void loadConfigFile(
+		final File configFile, final GameDataFactory gameData
+	) {
 		try (
-			BufferedReader in = new BufferedReader(new InputStreamReader(
+			final BufferedReader in = new BufferedReader(new InputStreamReader(
 				new FileInputStream(configFile), "UTF-8"))
 		) {
 			if (in == null) throw new FileNotFoundException(

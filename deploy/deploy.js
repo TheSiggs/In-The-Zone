@@ -19,6 +19,7 @@ process.on('uncaughtException', function(err){
 
 var server = http.createServer(srv)
 server.listen(4010)
+server.listen(4010)
 
 setTimeout(()=>{
   let proc = spawn('./GitLabHook.sh')
@@ -52,7 +53,7 @@ function srv(req, res){
 
 
   let url = req.url.split('/')
-  if(url[1]=='client'){
+  if(url[1]=='client' || req.headers.host == 'download.itz.nz' || true){
     if(url[2] == null || url[2] == ''){
       res.writeHead(200)
       res.end(clientsHTML())

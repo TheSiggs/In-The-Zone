@@ -12,12 +12,19 @@ import org.json.JSONObject;
 
 import inthezone.Log;
 
+/**
+ * An active game on the server.
+ * */
 public class Game {
 	public final Client clientA;
 	public final Client clientB;
 	private final File outFile;
 	private PrintWriter out = null;
 
+	/**
+	 * @param clientA player A
+	 * @param clientB player B
+	 * */
 	public Game(
 		final Client clientA,
 		final Client clientB
@@ -36,15 +43,27 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Get the other player.
+	 * @param me this player
+	 * */
 	public Client getOther(final Client me) {
 		return clientA == me? clientB : clientA;
 	}
 
+	/**
+	 * Handle the next command.
+	 * @param cmd the command
+	 * @param player the player that issued the command
+	 * */
 	public void nextCommand(final JSONObject cmd, final Client player) {
 		if (out != null)
 			out.println(player.getClientName() + "/" + cmd.toString());
 	}
 
+	/**
+	 * End the game.
+	 * */
 	public void close() {
 		out.close();
 	}

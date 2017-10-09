@@ -1,5 +1,8 @@
 package inthezone.protocol;
 
+/**
+ * Message kinds.  See Message class for more information.
+ * */
 public enum MessageKind {
 	S_VERSION, C_VERSION, OK, NOK, GAME_DATA, REQUEST_NAME, PLAYERS_JOIN,
 	CHALLENGE_PLAYER, ACCEPT_CHALLENGE, REJECT_CHALLENGE, COMMAND,

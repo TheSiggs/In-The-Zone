@@ -19,6 +19,9 @@ import java.util.UUID;
 import inthezone.Log;
 import inthezone.battle.data.GameDataFactory;
 
+/**
+ * The IO multiplexer.
+ * */
 public class Multiplexer implements Runnable {
 	private final static long timeout = 30 * 1000;
 
@@ -41,6 +44,13 @@ public class Multiplexer implements Runnable {
 
 	private final int maxClients;
 
+	/**
+	 * @param name the name of the server
+	 * @param port the port to listen on
+	 * @param backlog the server socket backlog value
+	 * @param maxClients the maximum number of clients that may connect
+	 * @param dataFactory the game data
+	 * */
 	public Multiplexer(
 		final String name,
 		final int port,
@@ -62,8 +72,10 @@ public class Multiplexer implements Runnable {
 
 	private boolean killThread = false;
 
-	@Override
-	public void run() {
+	/**
+	 * Start the multiplexer.
+	 * */
+	@Override public void run() {
 		while (!killThread) {
 			try {
 				doSelect();
@@ -74,6 +86,10 @@ public class Multiplexer implements Runnable {
 		}
 	}
 
+	/**
+	 * Create a new Selector.  This method is used to recover from an error which
+	 * shut down the Selector.
+	 * */
 	private void restoreSelector() {
 		try {
 			selector = Selector.open();
@@ -154,12 +170,20 @@ public class Multiplexer implements Runnable {
 		for (final Client c : disconnectedClients) c.closeConnection(false);
 	}
 
+	/**
+	 * Remove a client from set of logged in clients
+	 * @param c the client to remove
+	 * */
 	private void removeClient(final Client c) {
 		Log.info("Removing client " +
 			c.name.orElse("<UNNAMED CLIENT>"), null);
 		c.closeConnection(true);
 	}
 
+	/**
+	 * Initialise a new client
+	 * @param connection the connection the client is connecting on.
+	 * */
 	private void newClient(final SocketChannel connection) {
 		try {
 			if (sessions.size() >= maxClients) {

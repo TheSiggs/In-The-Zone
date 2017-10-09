@@ -54,6 +54,10 @@ import inthezone.game.DialogScreen;
 import inthezone.game.InTheZoneKeyBinding;
 import inthezone.protocol.ProtocolException;
 
+/**
+ * The main battle view.  This is the root handler for all messages concerning
+ * an ongoing battle.
+ * */
 public class BattleView
 	extends DialogScreen<BattleOutcome> implements BattleListener
 {
@@ -89,7 +93,13 @@ public class BattleView
 	public final ModalDialog modalDialog = new ModalDialog();
 
 	/**
-	 * Start a standard battle
+	 * Start a standard battle.
+	 * @param startBattle the StartBattleCommand
+	 * @param player this player
+	 * @param otherPlayer a method to get the commands of the other player
+	 * @param network the network
+	 * @param gameData the game data
+	 * @param config client configuration
 	 * */
 	public BattleView(
 		final StartBattleCommand startBattle,
@@ -105,7 +115,11 @@ public class BattleView
 	}
 
 	/**
-	 * Start a saved battle in replay mode
+	 * Start a saved battle in replay mode.
+	 * @param pb the PlayerbackGenerator
+	 * @param in the saved game
+	 * @param gameData the game data
+	 * @param config client configuration
 	 * */
 	public BattleView(
 		final PlaybackGenerator pb,
@@ -121,6 +135,17 @@ public class BattleView
 			view -> new ReplayHUD(view, gameData.getStandardSprites(), pb));
 	}
 
+	/**
+	 * Main constructor.
+	 * @param startBattle the StartBattleCommand
+	 * @param player this Player
+	 * @param thisPlayerGenerator CommandGenerator for this player
+	 * @param otherPlayer CommandGenerator for the other player
+	 * @param network the network
+	 * @param gameData the game data
+	 * @param config client configuration
+	 * @param hud a method to construct the HUD
+	 * */
 	public BattleView(
 		final StartBattleCommand startBattle,
 		final Player player,
@@ -249,10 +274,14 @@ public class BattleView
 
 	private Mode mode;
 
+	/**
+	 * Get the current UI mode.
+	 * */
 	public Mode getMode() {return mode;}
 
 	/**
 	 * Switch to a different UI mode.
+	 * @param mode the new mode
 	 * */
 	public void setMode(final Mode mode) {
 		this.mode = mode.setupMode();
@@ -289,6 +318,7 @@ public class BattleView
 
 	/**
 	 * Select a particular character.
+	 * @param id the id of the character to select
 	 * */
 	public void selectCharacterById(final int id) {
 		if (mode.canCancel()) {
@@ -335,6 +365,7 @@ public class BattleView
 
 	/**
 	 * Update information about the selected character.
+	 * @param c the character to update
 	 * */
 	public void updateSelectedCharacter(final CharacterFrozen c) {
 		selectedCharacter.ifPresent(sc -> {
@@ -355,6 +386,7 @@ public class BattleView
 
 	/**
 	 * Set the map points that can be selected.
+	 * @param mr the selectable points
 	 * */
 	public void setSelectable(final Collection<MapPoint> mr) {
 		canvas.setSelectable(mr);
@@ -362,6 +394,7 @@ public class BattleView
 
 	/**
 	 * Determine if a map point is selectable;
+	 * @param p the point to check
 	 * */
 	public boolean isSelectable(final MapPoint p) {
 		return canvas.isSelectable(p);
@@ -431,6 +464,7 @@ public class BattleView
 
 	/**
 	 * The selected character uses an ability.
+	 * @param ability the ability to use
 	 * */
 	public void useAbility(final Ability ability) {
 		try {
@@ -466,12 +500,20 @@ public class BattleView
 		}
 	}
 
+	/**
+	 * Determine if there are any valid moves (if not then the turn can be ended
+	 * automatically).
+	 * */
 	public boolean anyValidMoves() {
 		return sprites.characters.values().stream()
 			.filter(c -> c.getPlayer() == player)
 			.anyMatch(c -> anyValidMovesFor(c));
 	}
 
+	/**
+	 * Determine if there are any valid moves for a character.
+	 * @param c the character to check
+	 * */
 	public boolean anyValidMovesFor(final CharacterFrozen c) {
 		final boolean canMove =
 			mode.getFutureWithRetry(battle.requestInfo(new InfoMoveRange(c)))
@@ -482,23 +524,36 @@ public class BattleView
 		return canMove || canAttack;
 	}
 
-	@Override
-	public void endBattle(final BattleOutcome outcome) {
+	/**
+	 * Notify that the battle has ended.
+	 * @param outcome the outcome of the battle
+	 * */
+	@Override public void endBattle(final BattleOutcome outcome) {
 		selectCharacter(Optional.empty());
 		setMode(new ModeOtherTurn(this));
 		hud.doEndMode(outcome);
 	}
 
+	/**
+	 * Handle an end of battle situation.
+	 * @param outcome the outcome of the battle
+	 * */
 	public void handleEndBattle(final Optional<BattleOutcome> outcome) {
 		canvas.stopAnimating();
 		onDone.accept(outcome);
 	}
 
+	/**
+	 * Wait for the other client to reconnect.
+	 * */
 	public void waitForOtherClientToReconnect() {
 		setMode(new ModeWaitForReconnect(this, mode));
 		hud.doReconnectMode(false);
 	}
 
+	/**
+	 * Notification that the other client has reconnected.
+	 * */
 	public void otherClientReconnects() {
 		if (mode instanceof ModeWaitForReconnect) {
 			setMode(((ModeWaitForReconnect) mode).getPrevious());
@@ -508,8 +563,11 @@ public class BattleView
 
 	private boolean handlingError = false;
 
-	@Override
-	public void badCommand(final CommandException e) {
+	/**
+	 * Notification that one of the clients attempted to execute a bad command.
+	 * @param e the error
+	 * */
+	@Override public void badCommand(final CommandException e) {
 		System.err.println("Game error: ");
 		e.printStackTrace();
 
@@ -527,8 +585,11 @@ public class BattleView
 		battle.requestCommand(new ResignCommandRequest(player));
 	}
 
-	@Override
-	public void command(final ExecutedCommand ec) {
+	/**
+	 * Handle a command.
+	 * @param ec the command to handle
+	 * */
+	@Override public void command(final ExecutedCommand ec) {
 		System.err.println(ec.cmd.getJSON());
 		commands.queueCommand(ec);
 		if (!inAnimation) inAnimation = commands.doNextCommand();
@@ -539,8 +600,15 @@ public class BattleView
 		handlingError = false;
 	}
 
-	@Override
-	public void completeEffect(final InstantEffect e, final boolean canCancel) {
+	/**
+	 * Get more information from the player concerning an instant effect.
+	 * @param e the effect to complete
+	 * @param canCancel true if this effect can still be cancelled, otherwise
+	 * false.
+	 * */
+	@Override public void completeEffect(
+		final InstantEffect e, final boolean canCancel
+	) {
 		if (instantEffectCompletion.isPresent()) throw new RuntimeException(
 			"Invalid UI state.  Attempted to complete an instant effect, but we're already completing a different instant effect");
 

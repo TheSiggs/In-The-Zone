@@ -42,6 +42,10 @@ public class CharacterInfoBox extends AnchorPane {
 
 	private final ColorAdjust deadEffect = new ColorAdjust();
 
+	/**
+	 * @param character the character to display
+	 * @param sprites the standard sprites set (for icons and the like)
+	 * */
 	public CharacterInfoBox(
 		final CharacterFrozen character,
 		final StandardSprites sprites
@@ -102,6 +106,12 @@ public class CharacterInfoBox extends AnchorPane {
 		updateCharacter(character);
 	}
 
+	/**
+	 * Update the character status effects info.
+	 * @param c a new version of the character
+	 * @param buff the character's buff
+	 * @param debuff the character's debuff
+	 * */
 	private void updateStatus(
 		final CharacterFrozen c,
 		final Optional<StatusEffect> buff,
@@ -123,6 +133,10 @@ public class CharacterInfoBox extends AnchorPane {
 		}
 	}
 
+	/**
+	 * Get the icon to use for a status effect.
+	 * @param s the status effect
+	 * */
 	private ImageView statusEffectImage(final StatusEffect s) {
 		final ImageView r = new ImageView(
 			sprites.statusEffects.get(s.getInfo().type));
@@ -134,6 +148,10 @@ public class CharacterInfoBox extends AnchorPane {
 		return r;
 	}
 
+	/**
+	 * Get the revenge image.
+	 * @param c the character that has revenge
+	 * */
 	private ImageView revengeImage(final CharacterFrozen c) {
 		final ImageView r = new ImageView(sprites.revengeIcon);
 		final Tooltip t = new Tooltip(c.getName() + " is angry!\n" +
@@ -145,6 +163,10 @@ public class CharacterInfoBox extends AnchorPane {
 		return r;
 	}
 
+	/**
+	 * Update the character info.
+	 * @param c a new version of the character.
+	 * */
 	public void updateCharacter(final CharacterFrozen c) {
 		ap.update(c.hasMana()? "ap_mana" : "ap", c.getAP(), c.getStats().ap, false);
 		mp.update("mp", c.getMP(), c.getStats().mp, false);
@@ -153,6 +175,10 @@ public class CharacterInfoBox extends AnchorPane {
 		updateStatus(c, c.getStatusBuff(), c.getStatusDebuff());
 	}
 
+	/**
+	 * Set whether or not this character is selected.
+	 * @param isSelected true if selected, otherwise false
+	 * */
 	public void setSelected(final boolean isSelected) {
 		if (this.isSelected != isSelected) {
 			this.isSelected = isSelected;

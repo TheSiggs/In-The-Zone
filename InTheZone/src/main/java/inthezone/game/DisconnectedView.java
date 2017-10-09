@@ -21,6 +21,9 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 
+/**
+ * The startup splash screen.
+ * */
 public class DisconnectedView extends FlowPane {
 	private final Network network;
 
@@ -35,6 +38,14 @@ public class DisconnectedView extends FlowPane {
 	private String server;
 	private int port;
 
+	/**
+	 * @param parent the parent ContentPane
+	 * @param gameData the game data
+	 * @param config the client configuration
+	 * @param server the domain name of the server to connect to
+	 * @param port the port to connect to
+	 * @param cachedName the default name for this player
+	 * */
 	public DisconnectedView(
 		final ContentPane parent,
 		final GameDataFactory gameData,

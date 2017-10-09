@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
+/**
+ * The selected character is to use an ability.
+ * */
 public class ModeTarget extends Mode {
 	private final CharacterFrozen selectedCharacter;
 	private final Queue<MapPoint> recastFrom;

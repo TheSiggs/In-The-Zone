@@ -14,6 +14,9 @@ import java.util.Queue;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_MOVE;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 
+/**
+ * The move instant effect needs more input.
+ * */
 public class ModeMoveEffect extends ModeMove {
 	private final ModeAnimating lastMode;
 	private final Queue<CharacterFrozen> moveQueue = new LinkedList<>();

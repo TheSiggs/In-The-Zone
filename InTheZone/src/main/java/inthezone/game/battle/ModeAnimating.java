@@ -4,6 +4,9 @@ import inthezone.battle.CharacterFrozen;
 import isogame.engine.MapPoint;
 import java.util.Map;
 
+/**
+ * The UI is currently showing an animation.
+ * */
 public class ModeAnimating extends Mode {
 	private final Mode previous;
 

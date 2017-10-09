@@ -167,7 +167,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 			stageWrapper, loadout, buttonsPanel);
 
 		gameData.getStages().stream().map(x -> x.name).forEach(n -> stages.add(n));
-		for (Loadout l : config.loadouts) loadouts.add(l);
+		for (final Loadout l : config.loadouts) loadouts.add(l);
 
 		final Paint[] highlights =
 			new Paint[] {Color.rgb(0x00, 0x00, 0xFF, 0.2)};
@@ -263,7 +263,7 @@ public class ChallengePane extends DialogScreen<StartBattleCommandRequest> {
 		if (l != null && l.isLegitimate()) {
 			characterSelector.setCharacters(l.characters, player);
 
-			for (MapPoint p : characterPositions.values())
+			for (final MapPoint p : characterPositions.values())
 				currentStage.clearTileOfSprites(p);
 
 			characterInfoLeft.getChildren().clear();

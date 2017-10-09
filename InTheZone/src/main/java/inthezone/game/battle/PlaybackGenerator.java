@@ -31,6 +31,10 @@ import org.json.JSONObject;
 public class PlaybackGenerator implements CommandGenerator {
 	private BufferedReader inReader = null;
 
+	/**
+	 * @param inReader the file containing the game to replay
+	 * @param gameData the game data
+	 * */
 	public StartBattleCommand start(
 		final BufferedReader inReader,
 		final GameDataFactory gameData
@@ -54,6 +58,9 @@ public class PlaybackGenerator implements CommandGenerator {
 		public final JSONObject cmd;
 		public final boolean isEOF;
 
+		/**
+		 * @param raw the raw unparsed line
+		 * */
 		public RecordedLine(final String raw) throws JSONException {
 			if (raw == null) {
 				playerName = null;
@@ -109,6 +116,9 @@ public class PlaybackGenerator implements CommandGenerator {
 	/**
 	 * Generate the commands.  Waits for each command to be released before
 	 * passing it on.
+	 * @param battle the Battle object
+	 * @param listener the handler to send the commands to
+	 * @param forPlayer which player we are generating commands for
 	 * */
 	@Override public synchronized void generateCommands(
 		final Battle battle,

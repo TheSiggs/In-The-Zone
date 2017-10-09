@@ -27,6 +27,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+/**
+ * The root panel for the game.  Handles switching between screens.  The model
+ * is that there is a base screen (currently the lobby), and other screens can
+ * be stacked on top.  When a screen closes we remove it from the top of the
+ * stack revealing the previous screen.  The base screen isn't in the stack, so
+ * that's what we're left with when all the other screens are closed.
+ *
+ * This class is also the central dispatch point for messages from the
+ * comptroller layer, including lobby notifications and error notifications.
+ * */
 public class ContentPane extends StackPane implements LobbyListener {
 	private final DisconnectedView disconnected;
 	private final LobbyView lobbyView;
@@ -51,6 +61,13 @@ public class ContentPane extends StackPane implements LobbyListener {
 	private Optional<String> challengePlayer = Optional.empty();
 	private Optional<StartBattleCommandRequest> challenge = Optional.empty();
 
+	/**
+	 * @param config the client configuration
+	 * @param gameData the game data
+	 * @param server the domain name of the server to connect to
+	 * @param port the port to connect to
+	 * @param playername the default name for this player
+	 * */
 	public ContentPane(
 		final ClientConfig config,
 		final GameDataFactory gameData,
@@ -92,6 +109,9 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+	/**
+	 * Close a screen.
+	 * */
 	private void closeScreen() {
 		screens.pop();
 		if (screens.isEmpty()) {
@@ -111,14 +131,21 @@ public class ContentPane extends StackPane implements LobbyListener {
 		}
 	}
 
+	/**
+	 * Switch to a different base pane.
+	 * */
 	private void switchPane(final Pane target) {
 		currentPane.setVisible(false);
 		target.setVisible(true);
 		currentPane = target;
 	}
 
-	@Override
-	public void connectedToServer(
+	/**
+	 * Notification that we are now connected to the server.
+	 * @param playerName the name of the player
+	 * @param players the players currently in the lobby
+	 * */
+	@Override public void connectedToServer(
 		final String playerName, final Collection<String> players
 	) {
 		Platform.runLater(() -> {
@@ -129,8 +156,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void errorConnectingToServer(final Exception e) {
+	/**
+	 * Notification that there was an error connecting to the server
+	 * @param e the error
+	 * */
+	@Override public void errorConnectingToServer(final Exception e) {
 		Platform.runLater(() -> {
 			isConnected = false;
 			final Alert a = new Alert(Alert.AlertType.ERROR,
@@ -143,8 +173,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void serverError(final Exception e) {
+	/**
+	 * Notification that an error occurred in the server
+	 * @param e the error
+	 * */
+	@Override public void serverError(final Exception e) {
 		Platform.runLater(() -> {
 			System.err.println("Received server error");
 			e.printStackTrace();
@@ -160,8 +193,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 	}
 
 
-	@Override
-	public void serverNotification(final String e) {
+	/**
+	 * A notification from the server
+	 * @param e the message from the server
+	 * */
+	@Override public void serverNotification(final String e) {
 		Platform.runLater(() -> {
 			final Alert a = new Alert(Alert.AlertType.ERROR, e, ButtonType.CLOSE);
 			a.setHeaderText("Message from the server");
@@ -170,8 +206,10 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void connectionDropped() {
+	/**
+	 * A notification that the connection to the server was lost.
+	 * */
+	@Override public void connectionDropped() {
 		Platform.runLater(() -> {
 			isConnected = false;
 			currentBattle.ifPresent(b -> b.handleEndBattle(Optional.empty()));
@@ -180,13 +218,18 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
+	/**
+	 * Handle logout.
+	 * */
 	public void doLogout() {
 		network.logout();
 		networkThread.interrupt();
 	}
 
-	@Override
-	public void loggedOff() {
+	/**
+	 * A notification that we have logged out.
+	 * */
+	@Override public void loggedOff() {
 		Platform.runLater(() -> {
 			isConnected = false;
 			disconnected.endConnecting();
@@ -195,29 +238,43 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void playerHasLoggedIn(final String player) {
+	/**
+	 * A notification that a player logged into the lobby.
+	 * @param player the player that logged in
+	 * */
+	@Override public void playerHasLoggedIn(final String player) {
 		Platform.runLater(() -> {
 			lobbyView.playerJoins(player);
 		});
 	}
 
-	@Override
-	public void playerHasLoggedOff(final String player) {
+	/**
+	 * A notification that a player has logged off.
+	 * @param player the player that logged off
+	 * */
+	@Override public void playerHasLoggedOff(final String player) {
 		Platform.runLater(() -> {
 			lobbyView.playerLeaves(player);
 		});
 	}
 
-	@Override
-	public void playerHasEnteredBattle(final String player) {
+	/**
+	 * A notification that a player has entered a battle
+	 * @param player the player that entered a battle
+	 * */
+	@Override public void playerHasEnteredBattle(final String player) {
 		Platform.runLater(() -> {
 			lobbyView.playerEntersGame(player);
 		});
 	}
 
-	@Override
-	public void playerRefusesChallenge(
+	/**
+	 * A notification that a player refused a challenge
+	 * @param player the player that refused the challenge
+	 * @param notReady true if the player refused because their client was not
+	 * ready to accept battle requests.
+	 * */
+	@Override public void playerRefusesChallenge(
 		final String player, final boolean notReady
 	) {
 		Platform.runLater(() -> {
@@ -225,8 +282,11 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void challengeIssued(final String player) {
+	/**
+	 * A notification that this client has issued a challenge
+	 * @param player the player that was challenged
+	 * */
+	@Override public void challengeIssued(final String player) {
 		Platform.runLater(() -> {
 			lobbyView.issuedChallenge(player);
 		});
@@ -234,8 +294,13 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	private boolean fromQueue = false;
 
-	@Override
-	public void challengeFrom(
+	/**
+	 * Handle a challenge from another player.
+	 * @param player the player that initiated the challenge
+	 * @param fromQueue true if this game came from the game queue
+	 * @param cmd the StartBattleCommandRequest
+	 * */
+	@Override public void challengeFrom(
 		final String player,
 		final boolean fromQueue,
 		final StartBattleCommandRequest cmd
@@ -251,8 +316,12 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void otherClientDisconnects(final boolean logoff) {
+	/**
+	 * A notification that the other client disconnected.
+	 * @param logoff true if the other client deliberately logged out.  Otherwise
+	 * the connection was lost for some other reason.
+	 * */
+	@Override public void otherClientDisconnects(final boolean logoff) {
 		Platform.runLater(() -> {
 			currentBattle.ifPresent(bv -> {
 				if (logoff) {
@@ -264,8 +333,10 @@ public class ContentPane extends StackPane implements LobbyListener {
 		});
 	}
 
-	@Override
-	public void otherClientReconnects() {
+	/**
+	 * A notification that the other client reconnected to the server.
+	 * */
+	@Override public void otherClientReconnects() {
 		Platform.runLater(() -> {
 			currentBattle.ifPresent(bv -> {
 				bv.otherClientReconnects();
@@ -276,23 +347,38 @@ public class ContentPane extends StackPane implements LobbyListener {
 	private boolean cancelQueue = true;
 	private final Set<String> cancelledChallenges = new HashSet<>();
 
+	/**
+	 * A notification that another player cancelled a challenge that this player
+	 * issued.
+	 * @param player the player that cancelled the challenge
+	 * */
 	@Override public void challengeCancelled(final String player) {
 		Platform.runLater(() -> {
 			lobbyView.cancellationFrom(player);
 		});
 	}
 
+	/**
+	 * A notification that we are no longer waiting in the queue.
+	 * */
 	@Override public void queueCancelled() {
 		Platform.runLater(() -> {
 			lobbyView.queueCancellation();
 		});
 	}
 
+	/**
+	 * Enter the game queue.
+	 * @param vetoMaps the maps we don't want to play
+	 * */
 	public void enterQueue(final List<String> vetoMaps) {
 		network.enterQueue(vetoMaps);
 		cancelQueue = false;
 	}
 
+	/**
+	 * Leave the game queue.
+	 * */
 	public void cancelQueue() {
 		network.cancelChallenge();
 		cancelQueue = true;
@@ -300,14 +386,22 @@ public class ContentPane extends StackPane implements LobbyListener {
 
 	/**
 	 * Cancel an outstanding challenge.
+	 * @param player the player we don't want to challenge anymore
 	 * */
 	public void cancelChallenge(final String player) {
 		cancelledChallenges.add(player);
 		network.cancelChallenge();
 	}
 
-	@Override
-	public void startBattle(
+	/**
+	 * Start a battle
+	 * @param ready the StartBattleCommand
+	 * @param player this Player
+	 * @param otherPlayer the name of the other player
+	 * @param isFromQueue true if this game came from the game queue, otherwise
+	 * false
+	 * */
+	@Override public void startBattle(
 		final StartBattleCommand ready,
 		final Player player,
 		final String otherPlayer,

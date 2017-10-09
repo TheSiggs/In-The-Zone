@@ -14,6 +14,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+/**
+ * A scroll pane with arrows at each end of the pane instead of a scrollbar.
+ * */
 public class RollerScrollPane extends AnchorPane {
 	private final StackPane innerPane = new StackPane();
 	private final StackPane viewPane = new StackPane();
@@ -32,6 +35,11 @@ public class RollerScrollPane extends AnchorPane {
 
 	private boolean enableScrollWheel = true;
 
+	/**
+	 * @param content the content part of the pane
+	 * @param horizonatal true if it scrolls horizontally, otherwise it scrolls
+	 * vertically.
+	 * */
 	public RollerScrollPane(final Node content, final boolean horizontal) {
 		super();
 		this.horizontal = horizontal;
@@ -126,14 +134,28 @@ public class RollerScrollPane extends AnchorPane {
 		});
 	}
 
+	/**
+	 * Enable or disable the scroll wheel.
+	 * @param enableScrollWheel true to enable the scroll wheel, otherwise false.
+	 * */
 	public void setScrollWheelEnable(final boolean enableScrollWheel) {
 		this.enableScrollWheel = enableScrollWheel;
 	}
 
+	/**
+	 * Get the minimum scroll position.
+	 * */
 	public double getScrollMin() { return scrollMin; }
 
+	/**
+	 * Get the maximum scroll position.
+	 * */
 	public double getScrollMax() { return scrollMax; }
 
+	/**
+	 * Set the scroll position.
+	 * @param pos the scroll position to set
+	 * */
 	public void setScrollPos(final double pos) {
 		scroll = Math.min(scrollMax, Math.max(pos, scrollMin));
 		if (horizontal) innerPane.setTranslateX(-scroll);
@@ -142,6 +164,9 @@ public class RollerScrollPane extends AnchorPane {
 
 	private boolean isVisible = false;
 
+	/**
+	 * Show or hide the buttons as required.
+	 * */
 	private void showHideButtons() {
 		final Bounds vp = viewPane.getBoundsInParent();
 		final Bounds cn = innerPane.getBoundsInLocal();
@@ -172,6 +197,10 @@ public class RollerScrollPane extends AnchorPane {
 
 	private ScrollAnimation animation = null;
 
+	/**
+	 * Handle the mouse down event.
+	 * @param back scroll backwards
+	 * */
 	private void mouseDown(final boolean back) {
 		if (animation == null) {
 			// start the scrolling animation
@@ -180,6 +209,9 @@ public class RollerScrollPane extends AnchorPane {
 		}
 	}
 
+	/**
+	 * Handle the mouse up event.
+	 * */
 	private void mouseUp() {
 		if (animation != null) {
 			animation.pause();
@@ -187,6 +219,9 @@ public class RollerScrollPane extends AnchorPane {
 		}
 	}
 
+	/**
+	 * A Transition for scrolling.
+	 * */
 	private class ScrollAnimation extends Transition {
 		private final static double SCROLL_SPEED = 180;
 
@@ -194,6 +229,9 @@ public class RollerScrollPane extends AnchorPane {
 		final double start;
 		final boolean back;
 
+		/**
+		 * @param back true to scroll backwards, otherwise scroll forwards
+		 * */
 		public ScrollAnimation(final boolean back) {
 			this.back = back;
 			this.setInterpolator(Interpolator.LINEAR);

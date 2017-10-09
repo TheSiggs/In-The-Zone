@@ -20,8 +20,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javafx.scene.image.Image;
@@ -42,6 +44,16 @@ public class GameDataFactory implements HasJSONRepresentation {
 	private final boolean updateCache;
 
 	private JSONObject json = null;
+
+	private final Set<Runnable> updateWatchers = new HashSet<>();
+
+	public void addUpdateWatcher(final Runnable update) {
+		updateWatchers.add(update);
+	}
+
+	public void removeUpdateWatcher(final Runnable update) {
+		updateWatchers.remove(update);
+	}
 
 	public GameDataFactory(final Optional<File> baseDir, boolean useInternal)
 		throws IOException, CorruptDataException
@@ -107,6 +119,8 @@ public class GameDataFactory implements HasJSONRepresentation {
 				throw new CorruptDataException("IO error writing back to cache", e);
 			}
 		}
+
+		for (final Runnable r : updateWatchers) r.run();
 	}
 
 	private void loadGameData(final JSONObject json) throws CorruptDataException {
@@ -175,7 +189,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 		return stages.values();
 	}
 
-	public int getPriorityLevel(String l) {
+	public int getPriorityLevel(final String l) {
 		return globalLibrary.priorities.indexOf(l);
 	}
 

@@ -10,6 +10,9 @@ import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
+/**
+ * The selected character is to use an item.
+ * */
 public class ModeTargetItem extends Mode {
 	private final CharacterFrozen selectedCharacter;
 

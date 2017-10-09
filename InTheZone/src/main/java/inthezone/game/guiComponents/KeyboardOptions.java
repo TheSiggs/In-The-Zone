@@ -58,6 +58,9 @@ public class KeyboardOptions extends DialogPane {
 		return node;
 	}
 
+	/**
+	 * @param config the client configuration
+	 * */
 	public KeyboardOptions(final ClientConfig config) {
 		this.setId("keyboard");
 
@@ -128,6 +131,10 @@ public class KeyboardOptions extends DialogPane {
 	private final Map<KeyBinding, KeyField> primaries = new HashMap<>();
 	private final Map<KeyBinding, KeyField> secondaries = new HashMap<>();
 
+	/**
+	 * Initialise this keybindings dialog.
+	 * @param table the initial KeyBindingTable
+	 * */
 	private void initialize(final KeyBindingTable table) {
 		resultTable.loadBindings(table);
 		bindings.getChildren().clear();
@@ -172,6 +179,14 @@ public class KeyboardOptions extends DialogPane {
 		}
 	}
 
+	/**
+	 * Bind a key to a new action.
+	 * @param key the key combination to bind
+	 * @param action the action to bind it to
+	 * @param field the KeyField that started the rebinding operation
+	 * @param isPrimary true if this is a primary key, otherwise it is a
+	 * secondary key
+	 * */
 	private void rebindKey(
 		final KeyCodeCombination key,
 		final KeyBinding action,
@@ -205,6 +220,13 @@ public class KeyboardOptions extends DialogPane {
 		}
 	}
 
+	/**
+	 * Bind a key to a new action (assuming there are no conflicts).
+	 * @param key the key combination to bind
+	 * @param action the action to bind it to
+	 * @param isPrimary true if this is a primary key, otherwise it is a
+	 * secondary key
+	 * */
 	private void actuallyRebindKey(
 		final KeyCodeCombination key,
 		final KeyBinding action,

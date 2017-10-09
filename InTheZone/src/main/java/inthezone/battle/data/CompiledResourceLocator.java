@@ -17,26 +17,28 @@ import org.json.JSONObject;
 public class CompiledResourceLocator implements ResourceLocator {
 	private final Optional<File> gameDataCacheDir;
 
-	public CompiledResourceLocator(Optional<File> gameDataCacheDir) {
+	public CompiledResourceLocator(final Optional<File> gameDataCacheDir) {
 		this.gameDataCacheDir = gameDataCacheDir;
 	}
 
 	@Override
-	public InputStream gfx(String file) throws IOException {
-		InputStream r = this.getClass().getResourceAsStream("/gamedata/gfx/" + file);
+	public InputStream gfx(final String file) throws IOException {
+		final InputStream r =
+			this.getClass().getResourceAsStream("/gamedata/gfx/" + file);
 		if (r != null) return r; else
 			throw new FileNotFoundException("Missing gfx resource " + file);
 	}
 
 	@Override
-	public InputStream sfx(String file) throws IOException {
-		InputStream r = this.getClass().getResourceAsStream("/gamedata/sfx/" + file);
+	public InputStream sfx(final String file) throws IOException {
+		final InputStream r =
+			this.getClass().getResourceAsStream("/gamedata/sfx/" + file);
 		if (r != null) return r; else
 			throw new FileNotFoundException("Missing sfx resource " + file);
 	}
 
-	private int getStreamVersionNumber(InputStream s) {
-		try (BufferedReader in =
+	private int getStreamVersionNumber(final InputStream s) {
+		try (final BufferedReader in =
 			new BufferedReader(new InputStreamReader(s, "UTF-8"))
 		) {
 			if (in == null) return 0;
@@ -47,12 +49,12 @@ public class CompiledResourceLocator implements ResourceLocator {
 
 			return (new JSONObject(raw.toString())).optInt("versionNumber", 0);
 
-		} catch (JSONException|IOException e) {
+		} catch (final JSONException|IOException e) {
 			return 0;
 		}
 	}
 
-	private void copyGameData(File gameDataFile) throws IOException {
+	private void copyGameData(final File gameDataFile) throws IOException {
 		final File cache = gameDataCacheDir.get();
 		// copy the compiled-in version to make a new cached version
 		if (!cache.exists()) cache.mkdir();
@@ -87,14 +89,16 @@ public class CompiledResourceLocator implements ResourceLocator {
 	}
 
 	public InputStream internalGameData() throws IOException {
-		InputStream r = this.getClass().getResourceAsStream("/gamedata/game_data.json");
+		final InputStream r =
+			this.getClass().getResourceAsStream("/gamedata/game_data.json");
 		if (r != null) return r; else
 			throw new FileNotFoundException("Missing internal game data");
 	}
 
 	@Override
 	public InputStream globalLibrary() throws IOException {
-		InputStream r = this.getClass().getResourceAsStream(globalLibraryFilename());
+		final InputStream r =
+			this.getClass().getResourceAsStream(globalLibraryFilename());
 		if (r != null) return r; else
 			throw new FileNotFoundException("Missing global library");
 	}

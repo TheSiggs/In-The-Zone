@@ -15,6 +15,9 @@ import java.util.Optional;
 import inthezone.Log;
 import inthezone.battle.data.GameDataFactory;
 
+/**
+ * The game server
+ * */
 public class Server {
 	public static final int DEFAULT_BACKLOG = 10;
 	public static final int DEFAULT_MAXCLIENTS = 1000;

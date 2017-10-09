@@ -101,7 +101,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 		loadoutsWrapper.viewportBoundsProperty().addListener(v -> adjustScrollbar());
 		loadouts.boundsInLocalProperty().addListener(v -> adjustScrollbar());
 
-		for (Loadout l : parent.config.loadouts) {
+		for (final Loadout l : parent.config.loadouts) {
 			loadouts.getChildren().add(new LoadoutFrame(
 				parent, this, Optional.of(l), modalDialog));
 		}
@@ -271,7 +271,7 @@ class LoadoutFrame extends VBox {
 		if (this.mloadout.isPresent()) {
 			final HBox characters = new HBox();
 			characters.setMaxWidth(frameW);
-			for (CharacterProfile c : this.mloadout.get().characters) {
+			for (final CharacterProfile c : this.mloadout.get().characters) {
 				final StackPane wrapper = new StackPane();
 				wrapper.setMinWidth(100);
 				final ImageView img =

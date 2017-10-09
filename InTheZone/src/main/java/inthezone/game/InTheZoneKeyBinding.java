@@ -5,6 +5,9 @@ import isogame.engine.KeyBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Key binding end points.
+ * */
 public final class InTheZoneKeyBinding extends KeyBinding {
 	public static final KeyBinding altpath =
 		new InTheZoneKeyBinding("Alternative path", false);

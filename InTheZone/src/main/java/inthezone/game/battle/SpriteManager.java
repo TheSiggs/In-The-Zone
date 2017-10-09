@@ -54,6 +54,13 @@ public class SpriteManager {
 	private final Tooltip destructibleObjectTooltip2 =
 		new Tooltip("A destructible obstacle, can be destroyed in 1 hit");
 
+	/**
+	 * @param view a reference back to the BattleView
+	 * @param sprites the initial set of sprites to manage
+	 * @param standardSprites the standard sprites (icons etc.)
+	 * @param onAnimationsFinished a handler for when all the animations in a
+	 * series are finished
+	 * */
 	public SpriteManager(
 		final BattleView view, final Collection<Sprite> sprites,
 		final StandardSprites standardSprites,
@@ -84,6 +91,7 @@ public class SpriteManager {
 
 	/**
 	 * Get a character by its id.
+	 * @param id the id of the character to get.
 	 * */
 	public CharacterFrozen getCharacterById(final int id) {
 		return characters.get(id);
@@ -91,6 +99,7 @@ public class SpriteManager {
 
 	/**
 	 * Get a character by its position.
+	 * @param p the location of the character to get
 	 * */
 	public Optional<CharacterFrozen> getCharacterAt(final MapPoint p) {
 		return characters.values().stream()
@@ -99,6 +108,8 @@ public class SpriteManager {
 
 	/**
 	 * Schedule a teleport operation.
+	 * @param a the character to teleport
+	 * @param t the teleport target square
 	 * */
 	public void scheduleTeleport(final CharacterFrozen a, final MapPoint t) {
 		final int id = a.getId();
@@ -112,6 +123,10 @@ public class SpriteManager {
 
 	/**
 	 * Schedule a movement operation.
+	 * @param animation the name of the animation to play
+	 * @param speed the speed of the animation
+	 * @param path the path to follow
+	 * @param affected the character to move
 	 * */
 	public void scheduleMovement(
 		final String animation,
@@ -140,6 +155,9 @@ public class SpriteManager {
 		spritesInMotion += 1;
 	}
 
+	/**
+	 * Update the selection status in the UI.
+	 * */
 	public void updateSelectionStatus() {
 		final int selectedId =
 			view.getSelectedCharacter().map(c -> c.getId()).orElse(-1);
@@ -148,6 +166,10 @@ public class SpriteManager {
 		}
 	}
 
+	/**
+	 * Create a tooltip for a character
+	 * @param c the character to get the tooltip for
+	 * */
 	private Tooltip characterTooltip(final CharacterFrozen c) {
 		final StringBuilder out = new StringBuilder();
 		out.append(c.getName());
@@ -174,6 +196,7 @@ public class SpriteManager {
 
 	/**
 	 * Update the character models.
+	 * @param characters the characters to update
 	 * */
 	public void updateCharacters(
 		final List<? extends TargetableFrozen> characters
@@ -238,6 +261,9 @@ public class SpriteManager {
 		handleTemporaryImmobileObjects(characters);
 	}
 
+	/**
+	 * Get a tooltip for a mana zone.
+	 * */
 	public static Tooltip getManaZoneTooltip() {
 		final Tooltip tt = new Tooltip("Mana zone." +
 			"  Put your characters on mana zones for an extra power boost");
@@ -246,6 +272,9 @@ public class SpriteManager {
 		return tt;
 	}
 
+	/**
+	 * Handle other battle objects that are not characters.
+	 * */
 	private void handleTemporaryImmobileObjects(
 		final Collection<? extends TargetableFrozen> tios
 	) {

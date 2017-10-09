@@ -13,7 +13,10 @@ public class MultiTargetAssistant extends HBox {
 	private final Label message = new Label("");
 	private final Button done = new Button("done");
 
-	public MultiTargetAssistant(BattleView view) {
+	/**
+	 * @param view a reference back to the BattleView
+	 * */
+	public MultiTargetAssistant(final BattleView view) {
 		super();
 
 		this.setAlignment(Pos.CENTER);

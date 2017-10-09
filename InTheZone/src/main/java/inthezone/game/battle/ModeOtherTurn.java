@@ -6,6 +6,9 @@ import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.Player;
 import isogame.engine.SelectionInfo;
 
+/**
+ * It is the other player's turn.
+ * */
 public class ModeOtherTurn extends Mode {
 	public ModeOtherTurn(final BattleView view) {
 		super(view);

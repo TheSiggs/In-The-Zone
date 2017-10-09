@@ -12,6 +12,9 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
+/**
+ * A field for entering key bindings.
+ * */
 public class KeyField extends TextField {
 	private final Set<KeyCode> invalidKeys = new HashSet<>();
 
@@ -20,6 +23,9 @@ public class KeyField extends TextField {
 	
 	private Optional<KeyCodeCombination> previousValue = Optional.empty();
 
+	/**
+	 * @param key the initial key to display
+	 * */
 	public KeyField(final Optional<KeyCodeCombination> key) {
 		invalidKeys.add(KeyCode.ESCAPE);
 		invalidKeys.add(KeyCode.ENTER);

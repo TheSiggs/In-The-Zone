@@ -16,6 +16,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.StringConverter;
 
+/**
+ * A control which allows the user to select from a set of elements by swiping
+ * left and right.  It's circular so there is no start or end (scroll left from
+ * the start and you wrap around to the end).
+ * */
 public class RollingChoiceBox<T> extends Group {
 	private final HBox root = new HBox();
 	private final ComboBox<T> choice;
@@ -26,11 +31,17 @@ public class RollingChoiceBox<T> extends Group {
 		this(new ComboBox<>());
 	}
 
-	public RollingChoiceBox(ObservableList<T> items) {
+	/**
+	 * @param items the items the user can select from
+	 * */
+	public RollingChoiceBox(final ObservableList<T> items) {
 		this(new ComboBox<>(items));
 	}
 
-	private RollingChoiceBox(ComboBox<T> choice) {
+	/**
+	 * @param choice the backing ComboBox
+	 * */
+	private RollingChoiceBox(final ComboBox<T> choice) {
 		this.choice = choice;
 		choice.setButtonCell(null);
 		choice.setMaxWidth(Double.MAX_VALUE);
@@ -113,6 +124,9 @@ public class RollingChoiceBox<T> extends Group {
 	}
 }
 
+/**
+ * A list cell where the label is centred in the cell.
+ * */
 class CenteredListCell<T> extends ListCell<T> {
 	public CenteredListCell() {
 		this.setMaxWidth(Double.MAX_VALUE);

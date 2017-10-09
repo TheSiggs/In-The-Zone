@@ -87,6 +87,9 @@ public class ModalDialog extends Group {
 		nextDialog();
 	}
 
+	/**
+	 * Get the next dialog in the queue.
+	 * */
 	private void nextDialog() {
 		if (!isShowing()) {
 			currentDialog = Optional.ofNullable(nextDialog.poll());
@@ -120,6 +123,10 @@ public class ModalDialog extends Group {
 		});
 	}
 
+	/**
+	 * Simulate pressing a button.
+	 * @param b the button to simulate.
+	 * */
 	private void pressButton(final ButtonType b) {
 		currentDialog.ifPresent(pane -> {
 			final Node n = pane.lookupButton(b);
@@ -153,6 +160,8 @@ public class ModalDialog extends Group {
 
 	/**
 	 * Show an error dialog now.
+	 * @param e the error
+	 * @param header a message to show in the header area
 	 * */
 	public void showError(final Exception e, final String header) {
 		showError(e, header, () -> {});
@@ -160,6 +169,9 @@ public class ModalDialog extends Group {
 
 	/**
 	 * Show an error dialog now, with a custom continuation.
+	 * @param e the error to show
+	 * @param header a message to show in the header area
+	 * @param k the continuation.
 	 * */
 	public void showError(
 		final Exception e, final String header, final Runnable k
@@ -177,6 +189,7 @@ public class ModalDialog extends Group {
 
 	/**
 	 * Show a message dialog now.
+	 * @param message the message to show
 	 * */
 	public void showMessage(final String message) {
 		final DialogPane dialog = new DialogPane();
@@ -193,6 +206,9 @@ public class ModalDialog extends Group {
 	/**
 	 * Show a confirmation dialog now.  The confirmation dialog has ButtonType.NO
 	 * and ButtonType.YES.
+	 * @param prompt the prompt
+	 * @param message a message to show in the header
+	 * @param k the continuation
 	 * */
 	public void showConfirmation(
 		final String prompt, final String message, final Consumer<ButtonType> k

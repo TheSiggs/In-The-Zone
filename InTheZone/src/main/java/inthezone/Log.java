@@ -4,6 +4,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * A really simple logger.  Logs everything to System.err.
+ * */
 public class Log {
 	public static void trace(final String message, final Throwable e) {
 		log("TRACE", message, e);

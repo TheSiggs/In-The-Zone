@@ -8,6 +8,9 @@ import java.io.InputStreamReader;
 
 import inthezone.Log;
 
+/**
+ * A thread which monitors a pipe listening for management commands.
+ * */
 public class CommandThread implements Runnable {
 	private final File commandPipe;
 
@@ -25,6 +28,7 @@ public class CommandThread implements Runnable {
 			for (String ln = in.readLine(); ln != null; ln = in.readLine()) {
 				final String line = ln.trim().toLowerCase();
 				if (line.equals("terminate")) {
+					// The terminate command
 					Log.info("Terminate message received, shutting down now", null);
 					System.exit(3);
 				} else {

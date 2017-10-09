@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 
+/**
+ * An asynchronous channel for Messages.
+ * */
 public class MessageChannel {
 	private final SocketChannel channel;
 	private SelectionKey skey;
@@ -29,7 +32,14 @@ public class MessageChannel {
 	private final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
 	private final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
 
-	public MessageChannel(SocketChannel channel, Selector sel, Object key)
+	/**
+	 * @param channel the underlying SocketChannel
+	 * @param sel the Selector for non-blocking IO
+	 * @param key the selector key for this channel
+	 * */
+	public MessageChannel(
+		final SocketChannel channel, final Selector sel, final Object key
+	)
 		throws IOException, ClosedChannelException
 	{
 		this.channel = channel;
@@ -41,26 +51,43 @@ public class MessageChannel {
 		decoder.reset();
 	}
 
-	public void resetSelector(Selector sel, Object key)
+	/**
+	 * Reset the selector key to read only mode.  Call after all send operations
+	 * are complete.
+	 * @param sel the Selector for non-blocking IO
+	 * @param key the selector key for this channel.
+	 * */
+	public void resetSelector(final Selector sel, final Object key)
 		throws ClosedChannelException
 	{
 		this.skey = channel.register(sel, SelectionKey.OP_READ, key);
 	}
 
-	public void affiliate(Object key) {
+	/**
+	 * Associate this channel with a new selector key.
+	 * */
+	public void affiliate(final Object key) {
 		skey.attach(key);
 	}
 
-	public void requestSend(Message msg) {
+	/**
+	 * Request to send a message.  The message will be send when the channel is
+	 * ready for writing.
+	 * */
+	public void requestSend(final Message msg) {
 		skey.interestOps(skey.interestOps() | SelectionKey.OP_WRITE);
 		sendQueue.add(new SendState(CharBuffer.wrap(msg.toString())));
 	}
 
 	/**
-	 * IOExceptions are not recoverable, so the connection should be terminated.
+	 * Read messages (non-blocking).
+	 * @return As many complete messages as can be read without blocking.
+	 * Incomplete messages may be left in the buffer until the next call to
+	 * doRead.
+	 * @throws IOException not recoverable. The connection should be terminated.
 	 * */
 	public List<Message> doRead() throws IOException, ProtocolException {
-		int n = channel.read(recBuffer);
+		final int n = channel.read(recBuffer);
 		if (n == -1) {
 			channel.close();
 			recBuffer.clear();
@@ -74,7 +101,7 @@ public class MessageChannel {
 
 		recBuffer.flip();
 		msgBuffer.mark();
-		CoderResult r = decoder.decode(recBuffer, msgBuffer, false);
+		final CoderResult r = decoder.decode(recBuffer, msgBuffer, false);
 		recBuffer.compact();
 
 		if (r.isOverflow()) {
@@ -83,7 +110,7 @@ public class MessageChannel {
 			throw new IOException("Character set error (please use UTF-8)");
 		}
 
-		List<Message> msgs = new LinkedList<>();
+		final List<Message> msgs = new LinkedList<>();
 		Optional<Message> msg = readMessage(msgBuffer);
 		while (msg.isPresent()) {
 			msgs.add(msg.get());
@@ -103,7 +130,7 @@ public class MessageChannel {
 	 *
 	 * Assumes the limit is equal to the capacity.
 	 * */
-	private Optional<Message> readMessage(CharBuffer msgBuffer)
+	private Optional<Message> readMessage(final CharBuffer msgBuffer)
 		throws ProtocolException
 	{
 		String msg = null;
@@ -125,12 +152,15 @@ public class MessageChannel {
 			msgBuffer.limit(msgBuffer.capacity());
 			return Optional.empty();
 		} else {
-			int t = msgBuffer.position();
+			final int t = msgBuffer.position();
 			msgBuffer.position(0).mark().position(t);
 			return Optional.of(Message.fromString(msg));
 		}
 	}
 
+	/**
+	 * Write as many of the buffered messages as possible without blocking.
+	 * */
 	public void doWrite() throws IOException {
 		// write as many messages as possible to the send buffer.
 		while (writeMessage());
@@ -152,10 +182,10 @@ public class MessageChannel {
 		if (sendQueue.isEmpty()) return false;
 
 		boolean moreToWrite = false;
-		SendState sending = sendQueue.element();
+		final SendState sending = sendQueue.element();
 
 		if (sending.doEncode) {
-			CoderResult r = encoder.encode(sending.buffer, sndBuffer, false);
+			final CoderResult r = encoder.encode(sending.buffer, sndBuffer, false);
 			if (r.isUnderflow()) {
 				moreToWrite = true;
 				sending.doEncode = false;
@@ -166,7 +196,7 @@ public class MessageChannel {
 		}
 
 		if (sending.doFinalEncode) {
-			CoderResult r = encoder.encode(sending.buffer, sndBuffer, true);
+			final CoderResult r = encoder.encode(sending.buffer, sndBuffer, true);
 			if (r.isUnderflow()) {
 				moreToWrite = true;
 				sending.doFinalEncode = false;
@@ -177,7 +207,7 @@ public class MessageChannel {
 		}
 
 		if (sending.doFlush) {
-			CoderResult r = encoder.flush(sndBuffer);
+			final CoderResult r = encoder.flush(sndBuffer);
 			if (r.isUnderflow()) {
 				moreToWrite = true;
 				sending.doFlush = false;
@@ -193,13 +223,16 @@ public class MessageChannel {
 }
 
 
+/**
+ * The state of the sending channel.
+ * */
 class SendState {
 	public final CharBuffer buffer;
 	public boolean doEncode = true;
 	public boolean doFinalEncode = false;
 	public boolean doFlush = false;
 
-	public SendState(CharBuffer buffer) {
+	public SendState(final CharBuffer buffer) {
 		this.buffer = buffer;
 	}
 }

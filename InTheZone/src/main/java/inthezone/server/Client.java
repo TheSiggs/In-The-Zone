@@ -29,6 +29,9 @@ import inthezone.protocol.MessageKind;
 import inthezone.protocol.Protocol;
 import inthezone.protocol.ProtocolException;
 
+/**
+ * A connection to a game client.
+ * */
 public class Client {
 	public static final int MAX_CHALLENGES = 5;
 	public static final long DISCONNECTION_TIMEOUT_MILLIS = 30 * 1000;
@@ -70,6 +73,16 @@ public class Client {
 		return (!name.matches(".*(/|\\\\|>|<|\"|\\p{IsControl}).*"));
 	}
 
+	/**
+	 * @param serverName the name of this server
+	 * @param connection the connection to this client
+	 * @param sel the Selector for multiplexing non-blocking IO
+	 * @param namedClients the logged in clients list
+	 * @param pendingClients the clients that aren't logged in yet
+	 * @param sessions all the open sessions
+	 * @param gameQueue the game queue
+	 * @param dataFactory the game data
+	 * */
 	public Client(
 		final String serverName,
 		final SocketChannel connection,
@@ -98,10 +111,17 @@ public class Client {
 			Protocol.PROTOCOL_VERSION, dataFactory.getVersion(), sessionKey, serverName));
 	}
 
+	/**
+	 * Reset the connection to read only mode.  Called after a write is
+	 * completed.
+	 * */
 	public void resetSelector(final Selector sel) throws IOException {
 		channel.resetSelector(sel, this);
 	}
 
+	/**
+	 * Get the name of this client (or a default value).
+	 * */
 	public String getClientName() { return name.orElse("<UNNAMED CLIENT>"); }
 
 	/**
@@ -193,14 +213,14 @@ public class Client {
 	}
 
 	/**
-	 * Is the connection to this client open
+	 * Is the connection to this client open?
 	 * */
 	public boolean isConnected() {
 		return connection.isOpen();
 	}
 
 	/**
-	 * Is the client in the disconnected state
+	 * Is the client in the disconnected state?
 	 * */
 	public boolean isDisconnected() {
 		return state == ClientState.DISCONNECTED;
@@ -213,6 +233,7 @@ public class Client {
 
 	/**
 	 * Some other player leaves the lobby, i.e. disconnects from the server.
+	 * @param client the client that left the lobby
 	 * */
 	public void leftLobby(final Client client) throws ProtocolException {
 		if (!isConnected()) return;
@@ -223,6 +244,7 @@ public class Client {
 
 	/**
 	 * Some other player enters the lobby.
+	 * @param client the client that entered the lobby
 	 * */
 	public void enteredLobby(final Client client) throws ProtocolException {
 		if (!isConnected()) return;
@@ -233,6 +255,7 @@ public class Client {
 	/**
 	 * Some other client has entered a game (and so isn't available for
 	 * challenges).
+	 * @param client the client that entered a game.
 	 * */
 	public void enteredGame(final Client client) throws ProtocolException {
 		if (!isConnected()) return;
@@ -242,6 +265,8 @@ public class Client {
 
 	/**
 	 * Begin a game with another client.
+	 * @param client the client to start a game with
+	 * @param game the game to start
 	 * */
 	public void startGameWith(final Client client, final Game game) {
 		Log.info(getClientName() +
@@ -270,6 +295,7 @@ public class Client {
 
 	/**
 	 * A challenge made to this client is cancelled.
+	 * @param the client that made the challenge we are cancelling
 	 * */
 	public void challengeCancelled(final Client client) {
 		Log.info("A challenge made by " +
@@ -297,6 +323,7 @@ public class Client {
 
 	/**
 	 * Return true if matchmaking is allowed, false otherwise
+	 * @param other the client to make a match with
 	 * @param rq the start battle request from the other player
 	 * */
 	public boolean makeMatch(
@@ -328,6 +355,10 @@ public class Client {
 		}
 	}
 
+	/**
+	 * Make a match with another player (for the game queue).
+	 * @param rq The command request to match
+	 * */
 	public Optional<StartBattleCommand> completeMatch(
 		final StartBattleCommandRequest rq
 	) throws CorruptDataException {
@@ -363,6 +394,7 @@ public class Client {
 
 	/**
 	 * Forward a message on to this client.
+	 * @param msg the message to forward
 	 * */
 	public void forwardMessage(final Message msg) throws ProtocolException {
 		msg.setSequenceNumber(seq++);
@@ -375,6 +407,8 @@ public class Client {
 
 	/**
 	 * Replay all messages that came after the provided sequence number.
+	 * @param lastSequenceNumber the sequence number of the last message that was
+	 * successfully processed
 	 * */
 	public void replayMessagesFrom(final int lastSequenceNumber) {
 		for (final Message m : messages) {
@@ -445,6 +479,10 @@ public class Client {
 
 	/**
 	 * Attempt to reconnect this client
+	 * @param connection the new connection
+	 * @param channel the new channel
+	 * @param lastSequenceNumber the sequence number of the last message that was
+	 * completely processed
 	 * */
 	public void reconnect(
 		final SocketChannel connection,
@@ -476,6 +514,7 @@ public class Client {
 
 	/**
 	 * Process the next message, which may result in a state change.
+	 * @param msg the message to process
 	 * */
 	private void doNextMessage(final Message msg) throws ProtocolException {
 		if (msg.kind == MessageKind.LOGOFF) {
@@ -643,6 +682,7 @@ public class Client {
 
 	/**
 	 * This client challenges another client
+	 * @param msg the message that triggered the challenge
 	 * @param client The client to challenge
 	 * */
 	private void doChallenge(final Message msg, final Client client)
@@ -700,7 +740,8 @@ public class Client {
 
 	/**
 	 * Reject a challenge from another client
-	 * @param client The client who's challenge we are rejecting
+	 * @param msg the message that triggered the rejection
+	 * @param client the client who's challenge we are rejecting
 	 * */
 	private void doRejectChallenge(final Message msg, final	Client client)
 		throws ProtocolException
@@ -723,7 +764,9 @@ public class Client {
 	}
 
 	/**
-	 * @param client The client to start the battle with
+	 * Accept a challenge from another client.
+	 * @param msg the message that triggered the accept
+	 * @param client the client to start the battle with
 	 * */
 	private void doAcceptChallenge(final Message msg, final Client client)
 		throws ProtocolException
@@ -758,6 +801,11 @@ public class Client {
 
 	/**
 	 * Start a battle with another client.
+	 * @param other the other client
+	 * @param cmd the StartBattleCommand
+	 * @param thisPlayer this player
+	 * @param thatPlayer the other player
+	 * @param fromQueue true if this game was started from the game queue
 	 * */
 	private void doStartBattle(
 		final Client other,
@@ -788,6 +836,7 @@ public class Client {
 
 	/**
 	 * Enter the game queue.
+	 * @param vetoMaps a list of maps that this client doesn't want to play
 	 * */
 	private void doEnterQueue(final List<String> vetoMaps) {
 		state = ClientState.QUEUE;
@@ -862,6 +911,7 @@ public class Client {
 
 	/**
 	 * Accept a game from the queue.
+	 * @param msg the message that triggered the accept
 	 * */
 	public void doAcceptQueueGame(final Message msg) throws ProtocolException {
 		try {

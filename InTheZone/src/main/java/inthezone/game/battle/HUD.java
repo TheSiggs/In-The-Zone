@@ -19,6 +19,9 @@ import inthezone.battle.data.AbilityDescription;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 
+/**
+ * Common HUD components.
+ * */
 public abstract class HUD extends AnchorPane {
 	protected final MessageLine messageLine = new MessageLine();
 
@@ -34,6 +37,10 @@ public abstract class HUD extends AnchorPane {
 	protected final Map<Integer, CharacterInfoBox> characters = new HashMap<>();
 	protected final StandardSprites sprites;
 
+	/**
+	 * @param view a reference back to the BattleView
+	 * @param sprites the standard sprites (icons etc.)
+	 * */
 	protected HUD(final BattleView view, final StandardSprites sprites) {
 		this.view = view;
 		this.sprites = sprites;
@@ -46,26 +53,44 @@ public abstract class HUD extends AnchorPane {
 		potionItem.setButtonAction(() -> view.useItem());
 	}
 
+	/**
+	 * Notify a new round starting.
+	 * */
 	public final void notifyRound() {
 		roundCounter.increment();
 		if (view.isMyTurn.get()) notifyTurn();
 		else notifyOtherTurn();
 	}
 
-	protected void notifyTurn() {
-	}
+	/**
+	 * Notify the player's turn starting.
+	 * */
+	protected void notifyTurn() {}
 
-	protected void notifyOtherTurn() {
-	}
+	/**
+	 * Notify the other player's turn starting.
+	 * */
+	protected void notifyOtherTurn() {}
 
+	/**
+	 * Notify fatigue damage.
+	 * */
 	public final void notifyFatigue() {
 		roundCounter.setFatigue();
 	}
 
+	/**
+	 * Write a message to the HUD.
+	 * @param message the message to write
+	 * */
 	public final void writeMessage(final String message) {
 		messageLine.writeMessage(message);
 	}
 
+	/**
+	 * Select a character
+	 * @param oc the character to select, or Optional.empty() to clear selection
+	 * */
 	public final void selectCharacter(final Optional<CharacterFrozen> oc) {
 		final int id = oc.map(c -> c.getId()).orElse(-1);
 		oc.ifPresent(c -> updateAbilities(c, c.hasMana()));
@@ -74,19 +99,45 @@ public abstract class HUD extends AnchorPane {
 			box.setSelected(box.id == id);
 	}
 
+	/**
+	 * Handle a key binding.
+	 * */
 	public abstract void handleKey(final KeyBinding binding);
 
+	/**
+	 * A modal dialog starts.
+	 * */
 	public void modalStart() { disableUI.set(true); }
+
+	/**
+	 * A modal dialog ends.
+	 * */
 	public void modalEnd() { disableUI.set(false); }
 
 	/**
 	 * Switch to battle end mode.
+	 * @param outcome the outcome of the battle.
 	 * */
 	public abstract void doEndMode(final BattleOutcome outcome);
+
+	/**
+	 * Go into reconnect mode.
+	 * */
 	public abstract void doReconnectMode(final boolean thisClientReconnecting);
+
+	/**
+	 * End reconnect mode.
+	 * */
 	public abstract void endReconnectMode();
 
-	public final void updateAbilities(final CharacterFrozen c, final boolean mana) {
+	/**
+	 * Update the abilities list for a character
+	 * @param c a new copy of the character to update
+	 * @param mana true if this character is on a mana zone, otherwise false
+	 * */
+	public final void updateAbilities(
+		final CharacterFrozen c, final boolean mana
+	) {
 		final Ability basicAbility =
 			mana ? c.getBasicAbility().getMana() : c.getBasicAbility();
 
@@ -123,6 +174,10 @@ public abstract class HUD extends AnchorPane {
 		}
 	}
 
+	/**
+	 * Initialise the HUD
+	 * @param character all the characters that appear in the HUD.
+	 * */
 	public void init(final Collection<CharacterFrozen> characters) {
 		for (final CharacterFrozen c : characters) {
 			if (c.getPlayer() != view.player && view.player != Player.PLAYER_OBSERVER)

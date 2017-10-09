@@ -30,6 +30,7 @@ public abstract class Mode {
 
 	/**
 	 * Some properties of the selected character have changed.
+	 * @param selected the selected character
 	 * */
 	public Mode updateSelectedCharacter(final CharacterFrozen selected) {
 		return this;
@@ -37,6 +38,7 @@ public abstract class Mode {
 
 	/**
 	 * Register retargeting information.
+	 * @param retargeting the retargeting information
 	 * */
 	public Mode retarget(final Map<MapPoint, MapPoint> retargeting) {
 		return this;
@@ -44,30 +46,56 @@ public abstract class Mode {
 
 	/**
 	 * An animation is complete.
-	 * @param affected The targetables affected by the animation.
 	 * */
 	public Mode animationDone() {
 		throw new RuntimeException(
 			"GUI entered an invalid state.  Animation completed but we weren't waiting on any animation");
 	}
 
+	/**
+	 * */
 	public void nextPath() { return; }
 
+	/**
+	 * @return true if this mode permits the user to issue commands, otherwise
+	 * false.
+	 * */
 	public boolean isInteractive() {return true;}
+
+	/**
+	 * Handle a selection event.
+	 * @param selection information about what was selected
+	 * */
 	public void handleSelection(final SelectionInfo selection) {}
+
+	/**
+	 * Handler a mouse over event.
+	 * @param p the point the mouse moved over
+	 * */
 	public void handleMouseOver(final MapPoint p) {}
+
+	/**
+	 * Handle a mouse out event.
+	 * */
 	public void handleMouseOut() {}
+
+	/**
+	 * @return true if this mode can be cancelled, otherwise false
+	 * */
 	public boolean canCancel() {return true;}
 
+	/**
+	 * Get a future value, or Optional.empty() if ther eis an error.
+	 * */
 	public static <T> Optional<T> getFutureWithRetry(final Future<T> f) {
 		while (true) {
 			try {
 				return Optional.of(f.get());
 			} catch (InterruptedException e) {
 				/* ignore */
-			} catch (ExecutionException e) {
+			} catch (final ExecutionException e) {
 				return Optional.empty();
-			} catch (CancellationException e) {
+			} catch (final CancellationException e) {
 				return Optional.empty();
 			} 
 		}

@@ -34,20 +34,33 @@ public class CommandProcessor {
 	private final Queue<ExecutedCommand> commandQueue = new LinkedList<>();
 	private final BattleView view;
 
+	// Set this to true if no more commands are expected until the player issues
+	// another command request
 	private boolean isComplete = false;
 
+	/**
+	 * @param view the BattleView this object is associated with
+	 * */
 	public CommandProcessor(final BattleView view) {
 		this.view = view;
 	}
 
+	/**
+	 * @return true if the command queue is empty, otherwise false
+	 * */
 	public boolean isEmpty() {
 		return commandQueue.isEmpty();
 	}
 
+	/**
+	 * @return true if no more commands are expected until the player issues
+	 * another command, otherwise false.
+	 * */
 	public boolean isComplete() {return isComplete;}
 
 	/**
 	 * Put a command on the queue.
+	 * @param command the command to place on the queue
 	 * */
 	public void queueCommand(final ExecutedCommand command) {
 		commandQueue.add(command);
@@ -156,6 +169,9 @@ public class CommandProcessor {
 	}
 
 	/**
+	 * Handle an instant effect.
+	 * @param effect the instant effect
+	 * @param affectedCharacters the characters affected by the effect
 	 * @return true if a new animation was started.
 	 * */
 	private boolean instantEffect(

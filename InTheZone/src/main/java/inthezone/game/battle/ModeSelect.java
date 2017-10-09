@@ -6,6 +6,9 @@ import java.util.Optional;
 import inthezone.battle.CharacterFrozen;
 import isogame.engine.SelectionInfo;
 
+/**
+ * A character is selected.
+ * */
 public class ModeSelect extends Mode {
 	public ModeSelect(final BattleView view) {
 		super(view);

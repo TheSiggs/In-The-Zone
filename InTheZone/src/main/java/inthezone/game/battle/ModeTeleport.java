@@ -14,6 +14,9 @@ import java.util.Queue;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_PATH;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_TARGET;
 
+/**
+ * The teleport instant effect needs more information.
+ * */
 public class ModeTeleport extends Mode {
 	private final ModeAnimating lastMode;
 	private final Queue<CharacterFrozen> teleportQueue = new LinkedList<>();

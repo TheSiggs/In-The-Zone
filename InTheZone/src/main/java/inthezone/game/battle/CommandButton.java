@@ -11,12 +11,20 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Popup;
 
+/**
+ * One of the buttons for executing commands such as PUSH, POTION, and
+ * abilities.
+ * */
 public class CommandButton extends Button {
 	private final Label description = new Label();
 	private final Popup descriptionWindow = new Popup();
 
 	public final BooleanProperty cannotUseThis = new SimpleBooleanProperty(false);
 
+	/**
+	 * @param icon the icon to display
+	 * @param description the mouse over description
+	 * */
 	public CommandButton(final Image icon, final String description) {
 		super(null, new ImageView(icon));
 
@@ -55,10 +63,17 @@ public class CommandButton extends Button {
 	}
 
 	private Runnable action = () -> {};
+
+	/**
+	 * Set the action for when this button is clicked.
+	 * */
 	public void setButtonAction(final Runnable action) {
 		this.action = action;
 	}
 
+	/**
+	 * Execute the command this button is associated with.
+	 * */
 	public void doCommand() {
 		if (!cannotUseThis.get()) action.run();
 	}

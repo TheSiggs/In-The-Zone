@@ -10,6 +10,9 @@ import java.util.Optional;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_ATTACKAREA;
 import static inthezone.game.battle.Highlighters.HIGHLIGHT_MOVE;
 
+/**
+ * The selected character is to push.
+ * */
 public class ModePush extends Mode {
 	private final CharacterFrozen selectedCharacter;
 

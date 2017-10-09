@@ -10,6 +10,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+/**
+ * Dialog box to confirm if the player really wants to use an ability.  For
+ * abilities that can't be cancelled once they're invoked.
+ * */
 public class AbilityConfirmationDialog extends DialogPane {
 	private final Text text = new Text();
 	private final StackPane textWrapper = new StackPane(text);
@@ -17,6 +21,9 @@ public class AbilityConfirmationDialog extends DialogPane {
 	public final ButtonType confirmButton =
 		new ButtonType("Confirm", ButtonData.OK_DONE);
 	
+	/**
+	 * @param info information about the ability
+	 * */
 	public AbilityConfirmationDialog(final AbilityInfo info) {
 		this.getStylesheets().add("dialogs.css");
 		this.setHeaderText(null);

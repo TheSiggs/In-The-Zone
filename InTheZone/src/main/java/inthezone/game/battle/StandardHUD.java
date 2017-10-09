@@ -28,6 +28,9 @@ import inthezone.game.InTheZoneKeyBinding;
 import inthezone.game.battle.TurnClock;
 import inthezone.game.guiComponents.KeyboardOptions;
 
+/**
+ * The HUD for ordinary games.
+ * */
 public class StandardHUD extends HUD {
 	private final HBox characterInfoBoxes = new HBox();
 	private final Button endTurnButton = new Button("End turn");

@@ -8,6 +8,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 
+/**
+ * A status bar for the CharacterInfoBoxes.
+ * */
 public class StatBar extends StackPane {
 	private final static double WIDTH = 147;
 	private final static double HEIGHT = 20;
@@ -19,7 +22,12 @@ public class StatBar extends StackPane {
 	private int val = 0;
 	private int max = 0;
 
-	public StatBar(String id, boolean hasLabel) {
+	/**
+	 * @param id the JavaFX id for this control
+	 * @param hasLabel true if this StatBar is labelled with it's actual / max
+	 * values
+	 * */
+	public StatBar(final String id, final boolean hasLabel) {
 		this.setId(id);
 		this.getStyleClass().add("statBar");
 		this.setMaxWidth(WIDTH+4);
@@ -42,7 +50,17 @@ public class StatBar extends StackPane {
 		}
 	}
 
-	public void update(String id, int val, int max, boolean infinite) {
+	/**
+	 * Update this StatBar
+	 * @param id the new JavaFX id for this control
+	 * @param val the actual value
+	 * @param max the maximum value
+	 * @param infinite true if this bar is infinite (in which case the max value
+	 * is ignored)
+	 * */
+	public void update(
+		final String id, final int val, final int max, final boolean infinite
+	) {
 		this.setId(id);
 
 		if (val == 0) {

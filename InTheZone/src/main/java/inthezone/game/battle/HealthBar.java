@@ -13,6 +13,9 @@ import javafx.util.Duration;
 import static isogame.GlobalConstants.TILEW;
 import static isogame.GlobalConstants.TILEH;
 
+/**
+ * A healthbar that appears on top of a player.
+ * */
 public class HealthBar extends Group {
 	private int hp = 0;
 	private int maxHP = 0;
@@ -46,6 +49,10 @@ public class HealthBar extends Group {
 		background.setWidth(W - d);
 	}
 
+	/**
+	 * Update the health bar after damage.
+	 * @param damage the amount of damage (perhaps with a + or - sign)
+	 * */
 	private void doDamage(final String damage) {
 		final Text hpChangeLabel = new Text();
 		this.getChildren().add(hpChangeLabel);
@@ -64,6 +71,12 @@ public class HealthBar extends Group {
 		animation.play();
 	}
 
+	/**
+	 * Update HP.
+	 * @param hp the new hp value
+	 * @param maxHP the new maximum hp
+	 * @param cover true if the character has cover, otherwise false
+	 * */
 	public void updateHP(
 		final int hp, final int maxHP, final boolean cover
 	) {

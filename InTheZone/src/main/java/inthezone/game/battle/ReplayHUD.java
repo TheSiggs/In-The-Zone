@@ -18,6 +18,9 @@ import inthezone.battle.CharacterFrozen;
 import inthezone.battle.data.Player;
 import inthezone.battle.data.StandardSprites;
 
+/**
+ * A HUD for replaying recorded games.
+ * */
 public class ReplayHUD extends HUD {
 	@Override public void doEndMode(final BattleOutcome outcome) {
 		System.err.println("End mode");

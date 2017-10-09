@@ -7,6 +7,9 @@ import javafx.animation.Timeline;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
+/**
+ * The HUD message line
+ * */
 public class MessageLine extends Label {
 	private final Timeline animation = new Timeline();
 
@@ -18,7 +21,11 @@ public class MessageLine extends Label {
 		this.getStyleClass().add("message-line");
 	}
 
-	public void writeMessage(String message) {
+	/**
+	 * Write a message.
+	 * @param message the message to write
+	 * */
+	public void writeMessage(final String message) {
 		this.setText(message);
 		animation.stop();
 

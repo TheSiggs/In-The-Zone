@@ -16,6 +16,9 @@ import javafx.stage.Stage;
 import inthezone.battle.data.GameDataFactory;
 import inthezone.comptroller.Network;
 
+/**
+ * The main class for the game client.
+ * */
 public class Game extends Application {
 	/* TODO: find a way to set these from the build system */
 	private final static boolean IS_DEVEL_BUILD = true;
@@ -31,8 +34,12 @@ public class Game extends Application {
 
 	private boolean inGlobalExceptionHandler = false;
 
-	@Override
-	public void start(final Stage primaryStage) {
+	/**
+	 * JavaFX entry point.
+	 * */
+	@Override public void start(final Stage primaryStage) {
+
+		// Create a handler for unexpected exceptions.
 		Thread.currentThread().setUncaughtExceptionHandler((thread, e) -> {
 			if (inGlobalExceptionHandler) {
 				/* Double fault, hard terminate */
@@ -105,8 +112,8 @@ public class Game extends Application {
 			primaryStage.show();
 
 			/* This works around a race condition in javaFX that would otherwise lead
-			 * to incorrect mapping from local to screen coordinates for popup windows.
-			 * */
+			 * to incorrect mapping from local to screen coordinates for popup
+			 * windows.  */
 			primaryStage.setX(primaryStage.getX() + 1);
 			primaryStage.setY(primaryStage.getY() + 1);
 			primaryStage.setX(primaryStage.getX() - 1);

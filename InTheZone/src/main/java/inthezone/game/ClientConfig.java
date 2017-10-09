@@ -43,6 +43,9 @@ public class ClientConfig implements HasJSONRepresentation {
 	public static final KeyBindingTable defaultKeyBindingTable =
 		new KeyBindingTable();
 
+	/**
+	 * @param gameData the game data
+	 * */
 	public ClientConfig(final GameDataFactory gameData) {
 		defaultKeyBindingTable.setSecondaryKey(KeyBinding.scrollUp        , new KeyCodeCombination(KeyCode.UP)    );
 		defaultKeyBindingTable.setSecondaryKey(KeyBinding.scrollDown      , new KeyCodeCombination(KeyCode.DOWN)  );
@@ -84,6 +87,11 @@ public class ClientConfig implements HasJSONRepresentation {
 		loadConfigFile(configFile, gameData);
 	}
 
+	/**
+	 * Load configuration data from a file.
+	 * @param configFile the configuration file
+	 * @param gameData the game data
+	 * */
 	private void loadConfigFile(
 		final File configFile, final GameDataFactory gameData
 	) {
@@ -112,6 +120,9 @@ public class ClientConfig implements HasJSONRepresentation {
 	public String server = DEFAULT_SERVER;
 	public int port = DEFAULT_PORT;
 
+	/**
+	 * Get a default name for a new loadout.
+	 * */
 	public String newLoadoutName() {
 		final String base = "New loadout";
 		String r = base;
@@ -123,14 +134,26 @@ public class ClientConfig implements HasJSONRepresentation {
 		return r;
 	}
 
+	/**
+	 * Determine if a loadout name is value.
+	 * @param n the loadout name
+	 * */
 	public boolean isValidLoadoutName(final String n) {
 		return !loadouts.stream().anyMatch(l -> l.name.equals(n));
 	}
 
+	/**
+	 * Get the keybinding table.
+	 * */
 	public KeyBindingTable getKeyBindingTable() {
 		return keyBindings;
 	}
 
+	/**
+	 * Load the configuration from JSON
+	 * @param json the JSON containing the configuration data
+	 * @param gameData the game data to load
+	 * */
 	public void loadConfig(
 		final JSONObject json, final GameDataFactory gameData
 	) throws CorruptDataException {
@@ -165,10 +188,17 @@ public class ClientConfig implements HasJSONRepresentation {
 		}
 	}
 
+	/**
+	 * Load the default keybinding table.
+	 * */
 	private void copyDefaultKeysTable() {
 		keyBindings.loadBindings(defaultKeyBindingTable);
 	}
 
+	/**
+	 * Erase all customizations and replace the configuration file with a
+	 * default one.
+	 * */
 	private void resetConfigFile() {
 		defaultPlayerName = Optional.empty();
 		loadouts.clear();
@@ -176,8 +206,10 @@ public class ClientConfig implements HasJSONRepresentation {
 		writeConfig();
 	}
 
-	@Override
-	public JSONObject getJSON() {
+	/**
+	 * Encode to JSON.
+	 * */
+	@Override public JSONObject getJSON() {
 		final JSONObject o = new JSONObject();
 		defaultPlayerName.ifPresent(n -> o.put("name", n));
 		o.put("server", server);
@@ -190,6 +222,9 @@ public class ClientConfig implements HasJSONRepresentation {
 		return o;
 	}
 
+	/**
+	 * Write the configuration file to a JSON file.
+	 * */
 	public void writeConfig() {
 		if (!GameDataFactory.gameDataCacheDir.exists()) {
 			GameDataFactory.gameDataCacheDir.mkdir();

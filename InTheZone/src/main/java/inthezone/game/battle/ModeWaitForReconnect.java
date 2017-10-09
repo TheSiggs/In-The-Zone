@@ -4,6 +4,9 @@ import inthezone.battle.CharacterFrozen;
 import isogame.engine.MapPoint;
 import java.util.Map;
 
+/**
+ * Waiting for the other player to reconnect.
+ * */
 public class ModeWaitForReconnect extends Mode {
 	private Mode previous;
 

@@ -13,6 +13,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
+/**
+ * A HUD component to show the player how much time they have remaining for
+ * their turn.
+ * */
 public class TurnClock extends Pane {
 	private final Circle face = new Circle();
 	private final Line hand = new Line();
@@ -33,6 +37,9 @@ public class TurnClock extends Pane {
 
 	private final Rotate rotation = new Rotate();
 
+	/**
+	 * @param duration the duration of each cycle of the clock
+	 * */
 	public TurnClock(final Duration duration) {
 		this.duration = duration;
 
@@ -70,11 +77,17 @@ public class TurnClock extends Pane {
 		this.getChildren().addAll(face, hand, handBase, arc);
 	}
 
+	/**
+	 * Reset the clock to 0
+	 * */
 	public void reset() {
 		clockAnimator.stop();
 		setAngle(0);
 	}
 
+	/**
+	 * Format a count of seconds in a human readable format.
+	 * */
 	private String formatTime(final long s) {
 		String us = "" + s % 60;
 		while (us.length() < 2) us = "0" + us;
@@ -83,6 +96,10 @@ public class TurnClock extends Pane {
 
 	private long lastS = -1;
 
+	/**
+	 * Set the clock angle.
+	 * @param angle the angle to set
+	 * */
 	private void setAngle(final double angle) {
 		final long s = (long) Math.floor(
 			(duration.toMillis() / 250) * ((360d - angle) / 360d));
@@ -104,6 +121,9 @@ public class TurnClock extends Pane {
 		}
 	}
 
+	/**
+	 * Resize this control to fit its borders.
+	 * */
 	private void resizeGraphics() {
 		final double w = this.getWidth();
 		final double h = this.getHeight();

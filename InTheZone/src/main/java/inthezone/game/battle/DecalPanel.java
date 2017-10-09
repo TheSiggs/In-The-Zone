@@ -15,7 +15,7 @@ import static isogame.GlobalConstants.TILEH;
 import static isogame.GlobalConstants.TILEW;
 
 /**
- * A panel of information about character
+ * A panel of information about character.
  * */
 public class DecalPanel extends Group {
 	final private StandardSprites sprites;
@@ -40,6 +40,9 @@ public class DecalPanel extends Group {
 
 	private final static double DECAL_Y = -88d;
 
+	/**
+	 * @param sprites the standard sprite set (containing icons etc.)
+	 * */
 	public DecalPanel(final StandardSprites sprites) {
 		this.sprites = sprites;
 
@@ -76,6 +79,10 @@ public class DecalPanel extends Group {
 		this.setTranslateY(DECAL_Y);
 	}
 
+	/**
+	 * Update whether or not this character is selected
+	 * @param isSelected true if this character is selected, otherwise false
+	 * */
 	public void updateSelectionStatus(final boolean isSelected) {
 		final ObservableList<Node> graph = this.getChildren();
 		graph.remove(selectionIndicator);
@@ -83,7 +90,9 @@ public class DecalPanel extends Group {
 	}
 
 	/**
-	 * Update this decal panel
+	 * Update this decal panel.
+	 * @param c an updated copy of the character
+	 * @param isSelected true if this character is selected
 	 * */
 	public void updateCharacter(
 		final CharacterFrozen c, final boolean isSelected

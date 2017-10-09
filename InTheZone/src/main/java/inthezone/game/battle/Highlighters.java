@@ -3,6 +3,9 @@ package inthezone.game.battle;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+/**
+ * Highlight colors.
+ * */
 class Highlighters {
 	public final static int HIGHLIGHT_ATTACKAREA = 0;
 	public final static int HIGHLIGHT_PATH       = 1;

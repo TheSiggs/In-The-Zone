@@ -16,6 +16,10 @@ public class EndManager extends HBox {
 	private final Label message = new Label(" ");
 	private final Button close = new Button("Close");
 
+	/**
+	 * @param view a reference back the the BattleView
+	 * @param outcome the outcome of the battle
+	 * */
 	public EndManager(final BattleView view, final BattleOutcome outcome) {
 		super();
 

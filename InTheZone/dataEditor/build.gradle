@@ -1,15 +1,13 @@
 apply plugin : 'java'
 apply plugin : 'application'
 
-ext.moduleName = 'inthezone.client';
+ext.moduleName = 'inthezone.dataEditor';
 
-mainClassName = "$moduleName/inthezone.game.Game"
+mainClassName = "$moduleName/inthezone.dataEditor.DataEditor"
 
 dependencies {
-	implementation project(':common')
 	implementation project(':engine')
-	implementation project(':json')
-	testCompile 'junit:junit:4+'
+	implementation project(':common')
 }
 
 compileJava {

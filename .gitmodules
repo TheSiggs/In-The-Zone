@@ -1,3 +1,6 @@
 [submodule "InTheZone/iso-game-engine"]
 	path = InTheZone/iso-game-engine
 	url = https://github.com/CLowcay/iso-game-engine.git
+[submodule "InTheZone/game-ai"]
+	path = InTheZone/game-ai
+	url = git@github.com:CLowcay/game-ai.git

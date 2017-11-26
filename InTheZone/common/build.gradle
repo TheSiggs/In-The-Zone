@@ -1,0 +1,22 @@
+apply plugin : 'java'
+apply plugin : 'java-library'
+
+ext.moduleName = 'inthezone.common';
+
+dependencies {
+	api project(':engine')
+	implementation project(':game-ai')
+	implementation project(':json')
+	testCompile 'junit:junit:4+'
+}
+
+compileJava {
+	options.encoding = 'UTF-8'
+	options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
+}
+
+compileTestJava {
+	options.encoding = 'UTF-8'
+	options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
+}
+

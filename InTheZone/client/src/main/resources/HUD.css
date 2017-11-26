@@ -1,5 +1,5 @@
 .character-info-box {
-	-fx-background-image:url(gui_assets/character_box_tex.png);
+	-fx-background-image:url(character_box_tex.png);
 	-fx-border-width:2px;
 	-fx-border-style:solid;
 }
@@ -18,7 +18,7 @@
 
 .character-info-box-dead {
 	-fx-border-color:black;
-	-fx-background-image:url(gui_assets/character_box_tex_dead.png);
+	-fx-background-image:url(character_box_tex_dead.png);
 }
 
 #statusLine {
@@ -44,12 +44,12 @@
 }
 
 #selectedCharacterImage {
-	-fx-image:url(gui_assets/selected.png);
+	-fx-image:url(selected.png);
 }
 
 .message-line {
 	-fx-opacity:0.0;
-	-fx-background-image:url(gui_assets/big_gold_texture.png);
+	-fx-background-image:url(big_gold_texture.png);
 	-fx-border-color:black;
 	-fx-border-width:2px;
 	-fx-border-style:solid;
@@ -61,11 +61,11 @@
 }
 
 #rounds {
-	-fx-background-image:url(/gui_assets/rounds.png);
+	-fx-background-image:url(/rounds.png);
 }
 
 #rounds_fatigue {
-	-fx-background-image:url(/gui_assets/rounds_fatigue.png);
+	-fx-background-image:url(/rounds_fatigue.png);
 }
 
 .rounds_indicator {
@@ -98,27 +98,27 @@
 	-fx-stroke-width:2px;
 }
 
-#ap { -fx-background-image:url(gui_assets/ap_background.png); }
-#ap ImageView { -fx-image:url(gui_assets/ap.png); }
+#ap { -fx-background-image:url(ap_background.png); }
+#ap ImageView { -fx-image:url(ap.png); }
 
 #ap_mana {
-	-fx-background-image:url(gui_assets/ap_background_mana.png);
+	-fx-background-image:url(ap_background_mana.png);
 	-fx-border-color:#0000FF;
 }
-#ap_mana ImageView { -fx-image:url(gui_assets/ap_mana.png); }
+#ap_mana ImageView { -fx-image:url(ap_mana.png); }
 #ap_mana Line {-fx-stroke:#0000FF}
 
-#mp { -fx-background-image:url(gui_assets/mp_background.png); }
-#mp ImageView { -fx-image:url(gui_assets/mp.png); }
+#mp { -fx-background-image:url(mp_background.png); }
+#mp ImageView { -fx-image:url(mp.png); }
 
-#hp { -fx-background-image:url(gui_assets/hp_background.png); }
-#hp ImageView { -fx-image:url(gui_assets/hp.png); }
+#hp { -fx-background-image:url(hp_background.png); }
+#hp ImageView { -fx-image:url(hp.png); }
 
 #hp_cover {
-	-fx-background-image:url(gui_assets/hp_background_cover.png);
+	-fx-background-image:url(hp_background_cover.png);
 	-fx-border-color:#FFFF00;
 }
-#hp_cover ImageView { -fx-image:url(gui_assets/hp_cover.png); }
+#hp_cover ImageView { -fx-image:url(hp_cover.png); }
 
 .command-button-label {
 	-fx-background-color:white;
@@ -134,7 +134,7 @@
 }
 
 .hud-menu-button {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -162,7 +162,7 @@
 .hud-menu-button > .container > .menu-button:hover,
 .hud-menu-button > .container > .menu-button:focused,
 .hud-menu-button > .container > .menu-button:showing {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 }
 

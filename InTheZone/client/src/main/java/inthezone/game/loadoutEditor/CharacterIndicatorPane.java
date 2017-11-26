@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * A panel which displays information about a character.
+ * */
 public class CharacterIndicatorPane extends AnchorPane {
 	private final LoadoutModel loadouts;
 
@@ -47,10 +50,10 @@ public class CharacterIndicatorPane extends AnchorPane {
 
 	private final HBox switchButtons = new HBox();
 	private final Button switchLeft = new Button(null,
-		new ImageView(new Image("/gui_assets/arrow_left.png")));
+		new ImageView("/arrow_left.png"));
 	private final Button switchRight = new Button(null,
-		new ImageView(new Image("/gui_assets/arrow_right.png")));
-
+		new ImageView("/arrow_right.png"));
+	
 	public CharacterIndicatorPane(
 		final LoadoutModel loadouts,
 		final CharacterProfileModel profile,

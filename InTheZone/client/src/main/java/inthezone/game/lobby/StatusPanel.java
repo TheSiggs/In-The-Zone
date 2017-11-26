@@ -9,6 +9,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Panel which shows the current lobby state of the player (e.g. waiting on
+ * queue, waiting for challenged player to respond).
+ * */
 public class StatusPanel extends StackPane {
 	private final VBox inner = new VBox();
 	private final Label title = new Label("Status");

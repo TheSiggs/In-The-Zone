@@ -30,6 +30,9 @@ import inthezone.game.ContentPane;
 import inthezone.game.DialogScreen;
 import inthezone.game.battle.ModalDialog;
 
+/**
+ * A panel which displays multiple loadouts.
+ * */
 public class LoadoutOverview extends DialogScreen<Void> {
 	private final AnchorPane root = new AnchorPane();
 	private final Button newLoadout = new Button("New loadout");
@@ -165,9 +168,12 @@ public class LoadoutOverview extends DialogScreen<Void> {
 	}
 }
 
+/**
+ * A custom control which displays a preview of a loadout.
+ * */
 class LoadoutFrame extends VBox {
 	private static final Image badLoadoutImage =
-		new Image("/gui_assets/bad_loadout.png");
+		new Image("/bad_loadout.png");
 
 	private Optional<Loadout> mloadout;
 	private final StackPane topSpacer = new StackPane();
@@ -176,7 +182,7 @@ class LoadoutFrame extends VBox {
 	private final Label title = new Label(" ");
 	private final ImageView badLoadout = new ImageView(badLoadoutImage);
 	private final Button delete = new Button(null,
-		new ImageView(new Image("/gui_assets/x.png")));
+		new ImageView("/x.png"));
 	
 	private final Tooltip frameTooltip = new Tooltip();
 

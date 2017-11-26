@@ -28,6 +28,9 @@ import inthezone.battle.data.CharacterInfo;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.game.guiComponents.RollerScrollPane;
 
+/**
+ * A panel for configuring the character profile.
+ * */
 public class CharacterProfilePane extends HBox {
 	private final VBox leftSection = new VBox(4);
 	private final HBox topSection = new HBox(4);
@@ -256,6 +259,9 @@ public class CharacterProfilePane extends HBox {
 	}
 }
 
+/**
+ * Our custom spinner control for power points.
+ * */
 class PPSpinnerFactory extends SpinnerValueFactory<Integer> { 
 	private final int[] values;
 

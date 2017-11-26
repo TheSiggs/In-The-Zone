@@ -103,10 +103,8 @@ public class AbilitiesPane extends VBox {
 			.collect(Collectors.toList()).toArray(new String[0]);
 	}
 
-	private final static Image manaIcon = new Image(
-		AbilitiesPane.class.getResourceAsStream("/editor_assets/mana_ability.png"));
-	private final static Image subsequentIcon = new Image(
-		AbilitiesPane.class.getResourceAsStream("/editor_assets/sub_ability.png"));
+	private final static Image manaIcon = new Image("/mana_ability.png");
+	private final static Image subsequentIcon = new Image("/sub_ability.png");
 	
 	public static void setItemGraphic(final TreeItem<AbilityInfoModel> item) {
 		final AbilityInfoModel v = item.getValue();
@@ -194,6 +192,7 @@ public class AbilitiesPane extends VBox {
 
 				@Override
 				protected boolean computeValue() {
+					if (selected.isEmpty()) return false;
 					final TreeItem<AbilityInfoModel> item = table.getTreeItem(selected.get(0));
 					if (item == null) return false;
 					final AbilityInfoModel v = item.getValue();

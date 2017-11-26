@@ -81,7 +81,7 @@ public class Game extends Application {
 				try {
 					portOverride = Optional.ofNullable(args.get("port"))
 						.map(x -> Integer.parseInt(x));
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					System.err.println("Port parameter must be a number");
 					System.exit(2);
 				}
@@ -119,7 +119,8 @@ public class Game extends Application {
 			primaryStage.setX(primaryStage.getX() - 1);
 			primaryStage.setY(primaryStage.getY() - 1);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
+			e.printStackTrace();
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Error starting game client");

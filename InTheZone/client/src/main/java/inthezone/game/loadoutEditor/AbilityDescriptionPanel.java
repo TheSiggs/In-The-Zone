@@ -8,6 +8,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+/**
+ * A panel which displays a nicely formatted description of an ability.
+ * */
 public class AbilityDescriptionPanel extends VBox {
 	private final Label abilityName = new Label("");
 	private final Label description = new Label("");

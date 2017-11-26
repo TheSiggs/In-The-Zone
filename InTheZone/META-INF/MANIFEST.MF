@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: vecmath.jar durian-3.4.0.jar dcoder-ai.jar json-simple-1.1
- .1.jar engine.jar
-Main-Class: inthezone.server.Server
-

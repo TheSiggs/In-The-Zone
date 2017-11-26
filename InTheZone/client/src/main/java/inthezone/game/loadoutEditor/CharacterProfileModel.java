@@ -18,6 +18,9 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+/**
+ * Data model for character profiles.
+ * */
 public class CharacterProfileModel {
 	public final ObservableList<AbilityInfo> abilities = FXCollections.observableArrayList();
 	public final ObjectProperty<AbilityInfo> basicAbility = new SimpleObjectProperty<>();

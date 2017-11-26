@@ -8,6 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Custom control to indicate remaining power points.
+ * */
 public class PPIndicator extends StackPane {
 	private final Label label = new Label();
 
@@ -15,7 +18,7 @@ public class PPIndicator extends StackPane {
 		"You spend power points when you equip abilities,\n" +
 		"or when you add extra health, attack, or defence points";
 
-	public PPIndicator(IntegerProperty cost) {
+	public PPIndicator(final IntegerProperty cost) {
 		updatePP(cost.get());
 		label.getStyleClass().add("gui-textfield");
 
@@ -27,13 +30,13 @@ public class PPIndicator extends StackPane {
 
 	private ChangeListener<Number> updatePP = new ChangeListener<Number>() {
 		@Override public void changed(
-			ObservableValue<? extends Number> v, Number o, Number n
+			final ObservableValue<? extends Number> v, final Number o, final Number n
 		) {
 			updatePP(n.intValue());
 		}
 	};
 
-	private void updatePP(int n) {
+	private void updatePP(final int n) {
 		label.setText("Power points: " + n + " / " + Loadout.maxPP);
 		if (n > Loadout.maxPP) {
 			Tooltip.install(this, new Tooltip(tooltipMessage + "\n\n" +
@@ -47,7 +50,7 @@ public class PPIndicator extends StackPane {
 		}
 	}
 
-	public void setCostProperty(IntegerProperty cost) {
+	public void setCostProperty(final IntegerProperty cost) {
 		cost.removeListener(updatePP);
 		cost.addListener(updatePP);
 		updatePP(cost.get());

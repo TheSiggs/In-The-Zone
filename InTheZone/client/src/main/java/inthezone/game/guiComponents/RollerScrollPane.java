@@ -5,12 +5,12 @@ import javafx.animation.Transition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -69,19 +69,15 @@ public class RollerScrollPane extends AnchorPane {
 		});
 
 		if (horizontal) {
-			back = new Button(null, new ImageView(
-				new Image("/gui_assets/arrow_left.png")));
-			forward = new Button(null, new ImageView(
-				new Image("/gui_assets/arrow_right.png")));
+			back = new Button(null, new ImageView("/arrow_left.png"));
+			forward = new Button(null, new ImageView("/arrow_right.png"));
 			back.setMaxWidth(SCROLL_BUTTON_SIZE);
 			back.setMaxHeight(Double.MAX_VALUE);
 			forward.setMaxWidth(SCROLL_BUTTON_SIZE);
 			forward.setMaxHeight(Double.MAX_VALUE);
 		} else {
-			back = new Button(null, new ImageView(
-				new Image("/gui_assets/arrow_up.png")));
-			forward = new Button(null, new ImageView(
-				new Image("/gui_assets/arrow_down.png")));
+			back = new Button(null, new ImageView("/arrow_up.png"));
+			forward = new Button(null, new ImageView("/arrow_down.png"));
 			back.setMaxWidth(Double.MAX_VALUE);
 			back.setMaxHeight(SCROLL_BUTTON_SIZE);
 			forward.setMaxWidth(Double.MAX_VALUE);

@@ -12,6 +12,9 @@ import javafx.scene.shape.StrokeLineCap;
 
 import inthezone.battle.data.GameDataFactory;
 
+/**
+ * Custom control for the buttons on the veto panel.
+ * */
 public class VetoButton extends CheckBox {
 	public Stage stage;
 

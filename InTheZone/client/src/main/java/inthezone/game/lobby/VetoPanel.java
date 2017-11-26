@@ -23,6 +23,9 @@ import javafx.scene.layout.VBox;
 
 import inthezone.battle.data.GameDataFactory;
 
+/**
+ * Panel for vetoing maps that the player doesn't want to play.
+ * */
 public class VetoPanel extends StackPane {
 	private final VBox inner = new VBox();
 	private final Button resetButton = new Button("Reset");

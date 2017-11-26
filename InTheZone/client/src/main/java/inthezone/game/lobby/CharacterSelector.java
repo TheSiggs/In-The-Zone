@@ -17,6 +17,9 @@ import javafx.scene.canvas.GraphicsContext;
 import inthezone.battle.data.CharacterProfile;
 import inthezone.battle.data.Player;
 
+/**
+ * Panel for choosing characters.
+ * */
 public class CharacterSelector extends Canvas {
 	private final List<CharacterProfile> characters = new ArrayList<>();
 	private final List<Boolean> enabled = new ArrayList<>();

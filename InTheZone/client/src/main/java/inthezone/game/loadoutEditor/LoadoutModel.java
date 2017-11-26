@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * The data model for loadouts.
+ * */
 public class LoadoutModel {
 	public final StringProperty name = new SimpleStringProperty();
 

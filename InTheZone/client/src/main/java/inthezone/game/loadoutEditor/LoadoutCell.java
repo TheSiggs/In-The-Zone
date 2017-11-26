@@ -4,6 +4,9 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
+/**
+ * A loadout item for lists of loadouts.
+ * */
 public class LoadoutCell extends ListCell<LoadoutModel> {
 	public static Callback<ListView<LoadoutModel>, ListCell<LoadoutModel>>
 		forListView()

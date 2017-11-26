@@ -49,7 +49,7 @@ public class BattleTest {
 
 	public BattleTest() throws Exception {
 		testData = new GameDataFactory(Optional.of((
-			new File("build/resources/main/testgamedata")).getAbsoluteFile()), false, true);
+			new File("build/resources/main/testgamedata2")).getAbsoluteFile()), false, true);
 		checkers = testData.getStage("Checkerboard");
 		characters = testData.getCharacters();
 

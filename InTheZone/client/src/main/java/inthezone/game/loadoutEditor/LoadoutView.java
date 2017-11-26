@@ -29,6 +29,9 @@ import inthezone.game.DialogScreen;
 import inthezone.game.battle.ModalDialog;
 import inthezone.game.guiComponents.RollerScrollPane;
 
+/**
+ * The loadout editor screen.
+ * */
 public class LoadoutView extends DialogScreen<Loadout> {
 	private LoadoutModel model;
 

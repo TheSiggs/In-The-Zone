@@ -7,6 +7,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 
+/**
+ * The news panel.
+ * */
 public class NewsPanel extends StackPane {
 	private final VBox inner = new VBox();
 	private final Label title = new Label("News");

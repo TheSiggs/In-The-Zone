@@ -1,10 +1,10 @@
 .gui-pane {
-	-fx-background-image:url(/gui_assets/general_background.png);
+	-fx-background-image:url(/general_background.png);
 	-fx-background-size:100% 100%;
 }
 
 .gui-button {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -19,15 +19,15 @@
 }
 
 .gui-green-button {
-	-fx-background-image:url(/gui_assets/mp.png);
+	-fx-background-image:url(/mp.png);
 }
 
 .gui-green-button:disabled {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 }
 
 .gui-img-button {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -49,7 +49,7 @@
 }
 
 .panel {
-	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-image:url(/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -57,7 +57,7 @@
 }
 
 .opaque-roller-scroller {
-	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-image:url(/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 }
 
@@ -89,7 +89,7 @@
 }
 
 .gui-textfield {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -109,7 +109,7 @@
 }
 
 .pp-too-much {
-	-fx-background-image:url(/gui_assets/rounds_fatigue.png);
+	-fx-background-image:url(/rounds_fatigue.png);
 }
 
 .separator {
@@ -117,7 +117,7 @@
 }
 
 .gui-spinner {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-padding:4px;
 	-fx-focus-color: transparent;
 	-fx-faint-focus-color: transparent;
@@ -131,14 +131,14 @@
 }
 
 .gui-spinner .increment-arrow-button {
-	-fx-background-image:url(/gui_assets/plus.png);
+	-fx-background-image:url(/plus.png);
 	-fx-background-repeat:no-repeat;
 	-fx-background-position:center;
 	-fx-background-size:contain;
 }
 
 .gui-spinner .decrement-arrow-button {
-	-fx-background-image:url(/gui_assets/minus.png);
+	-fx-background-image:url(/minus.png);
 	-fx-background-repeat:no-repeat;
 	-fx-background-position:center center;
 	-fx-background-size:contain;
@@ -157,7 +157,7 @@
 }
 
 #add-ability-button {
-	-fx-background-image:url(/gui_assets/big_mixed_texture.png);
+	-fx-background-image:url(/big_mixed_texture.png);
 }
 
 .ability-name {
@@ -184,7 +184,7 @@
 }
 
 .gui-list {
-	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-image:url(/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-padding:0px;
 	-fx-focus-color:transparent;
@@ -205,7 +205,7 @@
 }
 
 .gui-list .list-cell:selected {
-	-fx-background-image:url(/gui_assets/mp.png);
+	-fx-background-image:url(/mp.png);
 	-fx-background-repeat:repeat;
 }
 
@@ -215,7 +215,7 @@
 }
 
 .gui-combo {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -243,21 +243,21 @@
 }
 
 .gui-combo .arrow-button {
-	-fx-background-image:url(/gui_assets/arrow_down.png);
+	-fx-background-image:url(/arrow_down.png);
 	-fx-background-repeat:no-repeat;
 	-fx-background-size:auto auto;
 	-fx-background-position:center center;
 }
 
 #basic-ability .arrow-button {
-	-fx-background-image:url(/gui_assets/plus.png);
+	-fx-background-image:url(/plus.png);
 	-fx-background-repeat:no-repeat;
 	-fx-background-size:auto auto;
 	-fx-background-position:center center;
 }
 
 .gui-combo .list-view {
-	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-image:url(/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-padding:0px;
 	-fx-border-color:black;
@@ -285,10 +285,10 @@
 }
 
 .ability-button .button {
-	-fx-graphic:url(/gui_assets/x.png);
+	-fx-graphic:url(/x.png);
 	-fx-content-display:graphic-only;
 	-fx-alignment:center;
-	-fx-background-image:url(/gui_assets/big_gold_texture.png);
+	-fx-background-image:url(/big_gold_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-border-style:solid;
 	-fx-border-width:2px;
@@ -302,7 +302,7 @@
 }
 
 .switch-buttons .button {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -322,7 +322,7 @@
 }
 
 .loadout-cell-frame {
-	-fx-background-image:url(/gui_assets/filmframe.png);
+	-fx-background-image:url(/filmframe.png);
 	-fx-padding:36px 60px 36px 60px;
 }
 
@@ -366,7 +366,7 @@
 }
 
 .rolling-choice-box {
-	-fx-background-image:url(/gui_assets/big_copper_texture.png);
+	-fx-background-image:url(/big_copper_texture.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px;
@@ -387,7 +387,7 @@
 	-fx-content-display:graphic-only;
 	-fx-alignment:center;
 	-fx-padding:6px 16px 6px 16px;
-	-fx-graphic:url(/gui_assets/arrow_left.png);
+	-fx-graphic:url(/arrow_left.png);
 }
 
 .rolling-choice-box .combo-box {
@@ -395,7 +395,7 @@
 }
 
 .rolling-choice-box .right-button {
-	-fx-graphic:url(/gui_assets/arrow_right.png);
+	-fx-graphic:url(/arrow_right.png);
 }
 
 .rolling-choice-box .combo-box .arrow-button {
@@ -414,7 +414,7 @@
 }
 
 .turn-clock-face {
-	-fx-fill:image-pattern("/gui_assets/big_mixed_texture.png");
+	-fx-fill:image-pattern("/big_mixed_texture.png");
 	-fx-stroke:black;
 	-fx-stroke-width:2px;
 	-fx-stroke-type:inside;
@@ -431,7 +431,7 @@
 }
 
 .main-menu {
-	-fx-background-image:url(/gui_assets/lobby_bg.png);
+	-fx-background-image:url(/lobby_bg.png);
 	-fx-border-style:solid;
 	-fx-border-width:0px 0px 2px 0px;
 	-fx-border-color:black;
@@ -471,12 +471,12 @@
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-	-fx-background-image:url(/gui_assets/ap.png);
+	-fx-background-image:url(/ap.png);
 	-fx-background-repeat:repeat;
 }
 
 .menu-item {
-	-fx-background-image:url(/gui_assets/button_tex.png);
+	-fx-background-image:url(/button_tex.png);
 	-fx-background-repeat:repeat;
 	-fx-border-color:black;
 	-fx-border-width:2px 2px 0px 2px;
@@ -496,7 +496,7 @@
 }
 
 .menu-item:focused, .menu-item:hovered {
-	-fx-background-image:url(/gui_assets/ap.png);
+	-fx-background-image:url(/ap.png);
 	-fx-background-repeat:repeat;
 }
 

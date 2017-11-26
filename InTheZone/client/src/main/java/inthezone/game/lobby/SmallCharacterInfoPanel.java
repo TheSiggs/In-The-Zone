@@ -12,6 +12,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * A small panel which shows the player everything they need to know about the
+ * characters in the loadout they selected.
+ * */
 public class SmallCharacterInfoPanel extends VBox {
 	private CharacterProfile profile;
 	private final Label name = new Label();

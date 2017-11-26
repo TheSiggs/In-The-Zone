@@ -46,11 +46,11 @@ public class Server {
 		final Map<String, String> parsedArgs = new HashMap<>();
 		for (final String arg : args) {
 			final String[] p = arg.split("=");
-			if (p.length != 2) {
-				System.out.println("Invalid command line option " + arg);
-				commandLineError();
+			if (p.length == 2) {
+				parsedArgs.put(p[0], p[1]);
+			} else {
+				parsedArgs.put(p[0], "");
 			}
-			parsedArgs.put(p[0], p[1]);
 		}
 
 		final Optional<File> baseDir = 

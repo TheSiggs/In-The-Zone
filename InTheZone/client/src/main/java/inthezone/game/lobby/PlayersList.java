@@ -20,6 +20,9 @@ import javafx.scene.layout.VBox;
 
 import inthezone.game.guiComponents.RollerScrollPane;
 
+/**
+ * Custom control to show which players are on the server.
+ * */
 public class PlayersList extends StackPane {
 	private final VBox inner = new VBox();
 	private final Label title = new Label("Players");

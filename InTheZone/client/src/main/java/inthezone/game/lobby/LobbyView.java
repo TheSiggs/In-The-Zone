@@ -40,6 +40,9 @@ import inthezone.game.battle.ModalDialog;
 import inthezone.game.guiComponents.KeyboardOptions;
 import inthezone.game.loadoutEditor.LoadoutOverview;
 
+/**
+ * The lobby screen.
+ * */
 public class LobbyView extends StackPane {
 	private final ContentPane parent;
 	private final GameDataFactory gameData;

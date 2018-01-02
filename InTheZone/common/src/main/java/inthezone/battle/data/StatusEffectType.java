@@ -1,7 +1,5 @@
 package inthezone.battle.data;
 
-import isogame.engine.CorruptDataException;
-
 public enum StatusEffectType {
 	ACCELERATED, DAZED, DEBILITATED, ENERGIZED, FEARED,
 	IMPRISONED, PRECISE, RESISTANT, VULNERABLE,
@@ -64,62 +62,8 @@ public enum StatusEffectType {
 		return this == PANICKED || this == FEARED;
 	}
 
-	public static StatusEffectType parse(String s)
-		throws CorruptDataException
-	{
-		switch(s.toLowerCase()) {
-			case "accelerated": return ACCELERATED;
-			case "dazed": return DAZED;
-			case "debilitated": return DEBILITATED;
-			case "energized": return ENERGIZED;
-			case "feared": return FEARED;
-			case "imprisoned": return IMPRISONED;
-			case "precise": return PRECISE;
-			case "resistant": return RESISTANT;
-			case "vulnerable": return VULNERABLE;
-			case "ongoing": return ONGOING;
-			case "panicked": return PANICKED;
-			case "regeneration": return REGENERATION;
-			case "silenced": return SILENCED;
-			case "slowed": return SLOWED;
-			case "strengthened": return STRENGTHENED;
-			case "stunned": return STUNNED;
-			case "vampirism": return VAMPIRISM;
-			case "weakened": return WEAKENED;
-			case "cover": return COVER;
-			default:
-				throw new CorruptDataException("Invalid status effect " + s);
-		}
-	}
-
 	public String toNiceString() {
-		if (this == ONGOING) return "ongoing damage"; else return this.toString();
-	}
-
-	@Override public String toString() {
-		switch (this) {
-			case ACCELERATED: return "accelerated";
-			case DAZED: return "dazed";
-			case DEBILITATED: return "debilitated";
-			case ENERGIZED: return "energized";
-			case FEARED: return "feared";
-			case IMPRISONED: return "imprisoned";
-			case PRECISE: return "precise";
-			case RESISTANT: return "resistant";
-			case VULNERABLE: return "vulnerable";
-			case ONGOING: return "ongoing";
-			case PANICKED: return "panicked";
-			case REGENERATION: return "regeneration";
-			case SILENCED: return "silenced";
-			case SLOWED: return "slowed";
-			case STRENGTHENED: return "strengthened";
-			case STUNNED: return "stunned";
-			case VAMPIRISM: return "vampirism";
-			case WEAKENED: return "weakened";
-			case COVER: return "cover";
-			default:
-				throw new RuntimeException("This cannot happen");
-		}
+		if (this == ONGOING) return "ongoing damage"; else return this.toString().toLowerCase();
 	}
 }
 

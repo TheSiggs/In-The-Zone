@@ -1,6 +1,5 @@
 package inthezone.battle.status;
 
-import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 
 import java.util.ArrayList;
@@ -8,9 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
@@ -23,13 +19,19 @@ import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.instant.PullPush;
 import inthezone.protocol.ProtocolException;
 
+import ssjsjs.annotations.As;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
+
 public class FearedStatusEffect extends StatusEffect {
 	private final MapPoint agentPos;
 	private final Character agent;
 	private final int g;
 
 	public FearedStatusEffect(
-		final StatusEffectInfo info, final Character agent, final int startTurn
+		final StatusEffectInfo info,
+		final int startTurn,
+		final Character agent
 	) {
 		super(info, startTurn);
 		this.agentPos = agent.getPos();
@@ -40,8 +42,11 @@ public class FearedStatusEffect extends StatusEffect {
 	/**
 	 * Construct an unresolved FearedStatusEffect
 	 * */
+	@JSONConstructor
 	private FearedStatusEffect(
-		final StatusEffectInfo info, final MapPoint agent, final int startTurn
+		@Field("info") final StatusEffectInfo info,
+		@Field("startTurn") final int startTurn,
+		@Field("agentPos")@As("agent") final MapPoint agent
 	) {
 		super(info, startTurn);
 		this.agent = null;
@@ -49,36 +54,12 @@ public class FearedStatusEffect extends StatusEffect {
 		g = info.param;
 	}
 
-	@Override 
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		r.put("info", info.toString());
-		r.put("startTurn", startTurn);
-		r.put("agent", agentPos.getJSON());
-		return r;
-	}
-
-	public static FearedStatusEffect fromJSON(final JSONObject o)
-		throws ProtocolException
-	{
-		try {
-			final MapPoint agent = MapPoint.fromJSON(o.getJSONObject("agent"));
-			final int startTurn = o.getInt("startTurn");
-			final StatusEffectInfo info = new StatusEffectInfo(o.getString("info"));
-
-			return new FearedStatusEffect(info, agent, startTurn);
-
-		} catch (JSONException|CorruptDataException e) {
-			throw new ProtocolException("Error parsing feared status effect", e);
-		}
-	}
-
 	@Override
 	public StatusEffect resolve(final BattleState battle) throws ProtocolException {
 		if (agent != null) return this; else {
-			return new FearedStatusEffect(info, 
+			return new FearedStatusEffect(info, startTurn,
 				battle.getCharacterAt(agentPos).orElseThrow(() ->
-					new ProtocolException("Cannot find feared agent")), startTurn);
+					new ProtocolException("Cannot find feared agent")));
 		}
 	}
 

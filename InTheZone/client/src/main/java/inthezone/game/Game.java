@@ -93,11 +93,11 @@ public class Game extends Application {
 				basedir.map(x -> (new File(x)).getAbsoluteFile()), false);
 			final ClientConfig config = new ClientConfig(gameData);
 
-			final String server = serverOverride.orElse(config.server);
-			final int port = portOverride.orElse(config.port);
+			final String server = serverOverride.orElse(config.getServer());
+			final int port = portOverride.orElse(config.getPort());
 
 			final ContentPane contentPane = new ContentPane(
-				config, gameData, server, port, config.defaultPlayerName);
+				config, gameData, server, port, config.getDefaultPlayerName());
 
 			this.network = contentPane.network;
 			this.networkThread = contentPane.networkThread;

@@ -2,9 +2,8 @@ package inthezone.game;
 
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
-import inthezone.util.DefaultServerConfig;
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
+import isogame.engine.CorruptDataException;
 import isogame.engine.KeyBinding;
 import isogame.engine.KeyBindingTable;
 import javafx.application.Platform;
@@ -22,28 +21,37 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+import ssjsjs.JSONDeserializeException;
+import ssjsjs.JSONSerializeException;
+import ssjsjs.SSJSJS;
 
 /**
  * Client configuration.
  * */
-public class ClientConfig implements HasJSONRepresentation {
+public class ClientConfig {
+	private final GameDataFactory gameData;
+
+	// The configuration file
 	private final File configFile =
 		new File(GameDataFactory.gameDataCacheDir, "client.json");
+	
+	// The configuration data
+	private ClientConfigData data = null;
 
-	private KeyBindingTable keyBindings = new KeyBindingTable();
-	public static final KeyBindingTable defaultKeyBindingTable =
-		new KeyBindingTable();
+	// The default key binding table
+	public static final KeyBindingTable defaultKeyBindingTable = new KeyBindingTable();
 
 	/**
 	 * @param gameData the game data
 	 * */
 	public ClientConfig(final GameDataFactory gameData) {
+		this.gameData = gameData;
+
 		defaultKeyBindingTable.setSecondaryKey(KeyBinding.scrollUp        , new KeyCodeCombination(KeyCode.UP)    );
 		defaultKeyBindingTable.setSecondaryKey(KeyBinding.scrollDown      , new KeyCodeCombination(KeyCode.DOWN)  );
 		defaultKeyBindingTable.setSecondaryKey(KeyBinding.scrollLeft      , new KeyCodeCombination(KeyCode.LEFT)  );
@@ -111,16 +119,12 @@ public class ClientConfig implements HasJSONRepresentation {
 		}
 	}
 
-	public Optional<String> defaultPlayerName = Optional.empty();
-	public final List<Loadout> loadouts = new ArrayList<>();
-
-	public String server = DefaultServerConfig.DEFAULT_SERVER;
-	public int port = DefaultServerConfig.DEFAULT_PORT;
-
 	/**
 	 * Get a default name for a new loadout.
 	 * */
 	public String newLoadoutName() {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
 		final String base = "New loadout";
 		String r = base;
 		int n = 2;
@@ -136,14 +140,132 @@ public class ClientConfig implements HasJSONRepresentation {
 	 * @param n the loadout name
 	 * */
 	public boolean isValidLoadoutName(final String n) {
-		return !loadouts.stream().anyMatch(l -> l.name.equals(n));
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return !data.loadouts.stream().anyMatch(l -> l.name.equals(n));
+	}
+
+	/**
+	 * Update a loadout.
+	 * @param id the id number of the loadout
+	 * @param loadout the new loadout
+	 * */
+	public void setLoadout(final int id, final Loadout loadout) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		data.loadouts.set(id, loadout);
+		writeConfig();
+	}
+
+	/**
+	 * Add a new loadout.
+	 * @param loadout the new loadout
+	 * */
+	public void addLoadout(final Loadout loadout) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		data.loadouts.add(0, loadout);
+		writeConfig();
+	}
+
+	/**
+	 * Get the id number of a loadout.
+	 * @param loadout the loadout to search for
+	 * @return the loadout id or -1 if there is no such loadout
+	 * */
+	public int getLoadoutID(final Loadout loadout) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return data.loadouts.indexOf(loadout);
+	}
+
+	/**
+	 * Delete a loadout.
+	 * @param loadout the loadout to delete
+	 * */
+	public void deleteLoadout(final Loadout loadout) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		data.loadouts.remove(loadout);
+		writeConfig();
+	}
+
+	/**
+	 * Get the loadouts.
+	 * */
+	public List<Loadout> getLoadouts() {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return data.loadouts;
 	}
 
 	/**
 	 * Get the keybinding table.
 	 * */
 	public KeyBindingTable getKeyBindingTable() {
-		return keyBindings;
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return data.keyBindings;
+	}
+
+	/**
+	 * Load new keybindings.
+	 * @param table the new keybindings table
+	 * */
+	public void loadKeyBindings(final KeyBindingTable table) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		data.keyBindings.loadBindings(table);
+		writeConfig();
+	}
+
+	/**
+	 * The server to connect to.
+	 * */
+	public String getServer() {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return data.server;
+	}
+
+	/**
+	 * The server port to connect to.
+	 * */
+	public int getPort() {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return data.port;
+	}
+
+	/**
+	 * The default player name for when connecting to the server
+	 * */
+	public Optional<String> getDefaultPlayerName() {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		return data.defaultPlayerName;
+	}
+
+	/**
+	 * Set the server.
+	 * @param server the new server
+	 * */
+	public void setServer(final String server) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		this.data = this.data.setServer(server);
+		writeConfig();
+	}
+
+	/**
+	 * Set the server port.
+	 * @param port the new server port
+	 * */
+	public void setPort(final int port) {
+		if (data == null) throw new NullPointerException("Missing configuration");
+
+		this.data = this.data.setPort(port);
+		writeConfig();
 	}
 
 	/**
@@ -153,43 +275,11 @@ public class ClientConfig implements HasJSONRepresentation {
 	 * */
 	public void loadConfig(
 		final JSONObject json, final GameDataFactory gameData
-	) throws CorruptDataException {
-
-		this.defaultPlayerName = Optional.empty();
-		loadouts.clear();
-
-		try {
-			final String name = json.optString("name", null);
-			final JSONArray loadouts = json.optJSONArray("loadouts");
-			final JSONObject keys = json.optJSONObject("keys");
-			this.server = json.optString("server", DefaultServerConfig.DEFAULT_SERVER);
-			this.port = json.optInt("port", DefaultServerConfig.DEFAULT_PORT);
-
-			this.defaultPlayerName = Optional.ofNullable(name);
-			if (loadouts != null) {
-				final List<JSONObject> ls =
-					jsonArrayToList(loadouts, JSONObject.class);
-				for (final JSONObject l : ls)
-					this.loadouts.add(Loadout.fromJSON(l, gameData));
-			}
-
-			if (keys != null) {
-				keyBindings = KeyBindingTable.fromJSON(
-					keys, InTheZoneKeyBinding::valueOf);
-			} else {
-				copyDefaultKeysTable();
-			}
-
-		} catch (final JSONException|ClassCastException e) {
-			throw new CorruptDataException("Type error in config file");
-		}
-	}
-
-	/**
-	 * Load the default keybinding table.
-	 * */
-	private void copyDefaultKeysTable() {
-		keyBindings.loadBindings(defaultKeyBindingTable);
+	) throws CorruptDataException, JSONDeserializeException {
+		final Map<String, Object> env = new HashMap<>();
+		env.put("gameData", gameData);
+		env.put("defaultKeyBindingTable", defaultKeyBindingTable);
+		this.data = SSJSJS.deserialize(json, ClientConfigData.class, env);
 	}
 
 	/**
@@ -197,42 +287,25 @@ public class ClientConfig implements HasJSONRepresentation {
 	 * default one.
 	 * */
 	private void resetConfigFile() {
-		defaultPlayerName = Optional.empty();
-		loadouts.clear();
-		copyDefaultKeysTable();
+		this.data = new ClientConfigData(gameData, defaultKeyBindingTable);
 		writeConfig();
-	}
-
-	/**
-	 * Encode to JSON.
-	 * */
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		defaultPlayerName.ifPresent(n -> o.put("name", n));
-		o.put("server", server);
-		o.put("port", port);
-		final JSONArray a = new JSONArray();
-		for (final Loadout l : loadouts) a.put(l.getJSON());
-		o.put("loadouts", a);
-		o.put("keys", keyBindings.getJSON());
-
-		return o;
 	}
 
 	/**
 	 * Write the configuration file to a JSON file.
 	 * */
-	public void writeConfig() {
+	private void writeConfig() {
 		if (!GameDataFactory.gameDataCacheDir.exists()) {
 			GameDataFactory.gameDataCacheDir.mkdir();
 		}
 
 		try (
-			PrintWriter out = new PrintWriter(new OutputStreamWriter(
+			final PrintWriter out = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(configFile), "UTF-8"))
 		) {
-			out.print(getJSON().toString());
-		} catch (final IOException e) {
+			out.print(SSJSJS.serialize(data).toString());
+		} catch (final IOException|JSONSerializeException e) {
+			e.printStackTrace();
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);
 			a.setHeaderText("Cannot create configuration file \"" +
@@ -240,17 +313,6 @@ public class ClientConfig implements HasJSONRepresentation {
 			a.setContentText(e.getMessage());
 			a.showAndWait();
 		}
-	}
-
-	private static <T> List<T> jsonArrayToList(
-		final JSONArray a, final Class<T> clazz
-	) throws ClassCastException {
-		final List<T> r = new ArrayList<>();
-		int limit = a.length();
-		for (int i = 0; i < limit; i++) {
-			r.add(clazz.cast(a.get(i)));
-		}
-		return r;
 	}
 }
 

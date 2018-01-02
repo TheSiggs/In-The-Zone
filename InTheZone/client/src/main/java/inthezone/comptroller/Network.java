@@ -1,20 +1,5 @@
 package inthezone.comptroller;
 
-import isogame.engine.CorruptDataException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.Socket;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
@@ -24,6 +9,21 @@ import inthezone.protocol.Message;
 import inthezone.protocol.MessageKind;
 import inthezone.protocol.Protocol;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.CorruptDataException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.UUID;
+import ssjsjs.JSONSerializeException;
+import ssjsjs.SSJSJS;
 
 public class Network implements Runnable {
 	private final static long timeout = 20*1000;
@@ -230,9 +230,11 @@ public class Network implements Runnable {
 		final StartBattleCommandRequest cmd, final String player
 	) {
 		try {
-			sendQueue.put(Message.CHALLENGE_PLAYER(player, cmd.getJSON(), false));
+			sendQueue.put(Message.CHALLENGE_PLAYER(player, SSJSJS.serialize(cmd), false));
 		} catch (final InterruptedException e) {
-			throw new RuntimeException("This cannot happen");
+			throw new RuntimeException("Interrupted: this cannot happen", e);
+		} catch (final JSONSerializeException e) {
+			throw new RuntimeException("Error serializing start battle command", e);
 		}
 	}
 
@@ -255,9 +257,11 @@ public class Network implements Runnable {
 	) {
 		try {
 			sendQueue.put(Message.ACCEPT_CHALLENGE(
-				otherPlayer, player, cmd.getJSON(), false));
+				otherPlayer, player, SSJSJS.serialize(cmd), false));
 		} catch (final InterruptedException e) {
-			throw new RuntimeException("This cannot happen");
+			throw new RuntimeException("Interrupted: This cannot happen");
+		} catch (final JSONSerializeException e) {
+			throw new RuntimeException("Error serializing accept challenge command", e);
 		}
 	}
 
@@ -272,9 +276,11 @@ public class Network implements Runnable {
 	) {
 		try {
 			sendQueue.put(Message.ACCEPT_CHALLENGE(
-				otherPlayer, player, cmdRq.getJSON(), true));
+				otherPlayer, player, SSJSJS.serialize(cmdRq), true));
 		} catch (final InterruptedException e) {
-			throw new RuntimeException("This cannot happen");
+			throw new RuntimeException("Interrupted: This cannot happen");
+		} catch (final JSONSerializeException e) {
+			throw new RuntimeException("Error serializing accept queued game command", e);
 		} 
 	}
 
@@ -300,9 +306,11 @@ public class Network implements Runnable {
 
 	public void sendCommand(final Command cmd) {
 		try {
-			sendQueue.put(Message.COMMAND(cmd.getJSON()));
+			sendQueue.put(Message.COMMAND(SSJSJS.serialize(cmd)));
 		} catch (final InterruptedException e) {
-			throw new RuntimeException("This cannot happen");
+			throw new RuntimeException("Interrupted: This cannot happen");
+		} catch (final JSONSerializeException e) {
+			throw new RuntimeException("Error serializing command", e);
 		}
 	}
 

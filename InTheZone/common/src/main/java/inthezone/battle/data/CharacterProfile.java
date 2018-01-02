@@ -1,17 +1,21 @@
 package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.As;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.Implicit;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.JSONable;
 
-public class CharacterProfile implements HasJSONRepresentation {
+/**
+ * A character with a selection of abilities and status buffs.
+ * */
+public class CharacterProfile implements JSONable {
 	public final CharacterInfo rootCharacter;
 	public final Collection<AbilityInfo> abilities;
 	public final AbilityInfo basicAbility;
@@ -21,39 +25,45 @@ public class CharacterProfile implements HasJSONRepresentation {
 	private final int extraAttack;
 	private final int extraHP;
 
+	private final String rootCharacterName;
+
+	/**
+	 * Get a list of all the abilities that this character profile can perform.
+	 * */
 	public Collection<AbilityInfo> allAbilities() {
 		final List<AbilityInfo> r = new LinkedList<>(abilities);
 		r.add(0, basicAbility);
 		return r;
 	}
 
-	public CharacterProfile(CharacterInfo rootCharacter)
+	/**
+	 * Create a default character profile with no abilities or extra status buffs selected.
+	 * */
+	public CharacterProfile(final CharacterInfo rootCharacter)
 		throws CorruptDataException
 	{
-		this.rootCharacter = rootCharacter;
-		this.abilities = new ArrayList<>();
-		abilities.addAll(rootCharacter.abilities.stream()
-			.filter(a -> a.type == AbilityType.SPECIAL)
-			.collect(Collectors.toList()));
-		basicAbility = rootCharacter.abilities.stream()
-			.filter(a -> a.type == AbilityType.BASIC)
-			.findFirst().orElseThrow(() ->
-				new CorruptDataException("No basic ability for " + rootCharacter.name));
-		extraAttack = 0;
-		extraHP = 0;
-
-		attackPP = 0;
-		hpPP = 0;
+		this(
+			rootCharacter, 
+			rootCharacter.abilities.stream()
+				.filter(a -> a.type == AbilityType.SPECIAL)
+				.collect(Collectors.toList()),
+			rootCharacter.abilities.stream()
+				.filter(a -> a.type == AbilityType.BASIC)
+				.findFirst().orElseThrow(() ->
+					new CorruptDataException("No basic ability for " + rootCharacter.name)),
+			0,
+			0);
 	}
 
 	public CharacterProfile(
-		CharacterInfo rootCharacter,
-		Collection<AbilityInfo> abilities,
-		AbilityInfo basicAbility,
-		int attackPP,
-		int hpPP
+		final CharacterInfo rootCharacter,
+		final Collection<AbilityInfo> abilities,
+		final AbilityInfo basicAbility,
+		final int attackPP,
+		final int hpPP
 	) throws CorruptDataException {
 		this.rootCharacter = rootCharacter;
+		this.rootCharacterName = rootCharacter.name;
 		this.abilities = abilities;
 		this.basicAbility = basicAbility;
 
@@ -69,6 +79,18 @@ public class CharacterProfile implements HasJSONRepresentation {
 			rootCharacter.attackCurve.get(attackPP - 1) - rootCharacter.stats.attack;
 		this.extraHP = hpPP == 0? 0 :
 			rootCharacter.hpCurve.get(hpPP - 1) - rootCharacter.stats.hp;
+	}
+
+	@JSONConstructor
+	public CharacterProfile(
+		@Implicit("gameData") final GameDataFactory gameData,
+		@Field("rootCharacterName")@As("for") final String rootCharacterName,
+		@Field("abilities") final Collection<AbilityInfo> abilities,
+		@Field("basicAbility") final AbilityInfo basicAbility,
+		@Field("attackPP")@As("attack") final int attackPP,
+		@Field("hpPP")@As("HP") final int hpPP
+	) throws CorruptDataException {
+		this(gameData.getCharacter(rootCharacterName), abilities, basicAbility, attackPP, hpPP);
 	}
 
 	/**
@@ -88,65 +110,7 @@ public class CharacterProfile implements HasJSONRepresentation {
 				Collectors.summingInt(x -> (int) x));
 	}
 
-	@Override
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		final JSONArray a = new JSONArray();
-		abilities.stream().forEach(x -> a.put(x.name));
-		r.put("for", rootCharacter.name);
-		r.put("abilities", a);
-		r.put("basicAbility", basicAbility.name);
-		r.put("attack", attackPP);
-		r.put("HP", hpPP);
-		return r;
-	}
-
-	public static CharacterProfile fromJSON(
-		JSONObject json, GameDataFactory gameData
-	) throws CorruptDataException {
-		try {
-			final CharacterInfo root = gameData.getCharacter(json.getString("for"));
-			if (root == null) throw new CorruptDataException(
-				"No such character \"" + json.getString("for") + "\" in character profile");
-
-			final Collection<AbilityInfo> abilities =
-				jsonArrayToList(json.getJSONArray("abilities"), String.class).stream()
-					.map(n -> root.lookupAbility(n))
-					.collect(Collectors.toList());
-
-			final AbilityInfo basicAbility =
-				root.lookupAbility(json.getString("basicAbility"));
-
-			if (abilities.stream().anyMatch(x -> x == null) || basicAbility == null)
-				throw new CorruptDataException("No such ability error in character profile");
-
-			final int attack = json.getInt("attack");
-			final int hp = json.getInt("HP");
-
-			return new CharacterProfile(
-				root, abilities, basicAbility, attack, hp);
-
-		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in character profile", e);
-
-		} catch (JSONException e) {
-			throw new CorruptDataException("Error parsing character profile, " + e.getMessage(), e);
-		}
-	}
-
-	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
-		throws ClassCastException
-	{
-		List<T> r = new ArrayList<>();
-		int limit = a.length();
-		for (int i = 0; i < limit; i++) {
-			r.add(clazz.cast(a.get(i)));
-		}
-		return r;
-	}
-
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return rootCharacter.name;
 	}
 }

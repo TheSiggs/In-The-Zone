@@ -6,7 +6,7 @@ ext.moduleName = 'inthezone.common';
 dependencies {
 	api project(':engine')
 	implementation project(':game-ai')
-	implementation project(':json')
+	implementation project(':org.json')
 	testCompile 'junit:junit:4+'
 }
 

@@ -8,6 +8,8 @@ import isogame.engine.CorruptDataException;
 import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
+import ssjsjs.JSONDeserializeException;
+import ssjsjs.SSJSJS;
 
 public class StatusEffectFactory {
 	public static StatusEffect getEffect(
@@ -35,7 +37,7 @@ public class StatusEffectFactory {
 			case FEARED:
 				Character c = agent.orElseThrow(() -> new RuntimeException(
 					"Attempted to create feared status without a character agent"));
-				return new FearedStatusEffect(info, c, startTurn);
+				return new FearedStatusEffect(info, startTurn, c);
 			case PANICKED: return new PanickedStatusEffect(info, startTurn);
 			case VAMPIRISM: return new Vampirism(info, startTurn);
 			case COVER: return new Cover(info, startTurn);
@@ -51,13 +53,13 @@ public class StatusEffectFactory {
 
 			switch (info.type) {
 				case ONGOING:
-				case REGENERATION: return HPStatusEffect.fromJSON(json);
-				case FEARED: return FearedStatusEffect.fromJSON(json);
+				case REGENERATION: return SSJSJS.deserialize(json, HPStatusEffect.class);
+				case FEARED: return SSJSJS.deserialize(json, FearedStatusEffect.class);
 				default:
 					final int startTurn = json.getInt("startTurn");
 					return getEffect(info, startTurn, 0, null);
 			}
-		} catch (CorruptDataException|JSONException e) {
+		} catch (final CorruptDataException|JSONException|JSONDeserializeException e) {
 			throw new ProtocolException("Error parsing status effect " +
 				json.toString());
 		}

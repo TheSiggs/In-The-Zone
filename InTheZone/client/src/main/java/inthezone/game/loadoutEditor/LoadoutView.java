@@ -151,15 +151,13 @@ public class LoadoutView extends DialogScreen<Loadout> {
 			modalDialog.showDialog(dialog, r -> {
 				if (r == ButtonType.YES) {
 					final Loadout out = this.model.encodeLoadout();
-					config.loadouts.set(loadoutID, out);
-					config.writeConfig();
+					config.setLoadout(loadoutID, out);
 					onDone.accept(Optional.of(out));
 				}
 			});
 		} else {
 			final Loadout out = this.model.encodeLoadout();
-			config.loadouts.set(loadoutID, out);
-			config.writeConfig();
+			config.setLoadout(loadoutID, out);
 			onDone.accept(Optional.of(out));
 		}
 	}

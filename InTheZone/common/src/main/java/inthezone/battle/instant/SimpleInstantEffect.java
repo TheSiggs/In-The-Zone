@@ -1,85 +1,53 @@
 package inthezone.battle.instant;
 
-import isogame.engine.CorruptDataException;
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
-
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.Targetable;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.protocol.ProtocolException;
-
+/**
+ * Basic instant effects that don't require special handling.
+ * */
 public class SimpleInstantEffect extends InstantEffect {
-	private final List<MapPoint> targets = new ArrayList<>();
-	private final InstantEffectType type;
+	private final InstantEffectType kind;
 
+	private final List<MapPoint> targets = new ArrayList<>();
+
+	@JSONConstructor
 	private SimpleInstantEffect(
-		final Set<MapPoint> targets,
-		final MapPoint agent,
-		final InstantEffectType type
-	) {
+		@Field("kind") final InstantEffectType kind,
+		@Field("targets") final Collection<MapPoint> targets,
+		@Field("agent") final MapPoint agent
+	) throws ProtocolException {
 		super(agent);
 		this.targets.addAll(targets);
-		this.type = type;
-	}
+		this.kind = kind;
 
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		final JSONArray a = new JSONArray();
-		o.put("kind", type.toString());
-		o.put("agent", agent.getJSON()); 
-		for (MapPoint t : targets) a.put(t.getJSON());
-		o.put("targets", a);
-		return o;
-	}
-
-	public static SimpleInstantEffect fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final InstantEffectType kind =
-				(new InstantEffectInfo(json.getString("kind"))).type;
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final JSONArray rawTargets = json.getJSONArray("targets");
-
-			if (!(kind == InstantEffectType.CLEANSE ||
-				kind == InstantEffectType.DEFUSE ||
-				kind == InstantEffectType.PURGE)
-			) throw new ProtocolException("Expected cleanse, defuse or purge effect");
-
-			final Set<MapPoint> targets = new HashSet<>();
-			for (int i = 0; i < rawTargets.length(); i++) {
-				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
-			}
-
-			return new SimpleInstantEffect(targets, agent, kind);
-
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing cleanse/purge/defuse effect", e);
-		}
+		if (!(kind == InstantEffectType.CLEANSE ||
+			kind == InstantEffectType.DEFUSE ||
+			kind == InstantEffectType.PURGE)
+		) throw new ProtocolException("Expected cleanse, defuse or purge effect");
 	}
 
 	public static SimpleInstantEffect getEffect(
 		final Set<MapPoint> targets,
 		final MapPoint agent, final InstantEffectType type
-	) {
-		return new SimpleInstantEffect(targets, agent, type);
+	) throws ProtocolException {
+		return new SimpleInstantEffect(type, targets, agent);
 	}
 
 	@Override public List<Targetable> apply(final Battle battle) {
-		switch (type) {
+		switch (kind) {
 			case CLEANSE: return battle.doCleanse(targets);
 			case PURGE: return battle.doPurge(targets);
 			case DEFUSE: return battle.doDefuse(targets);
@@ -91,11 +59,15 @@ public class SimpleInstantEffect extends InstantEffect {
 	@Override public InstantEffect retarget(
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
-		return new SimpleInstantEffect(
-			targets.stream()
-				.map(x -> retarget.getOrDefault(x, x))
-				.collect(Collectors.toSet()),
-			retarget.getOrDefault(agent, agent), type);
+		try {
+			return new SimpleInstantEffect(
+				kind, targets.stream()
+					.map(x -> retarget.getOrDefault(x, x))
+					.collect(Collectors.toSet()),
+				retarget.getOrDefault(agent, agent));
+		} catch (final ProtocolException e) {
+			throw new RuntimeException("Wrong kind for SimpleInstantEffect, this cannot happen", e);
+		}
 	}
 }
 

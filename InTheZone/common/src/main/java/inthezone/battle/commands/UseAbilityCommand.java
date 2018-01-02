@@ -1,29 +1,31 @@
 package inthezone.battle.commands;
 
-import java.util.Collection;
-
 import inthezone.battle.Ability;
 import inthezone.battle.Battle;
 import inthezone.battle.Casting;
-import inthezone.battle.Character;
 import inthezone.battle.DamageToTarget;
 import inthezone.battle.data.AbilityZoneType;
 import inthezone.battle.RoadBlock;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.As;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
+/**
+ * A character uses an ability.
+ * */
 public class UseAbilityCommand extends Command {
+	private CommandKind kind = CommandKind.ABILITY;
+
 	private MapPoint agent;
 	public final AbilityAgentType agentType;
 	public final String ability;
@@ -42,7 +44,8 @@ public class UseAbilityCommand extends Command {
 	public boolean placedZones = false;
 
 	public UseAbilityCommand(
-		final MapPoint agent, final AbilityAgentType agentType,
+		final MapPoint agent,
+		final AbilityAgentType agentType,
 		final String ability,
 		final String friendlyAbilityName,
 		final Collection<MapPoint> targetSquares,
@@ -54,7 +57,8 @@ public class UseAbilityCommand extends Command {
 	}
 
 	public UseAbilityCommand(
-		final MapPoint agent, final AbilityAgentType agentType,
+		final MapPoint agent,
+		final AbilityAgentType agentType,
 		final String ability,
 		final String friendlyAbilityName,
 		final Collection<MapPoint> targetSquares,
@@ -73,76 +77,28 @@ public class UseAbilityCommand extends Command {
 		canCancel = subsequentLevel == 0;
 	}
 
+	@JSONConstructor
+	private UseAbilityCommand(
+		@Field("kind") final CommandKind kind,
+		@Field("agent") final MapPoint agent,
+		@Field("agentType") final AbilityAgentType agentType,
+		@Field("ability") final String ability,
+		@Field("friendlyAbilityName")@As("fability") final String friendlyAbilityName,
+		@Field("targetSquares") final Collection<MapPoint> targetSquares,
+		@Field("targets") final Collection<DamageToTarget> targets,
+		@Field("constructed") final Collection<MapPoint> constructed,
+		@Field("subsequentLevel") final int subsequentLevel
+	) throws ProtocolException {
+		this(agent, agentType, ability, friendlyAbilityName,
+			targetSquares, targets, constructed, subsequentLevel);
+	}
+
 	/**
 	 * A hack to mark that this command has a pre-effect, and therefore cannot be
 	 * cancelled after all.
 	 * */
 	void notifyHasPreEffect() {
 		canCancel = false;
-	}
-
-	@Override 
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		r.put("kind", CommandKind.ABILITY.toString());
-		r.put("agent", agent.getJSON());
-		r.put("agentType", agentType.toString());
-		r.put("ability", ability);
-		r.put("fability", friendlyAbilityName);
-		r.put("subsequentLevel", subsequentLevel);
-		final JSONArray ta = new JSONArray();
-		for (DamageToTarget d : targets) ta.put(d.getJSON());
-		r.put("targets", ta);
-
-		final JSONArray tsa = new JSONArray();
-		for (final MapPoint p : targetSquares) tsa.put(p.getJSON());
-		r.put("targetSquares", tsa);
-
-		final JSONArray cs = new JSONArray();
-		for (MapPoint p : constructed) cs.put(p.getJSON());
-		r.put("constructed", cs);
-		return r;
-	}
-
-	public static UseAbilityCommand fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final AbilityAgentType agentType = AbilityAgentType.fromString(json.getString("agentType"));
-			final String ability = json.getString("ability");
-			final String friendlyAbilityName = json.optString("fability", ability);
-			final JSONArray rawTargets = json.getJSONArray("targets");
-			final JSONArray rawTargetSquares = json.getJSONArray("targetSquares");
-			final JSONArray rawConstructed = json.getJSONArray("constructed");
-			final int subsequentLevel = json.getInt("subsequentLevel");
-
-			if (kind != CommandKind.ABILITY)
-				throw new ProtocolException("Expected ability command");
-
-			final Collection<DamageToTarget> targets = new ArrayList<>();
-			for (int i = 0; i < rawTargets.length(); i++) {
-				targets.add(DamageToTarget.fromJSON(rawTargets.getJSONObject(i)));
-			}
-
-			final Collection<MapPoint> targetSquares = new ArrayList<>();
-			for (int i = 0; i < rawTargetSquares.length(); i++) {
-				targetSquares.add(MapPoint.fromJSON(rawTargetSquares.getJSONObject(i)));
-			}
-
-			final Collection<MapPoint> constructed = new ArrayList<>();
-			for (int i = 0; i < rawConstructed.length(); i++) {
-				constructed.add(MapPoint.fromJSON(rawConstructed.getJSONObject(i)));
-			}
-
-			return new UseAbilityCommand(
-				agent, agentType, ability, friendlyAbilityName,
-				targetSquares, targets, constructed, subsequentLevel);
-
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing ability command, " + e.getMessage(), e);
-		}
 	}
 
 	@Override

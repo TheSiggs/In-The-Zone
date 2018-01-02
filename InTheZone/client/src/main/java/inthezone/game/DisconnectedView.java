@@ -94,14 +94,12 @@ public class DisconnectedView extends FlowPane {
 				final String[] r = newServer.split(":");
 				if (r.length == 1) {
 					this.server = r[0];
-					config.server = this.server;
-					config.writeConfig();
+					config.setServer(this.server);
 				} else if (r.length == 2) {
 					this.server = r[0];
 					this.port = Integer.parseInt(r[1]);
-					config.server = this.server;
-					config.port = this.port;
-					config.writeConfig();
+					config.setServer(this.server);
+					config.setPort(this.port);
 				} else {
 					final Alert a = new Alert(
 						Alert.AlertType.INFORMATION, "Enter \"server:port\"");

@@ -1,13 +1,12 @@
 package inthezone.battle.commands;
 
+import inthezone.battle.BattleState;
+import inthezone.battle.data.Player;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import inthezone.battle.BattleState;
-import inthezone.battle.data.Player;
 
 public class MoveCommandRequest extends CommandRequest {
 	private final MapPoint start;
@@ -42,9 +41,13 @@ public class MoveCommandRequest extends CommandRequest {
 			pathSpec.orElseGet(() -> battleState.findPath(start, target, player));
 
 		if (battleState.canMove(path)) {
-			final List<Command> r = new ArrayList<>();
-			r.add(new MoveCommand(path, false));
-			return r;
+			try {
+				final List<Command> r = new ArrayList<>();
+				r.add(new MoveCommand(path, false));
+				return r;
+			} catch (final ProtocolException e) {
+				throw new CommandException("Error constructing move command", e);
+			}
 		} else {
 			throw new CommandException("30: Bad path command request");
 		}

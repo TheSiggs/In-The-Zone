@@ -6,5 +6,6 @@ module inthezone.client {
 	requires javafx.controls;
 	requires javafx.web;
 	requires org.json;
+	requires ssjsjs;
 }
 

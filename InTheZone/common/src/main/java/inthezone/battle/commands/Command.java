@@ -1,17 +1,14 @@
 package inthezone.battle.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import isogame.engine.HasJSONRepresentation;
-
-import org.json.JSONObject;
-
 import inthezone.battle.Battle;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONObject;
+import ssjsjs.JSONable;
 
-public abstract class Command implements HasJSONRepresentation {
+public abstract class Command implements JSONable {
 	/**
 	 * Do a command.
 	 * @return All the characters that were affected by the command
@@ -46,7 +43,7 @@ public abstract class Command implements HasJSONRepresentation {
 	{
 		final Object okind = json.get("kind");
 		if (okind == null) throw new ProtocolException("Missing command kind");
-		switch (CommandKind.fromString((String) okind)) {
+		switch (CommandKind.valueOf((String) okind)) {
 			case ENDTURN: return EndTurnCommand.fromJSON(json);
 			case STARTTURN: throw new RuntimeException("Cannot receive start turn command");
 			case MOVE: return MoveCommand.fromJSON(json);

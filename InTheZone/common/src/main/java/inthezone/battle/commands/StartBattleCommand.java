@@ -1,19 +1,5 @@
 package inthezone.battle.commands;
 
-import isogame.engine.CorruptDataException;
-import isogame.engine.FacingDirection;
-import isogame.engine.HasJSONRepresentation;
-import isogame.engine.MapPoint;
-import isogame.engine.Sprite;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
@@ -21,12 +7,24 @@ import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.CorruptDataException;
+import isogame.engine.FacingDirection;
+import isogame.engine.MapPoint;
+import isogame.engine.Sprite;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.JSONable;
 
 /**
  * Contains all the data needed to start a new battle.  When executed, this
  * command initializes a new battle.
  * */
-public class StartBattleCommand implements HasJSONRepresentation {
+public class StartBattleCommand implements JSONable {
+	private final String kind = "Start";
+
 	public final String stage;
 	public final boolean p1GoesFirst;
 	private final Loadout p1;
@@ -79,6 +77,24 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		}
 	}
 
+	@JSONConstructor
+	private StartBattleCommand(
+		@Field("kind") final String kind,
+		@Field("stage") final String stage,
+		@Field("p1GoesFirst") final boolean p1GoesFirst,
+		@Field("p1") final Loadout p1,
+		@Field("p2") final Loadout p2,
+		@Field("p1start") final List<MapPoint> p1start,
+		@Field("p2start") final List<MapPoint> p2start,
+		@Field("p1Name") final String p1Name,
+		@Field("p2Name") final String p2Name
+	) throws ProtocolException {
+		this(stage, p1GoesFirst, p1, p2, p1start, p2start, p1Name, p2Name);
+
+		if (!kind.equals("Start"))
+			throw new ProtocolException("Expected start command");
+	}
+
 	public Collection<Sprite> makeSprites() {
 		final Collection<Sprite> sprites = new ArrayList<>();
 		for (final Character c : characters) {
@@ -90,63 +106,6 @@ public class StartBattleCommand implements HasJSONRepresentation {
 		}
 
 		return sprites;
-	}
-
-	@Override 
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		final JSONArray a1 = new JSONArray();
-		final JSONArray a2 = new JSONArray();
-
-		for (final MapPoint p : p1start) a1.put(p.getJSON());
-		for (final MapPoint p : p2start) a2.put(p.getJSON());
-
-		r.put("kind", "Start");
-		r.put("stage", stage);
-		r.put("p1First", p1GoesFirst);
-		r.put("p1", p1.getJSON());
-		r.put("p2", p2.getJSON());
-		r.put("p1Start", a1);
-		r.put("p2Start", a2);
-		r.put("p1Name", p1Name);
-		r.put("p2Name", p2Name);
-		return r;
-	}
-
-	public static StartBattleCommand fromJSON(
-		final JSONObject json, final GameDataFactory gameData
-	) throws ProtocolException
-	{
-		try {
-			final String kind = json.getString("kind");
-			final String stage = json.getString("stage");
-			final boolean p1First = json.getBoolean("p1First");
-			final Loadout p1 = Loadout.fromJSON(json.getJSONObject("p1"), gameData);
-			final Loadout p2 = Loadout.fromJSON(json.getJSONObject("p2"), gameData);
-			final JSONArray rawp1Start = json.getJSONArray("p1Start");
-			final JSONArray rawp2Start = json.getJSONArray("p2Start");
-			final String p1Name = json.optString("p1Name", "Player A");
-			final String p2Name = json.optString("p2Name", "Player B");
-
-			if (!kind.equals("Start"))
-				throw new ProtocolException("Expected start command");
-
-			final List<MapPoint> p1Start = new ArrayList<>();
-			final List<MapPoint> p2Start = new ArrayList<>();
-
-			for (int i = 0; i < rawp1Start.length(); i++) {
-				p1Start.add(MapPoint.fromJSON(rawp1Start.getJSONObject(i)));
-			}
-			for (int i = 0; i < rawp2Start.length(); i++) {
-				p2Start.add(MapPoint.fromJSON(rawp2Start.getJSONObject(i)));
-			}
-
-			return new StartBattleCommand(
-				stage, p1First, p1, p2, p1Start, p2Start, p1Name, p2Name);
-
-		} catch (final JSONException|CorruptDataException e) {
-			throw new ProtocolException("Error parsing start command", e);
-		}
 	}
 
 	public Battle doCmd(final GameDataFactory gameData)

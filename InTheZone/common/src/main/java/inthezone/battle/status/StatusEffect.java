@@ -7,13 +7,14 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.data.Stats;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.JSONable;
 
-public abstract class StatusEffect implements HasJSONRepresentation {
+/**
+ * Base class for status effects.
+ * */
+public abstract class StatusEffect implements JSONable {
 	private static final int TOTAL_TURNS = 4;
 	protected final int startTurn;
 	public StatusEffectInfo info;
@@ -59,14 +60,6 @@ public abstract class StatusEffect implements HasJSONRepresentation {
 	 * */
 	public StatusEffect resolve(final BattleState battle) throws ProtocolException {
 		return this;
-	}
-
-	@Override
-	public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		o.put("info", info.toString());
-		o.put("startTurn", startTurn);
-		return o;
 	}
 }
 

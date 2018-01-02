@@ -1,17 +1,24 @@
 package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
+import ssjsjs.JSONable;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
 /**
  * Static data regarding an instant effect.
  * */
-public class InstantEffectInfo {
+public class InstantEffectInfo implements JSONable {
 	public final InstantEffectType type;
 	public final int param;
 
 	private static final int DEFAULT_PARAMETER = 0;
 
-	public InstantEffectInfo(final InstantEffectType type, final int param) {
+	@JSONConstructor
+	public InstantEffectInfo(
+		@Field("type") final InstantEffectType type,
+		@Field("param") final int param
+	) {
 		this.type = type;
 		this.param = param;
 	}
@@ -21,7 +28,7 @@ public class InstantEffectInfo {
 	{
 		String parts[] = effect.split("\\s");
 		if (parts.length < 1) throw new CorruptDataException("Expected instant effect");
-		this.type = InstantEffectType.fromString(parts[0]);
+		this.type = InstantEffectType.valueOf(parts[0]);
 
 		int paramv = DEFAULT_PARAMETER;
 		if (parts.length >= 2) {
@@ -39,11 +46,11 @@ public class InstantEffectInfo {
 	}
 
 	@Override public boolean equals(final Object b) {
-		if (b == null) return false;
-		else if (b instanceof InstantEffectInfo) {
+		if (!(b instanceof InstantEffectInfo)) return false;
+		else {
 			final InstantEffectInfo i = (InstantEffectInfo) b;
 			return i.type == this.type && i.param == this.param;
-		} else return false;
+		}
 	}
 
 	/**
@@ -54,8 +61,7 @@ public class InstantEffectInfo {
 		return type == InstantEffectType.OBSTACLES;
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		if (param == DEFAULT_PARAMETER) {
 			return type.toString();
 		} else {

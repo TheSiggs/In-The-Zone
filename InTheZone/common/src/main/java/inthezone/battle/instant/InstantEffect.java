@@ -1,22 +1,23 @@
 package inthezone.battle.instant;
 
-import isogame.engine.HasJSONRepresentation;
-import isogame.engine.MapPoint;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
-import inthezone.battle.Targetable;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.ExecutedCommand;
+import inthezone.battle.Targetable;
+import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import ssjsjs.JSONable;
 
-public abstract class InstantEffect implements HasJSONRepresentation {
+/**
+ * Base class for instant effects.
+ * */
+public abstract class InstantEffect implements JSONable {
 	public final MapPoint agent;
 
 	protected InstantEffect(final MapPoint agent) {

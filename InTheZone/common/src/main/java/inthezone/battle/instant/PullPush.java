@@ -1,25 +1,5 @@
 package inthezone.battle.instant;
 
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
@@ -33,8 +13,27 @@ import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
 import inthezone.battle.data.Player;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
+/**
+ * Push and pull instant effects.
+ * */
 public class PullPush extends InstantEffect {
+	private final InstantEffectType kind;
+
 	private final InstantEffectInfo type;
 	private final MapPoint castFrom;
 	public final List<List<MapPoint>> paths;
@@ -53,6 +52,7 @@ public class PullPush extends InstantEffect {
 		final boolean isFear
 	) {
 		super(castFrom);
+		this.kind = type.type;
 		this.type = type;
 		this.param = type.param;
 		this.castFrom = castFrom;
@@ -60,51 +60,18 @@ public class PullPush extends InstantEffect {
 		this.isFear = isFear;
 	}
 
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		final JSONArray a = new JSONArray();
-		o.put("kind", type.toString());
-		o.put("castFrom", castFrom.getJSON());
-		o.put("isFear", isFear);
-		for (List<MapPoint> path : paths) {
-			JSONArray pp = new JSONArray();
-			for (MapPoint p : path) pp.put(p.getJSON());
-			a.put(pp);
-		}
-		o.put("paths", a);
-		return o;
-	}
+	@JSONConstructor
+	private PullPush(
+		@Field("kind") final InstantEffectType kind,
+		@Field("type") final InstantEffectInfo type,
+		@Field("castFrom") final MapPoint castFrom,
+		@Field("paths") final List<List<MapPoint>> paths,
+		@Field("isFear") final boolean isFear
+	) throws ProtocolException {
+		this(type, castFrom, paths, isFear);
 
-	public static PullPush fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final InstantEffectInfo kind =
-				new InstantEffectInfo(json.getString("kind"));
-			final MapPoint castFrom =
-				MapPoint.fromJSON(json.getJSONObject("castFrom"));
-			final boolean isFear = json.getBoolean("isFear");
-			final JSONArray rawPaths = json.getJSONArray("paths");
-
-			if (!(kind.type == InstantEffectType.PULL || kind.type == InstantEffectType.PUSH))
-				throw new ProtocolException("Expected push or pull effect");
-
-			final List<List<MapPoint>> paths = new ArrayList<>();
-			for (int i = 0; i < rawPaths.length(); i++) {
-				final List<MapPoint> path = new ArrayList<>();
-				final JSONArray rawPath = rawPaths.getJSONArray(i);
-				for (int j = 0; j < rawPath.length(); j++) {
-					path.add(MapPoint.fromJSON(rawPath.getJSONObject(j)));
-				}
-
-				paths.add(path);
-			}
-
-			return new PullPush(kind, castFrom, paths, isFear);
-
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing push/pull effect", e);
-		}
+		if (!(kind == InstantEffectType.PULL || kind == InstantEffectType.PUSH)
+			|| kind != type.type) throw new ProtocolException("Expected push or pull effect");
 	}
 
 	/**

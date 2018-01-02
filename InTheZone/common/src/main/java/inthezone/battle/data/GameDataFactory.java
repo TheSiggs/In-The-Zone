@@ -1,20 +1,19 @@
 package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
 import isogame.engine.SpriteInfo;
 import isogame.engine.Stage;
 import isogame.resource.DevelopmentResourceLocator;
 import isogame.resource.ResourceLocator;
-
+import javafx.scene.image.Image;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -25,14 +24,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import javafx.scene.image.Image;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import ssjsjs.JSONDeserializeException;
+import ssjsjs.JSONSerializeException;
+import ssjsjs.SSJSJS;
 
-public class GameDataFactory implements HasJSONRepresentation {
+/**
+ * Constructs game data objects.
+ * */
+public class GameDataFactory {
 	private final Library globalLibrary;
 	private final StandardSprites standardSprites;
 	public final ResourceLocator loc;
@@ -44,6 +46,7 @@ public class GameDataFactory implements HasJSONRepresentation {
 	private final boolean updateCache;
 
 	private JSONObject json = null;
+	public JSONObject getJSON() {return json;}
 
 	private final Set<Runnable> updateWatchers = new HashSet<>();
 
@@ -101,9 +104,6 @@ public class GameDataFactory implements HasJSONRepresentation {
 		}
 	}
 
-	@Override
-	public JSONObject getJSON() {return json;}
-
 	public void update(final JSONObject json) throws CorruptDataException {
 		stages.clear();
 		characters.clear();
@@ -124,6 +124,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 	}
 
 	private void loadGameData(final JSONObject json) throws CorruptDataException {
+		final Map<String, Object> env = new HashMap<>();
+		env.put("locator", loc);
+		env.put("library", globalLibrary);
+
 		try {
 			this.json = json;
 			this.version = UUID.fromString(json.getString("version"));
@@ -132,18 +136,17 @@ public class GameDataFactory implements HasJSONRepresentation {
 			final JSONArray aCharacters = json.getJSONArray("characters");
 
 			for (final Object x : aStages) {
-				final Stage i = Stage.fromJSON(
-					(JSONObject) x, loc, globalLibrary);
+				final String name = ((JSONObject) x).optString("name");
+				final Stage i = Stage.fromJSON(name, (JSONObject) x, loc, globalLibrary);
 				stages.put(i.name, i);
 			}
 
 			for (final Object x : aCharacters) {
-				final CharacterInfo i =
-					CharacterInfo.fromJSON((JSONObject) x, loc, globalLibrary);
+				final CharacterInfo i = SSJSJS.deserialize((JSONObject) x, CharacterInfo.class, env);
 				characters.put(i.name, i);
 			}
 
-		} catch (final JSONException e) {
+		} catch (final JSONException|JSONDeserializeException e) {
 			throw new CorruptDataException("Error in game data: " + e.getMessage(), e);
 
 		} catch (final ClassCastException|IllegalArgumentException e) {
@@ -225,19 +228,19 @@ public class GameDataFactory implements HasJSONRepresentation {
 		final OutputStream outStream,
 		final Collection<File> stages,
 		final Collection<CharacterInfo> characters
-	) throws IOException {
+	) throws IOException, CorruptDataException {
 		try (final PrintWriter out =
 			new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
 		) {
 			final JSONObject o = new JSONObject();
 			final JSONArray s = new JSONArray();
 			final JSONArray c = new JSONArray();
-			final JSONArray w = new JSONArray();
 
 			for (final File stage : stages)
 				s.put(parseStage(stage));
+
 			for (final CharacterInfo character : characters)
-				c.put(character.getJSON());
+				c.put(SSJSJS.serialize(character));
 
 			o.put("version", UUID.randomUUID().toString());
 			o.put("versionNumber", ++versionNumber);
@@ -245,6 +248,10 @@ public class GameDataFactory implements HasJSONRepresentation {
 			o.put("characters", c);
 
 			out.print(o.toString(2));
+
+		} catch (final JSONSerializeException e) {
+			throw new CorruptDataException(
+				"Cannot serialize game data: " + e.getMessage(), e);
 		}
 	}
 

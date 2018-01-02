@@ -1,74 +1,48 @@
 package inthezone.battle.instant;
 
-import isogame.engine.CorruptDataException;
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
-
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.Targetable;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.protocol.ProtocolException;
-
+/**
+ * The revive instant effect.
+ * */
 public class Revive extends InstantEffect {
 	public final List<MapPoint> targets = new ArrayList<>();
 
-	protected Revive(final MapPoint agent, final Set<MapPoint> targets) {
+	private Revive(final MapPoint agent, final Collection<MapPoint> targets) {
 		super(agent);
 		this.targets.addAll(targets);
+	}
+
+	@JSONConstructor
+	private Revive(
+		@Field("kind") final InstantEffectType kind,
+		@Field("agent") final MapPoint agent,
+		@Field("targets") final Collection<MapPoint> targets
+	) throws ProtocolException {
+		this(agent, targets);
+
+		if (kind != InstantEffectType.REVIVE)
+			throw new ProtocolException("Expected revive effect");
 	}
 
 	public static Revive getEffect(
 		final Set<MapPoint> targets, final MapPoint agent
 	) {
 		return new Revive(agent, targets);
-	}
-
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		o.put("kind", InstantEffectType.REVIVE.toString());
-		o.put("agent", agent.getJSON());
-
-		final JSONArray a = new JSONArray();
-		for (MapPoint t : targets) a.put(t.getJSON());
-		o.put("targets", a);
-		return o;
-	}
-
-	public static Revive fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final InstantEffectType kind =
-				(new InstantEffectInfo(json.getString("kind"))).type;
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final JSONArray rawTargets = json.getJSONArray("targets");
-
-			if (kind != InstantEffectType.REVIVE)
-				throw new ProtocolException("Expected revive effect");
-
-			final Set<MapPoint> targets = new HashSet<>();
-			for (int i = 0; i < rawTargets.length(); i++) {
-				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
-			}
-
-			return new Revive(agent, targets);
-
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing revive effect", e);
-		}
 	}
 
 	/**

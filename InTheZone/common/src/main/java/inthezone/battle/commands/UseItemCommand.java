@@ -1,51 +1,42 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
-import inthezone.battle.Character;
 import inthezone.battle.HealthPotion;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
+/**
+ * A character uses a command.
+ * */
 public class UseItemCommand extends Command {
+	private final CommandKind kind = CommandKind.ITEM;
+
 	private final MapPoint agent;
 	private final MapPoint target;
 
-	public UseItemCommand(final MapPoint agent, final MapPoint target) {
+	public UseItemCommand(
+		final MapPoint agent,
+		final MapPoint target
+	) {
 		this.agent = agent;
 		this.target = target;
 	}
 
-	@Override 
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		r.put("kind", CommandKind.ITEM.toString());
-		r.put("agent", agent.getJSON());
-		r.put("target", target.getJSON());
-		return r;
-	}
+	@JSONConstructor
+	private UseItemCommand(
+		@Field("kind") final CommandKind kind,
+		@Field("agent") final MapPoint agent,
+		@Field("target") final MapPoint target
+	) throws ProtocolException {
+		this(agent, target);
 
-	public static UseItemCommand fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
-
-			if (kind != CommandKind.ITEM)
-				throw new ProtocolException("Expected move command");
-
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final MapPoint target = MapPoint.fromJSON(json.getJSONObject("target"));
-
-			return new UseItemCommand(agent, target);
-		} catch (JSONException|CorruptDataException e) {
-			throw new ProtocolException("Error parsing item command");
-		}
+		if (kind != CommandKind.ITEM)
+			throw new ProtocolException("Expected move command");
 	}
 
 	@Override

@@ -1,36 +1,36 @@
 package inthezone.battle.instant;
 
-import isogame.engine.CorruptDataException;
 import isogame.engine.MapPoint;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.CharacterFrozen;
-import inthezone.battle.Targetable;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
+import java.util.ArrayList;
+import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
+/**
+ * The move instant effect.
+ * */
 public class Move extends InstantEffect {
+	private final InstantEffectType kind = InstantEffectType.MOVE;
+
 	public final List<List<MapPoint>> paths = new ArrayList<>();
 	private final List<Character> affectedCharacters = new ArrayList<>();
 
@@ -64,46 +64,17 @@ public class Move extends InstantEffect {
 		});
 	}
 
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		final JSONArray a = new JSONArray();
-		o.put("kind", InstantEffectType.MOVE.toString());
-		o.put("range", range);
-		o.put("agent", agent.getJSON());
-		for (List<MapPoint> path : paths) {
-			final JSONArray pp = new JSONArray();
-			for (MapPoint p : path) pp.put(p.getJSON());
-			a.put(pp);
-		}
-		o.put("paths", a);
-		return o;
-	}
+	@JSONConstructor
+	private Move(
+		@Field("kind") final InstantEffectType kind,
+		@Field("range") final int range,
+		@Field("agent") final MapPoint agent,
+		@Field("paths") final Optional<List<List<MapPoint>>> paths
+	) throws ProtocolException {
+		this(Optional.empty(), range, paths, agent, true);
 
-	public static Move fromJSON(final JSONObject json) throws ProtocolException {
-		try {
-			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
-			int range = json.getInt("range");
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final JSONArray rawPaths = json.getJSONArray("paths");
-
-			if (kind != InstantEffectType.MOVE)
-				throw new ProtocolException("Expected move effect");
-
-			final List<List<MapPoint>> paths = new ArrayList<>();
-			for (int i = 0; i < rawPaths.length(); i++) {
-				final List<MapPoint> path = new ArrayList<>();
-				final JSONArray rawPath = rawPaths.getJSONArray(i);
-				for (int j = 0; j < rawPath.length(); j++) {
-					path.add(MapPoint.fromJSON(rawPath.getJSONObject(j)));
-				}
-
-				paths.add(path);
-			}
-
-			return new Move(Optional.empty(), range, Optional.of(paths), agent, true);
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing move effect", e);
-		}
+		if (kind != InstantEffectType.MOVE)
+			throw new ProtocolException("Expected move effect");
 	}
 
 	public static Move getEffect(

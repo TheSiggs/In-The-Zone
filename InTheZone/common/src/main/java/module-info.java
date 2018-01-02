@@ -12,5 +12,6 @@ module inthezone.common {
 	requires javafx.graphics;
 	requires nz.dcoder.ai;
 	requires org.json;
+	requires ssjsjs;
 }
 

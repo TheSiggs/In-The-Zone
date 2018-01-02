@@ -8,7 +8,7 @@ mainClassName = "$moduleName/inthezone.game.Game"
 dependencies {
 	implementation project(':common')
 	implementation project(':engine')
-	implementation project(':json')
+	implementation project(':org.json')
 	testCompile 'junit:junit:4+'
 }
 

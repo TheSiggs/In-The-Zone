@@ -16,5 +16,5 @@ include 'services:webservice'
 */
 
 rootProject.name = 'in-the-zone'
-include 'json', 'engine', 'game-ai', 'client', 'server', 'common', 'dataEditor'
+include 'org.json', 'ssjsjs', 'engine', 'game-ai', 'client', 'server', 'common', 'dataEditor'
 

@@ -1,17 +1,17 @@
 package inthezone.battle.data;
 
-import inthezone.battle.Character;
-import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.JSONable;
 
-public class Loadout implements HasJSONRepresentation {
+/**
+ * A user defined loadout.  Essentially a collection of character profiles.
+ * */
+public class Loadout implements JSONable {
 	public final String name;
 	public final List<CharacterProfile> characters = new ArrayList<>();
 	public final List<CharacterProfile> otherCharacters = new ArrayList<>();
@@ -19,10 +19,11 @@ public class Loadout implements HasJSONRepresentation {
 	public final static int maxPP = 25;
 	public final static int maxCharacters = 4;
 
+	@JSONConstructor
 	public Loadout(
-		String name,
-		List<CharacterProfile> characters,
-		List<CharacterProfile> otherCharacters
+		@Field("name") final String name,
+		@Field("characters") final Collection<CharacterProfile> characters,
+		@Field("otherCharacters") final Collection<CharacterProfile> otherCharacters
 	) {
 		this.name = name;
 		this.characters.addAll(characters);
@@ -40,58 +41,6 @@ public class Loadout implements HasJSONRepresentation {
 				.anyMatch(a -> a.banned) &&
 			characters.stream().map(c -> c.computeCost()).collect(
 				Collectors.summingInt(x -> (int) x)) <= maxPP;
-	}
-
-	@Override
-	public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		final JSONArray cs = new JSONArray();
-		final JSONArray ocs = new JSONArray();
-		for (CharacterProfile p : characters) cs.put(p.getJSON());
-		for (CharacterProfile p : otherCharacters) ocs.put(p.getJSON());
-		o.put("name", name);
-		o.put("characters", cs);
-		o.put("otherCharacters", ocs);
-		return o;
-	}
-
-	public static Loadout fromJSON(
-		JSONObject json, GameDataFactory gameData
-	) throws CorruptDataException {
-		try {
-			final String name = json.getString("name");
-			final List<JSONObject> cs =
-				jsonArrayToList(json.getJSONArray("characters"), JSONObject.class);
-			final JSONArray ocs = json.optJSONArray("otherCharacters");
-
-			final List<CharacterProfile> r = new ArrayList<>();
-			for (JSONObject c : cs) r.add(CharacterProfile.fromJSON(c, gameData));
-
-			final List<CharacterProfile> others = new ArrayList<>();
-			if (ocs != null) {
-				for (Object c : ocs)
-					others.add(CharacterProfile.fromJSON((JSONObject) c, gameData));
-			}
-
-			return new Loadout(name, r, others);
-
-		} catch (ClassCastException e) {
-			throw new CorruptDataException("Type error in loadout", e);
-
-		} catch (JSONException e) {
-			throw new CorruptDataException("Error parsing loadout, " + e.getMessage(), e);
-		}
-	}
-
-	private static <T> List<T> jsonArrayToList(JSONArray a, Class<T> clazz)
-		throws ClassCastException
-	{
-		List<T> r = new ArrayList<>();
-		int limit = a.length();
-		for (int i = 0; i < limit; i++) {
-			r.add(clazz.cast(a.get(i)));
-		}
-		return r;
 	}
 
 	@Override public String toString() {

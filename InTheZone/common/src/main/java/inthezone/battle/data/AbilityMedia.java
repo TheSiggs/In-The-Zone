@@ -1,17 +1,22 @@
 package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
 import isogame.engine.Library;
 import isogame.engine.SpriteInfo;
 import isogame.resource.ResourceLocator;
 import javafx.scene.image.Image;
 import java.io.IOException;
 import java.util.Optional;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.As;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.Implicit;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.JSONable;
 
-public class AbilityMedia implements HasJSONRepresentation {
+/**
+ * Icons and sprites and other assets associated with an ability.
+ * */
+public class AbilityMedia implements JSONable {
 	public final static String DEFAULT_ICON = "abilities/default.png";
 
 	public final Image icon;
@@ -19,61 +24,39 @@ public class AbilityMedia implements HasJSONRepresentation {
 	public final Optional<SpriteInfo> zoneTrapSprite;
 	public final Optional<SpriteInfo> obstacleSprite;
 
+	private final Optional<String> zoneTrapSpriteID;
+	private final Optional<String> obstacleSpriteID;
+
+	@JSONConstructor
 	public AbilityMedia(
-		Image icon,
-		String iconFile,
-		Optional<SpriteInfo> zoneTrapSprite,
-		Optional<SpriteInfo> obstacleSprite
-	) {
-		this.icon = icon;
-		this.iconFile = iconFile.equals("") ? DEFAULT_ICON : iconFile;
-		this.zoneTrapSprite = zoneTrapSprite;
-		this.obstacleSprite = obstacleSprite;
-	}
-
-	@Override public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		r.put("icon", iconFile);
-		zoneTrapSprite.ifPresent(e -> r.put("zoneTrapSprite", e.id));
-		obstacleSprite.ifPresent(e -> r.put("obstacleSprite", e.id));
-		return r;
-	}
-
-	public static AbilityMedia fromJSON(
-		JSONObject json, ResourceLocator loc, Library lib
+		@Implicit("locator") final ResourceLocator loc,
+		@Implicit("library") final Library lib,
+		@Field("iconFile")@As("icon") final String iconFile,
+		@Field("zoneTrapSpriteID")@As("zoneTrapSprite") final Optional<String> zoneTrapSpriteID,
+		@Field("obstacleSpriteID")@As("obstableSprite") final Optional<String> obstacleSpriteID
 	) throws CorruptDataException {
 		try {
-			final String iconFile = json.optString("icon", DEFAULT_ICON);
-			final String rzoneTrapSprite = json.optString("zoneTrapSprite", null);
-			final String robstacleSprite = json.optString("obstacleSprite", null);
-
-			final Optional<SpriteInfo> zoneTrapSprite;
-			if (rzoneTrapSprite == null) {
-				zoneTrapSprite = Optional.empty();
-			} else {
-				zoneTrapSprite = Optional.of(lib.getSprite(rzoneTrapSprite));
-			}
-
-			final Optional<SpriteInfo> obstacleSprite;
-			if (robstacleSprite == null) {
-				obstacleSprite = Optional.empty();
-			} else {
-				obstacleSprite = Optional.of(lib.getSprite(robstacleSprite));
-			}
-
-			final Image icon;
-			try {
-				icon = new Image(loc.gfx(iconFile));
-			} catch (IOException e) {
-				throw new CorruptDataException("Cannot find ability icon \"" +
-					iconFile + "\"");
-			}
-
-			return new AbilityMedia(icon, iconFile, zoneTrapSprite, obstacleSprite);
-
-		} catch (JSONException e) {
-			throw new CorruptDataException("Error parsing ability media, " + e.getMessage(), e);
+			this.icon = new Image(loc.gfx(iconFile));
+		} catch (final IOException e) {
+			throw new CorruptDataException("Cannot find ability icon \"" +
+				iconFile + "\"");
 		}
+
+		if (obstacleSpriteID.isPresent()) {
+			obstacleSprite = Optional.of(lib.getSprite(obstacleSpriteID.get()));
+		} else {
+			obstacleSprite = Optional.empty();
+		}
+
+		if (zoneTrapSpriteID.isPresent()) {
+			zoneTrapSprite = Optional.of(lib.getSprite(zoneTrapSpriteID.get()));
+		} else {
+			zoneTrapSprite = Optional.empty();
+		}
+
+		this.iconFile = iconFile.equals("") ? DEFAULT_ICON : iconFile;
+		this.zoneTrapSpriteID = zoneTrapSpriteID;
+		this.obstacleSpriteID = obstacleSpriteID;
 	}
 }
 

@@ -71,8 +71,7 @@ public class StandardHUD extends HUD {
 			view.modalDialog.showDialog(dialog, r -> {
 				if (r == KeyboardOptions.doneButton) {
 					view.canvas.keyBindings.loadBindings(dialog.resultTable);
-					config.getKeyBindingTable().loadBindings(dialog.resultTable);
-					config.writeConfig();
+					config.loadKeyBindings(dialog.resultTable);
 				}
 			});
 		});

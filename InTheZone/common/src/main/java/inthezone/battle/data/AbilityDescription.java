@@ -93,7 +93,7 @@ public class AbilityDescription {
 		final StringBuilder s, final AbilityInfo a
 	) {
 		s.append("(").append(a.type.toString());
-		if (a.isMana) s.append(" / mana");
+		if (a.isMana()) s.append(" / mana");
 		s.append(")");
 
 		s.append(" -- ").append(a.ap).append(" AP");
@@ -120,7 +120,7 @@ public class AbilityDescription {
 	private static void generateAbilityDescription(
 		final StringBuilder s, final AbilityInfo a
 	) {
-		if (a.isMana) s.append("when standing on a mana zone, ");
+		if (a.isMana()) s.append("when standing on a mana zone, ");
 		generateTopLevelAbility(s, true, 0, a);
 	}
 
@@ -518,7 +518,7 @@ public class AbilityDescription {
 					} else {
 						s.append(" yourself");
 					}
-				} else if (a.trap || a.isSubsequent) {
+				} else if (a.trap || a.isSubsequent()) {
 					s.append(" the target");
 				} else if (noTargetCharacters) {
 					s.append(" your square");

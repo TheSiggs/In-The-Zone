@@ -1,8 +1,13 @@
 package inthezone.battle.instant;
 
-import isogame.engine.CorruptDataException;
+import inthezone.battle.Battle;
+import inthezone.battle.BattleState;
+import inthezone.battle.commands.CommandException;
+import inthezone.battle.data.AbilityInfo;
+import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -12,67 +17,40 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import ssjsjs.annotations.As;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import inthezone.battle.Battle;
-import inthezone.battle.BattleState;
-import inthezone.battle.Targetable;
-import inthezone.battle.commands.CommandException;
-import inthezone.battle.data.AbilityInfo;
-import inthezone.battle.data.InstantEffectInfo;
-import inthezone.battle.data.InstantEffectType;
-import inthezone.protocol.ProtocolException;
-
+/**
+ * The create obstacles instant effect.
+ * */
 public class Obstacles extends InstantEffect {
+	private final InstantEffectType kind = InstantEffectType.OBSTACLES;
+
 	private final Collection<MapPoint> placements = new ArrayList<>();
 	private final String abilityName;
 
+	@JSONConstructor
 	private Obstacles(
-		final Set<MapPoint> placements,
-		final String abilityName, final MapPoint agent
+		@Field("kind") final InstantEffectType kind,
+		@Field("placements") final Collection<MapPoint> placements,
+		@Field("abilityName")@As("ability") final String abilityName,
+		@Field("agent") final MapPoint agent
+	) throws ProtocolException {
+		this(placements, abilityName, agent);
+
+		if (kind != InstantEffectType.OBSTACLES)
+			throw new ProtocolException("Expected obstacles effect");
+	}
+
+	private Obstacles(
+		final Collection<MapPoint> placements,
+		final String abilityName,
+		final MapPoint agent
 	) {
 		super(agent);
 		this.abilityName = abilityName;
 		this.placements.addAll(placements);
-	}
-
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		o.put("kind", InstantEffectType.OBSTACLES.toString());
-		o.put("agent", agent.getJSON());
-		o.put("ability", abilityName);
-
-		final JSONArray a = new JSONArray();
-		for (MapPoint p : placements) a.put(p.getJSON());
-		o.put("placements", a);
-		return o;
-	}
-
-	public static Obstacles fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final String abilityName = json.getString("ability");
-			final JSONArray rawPlacements = json.getJSONArray("placements");
-
-			if (kind != InstantEffectType.OBSTACLES)
-				throw new ProtocolException("Expected obstacles effect");
-
-			final Set<MapPoint> placements = new HashSet<>();
-			for (int i = 0; i < rawPlacements.length(); i++) {
-				placements.add(MapPoint.fromJSON(rawPlacements.getJSONObject(i)));
-			}
-
-			return new Obstacles(placements, abilityName, agent);
-
-		} catch (JSONException|CorruptDataException e) {
-			throw new ProtocolException("Error parsing obstacles effect", e);
-		}
 	}
 
 	public static Obstacles getEffect(

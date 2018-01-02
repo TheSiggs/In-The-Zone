@@ -1,23 +1,20 @@
 package inthezone.battle.commands;
 
-import isogame.engine.CorruptDataException;
-import isogame.engine.HasJSONRepresentation;
-import isogame.engine.MapPoint;
-import isogame.engine.Stage;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import inthezone.battle.data.GameDataFactory;
 import inthezone.battle.data.Loadout;
 import inthezone.battle.data.Player;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.CorruptDataException;
+import isogame.engine.MapPoint;
+import isogame.engine.Stage;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import ssjsjs.annotations.As;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.JSONable;
 
 /**
  * This one works a bit different.  Player 1 generates a
@@ -26,19 +23,15 @@ import inthezone.protocol.ProtocolException;
  * which he executes then sends to player 1, who executes it.  Then, the battle
  * begins.
  * */
-public class StartBattleCommandRequest implements HasJSONRepresentation {
+public class StartBattleCommandRequest implements JSONable {
+	private final String name = "startBattleReq";
+
 	public final String stage;
 	public final Player player;
 	public final String playerName;
 	private final Optional<Loadout> me;
 	private final Optional<List<MapPoint>> startTiles;
 
-	/**
-	 * @param stage The stage to battle on
-	 * @param me My loadout
-	 * @param startTiles The start tiles for my characters.  In the same order as
-	 * listed in the loadout.
-	 * */
 	public StartBattleCommandRequest(
 		final String stage,
 		final Player player,
@@ -50,70 +43,32 @@ public class StartBattleCommandRequest implements HasJSONRepresentation {
 		this.player = player;
 		this.playerName = playerName;
 		this.me = me;
-		this.startTiles = startTiles;
+		this.startTiles = startTiles.map(l -> new ArrayList<>(l));
 	}
 
-	@Override
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		final JSONArray a = new JSONArray();
+	/**
+	 * @param stage The stage to battle on
+	 * @param me My loadout
+	 * @param startTiles The start tiles for my characters.  In the same order as
+	 * listed in the loadout.
+	 * */
+	@JSONConstructor
+	private StartBattleCommandRequest(
+		@Field("name") final String name,
+		@Field("stage") final String stage,
+		@Field("player") final Player player,
+		@Field("playerName") final String playerName,
+		@Field("me")@As("loadout") final Optional<Loadout> me,
+		@Field("startTiles")@As("Starts") final Optional<List<MapPoint>> startTiles
+	) throws ProtocolException {
+		this(stage, player, playerName, me, startTiles);
 
-		startTiles.ifPresent(s -> {
-			s.stream().map(x -> x.getJSON()).forEach(x -> a.put(x));
-			r.put("starts", a);
-		});
-
-		r.put("name", "startBattleReq");
-		r.put("stage", stage);
-		r.put("player", player.toString());
-		r.put("playerName", playerName);
-		me.ifPresent(d -> r.put("loadout", d.getJSON()));
-		return r;
+		if (!name.equals("startBattleReq"))
+			throw new ProtocolException("Expected start battle request");
 	}
 
 	public Player getOtherPlayer() {
 		return player.otherPlayer();
-	}
-
-	public static StartBattleCommandRequest fromJSON(
-		final JSONObject json, final GameDataFactory gameData
-	) throws ProtocolException {
-
-		try {
-			final String name = json.getString("name");
-			final String playerName = json.getString("playerName");
-			final String stage = json.getString("stage");
-			final Player player = Player.fromString(json.getString("player"));
-			final JSONArray rawStarts = json.optJSONArray("starts");
-			final JSONObject mloadout = json.optJSONObject("loadout");
-
-			final Optional<Loadout> loadout;
-			if (mloadout != null) {
-				loadout = Optional.of(Loadout.fromJSON(mloadout, gameData));
-			} else {
-				loadout = Optional.empty();
-			}
-
-			final Optional<List<MapPoint>> starts;
-			if (rawStarts == null) {
-				starts = Optional.empty();
-			} else {
-				final List<MapPoint> ss = new ArrayList<>();
-				for (int i = 0; i < rawStarts.length(); i++) {
-					ss.add(MapPoint.fromJSON(rawStarts.getJSONObject(i)));
-				}
-				starts = Optional.of(ss);
-			}
-
-			if (!name.equals("startBattleReq"))
-				throw new ProtocolException("Expected start battle request");
-
-			return new StartBattleCommandRequest(
-				stage, player, playerName, loadout, starts);
-
-		} catch (final JSONException|CorruptDataException e) {
-			throw new ProtocolException("Parse error in start battle request", e);
-		}
 	}
 
 	/**

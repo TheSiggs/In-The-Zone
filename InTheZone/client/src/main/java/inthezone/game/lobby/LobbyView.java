@@ -113,10 +113,8 @@ public class LobbyView extends StackPane {
 		keybindings.setOnAction(event -> {
 			final KeyboardOptions dialog = new KeyboardOptions(config);
 			modalDialog.showDialog(dialog, r -> {
-				if (r == KeyboardOptions.doneButton) {
-					config.getKeyBindingTable().loadBindings(dialog.resultTable);
-					config.writeConfig();
-				}
+				if (r == KeyboardOptions.doneButton)
+					config.loadKeyBindings(dialog.resultTable);
 			});
 		});
 
@@ -260,7 +258,7 @@ public class LobbyView extends StackPane {
 	}
 
 	private void actuallyStartPracticeGame() {
-		if (config.loadouts.size() < 1) {
+		if (config.getLoadouts().size() < 1) {
 			modalDialog.showMessage(
 				"You must create at least one loadout before starting a game");
 			return;
@@ -290,7 +288,7 @@ public class LobbyView extends StackPane {
 	}
 
 	public void issueChallenge(final String player) {
-		if (config.loadouts.isEmpty()) {
+		if (config.getLoadouts().isEmpty()) {
 			modalDialog.showMessage(
 				"You must create at least one loadout before issuing a challenge");
 			return;
@@ -397,7 +395,7 @@ public class LobbyView extends StackPane {
 		final boolean fromQueue,
 		final StartBattleCommandRequest otherCmd
 	) {
-		if (config.loadouts.isEmpty()) {
+		if (config.getLoadouts().isEmpty()) {
 			// Automatically refuse the challenge
 			parent.network.refuseChallenge(player, thisPlayer);
 		}

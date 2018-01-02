@@ -2,10 +2,9 @@ package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
-import inthezone.battle.instant.InstantEffect;
-import inthezone.battle.instant.InstantEffectFactory;
 import inthezone.battle.Targetable;
 import inthezone.battle.Trigger;
+import inthezone.battle.instant.InstantEffect;
 import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
@@ -13,10 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.Field;
 
+/**
+ * One of the instant effects.
+ * */
 public class InstantEffectCommand extends Command {
+	private final CommandKind kind = CommandKind.INSTANT;
+
 	private InstantEffect effect;
 	private boolean isComplete;
 	private boolean waitingForCompletion = false;
@@ -24,9 +28,7 @@ public class InstantEffectCommand extends Command {
 	private final Optional<UseAbilityCommand> postAbility;
 	private final Optional<InstantEffectCommand> postEffect;
 
-	public InstantEffect getEffect() {
-		return effect;
-	}
+	public InstantEffect getEffect() { return effect; }
 
 	public InstantEffectCommand(
 		final InstantEffect effect,
@@ -38,6 +40,19 @@ public class InstantEffectCommand extends Command {
 		this.postEffect = postEffect;
 		isComplete = effect.isComplete();
 		canCancel = postAbility.map(a -> a.subsequentLevel == 0).orElse(false);
+	}
+
+	@JSONConstructor
+	private InstantEffectCommand(
+		@Field("kind") final CommandKind kind,
+		@Field("effect") final InstantEffect effect,
+		@Field("postAbility") final Optional<UseAbilityCommand> postAbility,
+		@Field("postEffect") final Optional<InstantEffectCommand> postEffect
+	) throws ProtocolException {
+		this(effect, postAbility, postEffect);
+
+		if (kind != CommandKind.INSTANT)
+			throw new ProtocolException("Expected effect command");
 	}
 
 	/**
@@ -69,31 +84,6 @@ public class InstantEffectCommand extends Command {
 		waitingForCompletion = false;
 	}
 
-	@Override 
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		r.put("kind", CommandKind.INSTANT.toString());
-		r.put("effect", effect.getJSON());
-		return r;
-	}
-
-	public static InstantEffectCommand fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
-			final InstantEffect effect = InstantEffectFactory.fromJSON(json.getJSONObject("effect"));
-
-			if (kind != CommandKind.INSTANT)
-				throw new ProtocolException("Expected effect command");
-
-			return new InstantEffectCommand(effect, Optional.empty(), Optional.empty());
-
-		} catch (ClassCastException|JSONException e) {
-			throw new ProtocolException("Error parsing effect command", e);
-		}
-	}
-
 	private void retarget(
 		final BattleState battle, final Map<MapPoint, MapPoint> retarget
 	) {
@@ -101,7 +91,7 @@ public class InstantEffectCommand extends Command {
 	}
 
 	@Override
-	public List<Targetable> doCmd(Battle battle) throws CommandException {
+	public List<Targetable> doCmd(final Battle battle) throws CommandException {
 		// assume the retargeting was already done by doCmdComputingTriggers
 		return effect.apply(battle);
 	}

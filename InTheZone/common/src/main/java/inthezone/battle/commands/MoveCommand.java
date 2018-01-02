@@ -1,70 +1,49 @@
 package inthezone.battle.commands;
 
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
+/**
+ * A character moves.
+ * */
 public class MoveCommand extends Command {
-	public final List<MapPoint> path;
+	private CommandKind kind = CommandKind.MOVE;
 
 	private final boolean isPanic;
+	public final List<MapPoint> path = new ArrayList<>();
 
 	/**
 	 * @param isPanic Set to true if this move command was created by the panic
 	 * status effect, and the traps and zones have not been triggered yet.
 	 * */
-	public MoveCommand(final List<MapPoint> path, final boolean isPanic)
-		throws CommandException
-	{
-		if (path.size() < 2) throw new CommandException("20: Bad path in move command");
-		this.path = path;
+	public MoveCommand(
+		final List<MapPoint> path,
+		final boolean isPanic
+	) throws ProtocolException {
+		if (path.size() < 2) throw new ProtocolException("20: Bad path in move command");
+		path.addAll(path);
 		this.isPanic = isPanic;
 	}
 
-	@Override 
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		final JSONArray a = new JSONArray();
-		r.put("kind", CommandKind.MOVE.toString());
-		for (MapPoint p : path) a.put(p.getJSON());
-		r.put("path", a);
-		return r;
-	}
-
-	public static MoveCommand fromJSON(final JSONObject json)
-		throws ProtocolException
+	@JSONConstructor
+	public MoveCommand(
+		@Field("kind") final CommandKind kind,
+		@Field("path") final MapPoint[] path
+	) throws ProtocolException
 	{
-		try {
-			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
-			final JSONArray rawPath = json.getJSONArray("path");
+		this(Arrays.asList(path), false);
 
-			if (kind != CommandKind.MOVE)
-				throw new ProtocolException("Expected move command");
-
-			final List<MapPoint> path = new ArrayList<>();
-			for (int i = 0; i < rawPath.length(); i++) {
-				path.add(MapPoint.fromJSON(rawPath.getJSONObject(i)));
-			}
-
-			// isPanic is always false here, because at this point the triggers have
-			// been resolved
-			return new MoveCommand(path, false);
-
-		} catch (CorruptDataException|CommandException|JSONException e) {
-			throw new ProtocolException("Error parsing move command", e);
-		}
+		if (kind != CommandKind.MOVE)
+			throw new ProtocolException("Expected move command");
 	}
 
 	@Override
@@ -105,28 +84,32 @@ public class MoveCommand extends Command {
 			turn.battleState.reduceToValidPath(
 				turn.battleState.trigger.shrinkPath(agent, path));
 		
-		if (path1.size() >= 2) {
-			final MoveCommand move1 = new MoveCommand(path1, false);
-			final List<Targetable> r1 = move1.doCmd(turn);
-			if (!r1.isEmpty()) r.add(new ExecutedCommand(move1, r1));
-		}
-
-		final MapPoint loc = path1.isEmpty()?
-			path.get(0) : path1.get(path1.size() - 1);
-		final List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
-		for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
-
-		agent.currentZone = turn.battleState.getZoneAt(loc);
-
-		if (isPanic && agent.getMP() > 0) {
-			final Optional<Character> oc = turn.battleState.getCharacterAt(loc);
-			if (oc.isPresent()) {
-				final List<Command> cont = oc.get().continueTurnReset(turn);
-				for (Command c : cont) r.addAll(c.doCmdComputingTriggers(turn));
+		try {
+			if (path1.size() >= 2) {
+				final MoveCommand move1 = new MoveCommand(path1, false);
+				final List<Targetable> r1 = move1.doCmd(turn);
+				if (!r1.isEmpty()) r.add(new ExecutedCommand(move1, r1));
 			}
-		}
 
-		return r;
+			final MapPoint loc = path1.isEmpty()?
+				path.get(0) : path1.get(path1.size() - 1);
+			final List<Command> triggers = turn.battleState.trigger.getAllTriggers(loc);
+			for (Command c : triggers) r.addAll(c.doCmdComputingTriggers(turn));
+
+			agent.currentZone = turn.battleState.getZoneAt(loc);
+
+			if (isPanic && agent.getMP() > 0) {
+				final Optional<Character> oc = turn.battleState.getCharacterAt(loc);
+				if (oc.isPresent()) {
+					final List<Command> cont = oc.get().continueTurnReset(turn);
+					for (Command c : cont) r.addAll(c.doCmdComputingTriggers(turn));
+				}
+			}
+
+			return r;
+		} catch (final ProtocolException e) {
+			throw new CommandException("Error constructing move command", e);
+		}
 	}
 }
 

@@ -374,8 +374,8 @@ public class Message {
 				throw new ProtocolException("Expected player");
 
 		try {
-			return Player.fromString(payload.getString("player"));
-		} catch (final JSONException|CorruptDataException e) {
+			return Player.valueOf(payload.getString("player"));
+		} catch (final JSONException e) {
 			throw new ProtocolException("Malformed message");
 		}
 	}

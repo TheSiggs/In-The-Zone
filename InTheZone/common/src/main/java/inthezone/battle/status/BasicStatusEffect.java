@@ -1,15 +1,21 @@
 package inthezone.battle.status;
 
 import inthezone.battle.data.StatusEffectInfo;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
 public class BasicStatusEffect extends StatusEffect {
 	private final double attackBuff;
 	private final double defenceBuff;
 	private final double chanceBuff;
 
+	@JSONConstructor
 	public BasicStatusEffect(
-		final StatusEffectInfo info, final int startTurn,
-		final double attackBuff, final double defenceBuff, final double chanceBuff
+		@Field("info") final StatusEffectInfo info,
+		@Field("startTurn") final int startTurn,
+		@Field("attackBuff") final double attackBuff,
+		@Field("defenceBuff") final double defenceBuff,
+		@Field("chanceBuff") final double chanceBuff
 	) {
 		super(info, startTurn);
 

@@ -1,9 +1,12 @@
 package inthezone.battle.data;
 
+/**
+ * A description of a status effect.
+ * */
 public class StatusEffectDescription {
 	private final StatusEffectInfo info;
 
-	public StatusEffectDescription(StatusEffectInfo info) {
+	public StatusEffectDescription(final StatusEffectInfo info) {
 		this.info = info;
 	}
 

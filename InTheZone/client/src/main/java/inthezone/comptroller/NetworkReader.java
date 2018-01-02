@@ -4,14 +4,16 @@ import inthezone.battle.commands.Command;
 import inthezone.battle.commands.StartBattleCommand;
 import inthezone.battle.commands.StartBattleCommandRequest;
 import inthezone.battle.data.GameDataFactory;
-import inthezone.battle.data.Player;
 import inthezone.protocol.Message;
 import inthezone.protocol.ProtocolException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.JSONDeserializeException;
+import ssjsjs.SSJSJS;
 
 public class NetworkReader implements Runnable {
 	private final BufferedReader in;
@@ -22,6 +24,8 @@ public class NetworkReader implements Runnable {
 	private final BlockingQueue<Command> recQueue;
 
 	private int lastSequenceNumber = 0;
+
+	private final Map<String, Object> env = new HashMap<>();
 
 	public NetworkReader(
 		final BufferedReader in,
@@ -35,6 +39,8 @@ public class NetworkReader implements Runnable {
 		this.recQueue = recQueue;
 		this.gameData = gameData;
 		this.parent = parent;
+
+		env.put("gameData", gameData);
 	}
 
 	public int getLastSequenceNumber() { return lastSequenceNumber; }
@@ -64,9 +70,8 @@ public class NetworkReader implements Runnable {
 						try {
 							lobbyListener.challengeFrom(msg.parseName(),
 								msg.payload.getBoolean("isQueue"),
-								StartBattleCommandRequest.fromJSON(
-									msg.payload.getJSONObject("cmd"), gameData));
-						} catch (final JSONException e) {
+								SSJSJS.deserialize(msg.payload.getJSONObject("cmd"), StartBattleCommandRequest.class, env));
+						} catch (final JSONException|JSONDeserializeException e) {
 							throw new ProtocolException(
 								"NetworkReader 10: Malformed command", e);
 						}
@@ -80,10 +85,10 @@ public class NetworkReader implements Runnable {
 					case START_BATTLE:
 						try {
 							lobbyListener.startBattle(
-								StartBattleCommand.fromJSON(msg.parseCommand(), gameData),
+								SSJSJS.deserialize(msg.parseCommand(), StartBattleCommand.class, env),
 								msg.parsePlayer(), msg.payload.getString("otherPlayer"),
 								msg.payload.getBoolean("isQueue"));
-						} catch (final JSONException e) {
+						} catch (final JSONException|JSONDeserializeException e) {
 							throw new ProtocolException(
 								"NetworkReader 20: Invalid start battle command", e);
 						}

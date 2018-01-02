@@ -21,8 +21,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
+import ssjsjs.JSONDeserializeException;
+import ssjsjs.SSJSJS;
 
 /**
  * A command generator that reads commands from a recorded game (to facilitate
@@ -44,8 +48,10 @@ public class PlaybackGenerator implements CommandGenerator {
 		try {
 			final RecordedLine inLine = new RecordedLine(inReader.readLine());
 			System.err.println("Recorded game was started by " + inLine.playerName);
-			return StartBattleCommand.fromJSON(inLine.cmd, gameData);
-		} catch (final JSONException e) {
+			final Map<String, Object> env = new HashMap<>();
+			env.put("gameData", gameData);
+			return SSJSJS.deserialize(inLine.cmd, StartBattleCommand.class, env);
+		} catch (final JSONException|JSONDeserializeException e) {
 			throw new ProtocolException("Error parsing JSON", e);
 		}
 	}

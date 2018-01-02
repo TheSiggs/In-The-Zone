@@ -1,45 +1,35 @@
 package inthezone.battle.commands;
 
 import inthezone.battle.Battle;
-import inthezone.battle.data.Player;
 import inthezone.battle.Targetable;
+import inthezone.battle.data.Player;
 import inthezone.protocol.ProtocolException;
-import isogame.engine.CorruptDataException;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.Field;
 
+/**
+ * One of the players ends their turn.
+ * */
 public class EndTurnCommand extends Command {
 	public final Player player;
+
+	private final CommandKind kind = CommandKind.ENDTURN;
 
 	public EndTurnCommand(final Player player) {
 		this.player = player;
 	}
 
-	@Override 
-	@SuppressWarnings("unchecked")
-	public JSONObject getJSON() {
-		final JSONObject r = new JSONObject();
-		r.put("kind", CommandKind.ENDTURN.toString());
-		r.put("player", player.toString());
-		return r;
-	}
+	@JSONConstructor
+	private EndTurnCommand(
+		@Field("kind") final CommandKind kind,
+		@Field("player") final Player player
+	) throws ProtocolException {
+		this(player);
 
-	public static EndTurnCommand fromJSON(final JSONObject json)
-		throws ProtocolException
-	{
-		try {
-			final CommandKind kind = CommandKind.fromString(json.getString("kind"));
-			final String player = json.getString("player");
-
-			if (kind != CommandKind.ENDTURN)
-				throw new ProtocolException("Expected end turn command");
-
-			return new EndTurnCommand(Player.fromString(player));
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing end turn command", e);
-		}
+		if (kind != CommandKind.ENDTURN)
+			throw new ProtocolException("Expected end turn command");
 	}
 
 	@Override

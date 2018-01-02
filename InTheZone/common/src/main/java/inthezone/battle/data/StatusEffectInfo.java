@@ -1,20 +1,34 @@
 package inthezone.battle.data;
 
 import isogame.engine.CorruptDataException;
+import ssjsjs.annotations.Field;
+import ssjsjs.JSONable;
+import ssjsjs.annotations.JSONConstructor;
 
-public class StatusEffectInfo {
+public class StatusEffectInfo implements JSONable {
 	public final StatusEffectType type;
 	public final StatusEffectKind kind;
 	public final int param;
 
 	private static final int DEFAULT_PARAMETER = 0;
 
+	@JSONConstructor
+	public StatusEffectInfo(
+		@Field("type") final StatusEffectType type,
+		@Field("kind") final StatusEffectKind kind,
+		@Field("param") final int param
+	) {
+		this.type = type;
+		this.kind = kind;
+		this.param = param;
+	}
+
 	public StatusEffectInfo(final String effect)
 		throws CorruptDataException
 	{
 		String parts[] = effect.split("\\s");
 		if (parts.length < 1) throw new CorruptDataException("Expected status effect");
-		this.type = StatusEffectType.parse(parts[0]);
+		this.type = StatusEffectType.valueOf(parts[0]);
 		this.kind = type.getEffectKind();
 
 		int paramv = DEFAULT_PARAMETER;
@@ -28,21 +42,19 @@ public class StatusEffectInfo {
 		this.param = paramv;
 	}
 
-	@Override
-	public boolean equals(final Object obj) {
+	@Override public boolean equals(final Object obj) {
 		if (this == obj) return true;
-		if (obj == null) return false;
-		if (obj instanceof StatusEffectInfo) {
+		else if (!(obj instanceof StatusEffectInfo)) return false;
+		else {
 			StatusEffectInfo x = (StatusEffectInfo) obj;
 			return
 				this.type == x.type &&
 				this.kind == x.kind &&
 				this.param == x.param;
-		} else return false;
+		}
 	}
 
-	@Override
-	public int hashCode() {
+	@Override public int hashCode() {
 		return type.hashCode() + kind.hashCode() + param;
 	}
 
@@ -54,8 +66,7 @@ public class StatusEffectInfo {
 		}
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		if (param == DEFAULT_PARAMETER) {
 			return type.toString();
 		} else {

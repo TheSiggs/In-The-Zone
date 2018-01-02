@@ -43,7 +43,7 @@ public class PushCommandRequest extends CommandRequest {
 		final Set<MapPoint> targets = new HashSet<>();
 		targets.add(target);
 
-		Command r = battleState.getCharacterAt(agent).flatMap(a -> {
+		final Command r = battleState.getCharacterAt(agent).flatMap(a -> {
 			if (a != null && t != null) {
 				final MapPoint d = agent.addScale(target.subtract(agent), 2);
 				final boolean effective = t.isPushable() && battleState.isSpaceFree(d);

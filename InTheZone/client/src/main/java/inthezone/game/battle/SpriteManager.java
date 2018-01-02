@@ -73,7 +73,7 @@ public class SpriteManager {
 		for (final Sprite s : this.sprites) {
 			view.getStage().addSprite(s);
 
-			s.doOnExternalAnimationFinished(() -> {
+			s.setOnExternalAnimationFinished(() -> {
 				final CharacterFrozen c = characters.get((Integer) s.userData);
 				s.setAnimation(c.isDead()? "dead" : "idle");
 

@@ -1,36 +1,36 @@
 package inthezone.battle.instant;
 
-import isogame.engine.CorruptDataException;
-import isogame.engine.MapPoint;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import inthezone.battle.Battle;
 import inthezone.battle.BattleState;
 import inthezone.battle.Character;
 import inthezone.battle.CharacterFrozen;
-import inthezone.battle.Targetable;
 import inthezone.battle.commands.Command;
 import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.ExecutedCommand;
 import inthezone.battle.data.InstantEffectInfo;
 import inthezone.battle.data.InstantEffectType;
+import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
+import isogame.engine.MapPoint;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
+/**
+ * Teleport instant effect.
+ * */
 public class Teleport extends InstantEffect {
+	private final InstantEffectType kind = InstantEffectType.TELEPORT;
+
 	public final int range;
 	private final List<Character> affectedCharacters = new ArrayList<>();
 
@@ -43,10 +43,10 @@ public class Teleport extends InstantEffect {
 	private List<MapPoint> destinations = new ArrayList<>();
 
 	private Teleport(
-		final Optional<Set<Character>> affectedCharacters,
+		final Optional<Collection<Character>> affectedCharacters,
 		final int range,
-		final Optional<Set<MapPoint>> targets,
-		final Optional<Set<MapPoint>> destinations,
+		final Optional<Collection<MapPoint>> targets,
+		final Optional<Collection<MapPoint>> destinations,
 		final MapPoint agent
 	) {
 		super(agent);
@@ -67,53 +67,22 @@ public class Teleport extends InstantEffect {
 		this.range = range;
 	}
 
+	@JSONConstructor
+	private Teleport(
+		@Field("kind") final InstantEffectType kind,
+		@Field("range") final int range,
+		@Field("targets") final Optional<Collection<MapPoint>> targets,
+		@Field("destinations") final Optional<Collection<MapPoint>> destinations,
+		@Field("agent") final MapPoint agent
+	) throws ProtocolException {
+		this(Optional.empty(), range, targets, destinations, agent);
+
+		if (kind != InstantEffectType.TELEPORT)
+			throw new ProtocolException("Expected teleport effect");
+	}
+
 	public List<MapPoint> getDestinations() {
 		return destinations;
-	}
-
-	@Override public JSONObject getJSON() {
-		final JSONObject o = new JSONObject();
-		o.put("kind", InstantEffectType.TELEPORT.toString());
-		o.put("agent", agent.getJSON());
-		o.put("range", range);
-
-		final JSONArray ts = new JSONArray();
-		final JSONArray ds = new JSONArray();
-		for (final MapPoint t : targets) ts.put(t.getJSON());
-		for (final MapPoint d : destinations) ds.put(d.getJSON());
-
-		o.put("targets", ts);
-		o.put("destinations", ds);
-		return o;
-	}
-
-	public static Teleport fromJSON(final JSONObject json) throws ProtocolException {
-		try {
-			final InstantEffectType kind = (new InstantEffectInfo(json.getString("kind"))).type;
-			final MapPoint agent = MapPoint.fromJSON(json.getJSONObject("agent"));
-			final int range = json.getInt("range");
-			final JSONArray rawTargets = json.getJSONArray("targets");
-			final JSONArray rawDestinations = json.getJSONArray("destinations");
-
-			if (kind != InstantEffectType.TELEPORT)
-				throw new ProtocolException("Expected teleport effect");
-
-			final Set<MapPoint> targets = new HashSet<>();
-			final Set<MapPoint> destinations = new HashSet<>();
-
-			for (int i = 0; i < rawTargets.length(); i++) {
-				targets.add(MapPoint.fromJSON(rawTargets.getJSONObject(i)));
-			}
-			for (int i = 0; i < rawDestinations.length(); i++) {
-				destinations.add(MapPoint.fromJSON(rawDestinations.getJSONObject(i)));
-			}
-
-			return new Teleport(Optional.empty(), range, Optional.of(targets),
-				Optional.of(destinations), agent);
-
-		} catch (JSONException|CorruptDataException  e) {
-			throw new ProtocolException("Error parsing teleport effect", e);
-		}
 	}
 
 	public static Teleport getEffect(

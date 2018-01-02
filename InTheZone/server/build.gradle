@@ -8,7 +8,7 @@ mainClassName = "$moduleName/inthezone.server.Server"
 dependencies {
 	implementation project(':common')
 	implementation project(':engine')
-	implementation project(':json')
+	implementation project(':org.json')
 }
 
 compileJava {

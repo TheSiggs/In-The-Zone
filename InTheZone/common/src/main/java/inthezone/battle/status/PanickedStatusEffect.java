@@ -3,20 +3,23 @@ package inthezone.battle.status;
 import inthezone.battle.Battle;
 import inthezone.battle.Character;
 import inthezone.battle.commands.Command;
-import inthezone.battle.commands.CommandException;
 import inthezone.battle.commands.MoveCommand;
 import inthezone.battle.data.StatusEffectInfo;
 import inthezone.battle.PathFinderNode;
+import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import nz.dcoder.ai.astar.Node;
+import ssjsjs.annotations.Field;
+import ssjsjs.annotations.JSONConstructor;
 
 public class PanickedStatusEffect extends StatusEffect {
+	@JSONConstructor
 	public PanickedStatusEffect(
-		final StatusEffectInfo info, final int startTurn
+		@Field("info") final StatusEffectInfo info,
+		@Field("startTurn") final int startTurn
 	) {
 		super(info, startTurn);
 	}
@@ -45,7 +48,7 @@ public class PanickedStatusEffect extends StatusEffect {
 		final List<Command> cmds = new LinkedList<>();
 		try {
 			if (r.size() >= 2) cmds.add(new MoveCommand(r, true));
-		} catch (CommandException e) {
+		} catch (final ProtocolException e) {
 			throw new RuntimeException("Panicked status generated an invalid move path");
 		}
 

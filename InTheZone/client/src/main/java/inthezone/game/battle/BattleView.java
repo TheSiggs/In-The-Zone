@@ -54,6 +54,9 @@ import inthezone.game.DialogScreen;
 import inthezone.game.InTheZoneKeyBinding;
 import inthezone.protocol.ProtocolException;
 
+import ssjsjs.SSJSJS;
+import ssjsjs.JSONSerializeException;
+
 /**
  * The main battle view.  This is the root handler for all messages concerning
  * an ongoing battle.
@@ -590,7 +593,14 @@ public class BattleView
 	 * @param ec the command to handle
 	 * */
 	@Override public void command(final ExecutedCommand ec) {
-		System.err.println(ec.cmd.getJSON());
+		try {
+			System.err.println(SSJSJS.serialize(ec.cmd));
+		} catch (final JSONSerializeException e) {
+			// this was just for debugging, so no need to crash here
+			System.err.println("Cannot serialize command");
+			e.printStackTrace();
+		}
+
 		commands.queueCommand(ec);
 		if (!inAnimation) inAnimation = commands.doNextCommand();
 		if (!(mode instanceof ModeAnimating) && !(mode instanceof ModeOtherTurn))

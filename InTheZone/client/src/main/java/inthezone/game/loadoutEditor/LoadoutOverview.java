@@ -104,7 +104,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 		loadoutsWrapper.viewportBoundsProperty().addListener(v -> adjustScrollbar());
 		loadouts.boundsInLocalProperty().addListener(v -> adjustScrollbar());
 
-		for (final Loadout l : parent.config.loadouts) {
+		for (final Loadout l : parent.config.getLoadouts()) {
 			loadouts.getChildren().add(new LoadoutFrame(
 				parent, this, Optional.of(l), modalDialog));
 		}
@@ -151,7 +151,7 @@ public class LoadoutOverview extends DialogScreen<Void> {
 				new LoadoutFrame(parent, this,
 					Optional.of(m.encodeLoadout()), modalDialog);
 			loadouts.getChildren().add(0, cell);
-			parent.config.loadouts.add(0, m.encodeLoadout());
+			parent.config.addLoadout(m.encodeLoadout());
 			parent.showScreen(
 				new LoadoutView(parent.config, parent.gameData, m, 0),
 				v -> cell.updateView(v));
@@ -216,7 +216,7 @@ class LoadoutFrame extends VBox {
 			if (!event.isStillSincePress()) return;
 			try {
 				if (this.mloadout.isPresent()) {
-					final int id = parent.config.loadouts.indexOf(this.mloadout.get());
+					final int id = parent.config.getLoadoutID(this.mloadout.get());
 					parent.showScreen(
 						new LoadoutView(parent.config, parent.gameData,
 							new LoadoutModel(parent.gameData, this.mloadout.get()), id),
@@ -235,8 +235,7 @@ class LoadoutFrame extends VBox {
 				"Really remove loadout " + this.mloadout.get().name + "?";
 			modalDialog.showConfirmation(prompt, null, bt -> {
 				if (bt == ButtonType.YES) {
-					parent.config.loadouts.remove(this.mloadout.get());
-					parent.config.writeConfig();
+					parent.config.deleteLoadout(this.mloadout.get());
 					overview.removeLoadoutFrame(this);
 				}
 			});

@@ -45,8 +45,8 @@ public class Teleport extends InstantEffect {
 	private Teleport(
 		final Optional<Collection<Character>> affectedCharacters,
 		final int range,
-		final Optional<Collection<MapPoint>> targets,
-		final Optional<Collection<MapPoint>> destinations,
+		final Optional<List<MapPoint>> targets,
+		final Optional<List<MapPoint>> destinations,
 		final MapPoint agent
 	) {
 		super(agent);
@@ -71,8 +71,8 @@ public class Teleport extends InstantEffect {
 	private Teleport(
 		@Field("kind") final InstantEffectType kind,
 		@Field("range") final int range,
-		@Field("targets") final Optional<Collection<MapPoint>> targets,
-		@Field("destinations") final Optional<Collection<MapPoint>> destinations,
+		@Field("targets") final Optional<List<MapPoint>> targets,
+		@Field("destinations") final Optional<List<MapPoint>> destinations,
 		@Field("agent") final MapPoint agent
 	) throws ProtocolException {
 		this(Optional.empty(), range, targets, destinations, agent);

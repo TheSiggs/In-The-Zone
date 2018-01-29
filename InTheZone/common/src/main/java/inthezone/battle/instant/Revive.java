@@ -31,7 +31,7 @@ public class Revive extends InstantEffect {
 	private Revive(
 		@Field("kind") final InstantEffectType kind,
 		@Field("agent") final MapPoint agent,
-		@Field("targets") final Collection<MapPoint> targets
+		@Field("targets") final List<MapPoint> targets
 	) throws ProtocolException {
 		this(agent, targets);
 

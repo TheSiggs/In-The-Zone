@@ -22,8 +22,8 @@ public class Loadout implements JSONable {
 	@JSON
 	public Loadout(
 		@Field("name") final String name,
-		@Field("characters") final Collection<CharacterProfile> characters,
-		@Field("otherCharacters") final Collection<CharacterProfile> otherCharacters
+		@Field("characters") final List<CharacterProfile> characters,
+		@Field("otherCharacters") final List<CharacterProfile> otherCharacters
 	) {
 		this.name = name;
 		this.characters.addAll(characters);

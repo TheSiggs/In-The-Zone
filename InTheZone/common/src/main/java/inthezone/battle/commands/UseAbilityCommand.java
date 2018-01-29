@@ -86,7 +86,7 @@ public class UseAbilityCommand extends Command {
 		@Field("friendlyAbilityName")@As("fability") final String friendlyAbilityName,
 		@Field("targetSquares") final Collection<MapPoint> targetSquares,
 		@Field("targets") final Collection<DamageToTarget> targets,
-		@Field("constructed") final Collection<MapPoint> constructed,
+		@Field("constructed") final List<MapPoint> constructed,
 		@Field("subsequentLevel") final int subsequentLevel
 	) throws ProtocolException {
 		this(agent, agentType, ability, friendlyAbilityName,

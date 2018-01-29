@@ -21,7 +21,7 @@ import inthezone.protocol.ProtocolException;
 
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 public class FearedStatusEffect extends StatusEffect {
 	private final MapPoint agentPos;
@@ -42,7 +42,7 @@ public class FearedStatusEffect extends StatusEffect {
 	/**
 	 * Construct an unresolved FearedStatusEffect
 	 * */
-	@JSONConstructor
+	@JSON
 	private FearedStatusEffect(
 		@Field("info") final StatusEffectInfo info,
 		@Field("startTurn") final int startTurn,

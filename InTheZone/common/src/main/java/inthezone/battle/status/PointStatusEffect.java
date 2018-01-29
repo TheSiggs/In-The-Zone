@@ -7,13 +7,13 @@ import inthezone.battle.data.StatusEffectInfo;
 import java.util.ArrayList;
 import java.util.List;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 public class PointStatusEffect extends StatusEffect {
 	private final int ap;
 	private final int mp;
 
-	@JSONConstructor
+	@JSON
 	public PointStatusEffect(
 		@Field("info") final StatusEffectInfo info,
 		@Field("startTurn") final int startTurn,

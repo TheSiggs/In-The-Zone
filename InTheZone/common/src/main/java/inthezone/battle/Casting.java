@@ -2,7 +2,7 @@ package inthezone.battle;
 
 import isogame.engine.MapPoint;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -12,7 +12,7 @@ public class Casting implements JSONable {
 	public final MapPoint castFrom;
 	public final MapPoint target;
 
-	@JSONConstructor
+	@JSON
 	public Casting(
 		@Field("castFrom") MapPoint castFrom,
 		@Field("target") MapPoint target

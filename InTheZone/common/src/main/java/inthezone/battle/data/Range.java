@@ -2,7 +2,7 @@ package inthezone.battle.data;
 
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -29,7 +29,7 @@ public class Range implements JSONable {
 		this(range, radius, piercing, targetMode.toString(), nTargets, los);
 	}
 
-	@JSONConstructor
+	@JSON
 	public Range(
 		@Field("range") final int range,
 		@Field("radius") final int radius,

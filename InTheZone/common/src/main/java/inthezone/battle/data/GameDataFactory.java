@@ -27,8 +27,8 @@ import java.util.UUID;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ssjsjs.JSONDeserializeException;
-import ssjsjs.JSONSerializeException;
+import ssjsjs.JSONdecodeException;
+import ssjsjs.JSONencodeException;
 import ssjsjs.SSJSJS;
 
 /**
@@ -142,11 +142,11 @@ public class GameDataFactory {
 			}
 
 			for (final Object x : aCharacters) {
-				final CharacterInfo i = SSJSJS.deserialize((JSONObject) x, CharacterInfo.class, env);
+				final CharacterInfo i = SSJSJS.decode((JSONObject) x, CharacterInfo.class, env);
 				characters.put(i.name, i);
 			}
 
-		} catch (final JSONException|JSONDeserializeException e) {
+		} catch (final JSONException|JSONdecodeException e) {
 			throw new CorruptDataException("Error in game data: " + e.getMessage(), e);
 
 		} catch (final ClassCastException|IllegalArgumentException e) {
@@ -240,7 +240,7 @@ public class GameDataFactory {
 				s.put(parseStage(stage));
 
 			for (final CharacterInfo character : characters)
-				c.put(SSJSJS.serialize(character));
+				c.put(SSJSJS.encode(character));
 
 			o.put("version", UUID.randomUUID().toString());
 			o.put("versionNumber", ++versionNumber);
@@ -249,7 +249,7 @@ public class GameDataFactory {
 
 			out.print(o.toString(2));
 
-		} catch (final JSONSerializeException e) {
+		} catch (final JSONencodeException e) {
 			throw new CorruptDataException(
 				"Cannot serialize game data: " + e.getMessage(), e);
 		}

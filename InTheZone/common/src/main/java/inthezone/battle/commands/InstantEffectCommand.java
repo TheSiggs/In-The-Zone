@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.annotations.Field;
 
 /**
@@ -42,7 +42,7 @@ public class InstantEffectCommand extends Command {
 		canCancel = postAbility.map(a -> a.subsequentLevel == 0).orElse(false);
 	}
 
-	@JSONConstructor
+	@JSON
 	private InstantEffectCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("effect") final InstantEffect effect,

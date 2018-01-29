@@ -22,7 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.UUID;
-import ssjsjs.JSONSerializeException;
+import ssjsjs.JSONencodeException;
 import ssjsjs.SSJSJS;
 
 public class Network implements Runnable {
@@ -230,10 +230,10 @@ public class Network implements Runnable {
 		final StartBattleCommandRequest cmd, final String player
 	) {
 		try {
-			sendQueue.put(Message.CHALLENGE_PLAYER(player, SSJSJS.serialize(cmd), false));
+			sendQueue.put(Message.CHALLENGE_PLAYER(player, SSJSJS.encode(cmd), false));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("Interrupted: this cannot happen", e);
-		} catch (final JSONSerializeException e) {
+		} catch (final JSONencodeException e) {
 			throw new RuntimeException("Error serializing start battle command", e);
 		}
 	}
@@ -257,10 +257,10 @@ public class Network implements Runnable {
 	) {
 		try {
 			sendQueue.put(Message.ACCEPT_CHALLENGE(
-				otherPlayer, player, SSJSJS.serialize(cmd), false));
+				otherPlayer, player, SSJSJS.encode(cmd), false));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("Interrupted: This cannot happen");
-		} catch (final JSONSerializeException e) {
+		} catch (final JSONencodeException e) {
 			throw new RuntimeException("Error serializing accept challenge command", e);
 		}
 	}
@@ -276,10 +276,10 @@ public class Network implements Runnable {
 	) {
 		try {
 			sendQueue.put(Message.ACCEPT_CHALLENGE(
-				otherPlayer, player, SSJSJS.serialize(cmdRq), true));
+				otherPlayer, player, SSJSJS.encode(cmdRq), true));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("Interrupted: This cannot happen");
-		} catch (final JSONSerializeException e) {
+		} catch (final JSONencodeException e) {
 			throw new RuntimeException("Error serializing accept queued game command", e);
 		} 
 	}
@@ -306,10 +306,10 @@ public class Network implements Runnable {
 
 	public void sendCommand(final Command cmd) {
 		try {
-			sendQueue.put(Message.COMMAND(SSJSJS.serialize(cmd)));
+			sendQueue.put(Message.COMMAND(SSJSJS.encode(cmd)));
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("Interrupted: This cannot happen");
-		} catch (final JSONSerializeException e) {
+		} catch (final JSONencodeException e) {
 			throw new RuntimeException("Error serializing command", e);
 		}
 	}

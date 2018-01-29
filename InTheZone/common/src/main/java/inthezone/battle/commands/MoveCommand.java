@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * A character moves.
@@ -34,7 +34,7 @@ public class MoveCommand extends Command {
 		this.isPanic = isPanic;
 	}
 
-	@JSONConstructor
+	@JSON
 	public MoveCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("path") final MapPoint[] path

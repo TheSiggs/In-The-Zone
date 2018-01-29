@@ -10,7 +10,7 @@ import java.util.Optional;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
 import ssjsjs.annotations.Implicit;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -27,7 +27,7 @@ public class AbilityMedia implements JSONable {
 	private final Optional<String> zoneTrapSpriteID;
 	private final Optional<String> obstacleSpriteID;
 
-	@JSONConstructor
+	@JSON
 	public AbilityMedia(
 		@Implicit("locator") final ResourceLocator loc,
 		@Implicit("library") final Library lib,

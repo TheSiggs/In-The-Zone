@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ssjsjs.JSONDeserializeException;
+import ssjsjs.JSONdecodeException;
 import ssjsjs.SSJSJS;
 
 /**
@@ -50,8 +50,8 @@ public class PlaybackGenerator implements CommandGenerator {
 			System.err.println("Recorded game was started by " + inLine.playerName);
 			final Map<String, Object> env = new HashMap<>();
 			env.put("gameData", gameData);
-			return SSJSJS.deserialize(inLine.cmd, StartBattleCommand.class, env);
-		} catch (final JSONException|JSONDeserializeException e) {
+			return SSJSJS.decode(inLine.cmd, StartBattleCommand.class, env);
+		} catch (final JSONException|JSONdecodeException e) {
 			throw new ProtocolException("Error parsing JSON", e);
 		}
 	}

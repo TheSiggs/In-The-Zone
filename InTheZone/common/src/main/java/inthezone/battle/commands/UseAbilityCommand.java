@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * A character uses an ability.
@@ -77,7 +77,7 @@ public class UseAbilityCommand extends Command {
 		canCancel = subsequentLevel == 0;
 	}
 
-	@JSONConstructor
+	@JSON
 	private UseAbilityCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("agent") final MapPoint agent,

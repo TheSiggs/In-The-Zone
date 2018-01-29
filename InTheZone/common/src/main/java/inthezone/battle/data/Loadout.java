@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -19,7 +19,7 @@ public class Loadout implements JSONable {
 	public final static int maxPP = 25;
 	public final static int maxCharacters = 4;
 
-	@JSONConstructor
+	@JSON
 	public Loadout(
 		@Field("name") final String name,
 		@Field("characters") final Collection<CharacterProfile> characters,

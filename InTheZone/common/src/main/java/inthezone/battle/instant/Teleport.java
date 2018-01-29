@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * Teleport instant effect.
@@ -67,7 +67,7 @@ public class Teleport extends InstantEffect {
 		this.range = range;
 	}
 
-	@JSONConstructor
+	@JSON
 	private Teleport(
 		@Field("kind") final InstantEffectType kind,
 		@Field("range") final int range,

@@ -1,11 +1,11 @@
 package inthezone.battle.status;
 
 import inthezone.battle.data.StatusEffectInfo;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.annotations.Field;
 
 public class Vampirism extends StatusEffect {
-	@JSONConstructor
+	@JSON
 	public Vampirism(
 		@Field("info") final StatusEffectInfo info,
 		@Field("startTurn") final int startTurn

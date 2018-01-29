@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * The revive instant effect.
@@ -27,7 +27,7 @@ public class Revive extends InstantEffect {
 		this.targets.addAll(targets);
 	}
 
-	@JSONConstructor
+	@JSON
 	private Revive(
 		@Field("kind") final InstantEffectType kind,
 		@Field("agent") final MapPoint agent,

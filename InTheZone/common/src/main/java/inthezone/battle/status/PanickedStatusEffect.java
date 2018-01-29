@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Set;
 import nz.dcoder.ai.astar.Node;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 public class PanickedStatusEffect extends StatusEffect {
-	@JSONConstructor
+	@JSON
 	public PanickedStatusEffect(
 		@Field("info") final StatusEffectInfo info,
 		@Field("startTurn") final int startTurn

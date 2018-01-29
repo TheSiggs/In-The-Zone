@@ -55,7 +55,7 @@ import inthezone.game.InTheZoneKeyBinding;
 import inthezone.protocol.ProtocolException;
 
 import ssjsjs.SSJSJS;
-import ssjsjs.JSONSerializeException;
+import ssjsjs.JSONencodeException;
 
 /**
  * The main battle view.  This is the root handler for all messages concerning
@@ -594,8 +594,8 @@ public class BattleView
 	 * */
 	@Override public void command(final ExecutedCommand ec) {
 		try {
-			System.err.println(SSJSJS.serialize(ec.cmd));
-		} catch (final JSONSerializeException e) {
+			System.err.println(SSJSJS.encode(ec.cmd));
+		} catch (final JSONencodeException e) {
 			// this was just for debugging, so no need to crash here
 			System.err.println("Cannot serialize command");
 			e.printStackTrace();

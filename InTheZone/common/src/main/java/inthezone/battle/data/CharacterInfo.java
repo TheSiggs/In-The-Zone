@@ -15,7 +15,7 @@ import java.util.Map;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
 import ssjsjs.annotations.Implicit;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 public class CharacterInfo implements JSONable {
@@ -44,7 +44,7 @@ public class CharacterInfo implements JSONable {
 
 	private final Map<String, AbilityInfo> abilitiesIndex = new HashMap<>();
 
-	@JSONConstructor
+	@JSON
 	public CharacterInfo(
 		@Implicit("locator") final ResourceLocator loc,
 		@Implicit("library") final Library lib,

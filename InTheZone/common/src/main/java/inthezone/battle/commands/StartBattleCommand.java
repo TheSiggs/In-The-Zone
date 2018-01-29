@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -77,7 +77,7 @@ public class StartBattleCommand implements JSONable {
 		}
 	}
 
-	@JSONConstructor
+	@JSON
 	private StartBattleCommand(
 		@Field("kind") final String kind,
 		@Field("stage") final String stage,

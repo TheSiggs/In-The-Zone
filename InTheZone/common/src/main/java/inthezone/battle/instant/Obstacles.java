@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * The create obstacles instant effect.
@@ -30,7 +30,7 @@ public class Obstacles extends InstantEffect {
 	private final Collection<MapPoint> placements = new ArrayList<>();
 	private final String abilityName;
 
-	@JSONConstructor
+	@JSON
 	private Obstacles(
 		@Field("kind") final InstantEffectType kind,
 		@Field("placements") final Collection<MapPoint> placements,

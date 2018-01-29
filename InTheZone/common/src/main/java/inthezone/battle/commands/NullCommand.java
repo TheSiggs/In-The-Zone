@@ -5,7 +5,7 @@ import inthezone.battle.Targetable;
 import inthezone.protocol.ProtocolException;
 import java.util.ArrayList;
 import java.util.List;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.annotations.Field;
 
 /**
@@ -16,7 +16,7 @@ public class NullCommand extends Command {
 
 	public NullCommand() { }
 
-	@JSONConstructor
+	@JSON
 	private NullCommand(
 		@Field("kind") final CommandKind kind
 	) throws ProtocolException {

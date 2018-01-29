@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * The move instant effect.
@@ -64,7 +64,7 @@ public class Move extends InstantEffect {
 		});
 	}
 
-	@JSONConstructor
+	@JSON
 	private Move(
 		@Field("kind") final InstantEffectType kind,
 		@Field("range") final int range,

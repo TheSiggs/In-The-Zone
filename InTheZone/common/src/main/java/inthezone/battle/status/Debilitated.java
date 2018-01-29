@@ -2,10 +2,10 @@ package inthezone.battle.status;
 
 import inthezone.battle.data.StatusEffectInfo;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 public class Debilitated extends StatusEffect {
-	@JSONConstructor
+	@JSON
 	public Debilitated(
 		@Field("info") final StatusEffectInfo info,
 		@Field("startTurn") final int startTurn

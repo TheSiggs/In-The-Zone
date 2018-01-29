@@ -10,7 +10,7 @@ import java.util.Optional;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
 import ssjsjs.annotations.Implicit;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -33,7 +33,7 @@ public class ClientConfigData implements JSONable {
 		this(gameData, defaultKeyBindingTable, Optional.empty(), null, null, new ArrayList<>(), null);
 	}
 
-	@JSONConstructor
+	@JSON
 	public ClientConfigData(
 		@Implicit("gameData") final GameDataFactory gameData,
 		@Implicit("defaultKeyBindingTable") final KeyBindingTable defaultKeyBindingTable,

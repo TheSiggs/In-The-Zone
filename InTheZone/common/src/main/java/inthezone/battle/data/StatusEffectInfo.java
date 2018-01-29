@@ -3,7 +3,7 @@ package inthezone.battle.data;
 import isogame.engine.CorruptDataException;
 import ssjsjs.annotations.Field;
 import ssjsjs.JSONable;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 public class StatusEffectInfo implements JSONable {
 	public final StatusEffectType type;
@@ -12,7 +12,7 @@ public class StatusEffectInfo implements JSONable {
 
 	private static final int DEFAULT_PARAMETER = 0;
 
-	@JSONConstructor
+	@JSON
 	public StatusEffectInfo(
 		@Field("type") final StatusEffectType type,
 		@Field("kind") final StatusEffectKind kind,

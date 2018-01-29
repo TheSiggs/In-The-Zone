@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
 import ssjsjs.annotations.Implicit;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -81,7 +81,7 @@ public class CharacterProfile implements JSONable {
 			rootCharacter.hpCurve.get(hpPP - 1) - rootCharacter.stats.hp;
 	}
 
-	@JSONConstructor
+	@JSON
 	public CharacterProfile(
 		@Implicit("gameData") final GameDataFactory gameData,
 		@Field("rootCharacterName")@As("for") final String rootCharacterName,

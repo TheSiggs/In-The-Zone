@@ -7,7 +7,7 @@ import inthezone.protocol.ProtocolException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.annotations.Field;
 
 /**
@@ -17,7 +17,7 @@ public class FatigueCommand extends Command {
 	private final CommandKind kind = CommandKind.FATIGUE;
 	private final Collection<DamageToTarget> targets = new ArrayList<>();
 
-	@JSONConstructor
+	@JSON
 	private FatigueCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("targets") final Collection<DamageToTarget> targets

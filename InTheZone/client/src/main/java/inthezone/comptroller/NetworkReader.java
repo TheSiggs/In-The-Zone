@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONException;
-import ssjsjs.JSONDeserializeException;
+import ssjsjs.JSONdecodeException;
 import ssjsjs.SSJSJS;
 
 public class NetworkReader implements Runnable {
@@ -70,8 +70,8 @@ public class NetworkReader implements Runnable {
 						try {
 							lobbyListener.challengeFrom(msg.parseName(),
 								msg.payload.getBoolean("isQueue"),
-								SSJSJS.deserialize(msg.payload.getJSONObject("cmd"), StartBattleCommandRequest.class, env));
-						} catch (final JSONException|JSONDeserializeException e) {
+								SSJSJS.decode(msg.payload.getJSONObject("cmd"), StartBattleCommandRequest.class, env));
+						} catch (final JSONException|JSONdecodeException e) {
 							throw new ProtocolException(
 								"NetworkReader 10: Malformed command", e);
 						}
@@ -85,10 +85,10 @@ public class NetworkReader implements Runnable {
 					case START_BATTLE:
 						try {
 							lobbyListener.startBattle(
-								SSJSJS.deserialize(msg.parseCommand(), StartBattleCommand.class, env),
+								SSJSJS.decode(msg.parseCommand(), StartBattleCommand.class, env),
 								msg.parsePlayer(), msg.payload.getString("otherPlayer"),
 								msg.payload.getBoolean("isQueue"));
-						} catch (final JSONException|JSONDeserializeException e) {
+						} catch (final JSONException|JSONdecodeException e) {
 							throw new ProtocolException(
 								"NetworkReader 20: Invalid start battle command", e);
 						}

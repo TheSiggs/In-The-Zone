@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import ssjsjs.annotations.As;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 /**
@@ -52,7 +52,7 @@ public class StartBattleCommandRequest implements JSONable {
 	 * @param startTiles The start tiles for my characters.  In the same order as
 	 * listed in the loadout.
 	 * */
-	@JSONConstructor
+	@JSON
 	private StartBattleCommandRequest(
 		@Field("name") final String name,
 		@Field("stage") final String stage,

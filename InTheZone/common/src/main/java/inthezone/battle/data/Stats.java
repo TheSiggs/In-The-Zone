@@ -2,7 +2,7 @@ package inthezone.battle.data;
 
 import ssjsjs.JSONable;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * Basic character stats
@@ -24,7 +24,7 @@ public class Stats implements JSONable {
 		this.defence = 0;
 	}
 
-	@JSONConstructor
+	@JSON
 	public Stats(
 		@Field("ap") final int ap,
 		@Field("mp") final int mp,

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * Basic instant effects that don't require special handling.
@@ -23,7 +23,7 @@ public class SimpleInstantEffect extends InstantEffect {
 
 	private final List<MapPoint> targets = new ArrayList<>();
 
-	@JSONConstructor
+	@JSON
 	private SimpleInstantEffect(
 		@Field("kind") final InstantEffectType kind,
 		@Field("targets") final Collection<MapPoint> targets,

@@ -3,7 +3,7 @@ package inthezone.battle;
 import inthezone.battle.status.StatusEffect;
 import java.util.Optional;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.JSONable;
 
 public class DamageToTarget implements JSONable {
@@ -15,7 +15,7 @@ public class DamageToTarget implements JSONable {
 	public final boolean pre;
 	public final boolean post;
 
-	@JSONConstructor
+	@JSON
 	public DamageToTarget(
 		@Field("target") final Casting target,
 		@Field("trap") final boolean isTargetATrap,

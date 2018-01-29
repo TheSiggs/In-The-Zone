@@ -3,7 +3,7 @@ package inthezone.battle.data;
 import java.util.Optional;
 import ssjsjs.JSONable;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 public class AbilityInfo implements JSONable {
 	public final boolean banned;
@@ -36,7 +36,7 @@ public class AbilityInfo implements JSONable {
 		return name;
 	}
 
-	@JSONConstructor
+	@JSON
 	public AbilityInfo(
 		@Field("banned") boolean banned,
 		@Field("name") String name,

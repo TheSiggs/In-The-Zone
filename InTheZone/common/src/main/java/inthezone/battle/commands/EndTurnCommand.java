@@ -6,7 +6,7 @@ import inthezone.battle.data.Player;
 import inthezone.protocol.ProtocolException;
 import java.util.ArrayList;
 import java.util.List;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.annotations.Field;
 
 /**
@@ -21,7 +21,7 @@ public class EndTurnCommand extends Command {
 		this.player = player;
 	}
 
-	@JSONConstructor
+	@JSON
 	private EndTurnCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("player") final Player player

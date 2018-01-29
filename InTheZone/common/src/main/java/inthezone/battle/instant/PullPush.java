@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * Push and pull instant effects.
@@ -60,7 +60,7 @@ public class PullPush extends InstantEffect {
 		this.isFear = isFear;
 	}
 
-	@JSONConstructor
+	@JSON
 	private PullPush(
 		@Field("kind") final InstantEffectType kind,
 		@Field("type") final InstantEffectInfo type,

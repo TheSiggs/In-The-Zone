@@ -8,7 +8,7 @@ import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * A character uses a command.
@@ -27,7 +27,7 @@ public class UseItemCommand extends Command {
 		this.target = target;
 	}
 
-	@JSONConstructor
+	@JSON
 	private UseItemCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("agent") final MapPoint agent,

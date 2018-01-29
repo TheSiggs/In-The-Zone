@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ssjsjs.JSONDeserializeException;
+import ssjsjs.JSONdecodeException;
 import ssjsjs.SSJSJS;
 
 /**
@@ -54,16 +54,16 @@ public class InstantEffectFactory {
 			switch (kind) {
 				case CLEANSE: /* fallthrough */
 				case DEFUSE: /* fallthrough */
-				case PURGE: return SSJSJS.deserialize(o, SimpleInstantEffect.class);
+				case PURGE: return SSJSJS.decode(o, SimpleInstantEffect.class);
 				case PUSH: /* fallthrough */
-				case PULL: return SSJSJS.deserialize(o, PullPush.class);
-				case TELEPORT: return SSJSJS.deserialize(o, Teleport.class);
-				case OBSTACLES: return SSJSJS.deserialize(o, Obstacles.class);
-				case MOVE: return SSJSJS.deserialize(o, Move.class);
-				case REVIVE: return SSJSJS.deserialize(o, Revive.class);
+				case PULL: return SSJSJS.decode(o, PullPush.class);
+				case TELEPORT: return SSJSJS.decode(o, Teleport.class);
+				case OBSTACLES: return SSJSJS.decode(o, Obstacles.class);
+				case MOVE: return SSJSJS.decode(o, Move.class);
+				case REVIVE: return SSJSJS.decode(o, Revive.class);
 				default: throw new ProtocolException("Unimplemented effect " + kind);
 			}
-		} catch (final JSONException|JSONDeserializeException|CorruptDataException  e) {
+		} catch (final JSONException|JSONdecodeException|CorruptDataException  e) {
 			throw new ProtocolException("Error parsing effect", e);
 		}
 	}

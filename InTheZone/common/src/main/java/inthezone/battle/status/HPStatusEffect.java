@@ -7,7 +7,7 @@ import inthezone.battle.data.StatusEffectInfo;
 import java.util.ArrayList;
 import java.util.List;
 import ssjsjs.annotations.Field;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 
 /**
  * A status effect that does ongoing damage or healing before the players turn.
@@ -15,7 +15,7 @@ import ssjsjs.annotations.JSONConstructor;
 public class HPStatusEffect extends StatusEffect {
 	private final int hp;
 
-	@JSONConstructor
+	@JSON
 	public HPStatusEffect(
 		@Field("info") final StatusEffectInfo info,
 		@Field("startTurn") final int startTurn,

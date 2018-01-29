@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.json.JSONObject;
-import ssjsjs.JSONDeserializeException;
-import ssjsjs.JSONSerializeException;
+import ssjsjs.JSONdecodeException;
+import ssjsjs.JSONencodeException;
 import ssjsjs.SSJSJS;
 
 /**
@@ -275,11 +275,11 @@ public class ClientConfig {
 	 * */
 	public void loadConfig(
 		final JSONObject json, final GameDataFactory gameData
-	) throws CorruptDataException, JSONDeserializeException {
+	) throws CorruptDataException, JSONdecodeException {
 		final Map<String, Object> env = new HashMap<>();
 		env.put("gameData", gameData);
 		env.put("defaultKeyBindingTable", defaultKeyBindingTable);
-		this.data = SSJSJS.deserialize(json, ClientConfigData.class, env);
+		this.data = SSJSJS.decode(json, ClientConfigData.class, env);
 	}
 
 	/**
@@ -303,8 +303,8 @@ public class ClientConfig {
 			final PrintWriter out = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(configFile), "UTF-8"))
 		) {
-			out.print(SSJSJS.serialize(data).toString());
-		} catch (final IOException|JSONSerializeException e) {
+			out.print(SSJSJS.encode(data).toString());
+		} catch (final IOException|JSONencodeException e) {
 			e.printStackTrace();
 			final Alert a = new Alert(Alert.AlertType.ERROR,
 				e.getMessage(), ButtonType.CLOSE);

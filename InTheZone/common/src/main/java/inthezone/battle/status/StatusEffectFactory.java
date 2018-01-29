@@ -8,7 +8,7 @@ import isogame.engine.CorruptDataException;
 import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ssjsjs.JSONDeserializeException;
+import ssjsjs.JSONdecodeException;
 import ssjsjs.SSJSJS;
 
 public class StatusEffectFactory {
@@ -53,13 +53,13 @@ public class StatusEffectFactory {
 
 			switch (info.type) {
 				case ONGOING:
-				case REGENERATION: return SSJSJS.deserialize(json, HPStatusEffect.class);
-				case FEARED: return SSJSJS.deserialize(json, FearedStatusEffect.class);
+				case REGENERATION: return SSJSJS.decode(json, HPStatusEffect.class);
+				case FEARED: return SSJSJS.decode(json, FearedStatusEffect.class);
 				default:
 					final int startTurn = json.getInt("startTurn");
 					return getEffect(info, startTurn, 0, null);
 			}
-		} catch (final CorruptDataException|JSONException|JSONDeserializeException e) {
+		} catch (final CorruptDataException|JSONException|JSONdecodeException e) {
 			throw new ProtocolException("Error parsing status effect " +
 				json.toString());
 		}

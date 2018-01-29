@@ -8,7 +8,7 @@ import inthezone.protocol.ProtocolException;
 import isogame.engine.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
-import ssjsjs.annotations.JSONConstructor;
+import ssjsjs.annotations.JSON;
 import ssjsjs.annotations.Field;
 
 /**
@@ -31,7 +31,7 @@ public class PushCommand extends Command {
 		this.effective = effective;
 	}
 
-	@JSONConstructor
+	@JSON
 	private PushCommand(
 		@Field("kind") final CommandKind kind,
 		@Field("agent") final MapPoint agent,
